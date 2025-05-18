@@ -1,5 +1,4 @@
 import { motion } from "framer-motion";
-
 import SectionSvg from "../assets/svg/SectionSvg";
 
 const Section = ({
@@ -14,12 +13,8 @@ const Section = ({
     <motion.section
       initial={{ opacity: 0 }}
       whileInView={{ opacity: 1 }}
-      transition={{
-        duration: 1.5,
-      }}
-      viewport={{
-        once: true,
-      }}
+      transition={{ duration: 1.5 }}
+      viewport={{ once: true }}
       id={id}
       className={`relative ${
         customPaddings ||
@@ -28,28 +23,26 @@ const Section = ({
     >
       {children}
 
-      {/* Garis kiri */}
+      {/* Garis vertikal kiri */}
       <div
-        className="hidden absolute top-0 left-3 w-0.25 h-full bg-stroke-1 pointer-events-none md:block lg:left-4 xl:left-5 z-30"
+        className="hidden absolute top-0 left-3 w-0.25 h-full bg-stroke-1 pointer-events-none md:block lg:left-4 xl:left-5 z-10"
         aria-hidden
       />
 
-      {/* Garis kanan */}
+      {/* Garis vertikal kanan */}
       <div
-        className="hidden absolute top-0 right-5 w-0.25 h-full bg-stroke-1 pointer-events-none md:block lg:right-7.5 xl:right-10 z-30"
+        className="hidden absolute top-0 right-5 w-0.25 h-full bg-stroke-1 pointer-events-none md:block lg:right-7.5 xl:right-10"
         aria-hidden
       />
 
       {crosses && (
         <>
-          {/* Garis horizontal di tengah */}
           <div
             className={`hidden absolute top-0 left-7.5 right-7.5 h-0.25 bg-stroke-1 ${
               crossesOffset || ""
-            } pointer-events-none lg:block xl:left-10 right-10 z-30`}
+            } pointer-events-none lg:block xl:left-10 right-10`}
             aria-hidden
           />
-
           <SectionSvg crossesOffset={`${crossesOffset || ""}`} />
         </>
       )}
