@@ -1,4 +1,4 @@
-import { motion } from "framer-motion";
+import { motion } from "framer-motion"; 
 import SectionSvg from "../assets/svg/SectionSvg";
 
 const Section = ({
@@ -27,8 +27,8 @@ const Section = ({
       {crosses && (
         <>
           <div
-            className={`hidden absolute top-0 left-7.5 right-7.5 h-0.25 bg-stroke-1 ${
-              crossesOffset || ""
+            className={`hidden absolute left-7.5 right-7.5 h-0.25 bg-stroke-1 ${
+              crossesOffset || "top-8"
             } pointer-events-none lg:block xl:left-10 xl:right-10`}
             aria-hidden
           />
