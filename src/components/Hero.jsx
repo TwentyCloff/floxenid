@@ -5,7 +5,7 @@ import { curve } from "../assets";
 import blackholeVideo from "../assets/hero/blackhole.webm";
 import Button from "./Button";
 import CompanyLogos from "./CompanyLogos";
-import { BackgroundCircles, BottomLine } from "./design/Hero";
+import { BottomLine } from "./design/Hero";
 import Section from "./Section";
 
 const Hero = () => {
@@ -71,11 +71,9 @@ const Hero = () => {
             Get started
           </Button>
         </div>
-
-        <BackgroundCircles />
       </div>
 
-      {/* Logos dan overlay cross */}
+      {/* Logos dan BottomLine */}
       <CompanyLogos className="relative z-10 mt-20" />
       <BottomLine className="relative z-20" />
     </Section>
