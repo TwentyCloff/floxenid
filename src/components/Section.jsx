@@ -13,12 +13,8 @@ const Section = ({
     <motion.section
       initial={{ opacity: 0 }}
       whileInView={{ opacity: 1 }}
-      transition={{
-        duration: 1.5,
-      }}
-      viewport={{
-        once: true,
-      }}
+      transition={{ duration: 1.5 }}
+      viewport={{ once: true }}
       id={id}
       className={`relative ${
         customPaddings ||
@@ -27,28 +23,19 @@ const Section = ({
     >
       {children}
 
-      {/* Garis kiri dan kanan dihapus supaya tidak muncul abu-abu */}
-      {/* 
-      <div
-        className="hidden absolute top-0 left-5 w-0.25 h-full bg-stroke-1 pointer-events-none md:block lg:left-7.5 xl:left-10"
-        aria-hidden
-      />
-      <div
-        className="hidden absolute top-0 left-5 w-0.25 h-full bg-stroke-1 pointer-events-none md:block lg:right-7.5 xl:right-10"
-        aria-hidden
-      /> 
-      */}
+      {/* Hapus garis kiri dan kanan vertikal */}
+      {/* Tidak ada tambahan garis abu kiri/kanan */}
 
+      {/* Cross garis horizontal atas (jika crosses true) */}
       {crosses && (
         <>
           <div
             className={`hidden absolute top-0 left-7.5 right-7.5 h-0.25 bg-stroke-1 ${
               crossesOffset || ""
-            } pointer-events-none lg:block xl:left-10 right-10`}
+            } pointer-events-none lg:block xl:left-10 xl:right-10`}
             aria-hidden
           />
-
-          <SectionSvg crossesOffset={`${crossesOffset || ""}`} />
+          <SectionSvg crossesOffset={crossesOffset || ""} />
         </>
       )}
     </motion.section>
