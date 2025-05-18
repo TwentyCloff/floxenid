@@ -13,11 +13,11 @@ const Hero = () => {
 
   return (
     <Section
-      className="pt-[12rem] -mt-[5.25rem]"
+      id="hero"
       crosses
       crossesOffset="lg:translate-y-[5.25rem]"
       customPaddings
-      id="hero"
+      className="pt-[12rem] -mt-[5.25rem] bg-[#0a0a0a] relative overflow-hidden" // tambah bg hitam + relative + overflow-hidden
     >
       {/* Background hitam full screen */}
       <div
@@ -25,7 +25,7 @@ const Hero = () => {
           position: "absolute",
           inset: 0,
           zIndex: -20,
-          backgroundColor: "#0a0a0a", // warna hitam abu-abu gelap
+          backgroundColor: "#0a0a0a",
         }}
       />
 
@@ -33,7 +33,7 @@ const Hero = () => {
       <div
         style={{
           position: "absolute",
-          top: "-10%", // agak ke atas
+          top: "-10%",
           left: "50%",
           transform: "translateX(-50%)",
           width: "120vw",
