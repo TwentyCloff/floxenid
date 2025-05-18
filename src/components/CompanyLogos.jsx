@@ -7,8 +7,10 @@ const stats = [
 
 const CompanyLogos = ({ className }) => {
   return (
-    <div className={`w-full bg-black py-12 ${className}`}>
-      {/* ⬇ Inner wrapper supaya tidak nabrak kiri-kanan */}
+    <div
+      className={`w-full bg-black py-12 pl-14 ${className}`}
+      // pl-14 = padding-left 56px untuk menghindari nabrak garis sidebar kiri
+    >
       <div className="max-w-screen-xl mx-auto px-4">
         <h5 className="tagline mb-6 text-center text-white/50">
           Helping people create beautiful content at
@@ -56,5 +58,6 @@ const CompanyLogos = ({ className }) => {
     </div>
   );
 };
+
 
 export default CompanyLogos;
