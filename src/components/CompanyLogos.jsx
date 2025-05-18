@@ -1,64 +1,43 @@
 const stats = [
-  { label: "Product Sold", value: "1,234" },
-  { label: "Total Customer", value: "567" },
-  { label: "Undetected Rate", value: "99.9%" },
-  { label: "Support Available", value: "24/7" },
+  { label: "Product Sold" },
+  { label: "Total Customer" },
+  { label: "Undetected Rate" },
+  { label: "Support Available" },
 ];
 
-const CompanyLogos = ({ className }) => {
+const CompanyLogos = () => {
   return (
-    <div
-      className={`relative w-full py-12 ${className}`}
-      style={{
-        backgroundColor: "transparent",  // transparan, no background
-        isolation: "isolate",             // isolasi dari efek filter video bawahnya
-        zIndex: 20,                      // lebih tinggi dari video (-10)
-      }}
-    >
-      <div className="max-w-screen-xl mx-auto px-4">
-        <h5 className="tagline mb-6 text-center text-white/50">
-          Helping people create beautiful content at
-        </h5>
-        <ul
+    <ul className="flex gap-6 justify-center flex-wrap px-2">
+      {stats.map((stat, i) => (
+        <li
+          key={i}
           className="
-            flex
-            gap-6
-            overflow-x-auto
-            no-scrollbar
-            snap-x snap-mandatory
-            scrollbar-thin scrollbar-thumb-indigo-500 scrollbar-track-transparent
-            px-2
-            md:overflow-x-visible
-            md:justify-center
-            md:flex-wrap
+            text-white
+            font-semibold
+            cursor-default
+            select-none
+            py-2 px-4
+            border-2
+            rounded-lg
+            border-transparent
+            bg-none
+            bg-clip-border
+            transition
+            hover:border-gradient-to-r
+            hover:from-indigo-500
+            hover:via-purple-500
+            hover:to-pink-500
           "
+          style={{
+            borderImageSlice: 1,
+            borderImageSource:
+              "linear-gradient(to right, #6366f1, #a855f7, #ec4899)",
+          }}
         >
-          {stats.map((stat, i) => (
-            <li
-              key={i}
-              className="
-                flex-shrink-0
-                snap-center
-                w-[70vw] md:w-[180px]
-                h-[120px]
-                rounded-2xl
-                border border-white/10
-                text-white
-                shadow-md
-                flex flex-col items-center justify-center
-                px-6 py-4
-                cursor-default
-                transition-transform duration-300 hover:scale-105
-                bg-[#1a1a1a]  /* kartu background agak gelap */
-              "
-            >
-              <p className="text-3xl font-bold">{stat.value}</p>
-              <p className="mt-2 text-sm font-semibold">{stat.label}</p>
-            </li>
-          ))}
-        </ul>
-      </div>
-    </div>
+          {stat.label}
+        </li>
+      ))}
+    </ul>
   );
 };
 
