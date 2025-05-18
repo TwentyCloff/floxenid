@@ -1,15 +1,14 @@
+const stats = [
+  { label: "Product Sold", value: "1,234" },
+  { label: "Total Customer", value: "567" },
+  { label: "Undetected Rate", value: "99.9%" },
+  { label: "Support Available", value: "24/7" },
+];
+
 const CompanyLogos = ({ className }) => {
   return (
-    <div className={`relative w-full py-20 overflow-hidden ${className}`}>
-      {/* Overlay background gelap sama seperti Hero */}
-      <div
-        className="absolute inset-0 bg-[#0a0a0a]"
-        style={{ zIndex: 0 }}
-        aria-hidden="true"
-      />
-
-      {/* Konten utama */}
-      <div className="relative z-10 max-w-screen-xl mx-auto px-4 text-white">
+    <div className={`relative w-full py-12 ${className}`}>
+      <div className="max-w-screen-xl mx-auto px-4">
         <h5 className="tagline mb-6 text-center text-white/50">
           Helping people create beautiful content at
         </h5>
@@ -27,12 +26,7 @@ const CompanyLogos = ({ className }) => {
             md:flex-wrap
           "
         >
-          {[
-            { label: "Product Sold", value: "1,234" },
-            { label: "Total Customer", value: "567" },
-            { label: "Undetected Rate", value: "99.9%" },
-            { label: "Support Available", value: "24/7" },
-          ].map((stat, i) => (
+          {stats.map((stat, i) => (
             <li
               key={i}
               className="
@@ -41,7 +35,6 @@ const CompanyLogos = ({ className }) => {
                 w-[70vw] md:w-[180px]
                 h-[120px]
                 rounded-2xl
-                bg-[#0a0a0a]
                 border border-white/10
                 text-white
                 shadow-md
@@ -49,6 +42,7 @@ const CompanyLogos = ({ className }) => {
                 px-6 py-4
                 cursor-default
                 transition-transform duration-300 hover:scale-105
+                bg-[#0a0a0a]
               "
             >
               <p className="text-3xl font-bold">{stat.value}</p>
