@@ -7,7 +7,7 @@ const stats = [
 
 const CompanyLogos = ({ className }) => {
   return (
-    <div className={`relative w-full py-12 ${className} z-[10]`}>
+    <div className={`relative w-full py-12 bg-[#0a0a0a] ${className}`}>
       {/* Background hitam pekat, full cover dan di bawah konten */}
       <div
         className="absolute inset-0 bg-[#0a0a0a] z-[-1]"
