@@ -7,55 +7,48 @@ const stats = [
 
 const CompanyLogos = ({ className }) => {
   return (
-    <div className={`${className} px-6 overflow-visible`}>
-      <h5 className="tagline mb-6 text-center text-n-1/50 font-semibold tracking-wide uppercase">
+    <div className={`${className} px-4 overflow-visible`}>
+      <h5 className="tagline mb-6 text-center text-n-1/50">
         Helping people create beautiful content at
       </h5>
-      <ul
-        className="
-          flex
-          gap-6
-          overflow-x-auto
-          no-scrollbar
-          flex-nowrap
-          px-1
-          scrollbar-none
-          justify-center
-          -mx-1
-        "
-      >
-        {stats.map((stat, i) => (
-          <li
-            key={i}
-            className="
-              flex-shrink-0
-              w-[160px]
-              h-[120px]
-              rounded-3xl
-              bg-gradient-to-tr from-indigo-600 via-purple-600 to-pink-600
-              text-white
-              shadow-xl
-              flex flex-col items-center justify-center
-              px-8 py-6
-              cursor-default
-              transition
-              duration-300
-              ease-in-out
-              hover:scale-105
-              hover:shadow-[0_15px_30px_rgba(130,90,230,0.6)]
-              hover:brightness-110
-            "
-            style={{ willChange: "transform, box-shadow, filter" }}
-          >
-            <p className="text-4xl font-extrabold tracking-tight drop-shadow-lg">
-              {stat.value}
-            </p>
-            <p className="mt-3 text-lg font-semibold tracking-wide drop-shadow-md">
-              {stat.label}
-            </p>
-          </li>
-        ))}
-      </ul>
+      <div className="w-full flex justify-center">
+        <ul
+          className="
+            flex 
+            gap-6
+            overflow-x-auto 
+            no-scrollbar
+            snap-x snap-mandatory
+            scrollbar-thin scrollbar-thumb-indigo-500 scrollbar-track-transparent
+            px-2
+            md:overflow-x-visible
+            md:justify-center
+            md:flex-wrap
+          "
+          style={{ maxWidth: "820px" }} // max width supaya pas desktop gak melebar ke tepi layar
+        >
+          {stats.map((stat, i) => (
+            <li
+              key={i}
+              className="
+                flex-shrink-0
+                snap-center
+                w-[70vw] md:w-[180px]
+                h-[110px] rounded-xl
+                bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500
+                text-white shadow-lg
+                flex flex-col items-center justify-center
+                px-6 py-4
+                cursor-default
+                transition-transform duration-300 hover:scale-105
+              "
+            >
+              <p className="text-3xl font-bold">{stat.value}</p>
+              <p className="mt-2 text-sm font-semibold">{stat.label}</p>
+            </li>
+          ))}
+        </ul>
+      </div>
     </div>
   );
 };
