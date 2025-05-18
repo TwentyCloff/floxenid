@@ -19,38 +19,18 @@ const Hero = () => {
       customPaddings
       className="pt-[12rem] -mt-[5.25rem] relative overflow-hidden"
     >
-      {/* Background hitam fullscreen fix */}
+      {/* Background hitam hanya dalam Hero section */}
       <div
-        style={{
-          position: "fixed",
-          top: 0,
-          left: 0,
-          width: "100vw",
-          height: "200vh",
-          backgroundColor: "#0a0a0a",
-          zIndex: -50,
-          pointerEvents: "none",
-        }}
+        className="absolute inset-0 bg-[#0a0a0a] z-[-20] pointer-events-none"
       />
 
-      {/* Video blackhole di atas background */}
+      {/* Video blackhole */}
       <video
         autoPlay
         muted
         loop
         playsInline
-        style={{
-          position: "absolute",
-          top: "-10%",
-          left: "50%",
-          transform: "translateX(-50%)",
-          width: "120vw",
-          height: "120vh",
-          objectFit: "cover",
-          filter: "brightness(0.6)",
-          zIndex: -10,
-          pointerEvents: "none",
-        }}
+        className="absolute top-[-10%] left-1/2 transform -translate-x-1/2 w-[120vw] h-[120vh] object-cover brightness-[0.6] z-[-10] pointer-events-none"
       >
         <source src={blackholeVideo} type="video/webm" />
       </video>
@@ -99,10 +79,8 @@ const Hero = () => {
         <BackgroundCircles />
       </div>
 
-      {/* CompanyLogos dengan z-10 agar tetap di bawah overlay cross */}
+      {/* Logos dan overlay cross */}
       <CompanyLogos className="relative z-10 mt-20" />
-
-      {/* Cross Overlay */}
       <BottomLine className="relative z-20" />
     </Section>
   );
