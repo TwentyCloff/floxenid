@@ -14,8 +14,6 @@ const Hero = () => {
   return (
     <Section
       id="hero"
-      crosses
-      crossesTop="7rem"  // Atur cross posisi vertikalnya di sini supaya tidak nabrak teks
       customPaddings
       className="pt-[12rem] -mt-[5.25rem] relative overflow-hidden"
     >
