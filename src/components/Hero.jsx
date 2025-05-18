@@ -1,7 +1,6 @@
 import { useRef } from "react";
 import Typewriter from "typewriter-effect";
 
-import { curve } from "../assets";
 import blackholeVideo from "../assets/hero/blackhole.webm";
 import Button from "./Button";
 import CompanyLogos from "./CompanyLogos";
@@ -17,25 +16,23 @@ const Hero = () => {
       customPaddings
       className="pt-[12rem] -mt-[5.25rem] relative overflow-hidden"
     >
+      {/* Background hitam hanya dalam Hero section */}
+      <div className="absolute inset-0 bg-[#0a0a0a] z-[-20] pointer-events-none" />
+
       {/* Video blackhole dengan filter brightness hanya di video */}
       <video
         autoPlay
         muted
         loop
         playsInline
-        className="absolute top-[-10%] left-1/2 transform -translate-x-1/2 w-[120vw] h-[120vh] object-cover brightness-[0.6] z-[-20] pointer-events-none"
+        className="absolute top-[-10%] left-1/2 transform -translate-x-1/2 w-[120vw] h-[120vh] object-cover brightness-[0.6] z-[-10] pointer-events-none"
       >
         <source src={blackholeVideo} type="video/webm" />
       </video>
 
-      {/* Wrapper untuk background gelap hanya di konten hero */}
-      <div className="relative z-10 max-w-[62rem] mx-auto">
-        <div
-          className="absolute inset-0 bg-[#0a0a0a]"
-          style={{ zIndex: -1, borderRadius: '1rem' }}
-        />
-        {/* Konten hero utama */}
-        <div ref={parallaxRef} className="relative text-center px-6 py-12 rounded-lg">
+      {/* Konten utama */}
+      <div ref={parallaxRef} className="container relative z-10">
+        <div className="relative max-w-[62rem] mx-auto text-center mb-[4rem] md:mb-20 lg:mb-[6rem]">
           <h1 className="h1 mb-6 text-white">
             Empower Your Scripts With
             <br />
@@ -58,13 +55,6 @@ const Hero = () => {
             Unlock the next level of game scripting{" "}
             <span className="inline-block relative font-semibold text-white">
               Qarvo
-              <img
-                src={curve}
-                className="absolute top-full left-0 w-full xl:-mt-2 pointer-events-none select-none"
-                width={624}
-                height={28}
-                alt="Curve"
-              />
             </span>
             .network
           </p>
@@ -75,11 +65,8 @@ const Hero = () => {
         </div>
       </div>
 
-      {/* CompanyLogos dan BottomLine tanpa background */}
-      <CompanyLogos
-        className="relative z-20 mt-20"
-        style={{ backgroundColor: 'transparent', isolation: 'isolate' }}
-      />
+      {/* Logos dan BottomLine */}
+      <CompanyLogos className="relative z-20 mt-20" />
       <BottomLine className="relative z-20" />
     </Section>
   );
