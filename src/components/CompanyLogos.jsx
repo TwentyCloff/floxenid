@@ -25,7 +25,7 @@ const CompanyLogos = ({ className }) => {
             md:justify-center
             md:flex-wrap
           "
-          style={{ maxWidth: "820px" }} // max width supaya pas desktop gak melebar ke tepi layar
+          style={{ maxWidth: "820px" }}
         >
           {stats.map((stat, i) => (
             <li
@@ -35,8 +35,8 @@ const CompanyLogos = ({ className }) => {
                 snap-center
                 w-[70vw] md:w-[180px]
                 h-[110px] rounded-xl
-                bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500
-                text-white shadow-lg
+                bg-black/60 border border-white/10
+                text-white shadow-md
                 flex flex-col items-center justify-center
                 px-6 py-4
                 cursor-default
