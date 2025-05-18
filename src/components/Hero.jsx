@@ -2,6 +2,7 @@ import { useRef } from "react";
 import Typewriter from "typewriter-effect";
 
 import { curve } from "../assets";
+import blackholeVideo from "../assets/hero/blackhole.webm";
 import Button from "./Button";
 import CompanyLogos from "./CompanyLogos";
 import { BackgroundCircles, BottomLine } from "./design/Hero";
@@ -12,16 +13,14 @@ const Hero = () => {
 
   return (
     <Section
-      className="pt-[12rem] -mt-[5.25rem]"
+      className="pt-[12rem] -mt-[5.25rem] bg-black min-h-screen relative overflow-hidden"
       crosses
       crossesOffset="lg:translate-y-[5.25rem]"
       customPaddings
       id="hero"
     >
-      <div ref={parallaxRef} className="container relative bg-black rounded-xl overflow-hidden">
-        {/* Tidak ada video background */}
-
-        <div className="relative z-10 max-w-[62rem] mx-auto text-center mb-[4rem] md:mb-20 lg:mb-[6rem]">
+      <div ref={parallaxRef} className="container relative z-20">
+        <div className="relative max-w-[62rem] mx-auto text-center mb-[4rem] md:mb-20 lg:mb-[6rem]">
           <h1 className="h1 mb-6 text-white">
             Empower Your Scripts With
             <br />
@@ -63,6 +62,20 @@ const Hero = () => {
         <BackgroundCircles />
 
         <CompanyLogos className="relative z-10 mt-20 block" />
+      </div>
+
+      {/* Video blackhole background di bawah teks */}
+      <div className="absolute inset-0 -z-10 flex justify-center items-start pt-16 overflow-hidden">
+        <video
+          autoPlay
+          muted
+          loop
+          playsInline
+          className="w-[120vw] max-w-none object-cover brightness-60 mix-blend-screen -translate-y-12"
+        >
+          <source src={blackholeVideo} type="video/webm" />
+          Your browser does not support the video tag.
+        </video>
       </div>
 
       <BottomLine />
