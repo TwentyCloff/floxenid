@@ -7,20 +7,21 @@ const stats = [
 
 const CompanyLogos = ({ className }) => {
   return (
-    <div className={`${className} px-4 overflow-visible`}>
+    <div className={`${className} px-6 overflow-visible`}>
       <h5 className="tagline mb-6 text-center text-n-1/50 font-semibold tracking-wide uppercase">
         Helping people create beautiful content at
       </h5>
       <ul
         className="
           flex
-          gap-8
+          gap-6
           overflow-x-auto
           no-scrollbar
           flex-nowrap
-          px-2
-          scrollbar-thin scrollbar-thumb-indigo-400 scrollbar-track-transparent
+          px-1
+          scrollbar-none
           justify-center
+          -mx-1
         "
       >
         {stats.map((stat, i) => (
@@ -30,23 +31,21 @@ const CompanyLogos = ({ className }) => {
               flex-shrink-0
               w-[160px]
               h-[120px]
-              rounded-2xl
-              bg-white/20 backdrop-blur-md
-              border border-white/30
+              rounded-3xl
+              bg-gradient-to-tr from-indigo-600 via-purple-600 to-pink-600
               text-white
-              shadow-lg
+              shadow-xl
               flex flex-col items-center justify-center
               px-8 py-6
               cursor-default
               transition
-              duration-400
+              duration-300
               ease-in-out
-              hover:scale-[1.07]
-              hover:shadow-[0_15px_25px_rgba(130,90,230,0.5)]
-              hover:border-indigo-400
-              hover:bg-gradient-to-r hover:from-indigo-600/70 hover:via-purple-600/70 hover:to-pink-600/70
+              hover:scale-105
+              hover:shadow-[0_15px_30px_rgba(130,90,230,0.6)]
+              hover:brightness-110
             "
-            style={{ willChange: "transform, box-shadow, background-color" }}
+            style={{ willChange: "transform, box-shadow, filter" }}
           >
             <p className="text-4xl font-extrabold tracking-tight drop-shadow-lg">
               {stat.value}
