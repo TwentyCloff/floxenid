@@ -1,18 +1,11 @@
-const stats = [
-  { label: "Product Sold", value: "1,234" },
-  { label: "Total Customer", value: "567" },
-  { label: "Undetected Rate", value: "99.9%" },
-  { label: "Support Available", value: "24/7" },
-];
-
 const CompanyLogos = ({ className }) => {
   return (
     <div
-      className={`w-full bg-black py-12 pl-14 ${className}`}
+      className={`w-full py-12 pl-14 ${className}`}
       // pl-14 = padding-left 56px untuk menghindari nabrak garis sidebar kiri
     >
       <div className="max-w-screen-xl mx-auto px-4">
-        <h5 className="tagline mb-6 text-center text-white/50">
+        <h5 className="tagline mb-6 text-center text-black/50">
           Helping people create beautiful content at
         </h5>
         <ul
@@ -38,10 +31,10 @@ const CompanyLogos = ({ className }) => {
                 w-[70vw] md:w-[180px]
                 h-[120px]
                 rounded-2xl
-                bg-white/10
+                bg-transparent
                 backdrop-blur-md
-                border border-white/20
-                text-white
+                border border-black/20
+                text-black
                 shadow-md
                 flex flex-col items-center justify-center
                 px-6 py-4
@@ -58,6 +51,3 @@ const CompanyLogos = ({ className }) => {
     </div>
   );
 };
-
-
-export default CompanyLogos;
