@@ -28,14 +28,14 @@ const Hero = () => {
         <source src={blackholeVideo} type="video/webm" />
       </video>
 
-      {/* Background hitam hanya di hero content container */}
-      <div className="absolute inset-0 z-[-10] pointer-events-none">
-        <div className="h-[300px] bg-[#0a0a0a] mx-auto max-w-[62rem]" />
-      </div>
-
-      {/* Konten utama hero (judul, button) */}
-      <div ref={parallaxRef} className="container relative z-10">
-        <div className="relative max-w-[62rem] mx-auto text-center mb-[4rem] md:mb-20 lg:mb-[6rem]">
+      {/* Wrapper untuk background gelap hanya di konten hero */}
+      <div className="relative z-10 max-w-[62rem] mx-auto">
+        <div
+          className="absolute inset-0 bg-[#0a0a0a]"
+          style={{ zIndex: -1, borderRadius: '1rem' }}
+        />
+        {/* Konten hero utama */}
+        <div ref={parallaxRef} className="relative text-center px-6 py-12 rounded-lg">
           <h1 className="h1 mb-6 text-white">
             Empower Your Scripts With
             <br />
@@ -75,8 +75,11 @@ const Hero = () => {
         </div>
       </div>
 
-      {/* CompanyLogos dan BottomLine */}
-      <CompanyLogos className="relative z-20 mt-20" />
+      {/* CompanyLogos dan BottomLine tanpa background */}
+      <CompanyLogos
+        className="relative z-20 mt-20"
+        style={{ backgroundColor: 'transparent', isolation: 'isolate' }}
+      />
       <BottomLine className="relative z-20" />
     </Section>
   );
