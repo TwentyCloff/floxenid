@@ -1,8 +1,7 @@
-import { useRef } from "react";
+import { useRef, useState, useEffect } from "react";
 import { ScrollParallax } from "react-just-parallax";
-import Typewriter from "typewriter-effect";
 
-import { curve, heroBackground } from "../assets";
+import { heroBackground } from "../assets";
 import { heroIcons } from "../constants";
 import Button from "./Button";
 import CompanyLogos from "./CompanyLogos";
@@ -13,34 +12,26 @@ import Section from "./Section";
 import sample1 from "../assets/hero/sample1.jpg";
 import sample2 from "../assets/hero/sample2.jpg";
 
-import { useEffect, useState } from "react";
-
-const products = [
-  {
-    image: sample1,
-    name: "Qarvo Executor",
-    description: "High-performance script execution."
-  },
-  {
-    image: sample2,
-    name: "Qarvo Hub",
-    description: "All-in-one GUI for Roblox exploits."
-  }
-];
+const products = [sample1, sample2];
 
 const Hero = () => {
   const parallaxRef = useRef(null);
-  const [index, setIndex] = useState(0);
+  const [current, setCurrent] = useState(0);
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setIndex((prev) => (prev + 1) % products.length);
-    }, 4000);
+      setCurrent((prev) => (prev + 1) % products.length);
+    }, 4000); // 4 seconds
     return () => clearInterval(interval);
   }, []);
 
-  const prevSlide = () => setIndex((index - 1 + products.length) % products.length);
-  const nextSlide = () => setIndex((index + 1) % products.length);
+  const nextSlide = () => {
+    setCurrent((prev) => (prev + 1) % products.length);
+  };
+
+  const prevSlide = () => {
+    setCurrent((prev) => (prev - 1 + products.length) % products.length);
+  };
 
   return (
     <Section
@@ -55,35 +46,11 @@ const Hero = () => {
           <h1 className="h1 mb-6">
             Empower Your Scripts With
             <br />
-            <Typewriter
-              options={{
-                strings: [
-                  "Fast Execution",
-                  "Continuous Improvement",
-                  "24/7 Support",
-                  "User-Friendly Interface",
-                  "Optimized Performance",
-                ],
-                autoStart: true,
-                loop: true,
-              }}
-            />
+            <span className="text-gradient">Qarvo</span>.network
           </h1>
-
           <p className="body-1 max-w-3xl mx-auto mb-6 text-n-2 lg:mb-8">
-            Unlock the next level of game scripting
-            with{" "}
-            <span className="inline-block relative font-semibold">
-              Qarvo
-              <img
-                src={curve}
-                className="absolute top-full left-0 w-full xl:-mt-2 pointer-events-none select-none"
-                width={624}
-                height={28}
-                alt="Curve"
-              />
-            </span>
-            .network
+            Unlock the next level of game scripting with{" "}
+            <span className="font-semibold">Qarvo.network</span>
           </p>
 
           <Button href="#pricing" white>
@@ -91,37 +58,37 @@ const Hero = () => {
           </Button>
         </div>
 
-        <div className="relative max-w-[23rem] mx-auto md:max-w-5xl xl:mb-24">
-          <div className="relative z-1 p-0.5 rounded-2xl bg-conic-gradient">
-            <div className="relative bg-n-8 rounded-[1rem]">
-              <div className="h-[1.4rem] bg-n-10 rounded-t-[0.9rem]" />
+        <div className="relative max-w-5xl mx-auto xl:mb-24">
+          <div className="relative rounded-[1.5rem] overflow-hidden">
+            <img
+              src={products[current]}
+              alt={`Product ${current}`}
+              className="w-full h-auto object-cover rounded-[1.5rem] shadow-none pointer-events-none select-none transition-all duration-500"
+            />
 
-              <div className="aspect-[33/40] rounded-b-[0.9rem] overflow-hidden md:aspect-[688/490] lg:aspect-[1024/490] flex items-center justify-center relative">
-                {products.map((product, i) => (
-                  <div
-                    key={i}
-                    className={`absolute transition-opacity duration-700 ease-in-out w-full h-full flex flex-col items-center justify-center text-center p-4 ${index === i ? 'opacity-100' : 'opacity-0'}`}
-                  >
-                    <img src={product.image} alt={product.name} className="rounded-xl w-auto h-60 object-contain mb-4" />
-                    <h3 className="text-xl font-bold text-white">{product.name}</h3>
-                    <p className="text-sm text-n-2">{product.description}</p>
-                  </div>
-                ))}
-                <button onClick={prevSlide} className="absolute left-4 top-1/2 -translate-y-1/2 text-white text-2xl">❮</button>
-                <button onClick={nextSlide} className="absolute right-4 top-1/2 -translate-y-1/2 text-white text-2xl">❯</button>
-              </div>
-            </div>
-
-            <Gradient />
+            {/* Navigation arrows */}
+            <button
+              onClick={prevSlide}
+              className="absolute top-1/2 left-4 transform -translate-y-1/2 text-white text-3xl bg-black/30 hover:bg-black/50 rounded-full px-3 py-2"
+            >
+              ‹
+            </button>
+            <button
+              onClick={nextSlide}
+              className="absolute top-1/2 right-4 transform -translate-y-1/2 text-white text-3xl bg-black/30 hover:bg-black/50 rounded-full px-3 py-2"
+            >
+              ›
+            </button>
           </div>
 
+          {/* Background */}
           <div className="absolute -top-[54%] left-1/2 w-[234%] -translate-x-1/2 md:-top-[46%] md:w-[138%] lg:-top-[104%]">
             <img
               src={heroBackground}
               className="w-full pointer-events-none select-none"
               width={1440}
               height={1800}
-              alt="Hero"
+              alt="Hero background"
             />
           </div>
 
