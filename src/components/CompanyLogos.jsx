@@ -7,38 +7,33 @@ const stats = [
 
 const CompanyLogos = () => {
   return (
-    <ul className="flex gap-6 justify-center flex-wrap px-2">
-      {stats.map((stat, i) => (
-        <li
-          key={i}
-          className="
-            text-white
-            font-semibold
-            cursor-default
-            select-none
-            py-4 px-6
-            border-2
-            rounded-xl
-            transition
-            flex flex-col items-center justify-center
-            w-[150px] h-[100px]
-          "
-          style={{
-            borderImageSlice: 1,
-            borderImageSource:
-              "linear-gradient(to right, #6366f1, #a855f7, #ec4899)",
-            borderImageWidth: 1,
-            borderImageOutset: 0,
-            borderImageRepeat: "stretch",
-            borderStyle: "solid",
-            background: "none",
-          }}
-        >
-          <span className="text-2xl font-bold">{stat.value}</span>
-          <span className="text-sm mt-1">{stat.label}</span>
-        </li>
-      ))}
-    </ul>
+    <div className="w-full px-4 py-12">
+      <h5 className="text-center text-white/50 mb-6">
+        Helping people create beautiful content at
+      </h5>
+      <ul className="flex flex-wrap justify-center gap-6">
+        {stats.map((stat, i) => (
+          <li
+            key={i}
+            className="text-white text-center px-6 py-4 rounded-2xl border"
+            style={{
+              borderWidth: "2px",
+              borderStyle: "solid",
+              borderImageSource:
+                "linear-gradient(to right, #6366f1, #a855f7, #ec4899)",
+              borderImageSlice: 1,
+              background: "none",
+              backgroundClip: "padding-box",
+              WebkitBackgroundClip: "padding-box",
+              MozBackgroundClip: "padding-box",
+            }}
+          >
+            <p className="text-3xl font-bold">{stat.value}</p>
+            <p className="mt-2 text-sm font-semibold">{stat.label}</p>
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 };
 
