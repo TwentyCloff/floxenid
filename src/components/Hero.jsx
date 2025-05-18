@@ -20,28 +20,24 @@ const Hero = () => {
       id="hero"
     >
       <div ref={parallaxRef} className="container relative">
-        {/* Wrapper teks dan video background */}
-        <div className="relative max-w-[62rem] mx-auto mb-[4rem] md:mb-20 lg:mb-[6rem] text-center">
-          
-          {/* Video Background di belakang teks */}
-          <div className="absolute inset-0 -z-10 rounded-xl overflow-hidden">
-            <video
-              autoPlay
-              muted
-              loop
-              playsInline
-              className="w-full h-full object-cover brightness-50"
-            >
-              <source src={blackholeVideo} type="video/webm" />
-              Your browser does not support the video tag.
-            </video>
-            
-            {/* Overlay warna hitam abu-abu semi transparan supaya teks tetap terbaca */}
-            <div className="absolute inset-0 bg-black bg-opacity-60" />
-          </div>
+        {/* Video background, besar, naik ke atas, blend mode */}
+        <div className="absolute inset-0 -z-10 rounded-xl overflow-hidden -top-12 scale-[1.2] origin-top">
+          <video
+            autoPlay
+            muted
+            loop
+            playsInline
+            className="w-full h-full object-cover brightness-60 mix-blend-screen"
+          >
+            <source src={blackholeVideo} type="video/webm" />
+            Your browser does not support the video tag.
+          </video>
+          {/* Overlay hitam semi transparan supaya tetap gelap */}
+          <div className="absolute inset-0 bg-black bg-opacity-50" />
+        </div>
 
-          {/* Teks utama */}
-          <h1 className="h1 mb-6 relative z-10 text-white">
+        <div className="relative z-10 max-w-[62rem] mx-auto text-center mb-[4rem] md:mb-20 lg:mb-[6rem]">
+          <h1 className="h1 mb-6 text-white">
             Empower Your Scripts With
             <br />
             <Typewriter
@@ -59,9 +55,9 @@ const Hero = () => {
             />
           </h1>
 
-          <p className="body-1 max-w-3xl mx-auto mb-6 text-n-2 relative z-10 text-gray-300 lg:mb-8">
+          <p className="body-1 max-w-3xl mx-auto mb-6 text-gray-300 lg:mb-8">
             Unlock the next level of game scripting{" "}
-            <span className="inline-block relative font-semibold text-white">
+            <span className="inline-block relative font-semibold">
               Qarvo
               <img
                 src={curve}
@@ -74,12 +70,11 @@ const Hero = () => {
             .network
           </p>
 
-          <Button href="#pricing" white className="relative z-10">
+          <Button href="#pricing" white>
             Get started
           </Button>
         </div>
 
-        {/* Background circles dan logo tetap di bawah */}
         <BackgroundCircles />
 
         <CompanyLogos className="relative z-10 mt-20 block" />
