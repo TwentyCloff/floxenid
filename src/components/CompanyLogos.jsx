@@ -7,14 +7,7 @@ const stats = [
 
 const CompanyLogos = ({ className }) => {
   return (
-    <div
-      className={`relative w-full py-12 ${className}`}
-      style={{
-        backgroundColor: 'transparent', // transparan biar gak kena filter
-        isolation: 'isolate',             // supaya layer ini gak bercampur efek filter parent
-        zIndex: 20,                      // lebih tinggi dari video (-10) dan bg (-20)
-      }}
-    >
+    <div className={`relative w-full py-12 ${className}`}>
       <div className="max-w-screen-xl mx-auto px-4">
         <h5 className="tagline mb-6 text-center text-white/50">
           Helping people create beautiful content at
@@ -49,7 +42,7 @@ const CompanyLogos = ({ className }) => {
                 px-6 py-4
                 cursor-default
                 transition-transform duration-300 hover:scale-105
-                bg-[#1a1a1a]  /* kartu tetap ada background agak gelap */
+                bg-transparent
               "
             >
               <p className="text-3xl font-bold">{stat.value}</p>
