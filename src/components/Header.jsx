@@ -42,7 +42,7 @@ const Header = () => {
             src={brainwave}
             width={190}
             height={40}
-            alt="Qarvo.Net"
+            alt="Brainwave"
             className="pointer-events-none select-none"
           />
         </a>
