@@ -7,11 +7,16 @@ const stats = [
 
 const CompanyLogos = ({ className }) => {
   return (
-    <div className={`relative w-full py-12 bg-[#0a0a0a] rounded-l-[1rem] ${className}`}>
-      {/* Overlay gelap untuk menutupi abu-abu */}
-      <div className="absolute inset-0 bg-[#0a0a0a] pointer-events-none rounded-l-[1rem] -z-10" />
+    <div className={`relative w-full py-12 rounded-l-[1rem] overflow-hidden ${className}`}>
+      {/* Background gelap solid, di depan background abu-abu tapi di belakang konten */}
+      <div
+        className="absolute inset-0 bg-[#0a0a0a]"
+        style={{ zIndex: -10 }}
+        aria-hidden="true"
+      />
 
-      <div className="max-w-screen-xl mx-auto px-4 relative z-10">
+      {/* Konten company */}
+      <div className="max-w-screen-xl mx-auto px-4 relative z-10 text-white">
         <h5 className="tagline mb-6 text-center text-white/50">
           Helping people create beautiful content at
         </h5>
@@ -59,4 +64,3 @@ const CompanyLogos = ({ className }) => {
 };
 
 export default CompanyLogos;
-
