@@ -1,6 +1,7 @@
 import { useRef } from "react";
 import Typewriter from "typewriter-effect";
 
+import { curve } from "../assets";
 import blackholeVideo from "../assets/hero/blackhole.webm";
 import Button from "./Button";
 import CompanyLogos from "./CompanyLogos";
@@ -55,6 +56,13 @@ const Hero = () => {
             Unlock the next level of game scripting{" "}
             <span className="inline-block relative font-semibold text-white">
               Qarvo
+              <img
+                src={curve}
+                className="absolute top-full left-0 w-full xl:-mt-2 pointer-events-none select-none"
+                width={624}
+                height={28}
+                alt="Curve"
+              />
             </span>
             .network
           </p>
@@ -65,7 +73,7 @@ const Hero = () => {
         </div>
       </div>
 
-      {/* Logos dan BottomLine */}
+      {/* CompanyLogos dan BottomLine */}
       <CompanyLogos className="relative z-20 mt-20" />
       <BottomLine className="relative z-20" />
     </Section>
