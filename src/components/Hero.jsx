@@ -28,8 +28,10 @@ const Hero = () => {
         <source src={blackholeVideo} type="video/webm" />
       </video>
 
-      {/* Background hitam hanya untuk hero content (container) */}
-      <div className="absolute inset-0 bg-[#0a0a0a] z-[-10] pointer-events-none" />
+      {/* Background hitam hanya di hero content container */}
+      <div className="absolute inset-0 z-[-10] pointer-events-none">
+        <div className="h-[300px] bg-[#0a0a0a] mx-auto max-w-[62rem]" />
+      </div>
 
       {/* Konten utama hero (judul, button) */}
       <div ref={parallaxRef} className="container relative z-10">
@@ -73,10 +75,8 @@ const Hero = () => {
         </div>
       </div>
 
-      {/* CompanyLogos tanpa background gelap, di atas video */}
+      {/* CompanyLogos dan BottomLine */}
       <CompanyLogos className="relative z-20 mt-20" />
-
-      {/* BottomLine juga di atas video */}
       <BottomLine className="relative z-20" />
     </Section>
   );
