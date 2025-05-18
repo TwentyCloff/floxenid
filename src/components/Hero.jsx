@@ -2,7 +2,6 @@ import { useRef } from "react";
 import Typewriter from "typewriter-effect";
 
 import { curve } from "../assets";
-import blackholeVideo from "../assets/hero/blackhole.webm";
 import Button from "./Button";
 import CompanyLogos from "./CompanyLogos";
 import { BackgroundCircles, BottomLine } from "./design/Hero";
@@ -19,22 +18,8 @@ const Hero = () => {
       customPaddings
       id="hero"
     >
-      <div ref={parallaxRef} className="container relative">
-        {/* Video background, besar, naik ke atas, blend mode */}
-        <div className="absolute inset-0 -z-10 rounded-xl overflow-hidden -top-12 scale-[1.2] origin-top">
-          <video
-            autoPlay
-            muted
-            loop
-            playsInline
-            className="w-full h-full object-cover brightness-60 mix-blend-screen"
-          >
-            <source src={blackholeVideo} type="video/webm" />
-            Your browser does not support the video tag.
-          </video>
-          {/* Overlay hitam semi transparan supaya tetap gelap */}
-          <div className="absolute inset-0 bg-black bg-opacity-50" />
-        </div>
+      <div ref={parallaxRef} className="container relative bg-black rounded-xl overflow-hidden">
+        {/* Tidak ada video background */}
 
         <div className="relative z-10 max-w-[62rem] mx-auto text-center mb-[4rem] md:mb-20 lg:mb-[6rem]">
           <h1 className="h1 mb-6 text-white">
