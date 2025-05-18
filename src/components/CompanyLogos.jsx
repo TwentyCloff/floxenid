@@ -7,11 +7,12 @@ const stats = [
 
 const CompanyLogos = ({ className }) => {
   return (
-    <div className={`w-full bg-black py-12 px-4 ${className}`}>
-      <h5 className="tagline mb-6 text-center text-white/50">
-        Helping people create beautiful content at
-      </h5>
-      <div className="w-full flex justify-center">
+    <div className={`w-full bg-black py-12 ${className}`}>
+      {/* ⬇ Inner wrapper supaya tidak nabrak kiri-kanan */}
+      <div className="max-w-screen-xl mx-auto px-4">
+        <h5 className="tagline mb-6 text-center text-white/50">
+          Helping people create beautiful content at
+        </h5>
         <ul
           className="
             flex 
@@ -25,7 +26,6 @@ const CompanyLogos = ({ className }) => {
             md:justify-center
             md:flex-wrap
           "
-          style={{ maxWidth: "1200px" }}
         >
           {stats.map((stat, i) => (
             <li
