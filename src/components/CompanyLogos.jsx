@@ -1,4 +1,4 @@
-const stats = [
+const stats = [ 
   { label: "Product Sold", value: "1,234" },
   { label: "Total Customer", value: "567" },
   { label: "Undetected Rate", value: "99.9%" },
@@ -42,7 +42,7 @@ const CompanyLogos = ({ className }) => {
                 px-6 py-4
                 cursor-default
                 transition-transform duration-300 hover:scale-105
-                bg-[#0a0a0a]
+                bg-[#141414]
               "
             >
               <p className="text-3xl font-bold">{stat.value}</p>
