@@ -43,7 +43,8 @@ const Hero = () => {
           </h1>
 
           <p className="body-1 max-w-3xl mx-auto mb-6 text-n-2 lg:mb-8">
-            "Unlock the next level of game scripting with{" "}
+            Unlock the next level of game scripting 
+            with{" "}
             <span className="inline-block relative font-semibold">
               Qarvo
               <img
@@ -54,7 +55,7 @@ const Hero = () => {
                 alt="Curve"
               />
             </span>
-            .Network
+            .network
           </p>
 
           <Button href="#pricing" white>
