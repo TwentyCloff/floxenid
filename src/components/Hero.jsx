@@ -4,7 +4,6 @@ import Typewriter from "typewriter-effect";
 import { curve } from "../assets";
 import blackholeVideo from "../assets/hero/blackhole.webm";
 import Button from "./Button";
-import CompanyLogos from "./CompanyLogos";
 import { BottomLine } from "./design/Hero";
 import Section from "./Section";
 
@@ -73,8 +72,7 @@ const Hero = () => {
         </div>
       </div>
 
-      {/* CompanyLogos dan BottomLine */}
-      <CompanyLogos className="relative z-20 mt-20" />
+      {/* BottomLine saja, CompanyLogos dihapus */}
       <BottomLine className="relative z-20" />
     </Section>
   );
