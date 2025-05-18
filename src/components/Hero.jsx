@@ -13,13 +13,54 @@ const Hero = () => {
 
   return (
     <Section
-      className="pt-[12rem] -mt-[5.25rem] bg-black min-h-screen relative overflow-hidden"
+      className="pt-[12rem] -mt-[5.25rem]"
       crosses
       crossesOffset="lg:translate-y-[5.25rem]"
       customPaddings
       id="hero"
     >
-      <div ref={parallaxRef} className="container relative z-20">
+      {/* Background hitam full screen */}
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          zIndex: -20,
+          backgroundColor: "#0a0a0a", // warna hitam abu-abu gelap
+        }}
+      />
+
+      {/* Video blackhole di belakang */}
+      <div
+        style={{
+          position: "absolute",
+          top: "-10%", // agak ke atas
+          left: "50%",
+          transform: "translateX(-50%)",
+          width: "120vw",
+          height: "120vh",
+          zIndex: -15,
+          overflow: "hidden",
+          pointerEvents: "none",
+        }}
+      >
+        <video
+          autoPlay
+          muted
+          loop
+          playsInline
+          style={{
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+            filter: "brightness(0.6)",
+          }}
+          onError={() => console.log("Video error loading blackhole")}
+        >
+          <source src={blackholeVideo} type="video/webm" />
+        </video>
+      </div>
+
+      <div ref={parallaxRef} className="container relative z-10">
         <div className="relative max-w-[62rem] mx-auto text-center mb-[4rem] md:mb-20 lg:mb-[6rem]">
           <h1 className="h1 mb-6 text-white">
             Empower Your Scripts With
@@ -39,9 +80,9 @@ const Hero = () => {
             />
           </h1>
 
-          <p className="body-1 max-w-3xl mx-auto mb-6 text-gray-300 lg:mb-8">
+          <p className="body-1 max-w-3xl mx-auto mb-6 text-n-2 lg:mb-8 text-gray-300">
             Unlock the next level of game scripting{" "}
-            <span className="inline-block relative font-semibold">
+            <span className="inline-block relative font-semibold text-white">
               Qarvo
               <img
                 src={curve}
@@ -62,20 +103,6 @@ const Hero = () => {
         <BackgroundCircles />
 
         <CompanyLogos className="relative z-10 mt-20 block" />
-      </div>
-
-      {/* Video blackhole background di bawah teks */}
-      <div className="absolute inset-0 -z-10 flex justify-center items-start pt-16 overflow-hidden">
-        <video
-          autoPlay
-          muted
-          loop
-          playsInline
-          className="w-[120vw] max-w-none object-cover brightness-60 mix-blend-screen -translate-y-12"
-        >
-          <source src={blackholeVideo} type="video/webm" />
-          Your browser does not support the video tag.
-        </video>
       </div>
 
       <BottomLine />
