@@ -23,17 +23,9 @@ const Hero = () => {
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % images.length);
-    }, 4000); // Ganti gambar setiap 4 detik
+    }, 4000);
     return () => clearInterval(interval);
   }, []);
-
-  const handlePrev = () => {
-    setCurrentSlide((prev) => (prev - 1 + images.length) % images.length);
-  };
-
-  const handleNext = () => {
-    setCurrentSlide((prev) => (prev + 1) % images.length);
-  };
 
   return (
     <Section
@@ -64,7 +56,8 @@ const Hero = () => {
           </h1>
 
           <p className="body-1 max-w-3xl mx-auto mb-6 text-n-2 lg:mb-8">
-            Unlock the next level of game scripting with{" "}
+            Unlock the next level of game scripting 
+            with{" "}
             <span className="inline-block relative font-semibold">
               Qarvo
               <img
@@ -83,27 +76,14 @@ const Hero = () => {
           </Button>
         </div>
 
-        <div className="relative max-w-[45rem] mx-auto mb-16 lg:mb-24">
-          <div className="relative rounded-[1.5rem] overflow-hidden shadow-none bg-transparent">
+        <div className="relative max-w-5xl mx-auto xl:mb-24">
+          {/* Removed conic-border wrapper */}
+          <div className="relative overflow-hidden rounded-[1.5rem]">
             <img
               src={images[currentSlide]}
               alt={`Slide ${currentSlide + 1}`}
-              className="w-full h-auto object-cover rounded-[1.5rem]"
+              className="w-full object-cover h-auto rounded-[1.5rem]"
             />
-
-            {/* Navigasi panah */}
-            <button
-              onClick={handlePrev}
-              className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-white/20 hover:bg-white/40 p-2 rounded-full"
-            >
-              ←
-            </button>
-            <button
-              onClick={handleNext}
-              className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-white/20 hover:bg-white/40 p-2 rounded-full"
-            >
-              →
-            </button>
 
             <Generating className="absolute left-4 right-4 bottom-5 md:left-1/2 md:right-auto md:bottom-8 md:w-[31rem] md:-translate-x-1/2" />
 
@@ -126,19 +106,19 @@ const Hero = () => {
           </div>
 
           <Gradient />
-        </div>
 
-        <div className="absolute -top-[54%] left-1/2 w-[234%] -translate-x-1/2 md:-top-[46%] md:w-[138%] lg:-top-[104%]">
-          <img
-            src={heroBackground}
-            className="w-full pointer-events-none select-none"
-            width={1440}
-            height={1800}
-            alt="Hero"
-          />
-        </div>
+          <div className="absolute -top-[54%] left-1/2 w-[234%] -translate-x-1/2 md:-top-[46%] md:w-[138%] lg:-top-[104%]">
+            <img
+              src={heroBackground}
+              className="w-full pointer-events-none select-none"
+              width={1440}
+              height={1800}
+              alt="Hero"
+            />
+          </div>
 
-        <BackgroundCircles />
+          <BackgroundCircles />
+        </div>
 
         <CompanyLogos className="hidden relative z-10 mt-20 lg:block" />
       </div>
