@@ -15,32 +15,13 @@ const Hero = () => {
     <Section
       id="hero"
       customPaddings
-      className="pt-[12rem] -mt-[5.25rem] relative overflow-hidden"
-      style={{ isolation: "isolate" }}  // pisahkan stacking context
+      className="pt-[12rem] -mt-[5.25rem] relative overflow-visible"
     >
-      {/* Background hitam, tanpa filter */}
-      <div
-        className="absolute inset-0 bg-[#0a0a0a] z-[-20] pointer-events-none"
-        style={{ filter: "none" }}  // pastikan no filter di sini
-      />
-
-      {/* Video blackhole berdiri sendiri, dengan filter hanya di video */}
-      <video
-        autoPlay
-        muted
-        loop
-        playsInline
-        className="fixed top-0 left-1/2 transform -translate-x-1/2 w-[120vw] h-[120vh] object-cover brightness-[0.6] z-[-30] pointer-events-none"
-        style={{ filter: "brightness(0.6)" }}  // filter di sini aja
-      >
-        <source src={blackholeVideo} type="video/webm" />
-      </video>
-
-      {/* Konten utama (container) */}
+      {/* Konten utama dan CompanyLogos tanpa background, transparan */}
       <div
         ref={parallaxRef}
-        className="container relative z-10"
-        style={{ isolation: "isolate" }} // layer ini bebas filter
+        className="container relative z-20"
+        style={{ isolation: "isolate" }}
       >
         <div className="relative max-w-[62rem] mx-auto text-center mb-[4rem] md:mb-20 lg:mb-[6rem]">
           <h1 className="h1 mb-6 text-white">
@@ -80,15 +61,32 @@ const Hero = () => {
             Get started
           </Button>
         </div>
+
+        {/* CompanyLogos tanpa background, transparan */}
+        <CompanyLogos
+          className="relative mt-20"
+          style={{ backgroundColor: "transparent", isolation: "isolate" }}
+        />
+
+        <BottomLine className="relative" />
       </div>
 
-      {/* CompanyLogos tetap bebas filter */}
-      <CompanyLogos
-        className="relative z-20 mt-20"
-        style={{ isolation: "isolate", backgroundColor: "transparent" }}
-      />
-
-      <BottomLine className="relative z-20" />
+      {/* Background hitam dan video blackhole muncul **di bawah konten**, fixed position */}
+      <div
+        className="fixed bottom-0 left-0 w-full h-[50vh] z-10 pointer-events-none"
+        style={{ backgroundColor: "#0a0a0a" }}
+      >
+        <video
+          autoPlay
+          muted
+          loop
+          playsInline
+          className="w-full h-full object-cover brightness-[0.6]"
+          style={{ filter: "brightness(0.6)" }}
+        >
+          <source src={blackholeVideo} type="video/webm" />
+        </video>
+      </div>
     </Section>
   );
 };
