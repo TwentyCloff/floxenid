@@ -16,6 +16,7 @@ const Hero = () => {
       id="hero"
       customPaddings
       className="pt-[12rem] -mt-[5.25rem] relative overflow-visible"
+      style={{ backgroundColor: "transparent" }} // *no background hitam di sini*
     >
       {/* Konten utama dan CompanyLogos tanpa background, transparan */}
       <div
@@ -71,9 +72,9 @@ const Hero = () => {
         <BottomLine className="relative" />
       </div>
 
-      {/* Background hitam dan video blackhole muncul **di bawah konten**, fixed position */}
+      {/* Background hitam + video blackhole di bawah konten utama */}
       <div
-        className="fixed bottom-0 left-0 w-full h-[50vh] z-10 pointer-events-none"
+        className="w-full h-[80vh] relative mt-20 z-10 pointer-events-none"
         style={{ backgroundColor: "#0a0a0a" }}
       >
         <video
