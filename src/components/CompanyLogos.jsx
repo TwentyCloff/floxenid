@@ -10,8 +10,8 @@ const CompanyLogos = ({ className }) => {
     <div
       className={`relative w-full py-12 ${className}`}
     >
-      {/* Background hitam hanya di bagian kontennya, tidak mengenai garis kiri */}
-      <div className="absolute inset-y-0 left-[56px] right-0 bg-[#0a0a0a] -z-10 rounded-l-[1rem]" />
+      {/* Background hitam penuh di seluruh area CompanyLogos */}
+      <div className="absolute inset-0 bg-black -z-10 rounded-l-[1rem]" />
 
       <div className="max-w-screen-xl mx-auto px-4">
         <h5 className="tagline mb-6 text-center text-white/50">
@@ -40,7 +40,7 @@ const CompanyLogos = ({ className }) => {
                 w-[70vw] md:w-[180px]
                 h-[120px]
                 rounded-2xl
-                bg-[#0a0a0a]
+                bg-black
                 border border-white/10
                 text-white
                 shadow-md
