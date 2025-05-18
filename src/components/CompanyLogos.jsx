@@ -7,10 +7,7 @@ const stats = [
 
 const CompanyLogos = ({ className }) => {
   return (
-    <div className={`relative w-full py-12 ${className}`}>
-      {/* Background hitam tapi transparan agar tidak nabrak cross */}
-      <div className="absolute inset-y-0 left-[56px] right-0 bg-[#0a0a0a] opacity-95 -z-10 rounded-l-[1rem]" />
-
+    <div className={`relative w-full py-12 bg-[#0a0a0a] ${className}`}>
       <div className="max-w-screen-xl mx-auto px-4">
         <h5 className="tagline mb-6 text-center text-white/50">
           Helping people create beautiful content at
