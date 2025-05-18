@@ -1,3 +1,10 @@
+const stats = [
+  { label: "Product Sold", value: "1,234" },
+  { label: "Total Customer", value: "567" },
+  { label: "Undetected Rate", value: "99.9%" },
+  { label: "Support Available", value: "24/7" },
+];
+
 const CompanyLogos = ({ className }) => {
   return (
     <div
@@ -51,3 +58,5 @@ const CompanyLogos = ({ className }) => {
     </div>
   );
 };
+
+export default CompanyLogos;
