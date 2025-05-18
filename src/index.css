@@ -19,8 +19,7 @@
 
 @layer base {
   body {
-    @apply font-sans text-n-1 text-base;
-    background-color: transparent !important;
+    @apply font-sans bg-black text-n-1 text-base;
   }
 }
 
