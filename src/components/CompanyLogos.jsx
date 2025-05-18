@@ -42,7 +42,7 @@ const CompanyLogos = ({ className }) => {
                 px-6 py-4
                 cursor-default
                 transition-transform duration-300 hover:scale-105
-                bg-[#141414]
+                bg-[#2c2c2c]
               "
             >
               <p className="text-3xl font-bold">{stat.value}</p>
