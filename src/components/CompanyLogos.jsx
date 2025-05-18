@@ -7,7 +7,10 @@ const stats = [
 
 const CompanyLogos = ({ className }) => {
   return (
-    <div className={`relative w-full py-12 bg-black ${className}`}>
+    <div
+      className={`relative w-full py-12 bg-black ${className}`}
+      style={{ isolation: 'isolate', zIndex: 10 }}
+    >
       <div className="max-w-screen-xl mx-auto px-4">
         <h5 className="tagline mb-6 text-center text-white/50">
           Helping people create beautiful content at
@@ -42,7 +45,7 @@ const CompanyLogos = ({ className }) => {
                 px-6 py-4
                 cursor-default
                 transition-transform duration-300 hover:scale-105
-                bg-[#2c2c2c]
+                bg-[#252525]
               "
             >
               <p className="text-3xl font-bold">{stat.value}</p>
