@@ -7,9 +7,18 @@ const stats = [
 
 const CompanyLogos = ({ className }) => {
   return (
-    <div className={`relative w-full py-12 ${className}`}>
+    <div
+      className={`relative w-full py-12 ${className}`}
+      style={{
+        isolation: 'isolate',
+        backgroundColor: 'transparent',
+        filter: 'none',
+        position: 'relative',
+        zIndex: 20,
+      }}
+    >
       <div className="max-w-screen-xl mx-auto px-4">
-        <h5 className="tagline mb-6 text-center text-white/50">
+        <h5 className="tagline mb-6 text-center text-white/50" style={{ filter: 'none' }}>
           Helping people create beautiful content at
         </h5>
         <ul
@@ -25,6 +34,7 @@ const CompanyLogos = ({ className }) => {
             md:justify-center
             md:flex-wrap
           "
+          style={{ filter: 'none' }}
         >
           {stats.map((stat, i) => (
             <li
@@ -35,18 +45,19 @@ const CompanyLogos = ({ className }) => {
                 w-[70vw] md:w-[180px]
                 h-[120px]
                 rounded-2xl
-                border border-white/10
                 text-white
-                shadow-md
                 flex flex-col items-center justify-center
                 px-6 py-4
                 cursor-default
                 transition-transform duration-300 hover:scale-105
                 bg-transparent
+                border-none
+                shadow-none
               "
+              style={{ filter: 'none' }}
             >
-              <p className="text-3xl font-bold">{stat.value}</p>
-              <p className="mt-2 text-sm font-semibold">{stat.label}</p>
+              <p className="text-3xl font-bold" style={{ filter: 'none' }}>{stat.value}</p>
+              <p className="mt-2 text-sm font-semibold" style={{ filter: 'none' }}>{stat.label}</p>
             </li>
           ))}
         </ul>
