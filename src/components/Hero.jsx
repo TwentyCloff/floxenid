@@ -25,16 +25,16 @@ const Hero = () => {
       <div ref={parallaxRef} className="container relative">
         <div className="relative z-1 max-w-[62rem] mx-auto text-center mb-[4rem] md:mb-20 lg:mb-[6rem]">
           <h1 className="h1 mb-6">
-            Explore the Possibilities of
+            Empower Your Scripts With
             <br />
             <Typewriter
               options={{
                 strings: [
-                  "AI Chatting",
-                  "Photo Editing",
-                  "Video Generation",
-                  "Image Generation",
-                  "Code Generation",
+                  "Fast Execution",
+                  "Continuous Improvement",
+                  "24/7 Support",
+                  "User-Friendly Interface",
+                  "Optimized Performance",
                 ],
                 autoStart: true,
                 loop: true,
@@ -43,10 +43,9 @@ const Hero = () => {
           </h1>
 
           <p className="body-1 max-w-3xl mx-auto mb-6 text-n-2 lg:mb-8">
-            Unleast the power of AI within Brainwave. Upgrade your productivity
-            with{" "}
+            "Unlock the next level of game scripting with{" "}
             <span className="inline-block relative font-semibold">
-              Brainwave
+              Qarvo
               <img
                 src={curve}
                 className="absolute top-full left-0 w-full xl:-mt-2 pointer-events-none select-none"
@@ -55,7 +54,7 @@ const Hero = () => {
                 alt="Curve"
               />
             </span>
-            , the open AI chat app.
+            .Network
           </p>
 
           <Button href="#pricing" white>
