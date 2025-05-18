@@ -1,11 +1,8 @@
 import { motion } from "framer-motion";
-import SectionSvg from "../assets/svg/SectionSvg";
 
 const Section = ({
   className,
   id,
-  crosses,
-  crossesTop = "6rem",
   customPaddings,
   children,
 }) => {
@@ -17,23 +14,10 @@ const Section = ({
       viewport={{ once: true }}
       id={id}
       className={`relative z-0 ${
-        customPaddings ||
-        `py-10 lg:py-16 xl:py-20 ${crosses ? "lg:py-32 xl:py-40" : ""}`
+        customPaddings || `py-10 lg:py-16 xl:py-20`
       } ${className || ""}`}
     >
       {children}
-
-      {/* Cross garis horizontal atas (jika crosses true) */}
-      {crosses && (
-        <>
-          <div
-            className="hidden absolute left-7.5 right-7.5 h-0.25 bg-stroke-1 pointer-events-none lg:block xl:left-10 xl:right-10"
-            style={{ top: crossesTop, zIndex: 0 }}
-            aria-hidden
-          />
-          <SectionSvg crossesTop={crossesTop} />
-        </>
-      )}
     </motion.section>
   );
 };
