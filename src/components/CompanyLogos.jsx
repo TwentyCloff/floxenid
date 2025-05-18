@@ -35,8 +35,8 @@ const CompanyLogos = ({ className }) => {
                 snap-center
                 w-[70vw] md:w-[180px]
                 h-[110px] rounded-xl
-                bg-black/60 border border-white/10
-                text-white shadow-md
+                bg-[#111111] bg-opacity-80
+                text-white shadow-lg
                 flex flex-col items-center justify-center
                 px-6 py-4
                 cursor-default
