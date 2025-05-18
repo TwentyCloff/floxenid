@@ -8,7 +8,12 @@ const stats = [
 const CompanyLogos = ({ className }) => {
   return (
     <div className={`relative w-full py-12 bg-[#0a0a0a] ${className}`}>
-      <div className="max-w-screen-xl mx-auto px-4">
+      {/* Overlay gelap absolute supaya nutup abu-abu */}
+      <div
+        className="absolute inset-0 bg-[#0a0a0a] opacity-90 pointer-events-none -z-10 rounded-l-[1rem]"
+      />
+      
+      <div className="max-w-screen-xl mx-auto px-4 relative z-10">
         <h5 className="tagline mb-6 text-center text-white/50">
           Helping people create beautiful content at
         </h5>
