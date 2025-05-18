@@ -51,7 +51,7 @@ const Hero = () => {
         <source src={blackholeVideo} type="video/webm" />
       </video>
 
-      {/* Konten utama di atas video */}
+      {/* Konten utama */}
       <div ref={parallaxRef} className="container relative z-10">
         <div className="relative max-w-[62rem] mx-auto text-center mb-[4rem] md:mb-20 lg:mb-[6rem]">
           <h1 className="h1 mb-6 text-white">
@@ -93,9 +93,10 @@ const Hero = () => {
         </div>
 
         <BackgroundCircles />
-
-        <CompanyLogos className="relative z-10 mt-20 block" />
       </div>
+
+      {/* CompanyLogos pindah ke luar container agar full width */}
+      <CompanyLogos className="relative z-10 mt-20" />
 
       <BottomLine />
     </Section>
