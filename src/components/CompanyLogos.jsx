@@ -7,7 +7,7 @@ const stats = [
 
 const CompanyLogos = ({ className }) => {
   return (
-    <div className={`${className} px-4 overflow-visible`}>
+    <div className={`bg-black ${className} px-4 py-12 overflow-visible`}>
       <h5 className="tagline mb-6 text-center text-n-1/50">
         Helping people create beautiful content at
       </h5>
@@ -34,12 +34,16 @@ const CompanyLogos = ({ className }) => {
                 flex-shrink-0
                 snap-center
                 w-[70vw] md:w-[180px]
-                h-[110px] rounded-xl
-                bg-[#111111] bg-opacity-80
-                text-white shadow-lg
-                flex flex-col items-center justify-center
-                px-6 py-4
-                cursor-default
+                h-[120px] 
+                rounded-2xl 
+                bg-white/10 
+                backdrop-blur-md 
+                border border-white/20 
+                text-white 
+                shadow-md 
+                flex flex-col items-center justify-center 
+                px-6 py-4 
+                cursor-default 
                 transition-transform duration-300 hover:scale-105
               "
             >
