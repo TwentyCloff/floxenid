@@ -95,10 +95,11 @@ const Hero = () => {
         <BackgroundCircles />
       </div>
 
-      {/* CompanyLogos pindah ke luar container agar full width */}
-      <CompanyLogos className="relative z-10 mt-20" />
+      {/* CompanyLogos dengan zIndex lebih rendah dari overlay cross */}
+      <CompanyLogos className="relative z-5 mt-20" />
 
-      <BottomLine />
+      {/* BottomLine (cross overlay) pastikan ini punya zIndex tinggi */}
+      <BottomLine className="relative z-20" />
     </Section>
   );
 };
