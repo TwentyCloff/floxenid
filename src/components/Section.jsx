@@ -16,15 +16,12 @@ const Section = ({
       transition={{ duration: 1.5 }}
       viewport={{ once: true }}
       id={id}
-      className={`relative ${
+      className={`relative z-0 ${
         customPaddings ||
         `py-10 lg:py-16 xl:py-20 ${crosses ? "lg:py-32 xl:py-40" : ""}`
       } ${className || ""}`}
     >
       {children}
-
-      {/* Hapus garis kiri dan kanan vertikal */}
-      {/* Tidak ada tambahan garis abu kiri/kanan */}
 
       {/* Cross garis horizontal atas (jika crosses true) */}
       {crosses && (
