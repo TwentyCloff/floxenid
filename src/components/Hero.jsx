@@ -17,9 +17,19 @@ const Hero = () => {
       crosses
       crossesOffset="lg:translate-y-[5.25rem]"
       customPaddings
-      className="pt-[12rem] -mt-[5.25rem] bg-[#0a0a0a] relative"
+      className="pt-[12rem] -mt-[5.25rem] relative overflow-hidden"
     >
-      {/* Video blackhole di belakang */}
+      {/* Background hitam fullscreen */}
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          backgroundColor: "#0a0a0a",
+          zIndex: -20,
+        }}
+      />
+
+      {/* Video blackhole di atas background hitam */}
       <video
         autoPlay
         muted
@@ -41,6 +51,7 @@ const Hero = () => {
         <source src={blackholeVideo} type="video/webm" />
       </video>
 
+      {/* Konten utama di atas video */}
       <div ref={parallaxRef} className="container relative z-10">
         <div className="relative max-w-[62rem] mx-auto text-center mb-[4rem] md:mb-20 lg:mb-[6rem]">
           <h1 className="h1 mb-6 text-white">
