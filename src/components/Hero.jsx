@@ -18,21 +18,18 @@ const Hero = () => {
       className="pt-[12rem] -mt-[5.25rem] relative overflow-hidden"
     >
       {/* Background hitam hanya dalam Hero section */}
-      <div className="absolute inset-0 bg-[#121212] z-[-20] pointer-events-none" />
+      <div className="absolute inset-0 bg-[#0a0a0a] z-[-20] pointer-events-none" />
 
-      {/* Video blackhole */}
+      {/* Video blackhole dengan filter brightness hanya di video */}
       <video
         autoPlay
         muted
         loop
         playsInline
-        className="absolute top-[-10%] left-1/2 transform -translate-x-1/2 w-[120vw] h-[120vh] object-cover brightness-[0.6] z-[-15] pointer-events-none"
+        className="absolute top-[-10%] left-1/2 transform -translate-x-1/2 w-[120vw] h-[120vh] object-cover brightness-[0.6] z-[-10] pointer-events-none"
       >
         <source src={blackholeVideo} type="video/webm" />
       </video>
-
-      {/* Overlay gelap semi-transparent supaya warna lebih terkontrol */}
-      <div className="absolute inset-0 bg-[#121212]/80 z-[-10] pointer-events-none" />
 
       {/* Konten utama */}
       <div ref={parallaxRef} className="container relative z-10">
@@ -77,7 +74,7 @@ const Hero = () => {
       </div>
 
       {/* Logos dan BottomLine */}
-      <CompanyLogos className="relative z-10 mt-20" />
+      <CompanyLogos className="relative z-20 mt-20" />
       <BottomLine className="relative z-20" />
     </Section>
   );
