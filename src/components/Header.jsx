@@ -33,7 +33,7 @@ const Header = () => {
       className={`fixed top-0 left-0 w-full z-50 transition-colors duration-300 ${
         openNavigation
           ? "bg-black backdrop-blur-md"
-          : "bg-black/8 backdrop-blur-md"
+          : "bg-black/3 backdrop-blur-md"
       }`}
     >
       <div className="flex items-center px-5 lg:px-7.5 xl:px-10 max-lg:py-4">
