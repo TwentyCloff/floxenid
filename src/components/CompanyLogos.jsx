@@ -10,9 +10,9 @@ const CompanyLogos = ({ className }) => {
     <div
       className={`relative w-full py-12 ${className}`}
       style={{
-        backgroundColor: '#121212', // sama dengan overlay gelap di Hero
-        isolation: 'isolate',
-        zIndex: 10,
+        backgroundColor: 'transparent', // transparan biar gak kena filter
+        isolation: 'isolate',             // supaya layer ini gak bercampur efek filter parent
+        zIndex: 20,                      // lebih tinggi dari video (-10) dan bg (-20)
       }}
     >
       <div className="max-w-screen-xl mx-auto px-4">
@@ -49,7 +49,7 @@ const CompanyLogos = ({ className }) => {
                 px-6 py-4
                 cursor-default
                 transition-transform duration-300 hover:scale-105
-                bg-[#121212] 
+                bg-[#1a1a1a]  /* kartu tetap ada background agak gelap */
               "
             >
               <p className="text-3xl font-bold">{stat.value}</p>
