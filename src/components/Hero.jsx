@@ -17,21 +17,21 @@ const Hero = () => {
       customPaddings
       className="pt-[12rem] -mt-[5.25rem] relative overflow-hidden"
     >
-      {/* Background hitam hanya dalam Hero section */}
-      <div className="absolute inset-0 bg-[#0a0a0a] z-[-20] pointer-events-none" />
-
       {/* Video blackhole dengan filter brightness hanya di video */}
       <video
         autoPlay
         muted
         loop
         playsInline
-        className="absolute top-[-10%] left-1/2 transform -translate-x-1/2 w-[120vw] h-[120vh] object-cover brightness-[0.6] z-[-10] pointer-events-none"
+        className="absolute top-[-10%] left-1/2 transform -translate-x-1/2 w-[120vw] h-[120vh] object-cover brightness-[0.6] z-[-20] pointer-events-none"
       >
         <source src={blackholeVideo} type="video/webm" />
       </video>
 
-      {/* Konten utama */}
+      {/* Background hitam hanya untuk hero content (container) */}
+      <div className="absolute inset-0 bg-[#0a0a0a] z-[-10] pointer-events-none" />
+
+      {/* Konten utama hero (judul, button) */}
       <div ref={parallaxRef} className="container relative z-10">
         <div className="relative max-w-[62rem] mx-auto text-center mb-[4rem] md:mb-20 lg:mb-[6rem]">
           <h1 className="h1 mb-6 text-white">
@@ -73,8 +73,10 @@ const Hero = () => {
         </div>
       </div>
 
-      {/* Logos dan BottomLine */}
+      {/* CompanyLogos tanpa background gelap, di atas video */}
       <CompanyLogos className="relative z-20 mt-20" />
+
+      {/* BottomLine juga di atas video */}
       <BottomLine className="relative z-20" />
     </Section>
   );
