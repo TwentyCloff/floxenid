@@ -5,7 +5,7 @@ const Section = ({
   className,
   id,
   crosses,
-  crossesTop = "5rem",
+  crossesTop = "6rem",
   customPaddings,
   children,
 }) => {
