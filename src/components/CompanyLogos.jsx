@@ -8,8 +8,12 @@ const stats = [
 const CompanyLogos = ({ className }) => {
   return (
     <div
-      className={`relative w-full py-12 bg-black/30 backdrop-blur-md ${className}`}
-      style={{ isolation: 'isolate', zIndex: 10 }}
+      className={`relative w-full py-12 ${className}`}
+      style={{
+        backgroundColor: '#121212', // sama dengan overlay gelap di Hero
+        isolation: 'isolate',
+        zIndex: 10,
+      }}
     >
       <div className="max-w-screen-xl mx-auto px-4">
         <h5 className="tagline mb-6 text-center text-white/50">
@@ -45,8 +49,7 @@ const CompanyLogos = ({ className }) => {
                 px-6 py-4
                 cursor-default
                 transition-transform duration-300 hover:scale-105
-                bg-black/30
-                backdrop-blur-md
+                bg-[#121212] 
               "
             >
               <p className="text-3xl font-bold">{stat.value}</p>
