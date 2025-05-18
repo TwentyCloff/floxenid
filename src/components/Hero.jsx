@@ -17,20 +17,14 @@ const Hero = () => {
       crosses
       crossesOffset="lg:translate-y-[5.25rem]"
       customPaddings
-      className="pt-[12rem] -mt-[5.25rem] bg-[#0a0a0a] relative overflow-hidden" // tambah bg hitam + relative + overflow-hidden
+      className="pt-[12rem] -mt-[5.25rem] bg-[#0a0a0a] relative"
     >
-      {/* Background hitam full screen */}
-      <div
-        style={{
-          position: "absolute",
-          inset: 0,
-          zIndex: -20,
-          backgroundColor: "#0a0a0a",
-        }}
-      />
-
       {/* Video blackhole di belakang */}
-      <div
+      <video
+        autoPlay
+        muted
+        loop
+        playsInline
         style={{
           position: "absolute",
           top: "-10%",
@@ -38,27 +32,14 @@ const Hero = () => {
           transform: "translateX(-50%)",
           width: "120vw",
           height: "120vh",
-          zIndex: -15,
-          overflow: "hidden",
+          objectFit: "cover",
+          filter: "brightness(0.6)",
+          zIndex: -10,
           pointerEvents: "none",
         }}
       >
-        <video
-          autoPlay
-          muted
-          loop
-          playsInline
-          style={{
-            width: "100%",
-            height: "100%",
-            objectFit: "cover",
-            filter: "brightness(0.6)",
-          }}
-          onError={() => console.log("Video error loading blackhole")}
-        >
-          <source src={blackholeVideo} type="video/webm" />
-        </video>
-      </div>
+        <source src={blackholeVideo} type="video/webm" />
+      </video>
 
       <div ref={parallaxRef} className="container relative z-10">
         <div className="relative max-w-[62rem] mx-auto text-center mb-[4rem] md:mb-20 lg:mb-[6rem]">
