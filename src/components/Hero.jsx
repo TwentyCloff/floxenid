@@ -1,95 +1,65 @@
-import { useRef } from "react";
-import Typewriter from "typewriter-effect";
+const stats = [ 
+  { label: "Product Sold", value: "1,234" },
+  { label: "Total Customer", value: "567" },
+  { label: "Undetected Rate", value: "99.9%" },
+  { label: "Support Available", value: "24/7" },
+];
 
-import { curve } from "../assets";
-import blackholeVideo from "../assets/hero/blackhole.webm";
-import Button from "./Button";
-import CompanyLogos from "./CompanyLogos";
-import { BottomLine } from "./design/Hero";
-import Section from "./Section";
-
-const Hero = () => {
-  const parallaxRef = useRef(null);
-
+const CompanyLogos = ({ className }) => {
   return (
-    <Section
-      id="hero"
-      customPaddings
-      className="pt-[12rem] -mt-[5.25rem] relative overflow-visible"
-      style={{ backgroundColor: "transparent" }} // *no background hitam di sini*
+    <div
+      className={`relative w-full py-12 ${className}`}
+      style={{
+        backgroundColor: 'transparent', // transparan biar gak kena filter
+        isolation: 'isolate',             // supaya layer ini gak bercampur efek filter parent
+        zIndex: 20,                      // lebih tinggi dari video (-10) dan bg (-20)
+      }}
     >
-      {/* Konten utama dan CompanyLogos tanpa background, transparan */}
-      <div
-        ref={parallaxRef}
-        className="container relative z-20"
-        style={{ isolation: "isolate" }}
-      >
-        <div className="relative max-w-[62rem] mx-auto text-center mb-[4rem] md:mb-20 lg:mb-[6rem]">
-          <h1 className="h1 mb-6 text-white">
-            Empower Your Scripts With
-            <br />
-            <Typewriter
-              options={{
-                strings: [
-                  "Fast Execution",
-                  "Continuous Improvement",
-                  "24/7 Support",
-                  "User-Friendly Interface",
-                  "Optimized Performance",
-                ],
-                autoStart: true,
-                loop: true,
-              }}
-            />
-          </h1>
-
-          <p className="body-1 max-w-3xl mx-auto mb-6 text-n-2 lg:mb-8 text-gray-300">
-            Unlock the next level of game scripting{" "}
-            <span className="inline-block relative font-semibold text-white">
-              Qarvo
-              <img
-                src={curve}
-                className="absolute top-full left-0 w-full xl:-mt-2 pointer-events-none select-none"
-                width={624}
-                height={28}
-                alt="Curve"
-              />
-            </span>
-            .network
-          </p>
-
-          <Button href="#pricing" white>
-            Get started
-          </Button>
-        </div>
-
-        {/* CompanyLogos tanpa background, transparan */}
-        <CompanyLogos
-          className="relative mt-20"
-          style={{ backgroundColor: "transparent", isolation: "isolate" }}
-        />
-
-        <BottomLine className="relative" />
-      </div>
-
-      {/* Background hitam + video blackhole di bawah konten utama */}
-      <div
-        className="w-full h-[80vh] relative mt-20 z-10 pointer-events-none"
-        style={{ backgroundColor: "#0a0a0a" }}
-      >
-        <video
-          autoPlay
-          muted
-          loop
-          playsInline
-          className="w-full h-full object-cover brightness-[0.6]"
-          style={{ filter: "brightness(0.6)" }}
+      <div className="max-w-screen-xl mx-auto px-4">
+        <h5 className="tagline mb-6 text-center text-white/50">
+          Helping people create beautiful content at
+        </h5>
+        <ul
+          className="
+            flex 
+            gap-6
+            overflow-x-auto 
+            no-scrollbar
+            snap-x snap-mandatory
+            scrollbar-thin scrollbar-thumb-indigo-500 scrollbar-track-transparent
+            px-2
+            md:overflow-x-visible
+            md:justify-center
+            md:flex-wrap
+          "
         >
-          <source src={blackholeVideo} type="video/webm" />
-        </video>
+          {stats.map((stat, i) => (
+            <li
+              key={i}
+              className="
+                flex-shrink-0
+                snap-center
+                w-[70vw] md:w-[180px]
+                h-[120px]
+                rounded-2xl
+                border border-white/10
+                text-white
+                shadow-md
+                flex flex-col items-center justify-center
+                px-6 py-4
+                cursor-default
+                transition-transform duration-300 hover:scale-105
+                bg-[#1a1a1a]  /* kartu tetap ada background agak gelap */
+              "
+            >
+              <p className="text-3xl font-bold">{stat.value}</p>
+              <p className="mt-2 text-sm font-semibold">{stat.label}</p>
+            </li>
+          ))}
+        </ul>
       </div>
-    </Section>
+    </div>
   );
 };
 
-export default Hero;
+export default CompanyLogos;
