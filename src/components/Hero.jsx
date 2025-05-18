@@ -3,17 +3,44 @@ import { ScrollParallax } from "react-just-parallax";
 import Typewriter from "typewriter-effect";
 
 import { curve, heroBackground } from "../assets";
-import videoRobot from "../assets/hero/videoplayback.webm";
 import { heroIcons } from "../constants";
 import Button from "./Button";
 import CompanyLogos from "./CompanyLogos";
 import { BackgroundCircles, BottomLine, Gradient } from "./design/Hero";
-import Generating from "./Generating";
 import Notification from "./Notification";
 import Section from "./Section";
 
+import sample1 from "../assets/hero/sample1.jpg";
+import sample2 from "../assets/hero/sample2.jpg";
+
+import { useEffect, useState } from "react";
+
+const products = [
+  {
+    image: sample1,
+    name: "Qarvo Executor",
+    description: "High-performance script execution."
+  },
+  {
+    image: sample2,
+    name: "Qarvo Hub",
+    description: "All-in-one GUI for Roblox exploits."
+  }
+];
+
 const Hero = () => {
   const parallaxRef = useRef(null);
+  const [index, setIndex] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setIndex((prev) => (prev + 1) % products.length);
+    }, 4000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const prevSlide = () => setIndex((index - 1 + products.length) % products.length);
+  const nextSlide = () => setIndex((index + 1) % products.length);
 
   return (
     <Section
@@ -44,7 +71,8 @@ const Hero = () => {
           </h1>
 
           <p className="body-1 max-w-3xl mx-auto mb-6 text-n-2 lg:mb-8">
-            Unlock the next level of game scripting with{" "}
+            Unlock the next level of game scripting
+            with{" "}
             <span className="inline-block relative font-semibold">
               Qarvo
               <img
@@ -68,43 +96,19 @@ const Hero = () => {
             <div className="relative bg-n-8 rounded-[1rem]">
               <div className="h-[1.4rem] bg-n-10 rounded-t-[0.9rem]" />
 
-              <div className="aspect-[33/40] rounded-b-[0.9rem] overflow-hidden md:aspect-[688/490] lg:aspect-[1024/490] relative">
-                <video
-                  src={videoRobot}
-                  autoPlay
-                  loop
-                  muted
-                  playsInline
-                  className="w-full scale-[1.7] translate-y-[8%] md:scale-[1] md:-translate-y-[10%] lg:-translate-y-[23%] pointer-events-none select-none"
-                  width={1024}
-                  height={490}
-                />
-                <div
-                  className="absolute inset-0 pointer-events-none"
-                  style={{
-                    background:
-                      "radial-gradient(circle, transparent 40%, rgba(0,0,0,0.7) 80%)",
-                  }}
-                />
-
-                <Generating className="absolute left-4 right-4 bottom-5 md:left-1/2 md:right-auto md:bottom-8 md:w-[31rem] md:-translate-x-1/2" />
-
-                <ScrollParallax isAbsolutelyPositioned>
-                  <ul className="hidden absolute -left-[5.5rem] bottom-[7.5rem] px-1 py-1 bg-n-9/40 backdrop-blur border border-n-1/10 rounded-2xl xl:flex">
-                    {heroIcons.map((icon, index) => (
-                      <li className="p-5" key={index}>
-                        <img src={icon} width={24} height={25} alt="icon" />
-                      </li>
-                    ))}
-                  </ul>
-                </ScrollParallax>
-
-                <ScrollParallax isAbsolutelyPositioned>
-                  <Notification
-                    className="hidden absolute -right-[5.5rem] bottom-[11rem] w-[18rem] xl:flex"
-                    title="Code generation"
-                  />
-                </ScrollParallax>
+              <div className="aspect-[33/40] rounded-b-[0.9rem] overflow-hidden md:aspect-[688/490] lg:aspect-[1024/490] flex items-center justify-center relative">
+                {products.map((product, i) => (
+                  <div
+                    key={i}
+                    className={`absolute transition-opacity duration-700 ease-in-out w-full h-full flex flex-col items-center justify-center text-center p-4 ${index === i ? 'opacity-100' : 'opacity-0'}`}
+                  >
+                    <img src={product.image} alt={product.name} className="rounded-xl w-auto h-60 object-contain mb-4" />
+                    <h3 className="text-xl font-bold text-white">{product.name}</h3>
+                    <p className="text-sm text-n-2">{product.description}</p>
+                  </div>
+                ))}
+                <button onClick={prevSlide} className="absolute left-4 top-1/2 -translate-y-1/2 text-white text-2xl">❮</button>
+                <button onClick={nextSlide} className="absolute right-4 top-1/2 -translate-y-1/2 text-white text-2xl">❯</button>
               </div>
             </div>
 
@@ -117,7 +121,7 @@ const Hero = () => {
               className="w-full pointer-events-none select-none"
               width={1440}
               height={1800}
-              alt="Hero Background"
+              alt="Hero"
             />
           </div>
 
