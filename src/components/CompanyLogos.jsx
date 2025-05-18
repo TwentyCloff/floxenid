@@ -8,11 +8,13 @@ const stats = [
 const CompanyLogos = ({ className }) => {
   return (
     <div
-      className={`w-full py-12 pl-14 ${className}`}
-      // pl-14 = padding-left 56px untuk menghindari nabrak garis sidebar kiri
+      className={`relative w-full py-12 ${className}`}
     >
+      {/* Background hitam hanya di bagian kontennya, tidak mengenai garis kiri */}
+      <div className="absolute inset-y-0 left-[56px] right-0 bg-[#0a0a0a] -z-10 rounded-l-[1rem]" />
+
       <div className="max-w-screen-xl mx-auto px-4">
-        <h5 className="tagline mb-6 text-center text-black/50">
+        <h5 className="tagline mb-6 text-center text-white/50">
           Helping people create beautiful content at
         </h5>
         <ul
@@ -38,10 +40,9 @@ const CompanyLogos = ({ className }) => {
                 w-[70vw] md:w-[180px]
                 h-[120px]
                 rounded-2xl
-                bg-transparent
-                backdrop-blur-md
-                border border-black/20
-                text-black
+                bg-[#0a0a0a]
+                border border-white/10
+                text-white
                 shadow-md
                 flex flex-col items-center justify-center
                 px-6 py-4
