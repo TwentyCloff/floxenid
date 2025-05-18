@@ -8,7 +8,7 @@ const stats = [
 const CompanyLogos = ({ className }) => {
   return (
     <div
-      className={`relative w-full py-12 bg-black ${className}`}
+      className={`relative w-full py-12 bg-black/30 backdrop-blur-md ${className}`}
       style={{ isolation: 'isolate', zIndex: 10 }}
     >
       <div className="max-w-screen-xl mx-auto px-4">
@@ -45,7 +45,8 @@ const CompanyLogos = ({ className }) => {
                 px-6 py-4
                 cursor-default
                 transition-transform duration-300 hover:scale-105
-                bg-[#252525]
+                bg-black/30
+                backdrop-blur-md
               "
             >
               <p className="text-3xl font-bold">{stat.value}</p>
