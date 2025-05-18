@@ -19,13 +19,13 @@ const Hero = () => {
       customPaddings
       className="pt-[12rem] -mt-[5.25rem] relative overflow-hidden"
     >
-      {/* Background hitam fullscreen (paling bawah) */}
+      {/* Background hitam fullscreen */}
       <div
         style={{
           position: "absolute",
           inset: 0,
           backgroundColor: "#0a0a0a",
-          zIndex: -10,
+          zIndex: -20,
         }}
       />
 
@@ -44,7 +44,7 @@ const Hero = () => {
           height: "120vh",
           objectFit: "cover",
           filter: "brightness(0.6)",
-          zIndex: -5,
+          zIndex: -10,
           pointerEvents: "none",
         }}
       >
@@ -95,10 +95,10 @@ const Hero = () => {
         <BackgroundCircles />
       </div>
 
-      {/* CompanyLogos di bawah konten hero tapi di atas video dan background */}
+      {/* CompanyLogos dengan zIndex rendah supaya tidak timpa cross overlay */}
       <CompanyLogos className="relative z-0 mt-20" />
 
-      {/* BottomLine (cross overlay) paling atas */}
+      {/* BottomLine (cross overlay) dengan zIndex tinggi */}
       <BottomLine className="relative z-20" />
     </Section>
   );
