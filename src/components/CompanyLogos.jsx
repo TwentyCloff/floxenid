@@ -1,8 +1,8 @@
 const stats = [
-  { label: "Product Sold" },
-  { label: "Total Customer" },
-  { label: "Undetected Rate" },
-  { label: "Support Available" },
+  { label: "Product Sold", value: "1,234" },
+  { label: "Total Customer", value: "567" },
+  { label: "Undetected Rate", value: "99.9%" },
+  { label: "Support Available", value: "24/7" },
 ];
 
 const CompanyLogos = () => {
@@ -12,21 +12,17 @@ const CompanyLogos = () => {
         <li
           key={i}
           className="
+            flex flex-col items-center
             text-white
             font-semibold
             cursor-default
             select-none
-            py-2 px-4
-            border-2
+            py-4 px-6
             rounded-lg
+            border-2
             border-transparent
             bg-none
             bg-clip-border
-            transition
-            hover:border-gradient-to-r
-            hover:from-indigo-500
-            hover:via-purple-500
-            hover:to-pink-500
           "
           style={{
             borderImageSlice: 1,
@@ -34,7 +30,8 @@ const CompanyLogos = () => {
               "linear-gradient(to right, #6366f1, #a855f7, #ec4899)",
           }}
         >
-          {stat.label}
+          <p className="text-3xl font-bold">{stat.value}</p>
+          <p className="mt-2 text-sm">{stat.label}</p>
         </li>
       ))}
     </ul>
