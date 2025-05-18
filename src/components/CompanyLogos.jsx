@@ -7,13 +7,9 @@ const stats = [
 
 const CompanyLogos = ({ className }) => {
   return (
-    <div
-      className={`relative w-full py-12 ${className}`}
-    >
-      {/* Background hitam di kanan (tidak menutupi overlay kiri) */}
-      <div
-        className="absolute inset-y-0 left-[56px] right-0 bg-[#0a0a0a] -z-10 rounded-l-[1rem] pointer-events-none"
-      />
+    <div className={`relative w-full py-12 ${className}`}>
+      {/* Background hitam mulai dari 56px ke kanan, rounded kiri supaya garis kiri terlihat */}
+      <div className="absolute inset-y-0 left-[56px] right-0 bg-[#0a0a0a] -z-10 rounded-l-[1rem]" />
 
       <div className="max-w-screen-xl mx-auto px-4">
         <h5 className="tagline mb-6 text-center text-white/50">
