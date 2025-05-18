@@ -16,23 +16,32 @@ const Hero = () => {
       id="hero"
       customPaddings
       className="pt-[12rem] -mt-[5.25rem] relative overflow-hidden"
+      style={{ isolation: "isolate" }}  // pisahkan stacking context
     >
-      {/* Background hitam hanya dalam Hero section */}
-      <div className="absolute inset-0 bg-[#0a0a0a] z-[-20] pointer-events-none" />
+      {/* Background hitam, tanpa filter */}
+      <div
+        className="absolute inset-0 bg-[#0a0a0a] z-[-20] pointer-events-none"
+        style={{ filter: "none" }}  // pastikan no filter di sini
+      />
 
-      {/* Video blackhole dengan filter brightness hanya di video */}
+      {/* Video blackhole berdiri sendiri, dengan filter hanya di video */}
       <video
         autoPlay
         muted
         loop
         playsInline
-        className="absolute top-[-10%] left-1/2 transform -translate-x-1/2 w-[120vw] h-[120vh] object-cover brightness-[0.6] z-[-10] pointer-events-none"
+        className="fixed top-0 left-1/2 transform -translate-x-1/2 w-[120vw] h-[120vh] object-cover brightness-[0.6] z-[-30] pointer-events-none"
+        style={{ filter: "brightness(0.6)" }}  // filter di sini aja
       >
         <source src={blackholeVideo} type="video/webm" />
       </video>
 
-      {/* Konten utama */}
-      <div ref={parallaxRef} className="container relative z-10">
+      {/* Konten utama (container) */}
+      <div
+        ref={parallaxRef}
+        className="container relative z-10"
+        style={{ isolation: "isolate" }} // layer ini bebas filter
+      >
         <div className="relative max-w-[62rem] mx-auto text-center mb-[4rem] md:mb-20 lg:mb-[6rem]">
           <h1 className="h1 mb-6 text-white">
             Empower Your Scripts With
@@ -73,8 +82,12 @@ const Hero = () => {
         </div>
       </div>
 
-      {/* Logos dan BottomLine */}
-      <CompanyLogos className="relative z-20 mt-20" />
+      {/* CompanyLogos tetap bebas filter */}
+      <CompanyLogos
+        className="relative z-20 mt-20"
+        style={{ isolation: "isolate", backgroundColor: "transparent" }}
+      />
+
       <BottomLine className="relative z-20" />
     </Section>
   );
