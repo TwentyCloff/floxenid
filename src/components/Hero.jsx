@@ -15,14 +15,12 @@ const Hero = () => {
     <Section
       id="hero"
       crosses
-      crossesOffset="lg:translate-y-[5.25rem]"
+      crossesOffset="lg:translate-y-[7rem]"  // offset garis cross dinaikkan supaya tidak nabrak
       customPaddings
-      className="pt-[12rem] -mt-[5.25rem] relative overflow-hidden"
+      className="pt-[14rem] -mt-[7rem] relative overflow-hidden"  // padding dan margin top disesuaikan
     >
       {/* Background hitam hanya dalam Hero section */}
-      <div
-        className="absolute inset-0 bg-[#0a0a0a] z-[-20] pointer-events-none"
-      />
+      <div className="absolute inset-0 bg-[#0a0a0a] z-[-20] pointer-events-none" />
 
       {/* Video blackhole */}
       <video
