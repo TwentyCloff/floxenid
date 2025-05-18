@@ -1,10 +1,11 @@
-import { useRef } from "react"; 
+import { useRef } from "react";
 import Typewriter from "typewriter-effect";
 
-import { curve, heroBackground } from "../assets";
+import { curve } from "../assets";
+import blackholeVideo from "../assets/hero/blackhole.webm";
 import Button from "./Button";
 import CompanyLogos from "./CompanyLogos";
-import { BackgroundCircles, BottomLine, Gradient } from "./design/Hero";
+import { BackgroundCircles, BottomLine } from "./design/Hero";
 import Section from "./Section";
 
 const Hero = () => {
@@ -19,8 +20,28 @@ const Hero = () => {
       id="hero"
     >
       <div ref={parallaxRef} className="container relative">
-        <div className="relative z-1 max-w-[62rem] mx-auto text-center mb-[4rem] md:mb-20 lg:mb-[6rem]">
-          <h1 className="h1 mb-6">
+        {/* Wrapper teks dan video background */}
+        <div className="relative max-w-[62rem] mx-auto mb-[4rem] md:mb-20 lg:mb-[6rem] text-center">
+          
+          {/* Video Background di belakang teks */}
+          <div className="absolute inset-0 -z-10 rounded-xl overflow-hidden">
+            <video
+              autoPlay
+              muted
+              loop
+              playsInline
+              className="w-full h-full object-cover brightness-50"
+            >
+              <source src={blackholeVideo} type="video/webm" />
+              Your browser does not support the video tag.
+            </video>
+            
+            {/* Overlay warna hitam abu-abu semi transparan supaya teks tetap terbaca */}
+            <div className="absolute inset-0 bg-black bg-opacity-60" />
+          </div>
+
+          {/* Teks utama */}
+          <h1 className="h1 mb-6 relative z-10 text-white">
             Empower Your Scripts With
             <br />
             <Typewriter
@@ -38,9 +59,9 @@ const Hero = () => {
             />
           </h1>
 
-          <p className="body-1 max-w-3xl mx-auto mb-6 text-n-2 lg:mb-8">
+          <p className="body-1 max-w-3xl mx-auto mb-6 text-n-2 relative z-10 text-gray-300 lg:mb-8">
             Unlock the next level of game scripting{" "}
-            <span className="inline-block relative font-semibold">
+            <span className="inline-block relative font-semibold text-white">
               Qarvo
               <img
                 src={curve}
@@ -53,27 +74,12 @@ const Hero = () => {
             .network
           </p>
 
-          <Button href="#pricing" white>
+          <Button href="#pricing" white className="relative z-10">
             Get started
           </Button>
         </div>
 
-        {/* Tambahkan container overlay hitam di sini */}
-        <div className="absolute -top-[54%] left-1/2 w-[234%] -translate-x-1/2 md:-top-[46%] md:w-[138%] lg:-top-[104%] rounded-[1rem] overflow-hidden">
-          <img
-            src={heroBackground}
-            className="w-full pointer-events-none select-none"
-            width={1440}
-            height={1800}
-            alt="Hero"
-          />
-          {/* Lapisan hitam transparan */}
-          <div className="absolute inset-0 bg-black opacity-30" />
-        </div>
-
-        {/* Gradient dari original, agar shading dan efek warna lebih kaya */}
-        <Gradient />
-
+        {/* Background circles dan logo tetap di bawah */}
         <BackgroundCircles />
 
         <CompanyLogos className="relative z-10 mt-20 block" />
