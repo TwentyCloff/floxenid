@@ -1,8 +1,8 @@
 const stats = [
-  { label: "Product Sold" },
-  { label: "Total Customer" },
-  { label: "Undetected Rate" },
-  { label: "Support Available" },
+  { label: "Product Sold", value: "1,234" },
+  { label: "Total Customer", value: "567" },
+  { label: "Undetected Rate", value: "99.9%" },
+  { label: "Support Available", value: "24/7" },
 ];
 
 const CompanyLogos = () => {
@@ -16,10 +16,12 @@ const CompanyLogos = () => {
             font-semibold
             cursor-default
             select-none
-            py-2 px-4
+            py-4 px-6
             border-2
-            rounded-lg
+            rounded-xl
             transition
+            flex flex-col items-center justify-center
+            w-[150px] h-[100px]
           "
           style={{
             borderImageSlice: 1,
@@ -29,9 +31,11 @@ const CompanyLogos = () => {
             borderImageOutset: 0,
             borderImageRepeat: "stretch",
             borderStyle: "solid",
+            background: "none",
           }}
         >
-          {stat.label}
+          <span className="text-2xl font-bold">{stat.value}</span>
+          <span className="text-sm mt-1">{stat.label}</span>
         </li>
       ))}
     </ul>
