@@ -1,8 +1,7 @@
-import { useRef } from "react";
+import { useRef } from "react"; 
 import Typewriter from "typewriter-effect";
 
 import { curve, heroBackground } from "../assets";
-import { heroIcons } from "../constants";
 import Button from "./Button";
 import CompanyLogos from "./CompanyLogos";
 import { BackgroundCircles, BottomLine, Gradient } from "./design/Hero";
@@ -59,9 +58,8 @@ const Hero = () => {
           </Button>
         </div>
 
-        {/* Bagian gambar robot dihapus seluruhnya */}
-
-        <div className="absolute -top-[54%] left-1/2 w-[234%] -translate-x-1/2 md:-top-[46%] md:w-[138%] lg:-top-[104%]">
+        {/* Tambahkan container overlay hitam di sini */}
+        <div className="absolute -top-[54%] left-1/2 w-[234%] -translate-x-1/2 md:-top-[46%] md:w-[138%] lg:-top-[104%] rounded-[1rem] overflow-hidden">
           <img
             src={heroBackground}
             className="w-full pointer-events-none select-none"
@@ -69,7 +67,12 @@ const Hero = () => {
             height={1800}
             alt="Hero"
           />
+          {/* Lapisan hitam transparan */}
+          <div className="absolute inset-0 bg-black opacity-30" />
         </div>
+
+        {/* Gradient dari original, agar shading dan efek warna lebih kaya */}
+        <Gradient />
 
         <BackgroundCircles />
 
