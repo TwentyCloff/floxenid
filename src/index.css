@@ -20,7 +20,7 @@
 @layer base {
   html, #root {
     height: 100%;
-    background-color: #1a1a1a; /* background gelap menyamarkan brightness 0.4 */
+    background-color: #0d0d0d; /* background gelap menyamarkan brightness 0.4 */
   }
   body {
     @apply font-sans text-n-1 text-base;
