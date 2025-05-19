@@ -4,7 +4,7 @@ import Typewriter from "typewriter-effect";
 import { curve } from "../assets";
 import blackholeVideo from "../assets/hero/blackhole.webm";
 import Button from "./Button";
-import { BottomLine } from "./design/Hero";
+// import { BottomLine } from "./design/Hero"; // sudah tidak dipakai
 import Section from "./Section";
 
 const Hero = () => {
@@ -16,15 +16,13 @@ const Hero = () => {
       customPaddings
       className="pt-[12rem] -mt-[5.25rem] relative overflow-hidden"
     >
-      {/* Background hitam hanya dalam Hero section */}
-      {/* <div className="absolute inset-0 bg-[#0a0a0a] z-[-20] pointer-events-none" /> */}
-      {/* Video blackhole dengan filter brightness hanya di video */}
+      {/* Video blackhole tanpa brightness filter */}
       <video
         autoPlay
         muted
         loop
         playsInline
-        className="absolute top-[-10%] left-1/2 transform -translate-x-1/2 w-[120vw] h-[120vh] object-cover brightness-[0.6] z-[-10] pointer-events-none"
+        className="absolute top-[-10%] left-1/2 transform -translate-x-1/2 w-[120vw] h-[120vh] object-cover z-[-10] pointer-events-none"
       >
         <source src={blackholeVideo} type="video/webm" />
       </video>
@@ -71,8 +69,8 @@ const Hero = () => {
         </div>
       </div>
 
-      {/* BottomLine dengan background dan elemen transparan */}
-      {/*<BottomLine className="relative z-20" />*/}
+      {/* BottomLine sudah dihilangkan */}
+      {/* <BottomLine className="relative z-20" /> */}
     </Section>
   );
 };
