@@ -4,7 +4,6 @@ import Typewriter from "typewriter-effect";
 import { curve } from "../assets";
 import blackholeVideo from "../assets/hero/blackhole.webm";
 import Button from "./Button";
-// import { BottomLine } from "./design/Hero"; // dihapus biar gak abu-abu
 import Section from "./Section";
 
 const Hero = () => {
@@ -14,29 +13,31 @@ const Hero = () => {
     <Section
       id="hero"
       customPaddings
-      className="pt-[12rem] -mt-[5.25rem] relative overflow-hidden"
+      className="pt-[12rem] -mt-[5.25rem] relative overflow-hidden bg-black"
     >
-      {/* Background gradient gelap halus */}
+      {/* Overlay Gradient Background */}
       <div
         className="absolute inset-0 z-[-20] pointer-events-none"
         style={{
-          background: "linear-gradient(180deg, #121212 0%, #000000 90%)",
+          background: "linear-gradient(180deg, #000000 0%, #000000 100%)",
         }}
       />
 
-      {/* Video blackhole dengan brightness filter lebih gelap */}
+      {/* Optional: dark overlay above video for extra contrast */}
+      <div className="absolute top-0 left-0 w-full h-full bg-black opacity-60 z-[-9]" />
+
+      {/* Blackhole Video Background */}
       <video
         autoPlay
         muted
         loop
         playsInline
         className="absolute top-[-10%] left-1/2 transform -translate-x-1/2 w-[120vw] h-[120vh] object-cover z-[-10] pointer-events-none"
-        style={{ filter: "brightness(0.4)" }}
       >
         <source src={blackholeVideo} type="video/webm" />
       </video>
 
-      {/* Konten utama */}
+      {/* Main Content */}
       <div ref={parallaxRef} className="container relative z-10">
         <div className="relative max-w-[62rem] mx-auto text-center mb-[4rem] md:mb-20 lg:mb-[6rem]">
           <h1 className="h1 mb-6 text-white">
@@ -77,9 +78,6 @@ const Hero = () => {
           </Button>
         </div>
       </div>
-
-      {/* BottomLine dihapus supaya tidak ada abu-abu */}
-      {/* <BottomLine className="relative z-20" /> */}
     </Section>
   );
 };
