@@ -1,13 +1,10 @@
-import PlusSvg from "../../assets/svg/PlusSvg";
-
-export const BottomLine = () => {
+const PlusSvg = ({ className = "" }) => {
   return (
-    <>
-      <div className="hidden absolute top-[55.25rem] left-10 right-10 h-0.25 bg-transparent pointer-events-none xl:block" />
-
-      <PlusSvg className="hidden absolute top-[54.9375rem] left-[2.1875rem] z-2 pointer-events-none xl:block text-transparent" />
-
-      <PlusSvg className="hidden absolute top-[54.9375rem] right-[2.1875rem] z-2 pointer-events-none xl:block text-transparent" />
-    </>
+    <svg className={className} width="11" height="11" fill="none">
+      <path
+        d="M7 1a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v2a1 1 0 0 1-1 1H1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1h2a1 1 0 0 1 1 1v2a1 1 0 0 0 1 1h1a1 1 0 0 0 1-1V8a1 1 0 0 1 1-1h2a1 1 0 0 0 1-1V5a1 1 0 0 0-1-1H8a1 1 0 0 1-1-1V1z"
+        fill="transparent"  // langsung transparent
+      />
+    </svg>
   );
 };
