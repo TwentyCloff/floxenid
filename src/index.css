@@ -19,7 +19,8 @@
 
 @layer base {
   body {
-    @apply font-sans bg-transparent text-n-1 text-base;
+    @apply font-sans text-n-1 text-base;
+    /* Background dihapus total */
   }
 }
 
