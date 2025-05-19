@@ -72,7 +72,7 @@ const Hero = () => {
       </div>
 
       {/* BottomLine dengan background dan elemen transparan */}
-      <BottomLine className="relative z-20" />
+      {/*<BottomLine className="relative z-20" />*/}
     </Section>
   );
 };
