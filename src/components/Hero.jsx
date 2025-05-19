@@ -15,7 +15,7 @@ const Hero = () => {
       customPaddings
       className="pt-[12rem] -mt-[5.25rem] relative overflow-hidden"
     >
-      {/* Background gradient halus */}
+      {/* Background gradient gelap halus */}
       <div
         className="absolute inset-0 z-[-20] pointer-events-none"
         style={{
@@ -23,10 +23,8 @@ const Hero = () => {
         }}
       />
 
-      {/* Overlay hitam semi-transparan */}
-      <div className="absolute top-0 left-0 w-full h-full bg-black opacity-40 z-[-9]" />
-
-      {/* Video blackhole dengan filter seimbang */}
+      {/* Video blackhole dengan brightness dan overlay */}
+      <div className="absolute top-0 left-0 w-full h-full bg-black opacity-20 z-[-9]" />
       <video
         autoPlay
         muted
@@ -34,7 +32,7 @@ const Hero = () => {
         playsInline
         className="absolute top-[-10%] left-1/2 transform -translate-x-1/2 w-[120vw] h-[120vh] object-cover z-[-10] pointer-events-none"
         style={{
-          filter: "brightness(0.45) contrast(1.1)",
+          filter: "brightness(0.7)",
         }}
       >
         <source src={blackholeVideo} type="video/webm" />
@@ -81,6 +79,14 @@ const Hero = () => {
           </Button>
         </div>
       </div>
+
+      {/* Gradient transisi ke hitam pekat */}
+      <div
+        className="absolute bottom-0 left-0 w-full h-[8rem] z-[-5]"
+        style={{
+          background: "linear-gradient(to bottom, transparent, #000)",
+        }}
+      />
     </Section>
   );
 };
