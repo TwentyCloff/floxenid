@@ -40,10 +40,11 @@ const Hero = () => {
       {/* Konten utama */}
       <div ref={parallaxRef} className="container relative z-10">
         <div className="relative max-w-[62rem] mx-auto text-center mb-[4rem] md:mb-20 lg:mb-[6rem]">
-          <h1 className="h1 mb-6 text-white">
+          <h1 className="h1 mb-6 text-white leading-tight">
             Empower Your Scripts With
             <br />
-            <span className="block min-h-[3.5rem] sm:min-h-[2.5rem]">
+            {/* Typewriter text dengan font kecil di mobile agar tidak wrap */}
+            <span className="block min-h-[2.5rem] text-sm sm:text-xl font-semibold">
               <Typewriter
                 options={{
                   strings: [
@@ -84,4 +85,4 @@ const Hero = () => {
   );
 };
 
-export default Hero
+export default Hero;
