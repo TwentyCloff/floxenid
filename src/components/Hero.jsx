@@ -32,20 +32,22 @@ const Hero = () => {
         muted
         loop
         playsInline
-        className="absolute left-1/2 transform -translate-x-1/2 w-[130vw] h-[130vh] object-cover z-[-10] pointer-events-none"
+        className="blackhole-video absolute left-1/2 transform -translate-x-1/2 w-[130vw] h-[130vh] object-cover z-[-10] pointer-events-none
+                   top-[-10%] sm:top-[-15%] md:top-[-10%] lg:top-[-10%]"
         style={{
-          top: "-5%",
           filter: "brightness(0.7)",
         }}
-      />
+      >
+        <source src={blackholeVideo} type="video/webm" />
+      </video>
 
-      {/* Mobile adjustment: override top & brightness */}
+      {/* Mobile-only adjustment */}
       <style>
         {`
           @media (max-width: 640px) {
-            video {
-              top: -25% !important;
-              filter: brightness(0.9) !important;
+            .blackhole-video {
+              top: -30% !important;
+              filter: brightness(0.95) !important;
             }
           }
         `}
