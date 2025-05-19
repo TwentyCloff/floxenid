@@ -23,20 +23,16 @@ const Hero = () => {
         }}
       />
 
-      {/* Overlay hitam */}
-      <div className="absolute top-0 left-0 w-full h-full bg-black opacity-20 z-[-9]" />
+      {/* Overlay hitam semi transparan */}
+      <div className="absolute top-0 left-0 w-full h-full bg-black opacity-40 z-[-9]" />
 
-      {/* Video blackhole dengan filter & posisi lebih rendah di mobile */}
+      {/* Video blackhole */}
       <video
         autoPlay
         muted
         loop
         playsInline
-        className="absolute left-1/2 transform -translate-x-1/2 w-[130vw] h-[130vh] object-cover z-[-10] pointer-events-none
-                   top-[-10%] sm:top-[-15%] md:top-[-10%] lg:top-[-10%]"
-        style={{
-          filter: "brightness(0.7)",
-        }}
+        className="absolute top-[-10%] left-1/2 transform -translate-x-1/2 w-[120vw] h-[120vh] object-cover z-[-10] pointer-events-none"
       >
         <source src={blackholeVideo} type="video/webm" />
       </video>
@@ -47,19 +43,21 @@ const Hero = () => {
           <h1 className="h1 mb-6 text-white">
             Empower Your Scripts With
             <br />
-            <Typewriter
-              options={{
-                strings: [
-                  "Fast Execution",
-                  "Continuous Improvement",
-                  "24/7 Support",
-                  "User-Friendly Interface",
-                  "Optimized Performance",
-                ],
-                autoStart: true,
-                loop: true,
-              }}
-            />
+            <span className="block min-h-[3.5rem] sm:min-h-[2.5rem]">
+              <Typewriter
+                options={{
+                  strings: [
+                    "Fast Execution",
+                    "Continuous Improvement",
+                    "24/7 Support",
+                    "User-Friendly Interface",
+                    "Optimized Performance",
+                  ],
+                  autoStart: true,
+                  loop: true,
+                }}
+              />
+            </span>
           </h1>
 
           <p className="body-1 max-w-3xl mx-auto mb-6 text-n-2 lg:mb-8 text-gray-300">
@@ -82,16 +80,8 @@ const Hero = () => {
           </Button>
         </div>
       </div>
-
-      {/* Gradient transisi halus ke hitam pekat di bawah */}
-      <div
-        className="absolute bottom-0 left-0 w-full h-[12rem] z-[-5]"
-        style={{
-          background: "linear-gradient(to bottom, transparent, #000)",
-        }}
-      />
     </Section>
   );
 };
 
-export default Hero;
+export default Hero
