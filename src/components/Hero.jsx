@@ -72,7 +72,7 @@ const Hero = () => {
         </div>
       </div>
 
-      {/* BottomLine saja, CompanyLogos dihapus */}
+      {/* BottomLine dengan background dan elemen transparan */}
       <BottomLine className="relative z-20" />
     </Section>
   );
