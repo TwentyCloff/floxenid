@@ -18,9 +18,15 @@
 }
 
 @layer base {
+  html, #root {
+    height: 100%;
+    background-color: #000; /* Background hitam full page */
+  }
   body {
-    @apply font-sans text-n-1 text-base;
-    /* Background dihapus total */
+    @apply font-sans text-n-1 text-base bg-black;
+    margin: 0;
+    min-height: 100vh;
+    background-color: #000; /* Pastikan body juga hitam */
   }
 }
 
