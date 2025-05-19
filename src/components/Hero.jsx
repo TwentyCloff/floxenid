@@ -13,9 +13,9 @@ const Hero = () => {
     <Section
       id="hero"
       customPaddings
-      className="pt-[12rem] -mt-[5.25rem] relative overflow-hidden"
+      className="pt-[10rem] sm:pt-[8rem] -mt-[5.25rem] relative overflow-hidden min-h-screen"
     >
-      {/* Background gradient gelap halus */}
+      {/* Background gradient */}
       <div
         className="absolute inset-0 z-[-20] pointer-events-none"
         style={{
@@ -23,14 +23,16 @@ const Hero = () => {
         }}
       />
 
-      {/* Video blackhole dengan brightness dan overlay */}
+      {/* Overlay hitam tipis */}
       <div className="absolute top-0 left-0 w-full h-full bg-black opacity-20 z-[-9]" />
+
+      {/* Video background */}
       <video
         autoPlay
         muted
         loop
         playsInline
-        className="absolute top-[-10%] left-1/2 transform -translate-x-1/2 w-[120vw] h-[120vh] object-cover z-[-10] pointer-events-none"
+        className="absolute top-0 left-0 w-full h-full object-cover object-top z-[-10] pointer-events-none"
         style={{
           filter: "brightness(0.7)",
         }}
@@ -39,9 +41,9 @@ const Hero = () => {
       </video>
 
       {/* Konten utama */}
-      <div ref={parallaxRef} className="container relative z-10">
-        <div className="relative max-w-[62rem] mx-auto text-center mb-[4rem] md:mb-20 lg:mb-[6rem]">
-          <h1 className="h1 mb-6 text-white">
+      <div ref={parallaxRef} className="container relative z-10 px-4">
+        <div className="relative max-w-[62rem] mx-auto text-center mb-20 sm:mb-16">
+          <h1 className="h1 mb-6 text-white text-3xl sm:text-4xl md:text-5xl">
             Empower Your Scripts With
             <br />
             <Typewriter
@@ -59,7 +61,7 @@ const Hero = () => {
             />
           </h1>
 
-          <p className="body-1 max-w-3xl mx-auto mb-6 text-n-2 lg:mb-8 text-gray-300">
+          <p className="body-1 max-w-3xl mx-auto mb-6 text-gray-300 text-base sm:text-lg">
             Unlock the next level of game scripting{" "}
             <span className="inline-block relative font-semibold text-white">
               Qarvo
@@ -80,9 +82,9 @@ const Hero = () => {
         </div>
       </div>
 
-      {/* Gradient transisi ke hitam pekat */}
+      {/* Gradient transisi ke bawah */}
       <div
-        className="absolute bottom-0 left-0 w-full h-[8rem] z-[-5]"
+        className="absolute bottom-0 left-0 w-full h-[6rem] z-[-5]"
         style={{
           background: "linear-gradient(to bottom, transparent, #000)",
         }}
