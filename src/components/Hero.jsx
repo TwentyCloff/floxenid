@@ -17,8 +17,7 @@ const Hero = () => {
       className="pt-[12rem] -mt-[5.25rem] relative overflow-hidden"
     >
       {/* Background hitam hanya dalam Hero section */}
-      <div className="absolute inset-0 bg-[#0a0a0a] z-[-20] pointer-events-none" />
-
+      {/* <div className="absolute inset-0 bg-[#0a0a0a] z-[-20] pointer-events-none" /> */}
       {/* Video blackhole dengan filter brightness hanya di video */}
       <video
         autoPlay
