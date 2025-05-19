@@ -15,7 +15,7 @@ const Hero = () => {
       customPaddings
       className="pt-[12rem] -mt-[5.25rem] relative overflow-hidden"
     >
-      {/* Background gradient gelap halus */}
+      {/* Gradient background atas ke bawah */}
       <div
         className="absolute inset-0 z-[-20] pointer-events-none"
         style={{
@@ -23,28 +23,31 @@ const Hero = () => {
         }}
       />
 
-      {/* Overlay hitam semi transparan */}
-      <div className="absolute top-0 left-0 w-full h-full bg-black opacity-40 z-[-9]" />
+      {/* Overlay hitam untuk menyamarkan video */}
+      <div className="absolute top-0 left-0 w-full h-full bg-black opacity-20 z-[-9]" />
 
-      {/* Video blackhole */}
+      {/* Video blackhole dengan responsif mobile */}
       <video
         autoPlay
         muted
         loop
         playsInline
-        className="absolute top-[-10%] left-1/2 transform -translate-x-1/2 w-[120vw] h-[120vh] object-cover z-[-10] pointer-events-none"
+        className="absolute left-1/2 transform -translate-x-1/2 w-[130vw] h-[130vh] object-cover z-[-10] pointer-events-none
+                   top-[-10%] sm:top-[-15%] md:top-[-10%] lg:top-[-10%]"
+        style={{
+          filter: "brightness(0.7)",
+        }}
       >
         <source src={blackholeVideo} type="video/webm" />
       </video>
 
       {/* Konten utama */}
       <div ref={parallaxRef} className="container relative z-10">
-        <div className="relative max-w-[62rem] mx-auto text-center mb-[4rem] md:mb-20 lg:mb-[6rem]">
-          <h1 className="h1 mb-6 text-white leading-tight">
+        <div className="relative max-w-[62rem] mx-auto text-center mb-[4rem] md:mb-20 lg:mb-[6rem] px-4">
+          <h1 className="h1 mb-6 text-white text-3xl sm:text-4xl md:text-5xl lg:text-6xl leading-tight">
             Empower Your Scripts With
             <br />
-            {/* Typewriter text dengan font kecil di mobile agar tidak wrap */}
-            <span className="block min-h-[2.5rem] text-sm sm:text-xl font-semibold">
+            <span className="block text-xl sm:text-2xl md:text-3xl lg:text-4xl font-medium mt-2 text-gray-100">
               <Typewriter
                 options={{
                   strings: [
@@ -81,6 +84,14 @@ const Hero = () => {
           </Button>
         </div>
       </div>
+
+      {/* Gradient bawah agar menyatu dengan latar */}
+      <div
+        className="absolute bottom-0 left-0 w-full h-[14rem] z-[-5]"
+        style={{
+          background: "linear-gradient(to bottom, transparent, #000)",
+        }}
+      />
     </Section>
   );
 };
