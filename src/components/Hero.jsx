@@ -33,7 +33,7 @@ const Hero = () => {
         loop
         playsInline
         className="absolute left-1/2 transform -translate-x-1/2 w-[130vw] h-[130vh] object-cover z-[-10] pointer-events-none
-                   top-[-2%] sm:top-[-12%] md:top-[-10%] lg:top-[-10%]"
+             top-[0%] sm:top-[-12%] md:top-[-10%] lg:top-[-10%]"
         style={{
           filter: "brightness(0.7)",
         }}
