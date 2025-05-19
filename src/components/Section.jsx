@@ -1,11 +1,6 @@
 import { motion } from "framer-motion";
 
-const Section = ({
-  className,
-  id,
-  customPaddings,
-  children,
-}) => {
+const Section = ({ className, id, customPaddings, children }) => {
   return (
     <motion.section
       initial={{ opacity: 0 }}
@@ -14,7 +9,7 @@ const Section = ({
       viewport={{ once: true }}
       id={id}
       className={`relative z-0 ${
-        customPaddings || `py-10 lg:py-16 xl:py-20`
+        customPaddings ? "" : "py-10 lg:py-16 xl:py-20"
       } ${className || ""}`}
     >
       {children}
