@@ -15,7 +15,7 @@ const Hero = () => {
       customPaddings
       className="pt-[12rem] -mt-[5.25rem] relative overflow-hidden"
     >
-      {/* Gradient background atas ke bawah */}
+      {/* Background gradient gelap halus */}
       <div
         className="absolute inset-0 z-[-20] pointer-events-none"
         style={{
@@ -23,31 +23,41 @@ const Hero = () => {
         }}
       />
 
-      {/* Overlay hitam untuk menyamarkan video */}
+      {/* Overlay hitam transparan */}
       <div className="absolute top-0 left-0 w-full h-full bg-black opacity-20 z-[-9]" />
 
-      {/* Video blackhole dengan responsif mobile */}
+      {/* Video blackhole */}
       <video
         autoPlay
         muted
         loop
         playsInline
-        className="absolute left-1/2 transform -translate-x-1/2 w-[130vw] h-[130vh] object-cover z-[-10] pointer-events-none
-             top-[10%] sm:top-[-12%] md:top-[-10%] lg:top-[-10%] object-[center_10%]"
+        className="absolute left-1/2 transform -translate-x-1/2 w-[130vw] h-[130vh] object-cover z-[-10] pointer-events-none"
         style={{
+          top: "-5%",
           filter: "brightness(0.7)",
         }}
-      >
-        <source src={blackholeVideo} type="video/webm" />
-      </video>
+      />
+
+      {/* Mobile adjustment: override top & brightness */}
+      <style>
+        {`
+          @media (max-width: 640px) {
+            video {
+              top: -25% !important;
+              filter: brightness(0.9) !important;
+            }
+          }
+        `}
+      </style>
 
       {/* Konten utama */}
       <div ref={parallaxRef} className="container relative z-10">
-        <div className="relative max-w-[62rem] mx-auto text-center mb-[4rem] md:mb-20 lg:mb-[6rem] px-4">
-          <h1 className="h1 mb-6 text-white text-3xl sm:text-4xl md:text-5xl lg:text-6xl leading-tight">
+        <div className="relative max-w-[62rem] mx-auto text-center mb-[4rem] md:mb-20 lg:mb-[6rem]">
+          <h1 className="h1 mb-6 text-white">
             Empower Your Scripts With
             <br />
-            <span className="block text-xl sm:text-2xl md:text-3xl lg:text-4xl font-medium mt-2 text-gray-100">
+            <span className="text-[1.4rem] sm:text-[1.75rem] md:text-[2rem] leading-snug block">
               <Typewriter
                 options={{
                   strings: [
@@ -85,9 +95,9 @@ const Hero = () => {
         </div>
       </div>
 
-      {/* Gradient bawah agar menyatu dengan latar */}
+      {/* Gradient transisi halus ke hitam pekat di bawah */}
       <div
-        className="absolute bottom-0 left-0 w-full h-[14rem] z-[-5]"
+        className="absolute bottom-0 left-0 w-full h-[12rem] z-[-5]"
         style={{
           background: "linear-gradient(to bottom, transparent, #000)",
         }}
