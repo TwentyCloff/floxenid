@@ -13,7 +13,7 @@ const Hero = () => {
     <Section
       id="hero"
       customPaddings
-      className="pt-[12rem] -mt-[5.25rem] relative overflow-hidden min-h-screen"
+      className="pt-[12rem] -mt-[5.25rem] relative overflow-hidden"
     >
       {/* Background gradient gelap halus */}
       <div
@@ -23,18 +23,19 @@ const Hero = () => {
         }}
       />
 
-      {/* Overlay hitam transparan */}
-      <div className="absolute top-0 left-0 w-full h-full bg-black opacity-30 z-[-9]" />
+      {/* Overlay hitam */}
+      <div className="absolute top-0 left-0 w-full h-full bg-black opacity-20 z-[-9]" />
 
-      {/* Video blackhole responsif */}
+      {/* Video blackhole dengan filter & posisi lebih rendah di mobile */}
       <video
         autoPlay
         muted
         loop
         playsInline
-        className="absolute top-0 left-0 w-full h-full object-cover object-top z-[-10] pointer-events-none"
+        className="absolute left-1/2 transform -translate-x-1/2 w-[130vw] h-[130vh] object-cover z-[-10] pointer-events-none
+                   top-[-10%] sm:top-[-15%] md:top-[-10%] lg:top-[-10%]"
         style={{
-          filter: "brightness(0.6)",
+          filter: "brightness(0.7)",
         }}
       >
         <source src={blackholeVideo} type="video/webm" />
@@ -42,8 +43,8 @@ const Hero = () => {
 
       {/* Konten utama */}
       <div ref={parallaxRef} className="container relative z-10">
-        <div className="relative max-w-[62rem] mx-auto text-center mb-[4rem] md:mb-20 lg:mb-[6rem] px-4">
-          <h1 className="h1 mb-6 text-white text-3xl sm:text-4xl md:text-5xl">
+        <div className="relative max-w-[62rem] mx-auto text-center mb-[4rem] md:mb-20 lg:mb-[6rem]">
+          <h1 className="h1 mb-6 text-white">
             Empower Your Scripts With
             <br />
             <Typewriter
@@ -61,7 +62,7 @@ const Hero = () => {
             />
           </h1>
 
-          <p className="body-1 max-w-3xl mx-auto mb-6 text-gray-300 text-base sm:text-lg lg:mb-8">
+          <p className="body-1 max-w-3xl mx-auto mb-6 text-n-2 lg:mb-8 text-gray-300">
             Unlock the next level of game scripting{" "}
             <span className="inline-block relative font-semibold text-white">
               Qarvo
@@ -81,6 +82,14 @@ const Hero = () => {
           </Button>
         </div>
       </div>
+
+      {/* Gradient transisi halus ke hitam pekat di bawah */}
+      <div
+        className="absolute bottom-0 left-0 w-full h-[12rem] z-[-5]"
+        style={{
+          background: "linear-gradient(to bottom, transparent, #000)",
+        }}
+      />
     </Section>
   );
 };
