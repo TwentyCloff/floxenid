@@ -4,7 +4,7 @@ import Typewriter from "typewriter-effect";
 import { curve } from "../assets";
 import blackholeVideo from "../assets/hero/blackhole.webm";
 import Button from "./Button";
-// import { BottomLine } from "./design/Hero"; // sudah tidak dipakai
+// import { BottomLine } from "./design/Hero"; // Di-comment/hapus jika bikin abu-abu
 import Section from "./Section";
 
 const Hero = () => {
@@ -16,7 +16,15 @@ const Hero = () => {
       customPaddings
       className="pt-[12rem] -mt-[5.25rem] relative overflow-hidden"
     >
-      {/* Video blackhole tanpa brightness filter */}
+      {/* Background gradient halus untuk transisi natural */}
+      <div
+        className="absolute inset-0 z-[-20] pointer-events-none"
+        style={{
+          background: "linear-gradient(180deg, #181818 0%, #000000 80%)",
+        }}
+      />
+
+      {/* Video blackhole tanpa filter brightness */}
       <video
         autoPlay
         muted
@@ -69,7 +77,7 @@ const Hero = () => {
         </div>
       </div>
 
-      {/* BottomLine sudah dihilangkan */}
+      {/* BottomLine dihapus agar tidak menambah abu-abu */}
       {/* <BottomLine className="relative z-20" /> */}
     </Section>
   );
