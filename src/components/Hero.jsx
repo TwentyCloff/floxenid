@@ -24,14 +24,14 @@ const Hero = () => {
         }}
       />
 
-      {/* Video blackhole dengan brightness filter 0.85 */}
+      {/* Video blackhole dengan brightness filter lebih gelap */}
       <video
         autoPlay
         muted
         loop
         playsInline
         className="absolute top-[-10%] left-1/2 transform -translate-x-1/2 w-[120vw] h-[120vh] object-cover z-[-10] pointer-events-none"
-        style={{ filter: "brightness(0.85)" }}
+        style={{ filter: "brightness(0.4)" }}
       >
         <source src={blackholeVideo} type="video/webm" />
       </video>
