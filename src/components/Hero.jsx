@@ -15,7 +15,7 @@ const Hero = () => {
       customPaddings
       className="pt-[12rem] -mt-[5.25rem] relative overflow-hidden bg-black"
     >
-      {/* Overlay Gradient Background */}
+      {/* Gradient Hitam Total */}
       <div
         className="absolute inset-0 z-[-20] pointer-events-none"
         style={{
@@ -23,21 +23,24 @@ const Hero = () => {
         }}
       />
 
-      {/* Optional: dark overlay above video for extra contrast */}
+      {/* Overlay Hitam Tipis */}
       <div className="absolute top-0 left-0 w-full h-full bg-black opacity-60 z-[-9]" />
 
-      {/* Blackhole Video Background */}
+      {/* Video Blackhole + filter tambahan */}
       <video
         autoPlay
         muted
         loop
         playsInline
         className="absolute top-[-10%] left-1/2 transform -translate-x-1/2 w-[120vw] h-[120vh] object-cover z-[-10] pointer-events-none"
+        style={{
+          filter: "brightness(0.3) contrast(1.2)",
+        }}
       >
         <source src={blackholeVideo} type="video/webm" />
       </video>
 
-      {/* Main Content */}
+      {/* Konten */}
       <div ref={parallaxRef} className="container relative z-10">
         <div className="relative max-w-[62rem] mx-auto text-center mb-[4rem] md:mb-20 lg:mb-[6rem]">
           <h1 className="h1 mb-6 text-white">
