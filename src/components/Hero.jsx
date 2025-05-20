@@ -1,4 +1,3 @@
-import { useEffect, useRef, useState } from "react";
 import Typewriter from "typewriter-effect";
 
 import { curve } from "../assets";
@@ -7,43 +6,6 @@ import Button from "./Button";
 import Section from "./Section";
 
 const Hero = () => {
-  const parallaxRef = useRef(null);
-  const [cursorPos, setCursorPos] = useState({ x: 0, y: 0 });
-  const [particles, setParticles] = useState([]);
-
-  // Update posisi kursor
-  useEffect(() => {
-    const handleMouseMove = (e) => {
-      setCursorPos({ x: e.clientX, y: e.clientY });
-    };
-
-    const handleClick = () => {
-      // Tambah partikel baru
-      const newParticles = Array.from({ length: 10 }, () => ({
-        id: Math.random(),
-        x: cursorPos.x,
-        y: cursorPos.y,
-      }));
-      setParticles((prev) => [...prev, ...newParticles]);
-
-      // Hapus partikel setelah 600ms
-      setTimeout(() => {
-        setParticles((prev) =>
-          prev.filter((p) => !newParticles.find((np) => np.id === p.id))
-        );
-      }, 600);
-    };
-
-    const heroElement = document.getElementById("hero");
-    heroElement?.addEventListener("mousemove", handleMouseMove);
-    heroElement?.addEventListener("click", handleClick);
-
-    return () => {
-      heroElement?.removeEventListener("mousemove", handleMouseMove);
-      heroElement?.removeEventListener("click", handleClick);
-    };
-  }, [cursorPos]);
-
   return (
     <Section
       id="hero"
@@ -76,7 +38,6 @@ const Hero = () => {
         <source src={blackholeVideo} type="video/webm" />
       </video>
 
-      {/* Mobile-only adjustment */}
       <style>
         {`
           @media (max-width: 640px) {
@@ -94,7 +55,7 @@ const Hero = () => {
       </style>
 
       {/* Konten utama */}
-      <div ref={parallaxRef} className="container relative z-10">
+      <div className="container relative z-10">
         <div className="relative max-w-[62rem] mx-auto text-center mb-[4rem] md:mb-20 lg:mb-[6rem]">
           <h1 className="h1 mb-6 text-white">
             Empower Your Scripts With
@@ -144,55 +105,6 @@ const Hero = () => {
           background: "linear-gradient(to bottom, transparent, #000)",
         }}
       />
-
-      {/* Custom Cursor */}
-      <div
-        className="hidden sm:block fixed z-50 pointer-events-none"
-        style={{
-          left: cursorPos.x,
-          top: cursorPos.y,
-          transform: "translate(-50%, -50%)",
-          width: "32px",
-          height: "32px",
-          borderRadius: "50%",
-          border: "2px solid white",
-          backgroundColor: "rgba(255, 255, 255, 0.1)",
-          backdropFilter: "blur(4px)",
-          transition: "transform 0.1s ease-out",
-        }}
-      />
-
-      {/* Partikel efek klik */}
-      {particles.map((p) => (
-        <div
-          key={p.id}
-          className="fixed z-40 pointer-events-none"
-          style={{
-            left: p.x,
-            top: p.y,
-            width: "6px",
-            height: "6px",
-            backgroundColor: "white",
-            borderRadius: "9999px",
-            transform: `translate(-50%, -50%) scale(${Math.random() * 1.5 + 1})`,
-            animation: "particle-pop 0.6s ease-out forwards",
-          }}
-        />
-      ))}
-
-      {/* Animasi partikel */}
-      <style>{`
-        @keyframes particle-pop {
-          0% {
-            opacity: 1;
-            transform: translate(-50%, -50%) scale(1);
-          }
-          100% {
-            opacity: 0;
-            transform: translate(-50%, -150%) scale(0.5);
-          }
-        }
-      `}</style>
     </Section>
   );
 };
