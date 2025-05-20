@@ -3,15 +3,17 @@ import { useEffect, useState } from "react";
 const CustomCursor = () => {
   const [cursorPos, setCursorPos] = useState({ x: 0, y: 0 });
   const [particles, setParticles] = useState([]);
+  const [visible, setVisible] = useState(true);
 
   useEffect(() => {
     const handleMouseMove = (e) => {
       setCursorPos({ x: e.clientX, y: e.clientY });
+      setVisible(true); // munculkan saat gerak
     };
 
     const handleClick = () => {
       const newParticles = Array.from({ length: 10 }, () => ({
-        id: crypto.randomUUID(),
+        id: Math.random(),
         x: cursorPos.x,
         y: cursorPos.y,
       }));
@@ -24,20 +26,29 @@ const CustomCursor = () => {
       }, 600);
     };
 
+    const handleMouseLeave = () => setVisible(false);
+    const handleVisibilityChange = () => {
+      setVisible(!document.hidden);
+    };
+
     document.addEventListener("mousemove", handleMouseMove);
     document.addEventListener("click", handleClick);
+    document.addEventListener("mouseleave", handleMouseLeave);
+    document.addEventListener("visibilitychange", handleVisibilityChange);
 
     return () => {
       document.removeEventListener("mousemove", handleMouseMove);
       document.removeEventListener("click", handleClick);
+      document.removeEventListener("mouseleave", handleMouseLeave);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
   }, [cursorPos]);
 
   return (
     <>
-      {/* Lingkaran utama cursor */}
+      {/* Custom Cursor with fade */}
       <div
-        className="fixed z-[9999] pointer-events-none hidden sm:block"
+        className="fixed z-50 pointer-events-none transition-opacity duration-200 sm:block hidden"
         style={{
           left: cursorPos.x,
           top: cursorPos.y,
@@ -48,15 +59,15 @@ const CustomCursor = () => {
           border: "2px solid white",
           backgroundColor: "rgba(255, 255, 255, 0.1)",
           backdropFilter: "blur(4px)",
-          transition: "transform 0.08s ease-out",
+          opacity: visible ? 1 : 0,
         }}
       />
 
-      {/* Partikel klik */}
+      {/* Partikel efek klik */}
       {particles.map((p) => (
         <div
           key={p.id}
-          className="fixed z-[9998] pointer-events-none"
+          className="fixed z-40 pointer-events-none"
           style={{
             left: p.x,
             top: p.y,
@@ -70,6 +81,7 @@ const CustomCursor = () => {
         />
       ))}
 
+      {/* Animasi partikel */}
       <style>{`
         @keyframes particle-pop {
           0% {
@@ -79,12 +91,6 @@ const CustomCursor = () => {
           100% {
             opacity: 0;
             transform: translate(-50%, -150%) scale(0.5);
-          }
-        }
-
-        @media (min-width: 640px) {
-          html, body {
-            cursor: none !important;
           }
         }
       `}</style>
