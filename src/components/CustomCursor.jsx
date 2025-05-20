@@ -1,32 +1,73 @@
 import { useEffect, useState } from "react";
 
+// Array SVG planet, bisa kamu modifikasi sendiri kalau mau
+const planets = [
+  // Bumi biru
+  <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" >
+    <circle cx="32" cy="32" r="30" fill="#3B82F6" />
+    <path fill="#2563EB" d="M20 15h10v10H20zM35 35h10v10H35z" />
+  </svg>,
+
+  // Mars merah
+  <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" >
+    <circle cx="32" cy="32" r="30" fill="#EF4444" />
+    <circle cx="22" cy="22" r="6" fill="#B91C1C" />
+    <circle cx="42" cy="42" r="8" fill="#DC2626" />
+  </svg>,
+
+  // Matahari kuning kecil
+  <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" >
+    <circle cx="32" cy="32" r="30" fill="#FBBF24" />
+    <circle cx="32" cy="32" r="20" fill="#F59E0B" />
+  </svg>,
+
+  // Gas raksasa ungu
+  <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" >
+    <circle cx="32" cy="32" r="30" fill="#8B5CF6" />
+    <ellipse cx="32" cy="32" rx="15" ry="30" fill="#7C3AED" />
+  </svg>,
+
+  // Planet hijau alien
+  <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" >
+    <circle cx="32" cy="32" r="30" fill="#22C55E" />
+    <circle cx="40" cy="24" r="6" fill="#15803D" />
+    <circle cx="24" cy="40" r="5" fill="#16A34A" />
+  </svg>,
+];
+
 const CustomCursor = () => {
   const [cursorPos, setCursorPos] = useState({ x: 0, y: 0 });
   const [particles, setParticles] = useState([]);
   const [visible, setVisible] = useState(true);
 
   useEffect(() => {
-    // Sembunyikan cursor default secara global
     document.body.style.cursor = "none";
 
     const handleMouseMove = (e) => {
       setCursorPos({ x: e.clientX, y: e.clientY });
-      setVisible(true); // munculkan saat gerak
+      setVisible(true);
     };
 
     const handleClick = () => {
-      const newParticles = Array.from({ length: 10 }, () => ({
-        id: Math.random(),
-        x: cursorPos.x,
-        y: cursorPos.y,
-      }));
-      setParticles((prev) => [...prev, ...newParticles]);
+      setParticles((prev) => {
+        let newParticles = prev.length >= 5 ? prev.slice(1) : prev;
+        const planetIndex = newParticles.length % planets.length;
 
-      setTimeout(() => {
-        setParticles((prev) =>
-          prev.filter((p) => !newParticles.find((np) => np.id === p.id))
-        );
-      }, 600);
+        const newParticle = {
+          id: Math.random(),
+          x: cursorPos.x,
+          y: cursorPos.y,
+          planetIndex,
+        };
+
+        newParticles = [...newParticles, newParticle];
+
+        setTimeout(() => {
+          setParticles((current) => current.filter((p) => p.id !== newParticle.id));
+        }, 600);
+
+        return newParticles;
+      });
     };
 
     const handleMouseLeave = () => setVisible(false);
@@ -40,7 +81,6 @@ const CustomCursor = () => {
     document.addEventListener("visibilitychange", handleVisibilityChange);
 
     return () => {
-      // Reset cursor saat komponen di-unmount
       document.body.style.cursor = "auto";
 
       document.removeEventListener("mousemove", handleMouseMove);
@@ -52,7 +92,6 @@ const CustomCursor = () => {
 
   return (
     <>
-      {/* Custom Cursor with fade */}
       <div
         className="fixed z-50 pointer-events-none transition-opacity duration-200 sm:block hidden"
         style={{
@@ -69,7 +108,6 @@ const CustomCursor = () => {
         }}
       />
 
-      {/* Partikel efek klik */}
       {particles.map((p) => (
         <div
           key={p.id}
@@ -77,17 +115,16 @@ const CustomCursor = () => {
           style={{
             left: p.x,
             top: p.y,
-            width: "6px",
-            height: "6px",
-            backgroundColor: "white",
-            borderRadius: "9999px",
-            transform: `translate(-50%, -50%) scale(${Math.random() * 1.5 + 1})`,
+            width: "24px",
+            height: "24px",
+            transform: "translate(-50%, -50%)",
             animation: "particle-pop 0.6s ease-out forwards",
           }}
-        />
+        >
+          {planets[p.planetIndex]}
+        </div>
       ))}
 
-      {/* Animasi partikel */}
       <style>{`
         @keyframes particle-pop {
           0% {
@@ -100,7 +137,6 @@ const CustomCursor = () => {
           }
         }
 
-        /* Override cursor default kecuali di elemen dengan class 'use-default-cursor' */
         body, *:not(.use-default-cursor) {
           cursor: none !important;
         }
