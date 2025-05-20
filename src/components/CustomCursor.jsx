@@ -1,24 +1,56 @@
 import { useEffect, useState } from "react";
 
+const YinYangParticle = ({ x, y, id }) => (
+  <svg
+    key={id}
+    className="yin-yang-particle"
+    width="24"
+    height="24"
+    viewBox="0 0 100 100"
+    style={{
+      position: "fixed",
+      left: x,
+      top: y,
+      transform: "translate(-50%, -50%)",
+      pointerEvents: "none",
+      zIndex: 40,
+      animation: "moveUpFade 1s ease-out forwards, spin 1s linear infinite",
+    }}
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <circle cx="50" cy="50" r="48" fill="black" stroke="white" strokeWidth="4" />
+    <path
+      d="M50 2
+         A48 48 0 1 1 50 98
+         A24 24 0 1 0 50 2Z"
+      fill="white"
+    />
+    <circle cx="50" cy="25" r="10" fill="black" />
+    <circle cx="50" cy="75" r="10" fill="white" />
+    <circle cx="50" cy="25" r="5" fill="white" />
+    <circle cx="50" cy="75" r="5" fill="black" />
+  </svg>
+);
+
 const CustomCursor = () => {
   const [cursorPos, setCursorPos] = useState({ x: 0, y: 0 });
   const [particles, setParticles] = useState([]);
   const [visible, setVisible] = useState(true);
 
   useEffect(() => {
-    // Sembunyikan cursor default secara global
+    // Hide default cursor
     document.body.style.cursor = "none";
 
     const handleMouseMove = (e) => {
       setCursorPos({ x: e.clientX, y: e.clientY });
-      setVisible(true); // munculkan saat gerak
+      setVisible(true);
     };
 
     const handleClick = () => {
-      const newParticles = Array.from({ length: 10 }, () => ({
+      const newParticles = Array.from({ length: 5 }, () => ({
         id: Math.random(),
-        x: cursorPos.x,
-        y: cursorPos.y,
+        x: cursorPos.x + (Math.random() - 0.5) * 30,
+        y: cursorPos.y + (Math.random() - 0.5) * 30,
       }));
       setParticles((prev) => [...prev, ...newParticles]);
 
@@ -26,7 +58,7 @@ const CustomCursor = () => {
         setParticles((prev) =>
           prev.filter((p) => !newParticles.find((np) => np.id === p.id))
         );
-      }, 600);
+      }, 1000);
     };
 
     const handleMouseLeave = () => setVisible(false);
@@ -40,7 +72,7 @@ const CustomCursor = () => {
     document.addEventListener("visibilitychange", handleVisibilityChange);
 
     return () => {
-      // Reset cursor saat komponen di-unmount
+      // Restore default cursor on unmount
       document.body.style.cursor = "auto";
 
       document.removeEventListener("mousemove", handleMouseMove);
@@ -52,7 +84,7 @@ const CustomCursor = () => {
 
   return (
     <>
-      {/* Custom Cursor with fade */}
+      {/* Custom Cursor */}
       <div
         className="fixed z-50 pointer-events-none transition-opacity duration-200 sm:block hidden"
         style={{
@@ -69,43 +101,29 @@ const CustomCursor = () => {
         }}
       />
 
-      {/* Partikel efek klik */}
+      {/* Yin Yang Particles */}
       {particles.map((p) => (
-        <div
-          key={p.id}
-          className="fixed z-40 pointer-events-none"
-          style={{
-            left: p.x,
-            top: p.y,
-            width: "6px",
-            height: "6px",
-            backgroundColor: "white",
-            borderRadius: "9999px",
-            transform: `translate(-50%, -50%) scale(${Math.random() * 1.5 + 1})`,
-            animation: "particle-pop 0.6s ease-out forwards",
-          }}
-        />
+        <YinYangParticle key={p.id} id={p.id} x={p.x} y={p.y} />
       ))}
 
-      {/* Animasi partikel */}
       <style>{`
-        @keyframes particle-pop {
+        @keyframes moveUpFade {
           0% {
             opacity: 1;
-            transform: translate(-50%, -50%) scale(1);
+            transform: translate(-50%, -50%) translateY(0);
           }
           100% {
             opacity: 0;
-            transform: translate(-50%, -150%) scale(0.5);
+            transform: translate(-50%, -150%) translateY(-20px);
           }
         }
-
-        /* Override cursor default kecuali di elemen dengan class 'use-default-cursor' */
-        body, *:not(.use-default-cursor) {
-          cursor: none !important;
-        }
-        .use-default-cursor {
-          cursor: auto !important;
+        @keyframes spin {
+          0% {
+            transform: translate(-50%, -50%) rotate(0deg);
+          }
+          100% {
+            transform: translate(-50%, -50%) rotate(360deg);
+          }
         }
       `}</style>
     </>
