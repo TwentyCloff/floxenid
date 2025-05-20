@@ -6,6 +6,9 @@ const CustomCursor = () => {
   const [visible, setVisible] = useState(true);
 
   useEffect(() => {
+    // Sembunyikan cursor default secara global
+    document.body.style.cursor = "none";
+
     const handleMouseMove = (e) => {
       setCursorPos({ x: e.clientX, y: e.clientY });
       setVisible(true); // munculkan saat gerak
@@ -37,6 +40,9 @@ const CustomCursor = () => {
     document.addEventListener("visibilitychange", handleVisibilityChange);
 
     return () => {
+      // Reset cursor saat komponen di-unmount
+      document.body.style.cursor = "auto";
+
       document.removeEventListener("mousemove", handleMouseMove);
       document.removeEventListener("click", handleClick);
       document.removeEventListener("mouseleave", handleMouseLeave);
@@ -92,6 +98,14 @@ const CustomCursor = () => {
             opacity: 0;
             transform: translate(-50%, -150%) scale(0.5);
           }
+        }
+
+        /* Override cursor default kecuali di elemen dengan class 'use-default-cursor' */
+        body, *:not(.use-default-cursor) {
+          cursor: none !important;
+        }
+        .use-default-cursor {
+          cursor: auto !important;
         }
       `}</style>
     </>
