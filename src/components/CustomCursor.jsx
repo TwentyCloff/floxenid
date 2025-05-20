@@ -1,61 +1,58 @@
 import { useEffect, useState } from "react";
 
-const YinYangParticle = ({ x, y, id }) => {
+const CrackLine = ({ x, y, id, angle, length }) => {
   return (
-    <svg
+    <div
       key={id}
-      className="yin-yang-particle"
-      width="32"
-      height="32"
-      viewBox="0 0 100 100"
       style={{
         position: "fixed",
         left: x,
         top: y,
-        transform: "translate(-50%, -50%)",
+        width: 0,
+        height: 2,
+        background:
+          "linear-gradient(90deg, rgba(255,255,255,0.9), rgba(128,0,128,0.9))",
+        transformOrigin: "0% 50%",
+        transform: `translate(-50%, -50%) rotate(${angle}deg)`,
+        filter:
+          "drop-shadow(0 0 8px rgba(128,0,128,0.8)) drop-shadow(0 0 12px rgba(255,255,255,0.8))",
+        animation: "crackExpand 0.6s forwards, crackFade 0.8s forwards 0.3s",
         pointerEvents: "none",
-        zIndex: 40,
-        animation: "moveUpFade 1s ease-out forwards, spin 1.5s linear infinite",
-        filter: "drop-shadow(0 0 8px rgba(128, 0, 128, 0.7)) drop-shadow(0 0 10px rgba(255, 255, 255, 0.8))",
+        zIndex: 100,
+        "--length": `${length}px`,
       }}
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      {/* Aura asap di belakang Yin Yang */}
-      <circle
-        cx="50"
-        cy="50"
-        r="40"
-        fill="url(#auraGradient)"
-        opacity="0.3"
-        style={{ animation: "pulseAura 2s ease-in-out infinite" }}
-      />
-      <defs>
-        <radialGradient id="auraGradient" cx="50%" cy="50%" r="50%">
-          <stop offset="0%" stopColor="rgba(255,255,255,0.6)" />
-          <stop offset="50%" stopColor="rgba(128,0,128,0.6)" />
-          <stop offset="100%" stopColor="transparent" />
-        </radialGradient>
-      </defs>
+    />
+  );
+};
 
-      {/* Yin Yang putih & ungu */}
-      <circle cx="50" cy="50" r="48" fill="#fff" stroke="#800080" strokeWidth="4" />
-      <path
-        d="M50 2
-           A48 48 0 1 1 50 98
-           A24 24 0 1 0 50 2Z"
-        fill="#800080"
-      />
-      <circle cx="50" cy="25" r="10" fill="#fff" />
-      <circle cx="50" cy="75" r="10" fill="#800080" />
-      <circle cx="50" cy="25" r="5" fill="#800080" />
-      <circle cx="50" cy="75" r="5" fill="#fff" />
-    </svg>
+const Debris = ({ x, y, id, angle, distance }) => {
+  // small glowing fragment that flies out then fades
+  return (
+    <div
+      key={id}
+      style={{
+        position: "fixed",
+        left: x,
+        top: y,
+        width: 6,
+        height: 6,
+        background:
+          "radial-gradient(circle, rgba(255,255,255,0.9) 0%, rgba(128,0,128,0.7) 70%, transparent 100%)",
+        borderRadius: "50%",
+        filter: "drop-shadow(0 0 6px rgba(128,0,128,0.8))",
+        transform: `translate(-50%, -50%) translate(${distance * Math.cos(angle)}px, ${distance * Math.sin(angle)}px)`,
+        animation: "debrisFly 1s forwards",
+        pointerEvents: "none",
+        zIndex: 101,
+      }}
+    />
   );
 };
 
 const CustomCursor = () => {
   const [cursorPos, setCursorPos] = useState({ x: 0, y: 0 });
-  const [particles, setParticles] = useState([]);
+  const [cracks, setCracks] = useState([]);
+  const [debris, setDebris] = useState([]);
   const [visible, setVisible] = useState(true);
 
   useEffect(() => {
@@ -67,15 +64,43 @@ const CustomCursor = () => {
     };
 
     const handleClick = () => {
-      const newParticle = {
-        id: Math.random(),
-        x: cursorPos.x,
-        y: cursorPos.y,
-      };
-      setParticles((prev) => [...prev, newParticle]);
+      // Create 8 crack lines with random angle/length
+      const newCracks = Array.from({ length: 8 }).map((_, i) => {
+        const angle = i * 45 + (Math.random() * 30 - 15);
+        const length = 70 + Math.random() * 50;
+        return {
+          id: Math.random(),
+          x: cursorPos.x,
+          y: cursorPos.y,
+          angle,
+          length,
+        };
+      });
 
+      // Create 12 debris particles with random angle/distance
+      const newDebris = Array.from({ length: 12 }).map(() => {
+        const angle = Math.random() * 2 * Math.PI;
+        const distance = 50 + Math.random() * 50;
+        return {
+          id: Math.random(),
+          x: cursorPos.x,
+          y: cursorPos.y,
+          angle,
+          distance,
+        };
+      });
+
+      setCracks((prev) => [...prev, ...newCracks]);
+      setDebris((prev) => [...prev, ...newDebris]);
+
+      // Remove them after animation duration
       setTimeout(() => {
-        setParticles((prev) => prev.filter((p) => p.id !== newParticle.id));
+        setCracks((prev) =>
+          prev.filter((c) => !newCracks.find((nc) => nc.id === c.id))
+        );
+        setDebris((prev) =>
+          prev.filter((d) => !newDebris.find((nd) => nd.id === d.id))
+        );
       }, 1200);
     };
 
@@ -118,38 +143,51 @@ const CustomCursor = () => {
         }}
       />
 
-      {/* Yin Yang Particle with aura */}
-      {particles.map((p) => (
-        <YinYangParticle key={p.id} id={p.id} x={p.x} y={p.y} />
+      {/* Crack Lines */}
+      {cracks.map(({ id, x, y, angle, length }) => (
+        <CrackLine key={id} x={x} y={y} angle={angle} length={length} />
+      ))}
+
+      {/* Debris Particles */}
+      {debris.map(({ id, x, y, angle, distance }) => (
+        <Debris key={id} x={x} y={y} angle={angle} distance={distance} />
       ))}
 
       <style>{`
-        @keyframes moveUpFade {
+        @keyframes crackExpand {
           0% {
+            width: 0;
             opacity: 1;
-            transform: translate(-50%, -50%) translateY(0);
+            filter: drop-shadow(0 0 10px rgba(128,0,128,0.9));
+          }
+          70% {
+            width: var(--length);
+            opacity: 1;
+            filter: drop-shadow(0 0 12px rgba(128,0,128,1)) drop-shadow(0 0 15px rgba(255,255,255,1));
           }
           100% {
             opacity: 0;
-            transform: translate(-50%, -150%) translateY(-20px);
+            filter: none;
           }
         }
-        @keyframes spin {
+        @keyframes crackFade {
           0% {
-            transform: translate(-50%, -50%) rotate(0deg);
+            opacity: 1;
           }
           100% {
-            transform: translate(-50%, -50%) rotate(360deg);
+            opacity: 0;
           }
         }
-        @keyframes pulseAura {
-          0%, 100% {
-            opacity: 0.3;
-            r: 40;
+        @keyframes debrisFly {
+          0% {
+            opacity: 1;
+            transform: translate(-50%, -50%) translate(0, 0);
+            filter: drop-shadow(0 0 8px rgba(128,0,128,0.8));
           }
-          50% {
-            opacity: 0.5;
-            r: 48;
+          100% {
+            opacity: 0;
+            transform: translate(-50%, -50%) translate(var(--dx), var(--dy));
+            filter: none;
           }
         }
       `}</style>
