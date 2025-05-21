@@ -26,14 +26,21 @@ const Pricing = () => {
     fetchPricing();
   }, []);
 
-  if (loading) return <div>Loading pricing...</div>;
+  if (loading) return <div className="text-center py-20 text-white">Loading pricing...</div>;
 
   return (
-    <section className="py-12 px-6 max-w-7xl mx-auto">
-      <h2 className="text-3xl font-bold mb-8 text-center">Pricing Plans</h2>
+    <section className="relative py-20 px-6 max-w-7xl mx-auto text-white">
+      <div className="absolute inset-0 bg-gradient-to-br from-[#0f0c29] via-[#302b63] to-[#24243e] opacity-80 -z-10" />
+      <div className="absolute inset-0 backdrop-blur-[4px] -z-10" />
+      
+      <h2 className="text-4xl font-extrabold text-center mb-12 bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
+        Pricing Plans
+      </h2>
+
       <PricingList data={pricingData} />
     </section>
   );
 };
 
 export default Pricing;
+
