@@ -1,47 +1,51 @@
-import { useEffect, useState } from 'react';
-import { collection, getDocs } from 'firebase/firestore';
-import { db } from '../firebase'; // pastikan ini sesuai dengan file firebase kamu
-import PricingList from './PricingList';
+import React, { useEffect, useState } from "react";
+import PricingList from "./PricingList";
+
+import { initializeApp } from "firebase/app";
+import { getFirestore, collection, getDocs } from "firebase/firestore";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDP6XNlI1jUgHN3pVWIXNZjGT3YWXKSdes",
+  authDomain: "gweenlearn.firebaseapp.com",
+  projectId: "gweenlearn",
+  storageBucket: "gweenlearn.firebasestorage.app",
+  messagingSenderId: "915816429541",
+  appId: "1:915816429541:web:65c885efda4472930c210c",
+  measurementId: "G-RSGBWRE6BD"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
 
 const Pricing = () => {
-  const [data, setData] = useState([]);
+  const [pricingData, setPricingData] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchPricing = async () => {
       try {
-        const querySnapshot = await getDocs(collection(db, 'projects'));
-        const items = querySnapshot.docs.map((doc) => ({
+        const querySnapshot = await getDocs(collection(db, "projects"));
+        const projects = querySnapshot.docs.map(doc => ({
           id: doc.id,
-          ...doc.data(),
+          ...doc.data()
         }));
-        setData(items);
+        setPricingData(projects);
       } catch (error) {
-        console.error('Error fetching pricing data:', error);
+        console.error("Error fetching pricing data:", error);
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchPricing();
   }, []);
 
-  return (
-    <section className="py-20 px-4 md:px-10 lg:px-20 bg-white" id="pricing">
-      <div className="text-center mb-12">
-        <h2 className="text-4xl font-bold text-gray-900 mb-4">Our Pricing</h2>
-        <p className="text-gray-600 text-lg">Choose the plan that suits you best</p>
-      </div>
+  if (loading) return <div>Loading pricing...</div>;
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {data.map((item) => (
-          <PricingList
-            key={item.id}
-            id={item.id}
-            name={item.name}
-            description={item.description}
-            price={item.price}
-            image={item.image}
-          />
-        ))}
-      </div>
+  return (
+    <section className="py-12 px-6 max-w-7xl mx-auto">
+      <h2 className="text-3xl font-bold mb-8 text-center">Pricing Plans</h2>
+      <PricingList data={pricingData} />
     </section>
   );
 };
