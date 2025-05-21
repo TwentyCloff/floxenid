@@ -30,24 +30,33 @@ const ProjectDetails = () => {
     fetchProject();
   }, [id, navigate]);
 
-  if (loading) return <div>Loading project details...</div>;
-  if (!project) return <div>Project not found.</div>;
+  if (loading) return <div className="text-center py-20 text-white">Loading project details...</div>;
+  if (!project) return <div className="text-center py-20 text-white">Project not found.</div>;
 
   return (
-    <div className="max-w-4xl mx-auto p-6">
-      <button onClick={() => navigate(-1)} className="mb-6 text-blue-600 underline">
-        ← Back
+    <div className="max-w-4xl mx-auto p-6 text-white">
+      <button
+        onClick={() => navigate(-1)}
+        className="mb-6 text-blue-400 hover:underline text-sm transition-all"
+      >
+        ← Back to Pricing
       </button>
 
-      <h1 className="text-4xl font-bold mb-4">{project.title}</h1>
-      <p className="mb-6">{project.description}</p>
-      <p className="text-xl font-semibold mb-6">Price: ${project.price}</p>
+      <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-6 shadow-lg">
+        <h1 className="text-4xl font-extrabold mb-4 text-gradient bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
+          {project.title}
+        </h1>
+        <p className="mb-6 text-white/80">{project.description}</p>
+        <p className="text-xl font-bold mb-6 text-blue-400">Price: ${project.price}</p>
 
-      {project.imageUrl && (
-        <img src={project.imageUrl} alt={project.title} className="rounded-lg w-full object-cover" />
-      )}
-
-      {/* Konten tambahan sesuai project */}
+        {project.imageUrl && (
+          <img
+            src={project.imageUrl}
+            alt={project.title}
+            className="rounded-lg w-full object-cover shadow-lg"
+          />
+        )}
+      </div>
     </div>
   );
 };
