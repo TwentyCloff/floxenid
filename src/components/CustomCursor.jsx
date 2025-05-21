@@ -15,7 +15,6 @@ const CustomCursor = () => {
   const [particles, setParticles] = useState([]);
   const planetIndex = useRef(0);
   const requestRef = useRef(null);
-  const [clicked, setClicked] = useState(false);
 
   useEffect(() => {
     const handleMouseMove = (e) => {
@@ -38,6 +37,7 @@ const CustomCursor = () => {
   }, []);
 
   useEffect(() => {
+    // Smoothly follow mouse
     const lerp = (start, end, factor) => start + (end - start) * factor;
 
     const animate = () => {
@@ -53,12 +53,11 @@ const CustomCursor = () => {
   }, [mousePos]);
 
   const handleClick = () => {
-    if (clicked) return;
-
-    setClicked(true);
-
     setParticles((prev) => {
-      if (prev.length >= 5) return prev;
+      if (prev.length >= 5) {
+        // Clear all particles immediately if limit exceeded
+        return [];
+      }
 
       const id = Date.now() + Math.random();
       const img = planetImages[planetIndex.current];
@@ -69,17 +68,24 @@ const CustomCursor = () => {
         x: mousePos.x,
         y: mousePos.y,
         img,
+        exiting: false,
       };
 
-      // Hapus partikel ini secara individual setelah 3 detik
+      // Schedule popout animation after 3 seconds
       setTimeout(() => {
-        setParticles((cur) => cur.filter((p) => p.id !== id));
+        setParticles((cur) =>
+          cur.map((p) =>
+            p.id === id ? { ...p, exiting: true } : p
+          )
+        );
+        // Remove particle after popout animation duration (0.3s)
+        setTimeout(() => {
+          setParticles((cur) => cur.filter((p) => p.id !== id));
+        }, 300);
       }, 3000);
 
       return [...prev, newParticle];
     });
-
-    setTimeout(() => setClicked(false), 300);
   };
 
   return (
@@ -96,7 +102,7 @@ const CustomCursor = () => {
       </div>
 
       <div
-        className={`custom-cursor-circle ${clicked ? "clicked" : ""}`}
+        className="custom-cursor-circle"
         style={{
           left: circlePos.x,
           top: circlePos.y,
@@ -109,7 +115,7 @@ const CustomCursor = () => {
           key={p.id}
           src={p.img}
           alt="planet"
-          className="custom-cursor-planet"
+          className={`custom-cursor-planet ${p.exiting ? "planet-exit" : ""}`}
           style={{
             left: p.x,
             top: p.y,
@@ -118,6 +124,7 @@ const CustomCursor = () => {
         />
       ))}
 
+      {/* Fullscreen transparent div to catch clicks */}
       <div
         style={{
           position: "fixed",
