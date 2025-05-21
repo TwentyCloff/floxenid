@@ -11,6 +11,7 @@ const Hero = lazy(() => import("./components/Hero"));
 const Pricing = lazy(() => import("./components/Pricing"));
 const Roadmap = lazy(() => import("./components/Roadmap"));
 const Services = lazy(() => import("./components/Services"));
+const PaymentPage = lazy(() => import("./components/PaymentPage")); // Tambahkan ini
 
 const Home = () => (
   <>
@@ -28,13 +29,14 @@ const Home = () => (
   </>
 );
 
-const Loading = () => <div>Loading...</div>;
+const Loading = () => <div className="flex justify-center items-center h-screen">Loading...</div>;
 
 const App = () => (
   <Router>
     <Suspense fallback={<Loading />}>
       <Routes>
         <Route path="/" element={<Home />} />
+        <Route path="/payment" element={<PaymentPage />} /> {/* Tambahkan route ini */}
         <Route path="*" element={<div>404 Not Found</div>} />
       </Routes>
     </Suspense>
