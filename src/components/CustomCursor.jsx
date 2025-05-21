@@ -22,18 +22,17 @@ const CustomCursor = () => {
       setVisible(true);
     };
 
-    const handleMouseLeave = () => {
-      setVisible(false);
-    };
+    const handleMouseLeave = () => setVisible(false);
+    const handleMouseEnter = () => setVisible(true);
 
     window.addEventListener("mousemove", handleMouseMove);
     window.addEventListener("mouseout", handleMouseLeave);
-    window.addEventListener("mouseenter", () => setVisible(true));
+    window.addEventListener("mouseenter", handleMouseEnter);
 
     return () => {
       window.removeEventListener("mousemove", handleMouseMove);
       window.removeEventListener("mouseout", handleMouseLeave);
-      window.removeEventListener("mouseenter", () => setVisible(true));
+      window.removeEventListener("mouseenter", handleMouseEnter);
     };
   }, []);
 
@@ -47,6 +46,7 @@ const CustomCursor = () => {
       }));
       requestRef.current = requestAnimationFrame(animate);
     };
+
     requestRef.current = requestAnimationFrame(animate);
     return () => cancelAnimationFrame(requestRef.current);
   }, [mousePos]);
@@ -76,7 +76,7 @@ const CustomCursor = () => {
 
   return (
     <>
-      {/* Dot dan Click! text */}
+      {/* Dot kecil */}
       <div
         className="custom-cursor-dot"
         style={{
@@ -88,7 +88,7 @@ const CustomCursor = () => {
         <div className="custom-cursor-click-text">Click!</div>
       </div>
 
-      {/* Lingkaran outer */}
+      {/* Lingkaran besar */}
       <div
         className="custom-cursor-circle"
         style={{
@@ -98,7 +98,7 @@ const CustomCursor = () => {
         }}
       />
 
-      {/* Planet Particles */}
+      {/* Planet particles */}
       {particles.map((p) => (
         <img
           key={p.id}
@@ -113,7 +113,7 @@ const CustomCursor = () => {
         />
       ))}
 
-      {/* Overlay */}
+      {/* Overlay untuk tangkap klik + hide native cursor */}
       <div
         style={{
           position: "fixed",
@@ -121,6 +121,7 @@ const CustomCursor = () => {
           zIndex: 9999,
           pointerEvents: "auto",
           backgroundColor: "transparent",
+          cursor: "none",
         }}
         onClick={handleClick}
       />
@@ -129,4 +130,3 @@ const CustomCursor = () => {
 };
 
 export default CustomCursor;
-
