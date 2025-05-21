@@ -9,6 +9,17 @@ const PricingList = () => {
       console.log("ID kosong");
       e.preventDefault();
       alert("Project details are not available");
+      return;
+    }
+
+    if (id === "1") {
+      // Validasi akses premium
+      const isLoggedIn = localStorage.getItem("user"); // Ganti sesuai sistem login kamu
+      if (!isLoggedIn) {
+        e.preventDefault();
+        alert("Hanya pengguna premium yang bisa mengakses project ini.");
+        return;
+      }
     }
   };
 
@@ -25,7 +36,7 @@ const PricingList = () => {
           </p>
 
           <div className="flex items-center h-[5.5rem] mb-6">
-            {plan.price && (
+            {plan.price !== null && plan.price !== undefined && (
               <>
                 <div className="h-3">$</div>
                 <div className="text-[5.5rem] leading-none font-bold">
@@ -35,7 +46,7 @@ const PricingList = () => {
             )}
           </div>
 
-          {plan.price ? (
+          {plan.price !== null && plan.price !== undefined ? (
             plan.id ? (
               <Link
                 to={`/project/${plan.id}`}
