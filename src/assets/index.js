@@ -147,4 +147,5 @@ export {
   instagram,
   telegram,
   twitter,
+  verificon,
 };
