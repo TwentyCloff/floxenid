@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react"; 
+import { useEffect, useRef, useState } from "react";
 import planet1 from "../assets/planet-1.png";
 import planet2 from "../assets/planet-2.png";
 import planet3 from "../assets/planet-3.png";
@@ -11,19 +11,23 @@ const planetImages = [planet1, planet2, planet3, planet4, planet5];
 const CustomCursor = () => {
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const [particles, setParticles] = useState([]);
+  const [visible, setVisible] = useState(true);
   const dotRef = useRef(null);
   const circleRef = useRef(null);
   const requestRef = useRef(null);
   const planetIndex = useRef(0);
 
+  // Track mouse position
   useEffect(() => {
     const handleMouseMove = (e) => {
       setMousePos({ x: e.clientX, y: e.clientY });
+      setVisible(true);
     };
     window.addEventListener("mousemove", handleMouseMove);
     return () => window.removeEventListener("mousemove", handleMouseMove);
   }, []);
 
+  // Animate circle follow with lerp smoothing
   useEffect(() => {
     const moveCircle = () => {
       if (circleRef.current) {
@@ -41,9 +45,27 @@ const CustomCursor = () => {
     return () => cancelAnimationFrame(requestRef.current);
   }, [mousePos]);
 
+  // Fade out cursor on mouse leave window
+  useEffect(() => {
+    const handleMouseLeave = () => setVisible(false);
+    const handleMouseEnter = () => setVisible(true);
+    window.addEventListener("mouseout", (e) => {
+      if (!e.relatedTarget || e.relatedTarget.nodeName === "HTML") {
+        handleMouseLeave();
+      }
+    });
+    window.addEventListener("mouseenter", handleMouseEnter);
+    return () => {
+      window.removeEventListener("mouseout", handleMouseLeave);
+      window.removeEventListener("mouseenter", handleMouseEnter);
+    };
+  }, []);
+
+  // Handle click: add planet particle
   const handleClick = () => {
     setParticles((prev) => {
       if (prev.length >= 5) {
+        // Clear all particles if max reached
         return [];
       }
 
@@ -58,6 +80,7 @@ const CustomCursor = () => {
 
       planetIndex.current = (planetIndex.current + 1) % planetImages.length;
 
+      // Remove particle after 3 seconds
       setTimeout(() => {
         setParticles((current) => current.filter((p) => p.id !== id));
       }, 3000);
@@ -71,56 +94,52 @@ const CustomCursor = () => {
       {/* Dot (cursor center) */}
       <div
         ref={dotRef}
-        className="fixed w-[8px] h-[8px] bg-white rounded-full z-50 pointer-events-none"
+        className="custom-cursor-dot"
         style={{
           left: mousePos.x,
           top: mousePos.y,
-          transform: "translate(-50%, -50%)",
+          opacity: visible ? 1 : 0,
         }}
       />
 
       {/* Circle follower */}
       <div
         ref={circleRef}
-        className="fixed w-16 h-16 rounded-full border-2 border-white bg-white/10 z-40 pointer-events-none"
+        className="custom-cursor-circle"
         style={{
           left: mousePos.x,
           top: mousePos.y,
-          transform: "translate(-50%, -50%)",
-          backdropFilter: "none",
+          opacity: visible ? 1 : 0,
         }}
       >
-        {/* Click text di bawah dot (di luar lingkaran) */}
-        <div
-          className="absolute left-1/2 top-full translate-x-[-50%] mt-4 text-white text-sm select-none pointer-events-none"
-          style={{ userSelect: "none" }}
-        >
-          Click!
-        </div>
+        {/* Click text below */}
+        <div className="custom-cursor-click-text">Click!</div>
       </div>
 
-      {/* Planets (particles) */}
+      {/* Planets particles */}
       {particles.map((p) => (
         <img
           key={p.id}
           src={p.img}
           alt="planet"
-          className="fixed z-30 pointer-events-none animate-popout"
+          className="custom-cursor-planet"
           style={{
             left: p.x,
             top: p.y,
-            width: "48px",
-            height: "48px",
-            transform: "translate(-50%, -50%)",
           }}
         />
       ))}
 
-      {/* Click listener overlay */}
+      {/* Invisible full screen overlay to catch clicks */}
       <div
-        className="fixed inset-0 z-10"
+        style={{
+          position: "fixed",
+          inset: 0,
+          zIndex: 9990,
+          pointerEvents: "auto",
+          backgroundColor: "transparent",
+        }}
         onClick={handleClick}
-        style={{ pointerEvents: "auto" }}
       />
     </>
   );
