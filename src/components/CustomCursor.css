@@ -1,3 +1,8 @@
+/* Hilangkan native cursor */
+body {
+  cursor: none !important;
+}
+
 .custom-cursor-dot {
   position: fixed;
   width: 8px;
@@ -11,21 +16,21 @@
 
 .custom-cursor-click-text {
   position: absolute;
-  top: 24px; /* jauh di bawah lingkaran */
+  top: 30px; /* Jauh di luar lingkaran */
   left: 50%;
   transform: translateX(-50%);
   font-size: 12px;
   font-weight: bold;
   color: white;
   white-space: nowrap;
-  text-shadow: 0 0 3px #000;
+  text-shadow: 0 0 4px black;
   pointer-events: none;
 }
 
 .custom-cursor-circle {
   position: fixed;
-  width: 60px; /* diperbesar */
-  height: 60px;
+  width: 70px;
+  height: 70px;
   border: 2px solid white;
   border-radius: 50%;
   transform: translate(-50%, -50%);
@@ -36,8 +41,8 @@
 
 .custom-cursor-planet {
   position: fixed;
-  width: 64px; /* ukuran planet diperbesar */
-  height: 64px;
+  width: 72px;
+  height: 72px;
   transform: translate(-50%, -50%);
   pointer-events: none;
   z-index: 9998;
