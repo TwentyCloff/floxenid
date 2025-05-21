@@ -4,8 +4,7 @@ import planet2 from "../assets/planet-2.png";
 import planet3 from "../assets/planet-3.png";
 import planet4 from "../assets/planet-4.png";
 import planet5 from "../assets/planet-5.png";
-import './customCursor.css';
-
+import "./CustomCursor.css";
 
 const planetImages = [planet1, planet2, planet3, planet4, planet5];
 
