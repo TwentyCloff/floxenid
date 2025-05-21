@@ -13,7 +13,7 @@ const CustomCursor = () => {
   const [circlePos, setCirclePos] = useState({ x: 0, y: 0 });
   const [visible, setVisible] = useState(true);
   const [particles, setParticles] = useState([]);
-  const [clicked, setClicked] = useState(false); // state tambahan untuk animasi klik
+  const [clicked, setClicked] = useState(false); // untuk animasi klik
   const planetIndex = useRef(0);
   const requestRef = useRef(null);
 
@@ -53,9 +53,9 @@ const CustomCursor = () => {
   }, [mousePos]);
 
   const handleClick = () => {
-    if (clicked) return; // biar animasi gak tabrakan
+    if (clicked) return; // hindari klik bertumpuk selama animasi
 
-    setClicked(true); // aktifkan animasi klik lingkaran
+    setClicked(true); // mulai animasi klik lingkaran
 
     setParticles((prev) => {
       if (prev.length >= 5) return [];
@@ -78,7 +78,7 @@ const CustomCursor = () => {
       return [...prev, newParticle];
     });
 
-    // reset state clicked setelah animasi selesai (0.3 detik)
+    // reset animasi setelah selesai (300ms)
     setTimeout(() => setClicked(false), 300);
   };
 
