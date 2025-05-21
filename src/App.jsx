@@ -11,7 +11,6 @@ const Hero = lazy(() => import("./components/Hero"));
 const Pricing = lazy(() => import("./components/Pricing"));
 const Roadmap = lazy(() => import("./components/Roadmap"));
 const Services = lazy(() => import("./components/Services"));
-const ProjectDetails = lazy(() => import("./pages/ProjectDetails"));
 
 const Home = () => (
   <>
@@ -36,7 +35,6 @@ const App = () => (
     <Suspense fallback={<Loading />}>
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/project/:id" element={<ProjectDetails />} />
         <Route path="*" element={<div>404 Not Found</div>} />
       </Routes>
     </Suspense>
