@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react"; 
 import planet1 from "../asseth/planet-1.png";
 import planet2 from "../asseth/planet-2.png";
 import planet3 from "../asseth/planet-3.png";
@@ -86,7 +86,6 @@ const CustomCursor = () => {
           left: mousePos.x,
           top: mousePos.y,
           transform: "translate(-50%, -50%)",
-          // Hilangkan backdropBlur agar tidak blur di dalam lingkaran
           backdropFilter: "none",
         }}
       >
@@ -115,31 +114,6 @@ const CustomCursor = () => {
           }}
         />
       ))}
-
-      {/* CSS Animations */}
-      <style>{`
-        .animate-popout {
-          animation: popout 0.25s ease-out, fadeout 0.25s ease-in 2.75s forwards;
-        }
-        @keyframes popout {
-          0% {
-            opacity: 0;
-            transform: translate(-50%, -50%) scale(0.7);
-          }
-          100% {
-            opacity: 1;
-            transform: translate(-50%, -50%) scale(1);
-          }
-        }
-        @keyframes fadeout {
-          to {
-            opacity: 0;
-          }
-        }
-        * {
-          cursor: none !important;
-        }
-      `}</style>
 
       {/* Click listener overlay */}
       <div
