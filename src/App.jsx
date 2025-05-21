@@ -9,7 +9,7 @@ import Hero from "./components/Hero";
 import Pricing from "./components/Pricing";
 import Roadmap from "./components/Roadmap";
 import Services from "./components/Services";
-import ProjectDetails from "./components/ProjectDetails"; // Pastikan file ini ada
+import ProjectDetails from "./pages/ProjectDetails"; // Pastikan file ini ada
 
 const Home = () => {
   return (
