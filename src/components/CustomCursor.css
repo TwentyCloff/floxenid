@@ -59,18 +59,35 @@ body {
   width: 48px;
   height: 48px;
   pointer-events: none;
-  transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%) scale(0);
   z-index: 9999;
-  animation: planet-fade 3s forwards;
+  animation: planet-popin 0.3s forwards;
+  user-select: none;
+  -webkit-user-drag: none;
 }
 
-@keyframes planet-fade {
-  0% {
+@keyframes planet-popin {
+  from {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(0);
+  }
+  to {
     opacity: 1;
     transform: translate(-50%, -50%) scale(1);
   }
-  100% {
-    opacity: 0;
-    transform: translate(-50%, -50%) scale(1.2);
+}
+
+@keyframes planet-popout {
+  from {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
   }
+  to {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(1.5);
+  }
+}
+
+.planet-exit {
+  animation: planet-popout 0.3s forwards;
 }
