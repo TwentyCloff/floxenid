@@ -1,7 +1,5 @@
-// src/components/Pricing.jsx
 import React, { useEffect, useState } from "react";
 import PricingList from "./PricingList";
-
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../config/firebase";
 
@@ -13,7 +11,7 @@ const Pricing = () => {
     const fetchPricing = async () => {
       try {
         const querySnapshot = await getDocs(collection(db, "projects"));
-        const projects = querySnapshot.docs.map((doc) => ({
+        const projects = querySnapshot.docs.map(doc => ({
           id: doc.id,
           ...doc.data(),
         }));
