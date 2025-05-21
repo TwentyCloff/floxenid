@@ -16,7 +16,7 @@ const PricingList = () => {
     <div className="flex gap-[1rem] max-lg:flex-wrap">
       {pricing.map((plan, i) => (
         <div
-          key={plan.id}
+          key={plan.id || i}
           className="w-[19rem] max-lg:w-full h-full px-6 bg-n-8 border border-n-6 rounded-[2rem] lg:w-auto even:py-14 odd:py-8 odd:my-4 [&>h4]:first:text-color-2 [&>h4]:even:text-color-1 [&>h4]:last:text-color-3"
         >
           <h4 className="h4 mb-4">{plan.title}</h4>
@@ -36,17 +36,23 @@ const PricingList = () => {
           </div>
 
           {plan.price ? (
-            <Link
-              to={`/project/${plan.id}`}
-              onClick={(e) => handleGetStarted(e, plan.id)}
-              className={`flex justify-center items-center px-8 py-4 rounded-full border font-code text-sm font-bold uppercase tracking-wider transition-colors mb-6 w-full ${
-                plan.premium
-                  ? "bg-n-1 text-n-8 hover:bg-n-1/90"
-                  : "bg-transparent text-n-1 border-n-1 hover:bg-n-1/10"
-              }`}
-            >
-              Get started
-            </Link>
+            plan.id ? (
+              <Link
+                to={`/project/${plan.id}`}
+                onClick={(e) => handleGetStarted(e, plan.id)}
+                className={`flex justify-center items-center px-8 py-4 rounded-full border font-code text-sm font-bold uppercase tracking-wider transition-colors mb-6 w-full ${
+                  plan.premium
+                    ? "bg-n-1 text-n-8 hover:bg-n-1/90"
+                    : "bg-transparent text-n-1 border-n-1 hover:bg-n-1/10"
+                }`}
+              >
+                Get started
+              </Link>
+            ) : (
+              <span className="block text-center text-sm text-n-1/50 italic mb-6">
+                Details Not Available
+              </span>
+            )
           ) : (
             <Button
               className="w-full mb-6"
