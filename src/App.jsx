@@ -1,15 +1,17 @@
+import { lazy, Suspense } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-
 import ButtonGradient from "./assets/svg/ButtonGradient";
-import Benefits from "./components/Benefits";
-import Collaboration from "./components/Collaboration";
-import Footer from "./components/Footer";
-import Header from "./components/Header";
-import Hero from "./components/Hero";
-import Pricing from "./components/Pricing";
-import Roadmap from "./components/Roadmap";
-import Services from "./components/Services";
-import ProjectDetails from "./pages/ProjectDetails";
+
+// Lazy-loaded components
+const Benefits = lazy(() => import("./components/Benefits"));
+const Collaboration = lazy(() => import("./components/Collaboration"));
+const Footer = lazy(() => import("./components/Footer"));
+const Header = lazy(() => import("./components/Header"));
+const Hero = lazy(() => import("./components/Hero"));
+const Pricing = lazy(() => import("./components/Pricing"));
+const Roadmap = lazy(() => import("./components/Roadmap"));
+const Services = lazy(() => import("./components/Services"));
+const ProjectDetails = lazy(() => import("./pages/ProjectDetails"));
 
 const Home = () => (
   <>
@@ -27,12 +29,17 @@ const Home = () => (
   </>
 );
 
+const Loading = () => <div>Loading...</div>;
+
 const App = () => (
   <Router>
-    <Routes>
-      <Route path="/" element={<Home />} />
-      <Route path="/project/:id" element={<ProjectDetails />} />
-    </Routes>
+    <Suspense fallback={<Loading />}>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/project/:id" element={<ProjectDetails />} />
+        <Route path="*" element={<div>404 Not Found</div>} />
+      </Routes>
+    </Suspense>
   </Router>
 );
 
