@@ -79,9 +79,7 @@ const CustomCursor = () => {
       // Schedule popout animation after 3 seconds
       setTimeout(() => {
         setParticles((cur) =>
-          cur.map((p) =>
-            p.id === id ? { ...p, exiting: true } : p
-          )
+          cur.map((p) => (p.id === id ? { ...p, exiting: true } : p))
         );
         // Remove particle after popout animation duration (0.3s)
         setTimeout(() => {
