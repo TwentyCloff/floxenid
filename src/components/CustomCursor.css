@@ -1,85 +1,56 @@
-/* Hide default cursor */
-* {
-  cursor: none !important;
-}
-
 .custom-cursor-dot {
   position: fixed;
-  width: 20px;
-  height: 20px;
-  background: white;
+  width: 8px;
+  height: 8px;
+  background-color: white;
   border-radius: 50%;
-  pointer-events: none;
   transform: translate(-50%, -50%);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  user-select: none;
-  z-index: 999999;
-  font-family: Arial, sans-serif;
-  font-size: 9px;
-  font-weight: bold;
-  color: black;
-  white-space: nowrap;
-
-  opacity: 1;
-  transition: opacity 0.2s ease;
+  pointer-events: none;
+  z-index: 10000;
 }
 
 .custom-cursor-click-text {
-  margin-top: 24px; /* jarak bawah dot */
-  user-select: none;
-  pointer-events: none;
+  position: absolute;
+  top: 24px; /* jauh di bawah lingkaran */
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 12px;
+  font-weight: bold;
   color: white;
-  text-shadow: 0 0 4px black;
-  font-weight: 600;
-  font-size: 10px;
+  white-space: nowrap;
+  text-shadow: 0 0 3px #000;
+  pointer-events: none;
 }
 
 .custom-cursor-circle {
   position: fixed;
-  width: 50px;
-  height: 50px;
+  width: 60px; /* diperbesar */
+  height: 60px;
   border: 2px solid white;
   border-radius: 50%;
-  pointer-events: none;
   transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 9999;
   transition: opacity 0.2s ease;
-  z-index: 999998;
-  opacity: 1;
 }
 
-/* Particle planet */
 .custom-cursor-planet {
   position: fixed;
-  width: 32px;
-  height: 32px;
-  pointer-events: none;
-  user-select: none;
+  width: 64px; /* ukuran planet diperbesar */
+  height: 64px;
   transform: translate(-50%, -50%);
-  animation: popout 0.25s ease-out, fadeout 0.25s ease-in 2.75s forwards;
-  z-index: 999997;
+  pointer-events: none;
+  z-index: 9998;
+  animation: pop 0.2s ease-out;
 }
 
-@keyframes popout {
+@keyframes pop {
   0% {
+    transform: translate(-50%, -50%) scale(0.6);
     opacity: 0;
-    transform: translate(-50%, -50%) scale(0.7);
   }
   100% {
-    opacity: 1;
     transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
   }
-}
-
-@keyframes fadeout {
-  to {
-    opacity: 0;
-  }
-}
-
-/* Hidden state */
-.custom-cursor-dot.hidden,
-.custom-cursor-circle.hidden {
-  opacity: 0;
 }
