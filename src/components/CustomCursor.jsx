@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from "react";
-import planet1 from "../asseth/planet-1.png";
-import planet2 from "../asseth/planet-2.png";
-import planet3 from "../asseth/planet-3.png";
-import planet4 from "../asseth/planet-4.png";
-import planet5 from "../asseth/planet-5.png";
+import planet1 from "../assets/planet-1.png";
+import planet2 from "../assets/planet-2.png";
+import planet3 from "../assets/planet-3.png";
+import planet4 from "../assets/planet-4.png";
+import planet5 from "../assets/planet-5.png";
 
 const planetImages = [planet1, planet2, planet3, planet4, planet5];
 
