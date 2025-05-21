@@ -1,8 +1,16 @@
 import { check } from "../assets";
 import { pricing } from "../constants";
 import Button from "./Button";
+import { useNavigate } from "react-router-dom";
 
 const PricingList = () => {
+  const navigate = useNavigate();
+
+  const handleGetStarted = (planTitle, planPrice) => {
+    // Navigasi ke halaman pembayaran dengan parameter query
+    navigate(`/payment?plan=${encodeURIComponent(planTitle)}&price=${planPrice}`);
+  };
+
   return (
     <div className="flex gap-[1rem] max-lg:flex-wrap">
       {pricing.map((plan, i) => (
@@ -28,7 +36,8 @@ const PricingList = () => {
 
           <Button
             className="w-full mb-6"
-            href={plan.price ? "#" : "mailto:info@example.com"}
+            onClick={plan.price ? () => handleGetStarted(plan.title, plan.price) : null}
+            href={!plan.price ? "mailto:info@example.com" : null}
             white={!plan.premium}
           >
             {plan.price ? "Get started" : "Contact us"}
@@ -45,7 +54,6 @@ const PricingList = () => {
                   alt="Check"
                   width={24}
                   height={24}
-                  className="pointer-events-none select-none"
                 />
                 <p className="body-2 ml-4">{feature}</p>
               </li>
