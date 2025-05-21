@@ -15,23 +15,36 @@ const CustomCursor = () => {
   const [particles, setParticles] = useState([]);
   const planetIndex = useRef(0);
 
+  // Positions for smooth animation
+  const pos = useRef({ x: window.innerWidth / 2, y: window.innerHeight / 2 });
+  const circlePos = useRef({ x: pos.current.x, y: pos.current.y });
+  const requestRef = useRef();
+
+  // Animate circle following dot smoothly
+  const animate = () => {
+    const lerp = (start, end, amt) => start + (end - start) * amt;
+    circlePos.current.x = lerp(circlePos.current.x, pos.current.x - 32, 0.15);
+    circlePos.current.y = lerp(circlePos.current.y, pos.current.y - 32, 0.15);
+
+    if (circleRef.current) {
+      circleRef.current.style.left = `${circlePos.current.x}px`;
+      circleRef.current.style.top = `${circlePos.current.y}px`;
+    }
+    requestRef.current = requestAnimationFrame(animate);
+  };
+
+  useEffect(() => {
+    requestRef.current = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(requestRef.current);
+  }, []);
+
   useEffect(() => {
     const moveCursor = (e) => {
-      const { clientX, clientY } = e;
+      pos.current.x = e.clientX;
+      pos.current.y = e.clientY;
       if (dotRef.current) {
-        dotRef.current.style.left = `${clientX}px`;
-        dotRef.current.style.top = `${clientY}px`;
-      }
-      if (circleRef.current) {
-        circleRef.current.animate([
-          { left: `${circleRef.current.style.left}`, top: `${circleRef.current.style.top}` },
-          { left: `${clientX - 20}px`, top: `${clientY - 20}px` }
-        ], {
-          duration: 150,
-          fill: 'forwards'
-        });
-        circleRef.current.style.left = `${clientX - 20}px`;
-        circleRef.current.style.top = `${clientY - 20}px`;
+        dotRef.current.style.left = `${e.clientX}px`;
+        dotRef.current.style.top = `${e.clientY}px`;
       }
     };
 
@@ -56,19 +69,19 @@ const CustomCursor = () => {
       return;
     }
 
-    const { clientX, clientY } = e;
     const image = planetImages[planetIndex.current % planetImages.length];
     planetIndex.current++;
 
     const id = Date.now();
     const newParticle = {
       id,
-      x: clientX,
-      y: clientY,
+      x: e.clientX,
+      y: e.clientY,
       image
     };
     setParticles((prev) => [...prev, newParticle]);
 
+    // Hapus partikel setelah 3 detik (langsung hilang tanpa shrink)
     setTimeout(() => {
       setParticles((prev) => prev.filter((p) => p.id !== id));
     }, 3000);
@@ -78,22 +91,24 @@ const CustomCursor = () => {
     <div onClick={handleClick}>
       <div
         ref={dotRef}
-        className="cursor-dot"
-        style={{ opacity: isVisible ? 1 : 0 }}
-      ></div>
+        className="custom-cursor-dot"
+        style={{ opacity: isVisible ? 1 : 0, visibility: isVisible ? 'visible' : 'hidden' }}
+      />
       <div
         ref={circleRef}
-        className="cursor-circle"
-        style={{ opacity: isVisible ? 1 : 0 }}
+        className="custom-cursor-circle"
+        style={{ opacity: isVisible ? 1 : 0, visibility: isVisible ? 'visible' : 'hidden' }}
       >
-        <div className="cursor-text">Click!</div>
+        <div className="custom-cursor-text">Click!</div>
       </div>
       {particles.map((p) => (
         <img
           key={p.id}
           src={p.image}
-          className="cursor-particle"
+          className="planet-particle"
           style={{ left: p.x, top: p.y }}
+          alt="planet"
+          draggable={false}
         />
       ))}
     </div>
