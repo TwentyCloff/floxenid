@@ -22,22 +22,21 @@ const CustomCursor = () => {
       setVisible(true);
     };
 
-    const handleMouseLeave = () => {
-      setVisible(false);
-    };
+    const handleMouseLeave = () => setVisible(false);
+    const handleMouseEnter = () => setVisible(true);
 
     window.addEventListener("mousemove", handleMouseMove);
     window.addEventListener("mouseout", handleMouseLeave);
-    window.addEventListener("mouseenter", () => setVisible(true));
+    window.addEventListener("mouseenter", handleMouseEnter);
 
     return () => {
       window.removeEventListener("mousemove", handleMouseMove);
       window.removeEventListener("mouseout", handleMouseLeave);
-      window.removeEventListener("mouseenter", () => setVisible(true));
+      window.removeEventListener("mouseenter", handleMouseEnter);
     };
   }, []);
 
-  // Animasi lerp circle ke dot
+  // Lerp animation for circle following dot
   useEffect(() => {
     const lerp = (start, end, factor) => start + (end - start) * factor;
 
@@ -54,19 +53,13 @@ const CustomCursor = () => {
 
   const handleClick = () => {
     setParticles((prev) => {
-      if (prev.length >= 5) return [];
+      if (prev.length >= 5) return prev; // Jangan tambah kalau sudah 5
 
       const id = Date.now() + Math.random();
       const img = planetImages[planetIndex.current];
       planetIndex.current = (planetIndex.current + 1) % planetImages.length;
 
-      // Buat particle baru
-      const newParticle = {
-        id,
-        x: mousePos.x,
-        y: mousePos.y,
-        img,
-      };
+      const newParticle = { id, x: mousePos.x, y: mousePos.y, img };
 
       // Hapus particle setelah 3 detik
       setTimeout(() => {
@@ -79,7 +72,7 @@ const CustomCursor = () => {
 
   return (
     <>
-      {/* Dot + Click! text di bawahnya */}
+      {/* Dot + Click! text di dalam dot dengan jarak bawah */}
       <div
         className="custom-cursor-dot"
         style={{
@@ -88,10 +81,10 @@ const CustomCursor = () => {
           opacity: visible ? 1 : 0,
         }}
       >
-        <div className="custom-cursor-click-text">Click!</div>
+        <span className="custom-cursor-click-text">Click!</span>
       </div>
 
-      {/* Lingkaran ngikutin dot (lerp) */}
+      {/* Lingkaran ngikut dot (lerp) */}
       <div
         className="custom-cursor-circle"
         style={{
