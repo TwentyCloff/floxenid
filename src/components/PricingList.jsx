@@ -11,16 +11,6 @@ const PricingList = () => {
       alert("Project details are not available");
       return;
     }
-
-    if (id === "1") {
-      // Validasi akses premium
-      const isLoggedIn = localStorage.getItem("user"); // Ganti sesuai sistem login kamu
-      if (!isLoggedIn) {
-        e.preventDefault();
-        alert("Hanya pengguna premium yang bisa mengakses project ini.");
-        return;
-      }
-    }
   };
 
   return (
