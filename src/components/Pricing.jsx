@@ -1,21 +1,9 @@
+// src/components/Pricing.jsx
 import React, { useEffect, useState } from "react";
 import PricingList from "./PricingList";
 
-import { initializeApp } from "firebase/app";
-import { getFirestore, collection, getDocs } from "firebase/firestore";
-
-const firebaseConfig = {
-  apiKey: "AIzaSyDP6XNlI1jUgHN3pVWIXNZjGT3YWXKSdes",
-  authDomain: "gweenlearn.firebaseapp.com",
-  projectId: "gweenlearn",
-  storageBucket: "gweenlearn.firebasestorage.app",
-  messagingSenderId: "915816429541",
-  appId: "1:915816429541:web:65c885efda4472930c210c",
-  measurementId: "G-RSGBWRE6BD"
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+import { collection, getDocs } from "firebase/firestore";
+import { db } from "../config/firebase";
 
 const Pricing = () => {
   const [pricingData, setPricingData] = useState([]);
@@ -25,9 +13,9 @@ const Pricing = () => {
     const fetchPricing = async () => {
       try {
         const querySnapshot = await getDocs(collection(db, "projects"));
-        const projects = querySnapshot.docs.map(doc => ({
+        const projects = querySnapshot.docs.map((doc) => ({
           id: doc.id,
-          ...doc.data()
+          ...doc.data(),
         }));
         setPricingData(projects);
       } catch (error) {
