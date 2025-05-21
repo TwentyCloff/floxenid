@@ -18,7 +18,7 @@ body {
   font-size: 12px;
   font-weight: bold;
   color: white;
-  margin-top: 28px; /* agak ke bawah dari sebelumnya */
+  margin-top: 28px; /* agak ke bawah */
   position: absolute;
   left: 50%;
   top: 100%;
@@ -29,8 +29,8 @@ body {
 
 .custom-cursor-circle {
   position: fixed;
-  width: 80px;
-  height: 80px;
+  width: 70px;
+  height: 70px;
   border: 2px solid white;
   border-radius: 50%;
   transform: translate(-50%, -50%) scale(1);
@@ -58,12 +58,12 @@ body {
 
 .custom-cursor-planet {
   position: fixed;
-  width: 48px;
-  height: 48px;
+  width: 70px;
+  height: 70px;
   pointer-events: none;
   transform: translate(-50%, -50%) scale(0);
   z-index: 9999;
-  animation: planet-popin 0.35s forwards cubic-bezier(0.4, 0, 0.2, 1);
+  animation: planet-popin 0.15s forwards cubic-bezier(0.4, 0, 0.2, 1);
   user-select: none;
   -webkit-user-drag: none;
 }
