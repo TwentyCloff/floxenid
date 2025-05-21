@@ -22,8 +22,13 @@ const CustomCursor = () => {
       setVisible(true);
     };
 
-    const handleMouseLeave = () => setVisible(false);
-    const handleMouseEnter = () => setVisible(true);
+    const handleMouseLeave = () => {
+      setVisible(false);
+    };
+
+    const handleMouseEnter = () => {
+      setVisible(true);
+    };
 
     window.addEventListener("mousemove", handleMouseMove);
     window.addEventListener("mouseout", handleMouseLeave);
@@ -36,7 +41,7 @@ const CustomCursor = () => {
     };
   }, []);
 
-  // Lerp animation for circle following dot
+  // Animasi lerp circle ke dot
   useEffect(() => {
     const lerp = (start, end, factor) => start + (end - start) * factor;
 
@@ -53,13 +58,19 @@ const CustomCursor = () => {
 
   const handleClick = () => {
     setParticles((prev) => {
-      if (prev.length >= 5) return prev; // Jangan tambah kalau sudah 5
+      if (prev.length >= 5) return [];
 
       const id = Date.now() + Math.random();
       const img = planetImages[planetIndex.current];
       planetIndex.current = (planetIndex.current + 1) % planetImages.length;
 
-      const newParticle = { id, x: mousePos.x, y: mousePos.y, img };
+      // Buat particle baru
+      const newParticle = {
+        id,
+        x: mousePos.x,
+        y: mousePos.y,
+        img,
+      };
 
       // Hapus particle setelah 3 detik
       setTimeout(() => {
@@ -72,25 +83,24 @@ const CustomCursor = () => {
 
   return (
     <>
-      {/* Dot + Click! text di dalam dot dengan jarak bawah */}
+      {/* Dot */}
       <div
-        className="custom-cursor-dot"
+        className={`custom-cursor-dot ${visible ? "visible" : "hidden"}`}
         style={{
           left: mousePos.x,
           top: mousePos.y,
-          opacity: visible ? 1 : 0,
         }}
       >
-        <span className="custom-cursor-click-text">Click!</span>
+        {/* Text Click! di bawah dot */}
+        <div className="custom-cursor-click-text">Click!</div>
       </div>
 
-      {/* Lingkaran ngikut dot (lerp) */}
+      {/* Lingkaran ngikutin dot (lerp) */}
       <div
-        className="custom-cursor-circle"
+        className={`custom-cursor-circle ${visible ? "visible" : "hidden"}`}
         style={{
           left: circlePos.x,
           top: circlePos.y,
-          opacity: visible ? 1 : 0,
         }}
       />
 
