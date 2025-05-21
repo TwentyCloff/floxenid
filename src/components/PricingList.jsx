@@ -1,20 +1,26 @@
-import { useNavigate } from 'react-router-dom';
+import React from "react";
+import { useNavigate } from "react-router-dom";
 
-const PricingList = ({ id, name, description, price, image }) => {
+const PricingList = ({ data }) => {
   const navigate = useNavigate();
 
   return (
-    <div className="bg-gray-100 rounded-lg shadow-lg p-6 text-center hover:shadow-xl transition-all">
-      <img src={image} alt={name} className="w-full h-40 object-cover rounded-md mb-4" />
-      <h3 className="text-xl font-bold mb-2">{name}</h3>
-      <p className="text-gray-600 mb-4">{description}</p>
-      <p className="text-lg font-semibold mb-4">{price}</p>
-      <button
-        onClick={() => navigate(`/project/${id}`)}
-        className="bg-blue-600 text-white px-5 py-2 rounded hover:bg-blue-700 transition"
-      >
-        Get Started
-      </button>
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      {data.map((item) => (
+        <div key={item.id} className="border rounded-lg p-6 shadow-md flex flex-col justify-between">
+          <div>
+            <h3 className="text-xl font-bold mb-2">{item.title}</h3>
+            <p className="mb-4">{item.description}</p>
+            <p className="text-2xl font-semibold mb-4">${item.price}</p>
+          </div>
+          <button
+            onClick={() => navigate(`/project/${item.id}`)}
+            className="mt-auto bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded"
+          >
+            Get Started
+          </button>
+        </div>
+      ))}
     </div>
   );
 };
