@@ -1,7 +1,6 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import ButtonGradient from "./assets/svg/ButtonGradient";
 
-// Import langsung semua komponen
 import Benefits from "./components/Benefits";
 import Collaboration from "./components/Collaboration";
 import Footer from "./components/Footer";
@@ -28,14 +27,21 @@ const Home = () => (
   </>
 );
 
-const App = () => (
-  <Router>
+const App = () => {
+  return (
     <Routes>
       <Route path="/" element={<Home />} />
       <Route path="/payment" element={<PaymentPage />} />
-      <Route path="*" element={<div>404 Not Found</div>} />
+      <Route
+        path="*"
+        element={
+          <div className="text-center text-white p-10 text-2xl">
+            404 Not Found
+          </div>
+        }
+      />
     </Routes>
-  </Router>
-);
+  );
+};
 
 export default App;
