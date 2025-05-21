@@ -4,11 +4,11 @@ import Button from "./Button";
 import { Link } from "react-router-dom";
 
 const PricingList = () => {
-  const handleGetStarted = (e, plan) => {
-    if (!plan.id) {
+  const handleGetStarted = (e, id) => {
+    if (!id) {
       console.log("ID kosong");
       e.preventDefault();
-      alert("Product details are not available");
+      alert("Project details are not available");
     }
   };
 
@@ -37,22 +37,21 @@ const PricingList = () => {
 
           {plan.price ? (
             <Link
-              to={`/product/${plan.id}`}
-              onClick={(e) => handleGetStarted(e, plan)}
-              className="w-full mb-6"
+              to={`/project/${plan.id}`}
+              onClick={(e) => handleGetStarted(e, plan.id)}
+              className={`flex justify-center items-center px-8 py-4 rounded-full border font-code text-sm font-bold uppercase tracking-wider transition-colors mb-6 w-full ${
+                plan.premium
+                  ? "bg-n-1 text-n-8 hover:bg-n-1/90"
+                  : "bg-transparent text-n-1 border-n-1 hover:bg-n-1/10"
+              }`}
             >
-              <Button
-                as="div" // Menggunakan as="div" karena sudah dibungkus Link
-                white={!plan.premium}
-              >
-                Get started
-              </Button>
+              Get started
             </Link>
           ) : (
             <Button
               className="w-full mb-6"
               href="mailto:info@example.com"
-              white={!plan.premium}
+              white
             >
               Contact us
             </Button>
