@@ -16,6 +16,8 @@ const CustomCursor = () => {
   const [circleClicked, setCircleClicked] = useState(false);
   const planetIndex = useRef(0);
   const requestRef = useRef(null);
+  // Ref untuk simpan semua timeout agar bisa clear kalau perlu
+  const timeoutsRef = useRef({});
 
   useEffect(() => {
     const handleMouseMove = (e) => {
@@ -34,6 +36,9 @@ const CustomCursor = () => {
       window.removeEventListener("mousemove", handleMouseMove);
       window.removeEventListener("mouseout", handleMouseLeave);
       window.removeEventListener("mouseenter", handleMouseEnter);
+
+      // Clear semua timeout kalau component unmount
+      Object.values(timeoutsRef.current).forEach(clearTimeout);
     };
   }, []);
 
@@ -54,13 +59,15 @@ const CustomCursor = () => {
   }, [mousePos]);
 
   const handleClick = () => {
-    // Trigger circle animation
     setCircleClicked(true);
     setTimeout(() => setCircleClicked(false), 400);
 
     setParticles((prev) => {
       if (prev.length >= 5) {
-        // Clear all particles immediately if limit exceeded
+        // Clear semua timeout lama dulu supaya gak numpuk delay lama
+        Object.values(timeoutsRef.current).forEach(clearTimeout);
+        timeoutsRef.current = {};
+
         return [];
       }
 
@@ -76,16 +83,23 @@ const CustomCursor = () => {
         exiting: false,
       };
 
-      // Schedule popout animation after 3 seconds
-      setTimeout(() => {
+      // Hapus timeout lama dulu kalau ada untuk particle ini
+      if (timeoutsRef.current[id]) {
+        clearTimeout(timeoutsRef.current[id]);
+      }
+
+      // Schedule popout animasi dan hapus state dengan cepat (0.1 detik animasi)
+      timeoutsRef.current[id] = setTimeout(() => {
         setParticles((cur) =>
           cur.map((p) => (p.id === id ? { ...p, exiting: true } : p))
         );
-        // Remove particle after popout animation duration (0.3s)
-        setTimeout(() => {
+
+        // Hapus setelah animasi pop out 100ms
+        timeoutsRef.current[id] = setTimeout(() => {
           setParticles((cur) => cur.filter((p) => p.id !== id));
-        }, 300);
-      }, 3000);
+          delete timeoutsRef.current[id];
+        }, 100);
+      }, 3000); // tetap 3 detik sebelum mulai pop out
 
       return [...prev, newParticle];
     });
