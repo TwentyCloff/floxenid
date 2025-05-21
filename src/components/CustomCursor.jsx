@@ -76,7 +76,6 @@ const CustomCursor = () => {
 
   return (
     <>
-      {/* Dot kecil */}
       <div
         className="custom-cursor-dot"
         style={{
@@ -88,7 +87,6 @@ const CustomCursor = () => {
         <div className="custom-cursor-click-text">Click!</div>
       </div>
 
-      {/* Lingkaran besar */}
       <div
         className="custom-cursor-circle"
         style={{
@@ -98,7 +96,6 @@ const CustomCursor = () => {
         }}
       />
 
-      {/* Planet particles */}
       {particles.map((p) => (
         <img
           key={p.id}
@@ -113,7 +110,6 @@ const CustomCursor = () => {
         />
       ))}
 
-      {/* Overlay untuk tangkap klik + hide native cursor */}
       <div
         style={{
           position: "fixed",
@@ -121,7 +117,6 @@ const CustomCursor = () => {
           zIndex: 9999,
           pointerEvents: "auto",
           backgroundColor: "transparent",
-          cursor: "none",
         }}
         onClick={handleClick}
       />
