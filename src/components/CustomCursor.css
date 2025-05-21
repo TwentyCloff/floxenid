@@ -1,4 +1,7 @@
-/* CustomCursor.css */
+/* Hide default cursor */
+* {
+  cursor: none !important;
+}
 
 .custom-cursor-dot {
   position: fixed;
@@ -11,7 +14,6 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  flex-direction: column;
   user-select: none;
   z-index: 999999;
   font-family: Arial, sans-serif;
@@ -19,12 +21,19 @@
   font-weight: bold;
   color: black;
   white-space: nowrap;
+
+  opacity: 1;
+  transition: opacity 0.2s ease;
 }
 
 .custom-cursor-click-text {
-  margin-top: 24px; /* Jarak bawah dot */
+  margin-top: 24px; /* jarak bawah dot */
   user-select: none;
   pointer-events: none;
+  color: white;
+  text-shadow: 0 0 4px black;
+  font-weight: 600;
+  font-size: 10px;
 }
 
 .custom-cursor-circle {
@@ -35,10 +44,12 @@
   border-radius: 50%;
   pointer-events: none;
   transform: translate(-50%, -50%);
-  transition: opacity 0.15s ease;
+  transition: opacity 0.2s ease;
   z-index: 999998;
+  opacity: 1;
 }
 
+/* Particle planet */
 .custom-cursor-planet {
   position: fixed;
   width: 32px;
@@ -50,7 +61,6 @@
   z-index: 999997;
 }
 
-/* Animasi planet muncul dan hilang */
 @keyframes popout {
   0% {
     opacity: 0;
@@ -68,7 +78,8 @@
   }
 }
 
-/* Hide default cursor */
-* {
-  cursor: none !important;
+/* Hidden state */
+.custom-cursor-dot.hidden,
+.custom-cursor-circle.hidden {
+  opacity: 0;
 }
