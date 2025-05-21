@@ -1,54 +1,48 @@
-import { smallSphere, stars } from "../assets";
-import { LeftLine, RightLine } from "./design/Pricing";
-import Heading from "./Heading";
-import PricingList from "./PricingList";
-import Section from "./Section";
+import { useEffect, useState } from 'react';
+import { collection, getDocs } from 'firebase/firestore';
+import { db } from '../firebase'; // pastikan ini sesuai dengan file firebase kamu
+import PricingList from './PricingList';
 
 const Pricing = () => {
+  const [data, setData] = useState([]);
+
+  useEffect(() => {
+    const fetchPricing = async () => {
+      try {
+        const querySnapshot = await getDocs(collection(db, 'projects'));
+        const items = querySnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        setData(items);
+      } catch (error) {
+        console.error('Error fetching pricing data:', error);
+      }
+    };
+
+    fetchPricing();
+  }, []);
+
   return (
-    <Section className="overflow-hidden" id="pricing">
-      <div className="container relative z-2">
-        <div className="hidden relative justify-center mb-[6.5rem] lg:flex">
-          <img
-            src={smallSphere}
-            className="relative z-1 pointer-events-none select-none"
-            width={255}
-            height={255}
-            alt="Sphere"
-          />
-
-          <div className="absolute top-1/2 left-1/2 w-[60rem] -translate-x-1/2 -translate-y-1/2 pointer-events-none">
-            <img
-              src={stars}
-              className="w-full animate-pulse pointer-events-none select-none"
-              width={950}
-              height={400}
-              alt="Stars"
-            />
-          </div>
-        </div>
-
-        <Heading
-          tag="Get started with Brainwave"
-          title="Pay once, use forever"
-        />
-
-        <div className="relative">
-          <PricingList />
-          <LeftLine />
-          <RightLine />
-        </div>
-
-        <div className="flex justify-center mt-10">
-          <a
-            className="text-xs font-code font-bold tracking-wider uppercase border-b"
-            href="#"
-          >
-            See the full details
-          </a>
-        </div>
+    <section className="py-20 px-4 md:px-10 lg:px-20 bg-white" id="pricing">
+      <div className="text-center mb-12">
+        <h2 className="text-4xl font-bold text-gray-900 mb-4">Our Pricing</h2>
+        <p className="text-gray-600 text-lg">Choose the plan that suits you best</p>
       </div>
-    </Section>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {data.map((item) => (
+          <PricingList
+            key={item.id}
+            id={item.id}
+            name={item.name}
+            description={item.description}
+            price={item.price}
+            image={item.image}
+          />
+        ))}
+      </div>
+    </section>
   );
 };
 
