@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
-import planet1 from "./assets/planet-1.png";
-import planet2 from "./assets/planet-2.png";
-import planet3 from "./assets/planet-3.png";
-import planet4 from "./assets/planet-4.png";
-import planet5 from "./assets/planet-5.png";
 
-const planetImages = [planet1, planet2, planet3, planet4, planet5];
+// Import gambar planet
+import planet1 from "../asseth/planet-1.png";
+import planet2 from "../asseth/planet-2.png";
+import planet3 from "../asseth/planet-3.png";
+import planet4 from "../asseth/planet-4.png";
+import planet5 from "../asseth/planet-5.png";
+
+const planets = [planet1, planet2, planet3, planet4, planet5];
 
 const CustomCursor = () => {
   const [cursorPos, setCursorPos] = useState({ x: 0, y: 0 });
@@ -22,33 +24,25 @@ const CustomCursor = () => {
 
     const handleClick = () => {
       setParticles((prev) => {
-        if (prev.length >= 5) {
-          return []; // Jika sudah 5, klik ke-6 hapus semuanya langsung
-        }
+        // Jika sudah ada 5 partikel, hapus semua langsung
+        if (prev.length >= 5) return [];
+
+        const id = Math.random();
+        const planetIndex = prev.length % planets.length;
 
         const newParticle = {
-          id: Math.random(),
+          id,
           x: cursorPos.x,
           y: cursorPos.y,
-          image: planetImages[prev.length % planetImages.length],
-          fading: false,
+          planetIndex,
         };
 
         // Tambahkan partikel baru
         const newParticles = [...prev, newParticle];
 
-        // Jadwalkan fade-out setelah 3 detik
+        // Jadwalkan partikel ini menghilang setelah 3 detik
         setTimeout(() => {
-          setParticles((curr) =>
-            curr.map((p) =>
-              p.id === newParticle.id ? { ...p, fading: true } : p
-            )
-          );
-        }, 2500);
-
-        // Hapus setelah 3 detik
-        setTimeout(() => {
-          setParticles((curr) => curr.filter((p) => p.id !== newParticle.id));
+          setParticles((current) => current.filter((p) => p.id !== id));
         }, 3000);
 
         return newParticles;
@@ -56,9 +50,7 @@ const CustomCursor = () => {
     };
 
     const handleMouseLeave = () => setVisible(false);
-    const handleVisibilityChange = () => {
-      setVisible(!document.hidden);
-    };
+    const handleVisibilityChange = () => setVisible(!document.hidden);
 
     document.addEventListener("mousemove", handleMouseMove);
     document.addEventListener("click", handleClick);
@@ -76,7 +68,7 @@ const CustomCursor = () => {
 
   return (
     <>
-      {/* Custom cursor bulat */}
+      {/* Kursor custom */}
       <div
         className="fixed z-50 pointer-events-none transition-opacity duration-200 sm:block hidden"
         style={{
@@ -93,26 +85,30 @@ const CustomCursor = () => {
         }}
       />
 
-      {/* Partikel gambar planet */}
+      {/* Partikel planet */}
       {particles.map((p) => (
         <img
           key={p.id}
-          src={p.image}
+          src={planets[p.planetIndex]}
           alt="planet"
-          className="fixed z-40 pointer-events-none transition-opacity duration-500"
+          className="fixed z-40 pointer-events-none particle"
           style={{
             left: p.x,
             top: p.y,
-            width: "40px",
-            height: "40px",
+            width: "32px",
+            height: "32px",
             transform: "translate(-50%, -50%)",
-            opacity: p.fading ? 0 : 1,
+            animation: "fadeout 3s ease-out forwards",
           }}
         />
       ))}
 
-      {/* Tambahan styling global */}
       <style>{`
+        @keyframes fadeout {
+          0% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+          100% { opacity: 0; transform: translate(-50%, -80%) scale(0.6); }
+        }
+
         body, *:not(.use-default-cursor) {
           cursor: none !important;
         }
@@ -125,3 +121,4 @@ const CustomCursor = () => {
 };
 
 export default CustomCursor;
+
