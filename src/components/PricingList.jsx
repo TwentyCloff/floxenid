@@ -1,53 +1,28 @@
-import React, { useEffect, useState } from "react";
-import PricingList from "./PricingList";
+import React from "react";
+import { useNavigate } from "react-router-dom";
 
-import { initializeApp } from "firebase/app";
-import { getFirestore, collection, getDocs } from "firebase/firestore";
-
-const firebaseConfig = {
-  apiKey: "AIzaSyDP6XNlI1jUgHN3pVWIXNZjGT3YWXKSdes",
-  authDomain: "gweenlearn.firebaseapp.com",
-  projectId: "gweenlearn",
-  storageBucket: "gweenlearn.firebasestorage.app",
-  messagingSenderId: "915816429541",
-  appId: "1:915816429541:web:65c885efda4472930c210c",
-  measurementId: "G-RSGBWRE6BD"
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-
-const Pricing = () => {
-  const [pricingData, setPricingData] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchPricing = async () => {
-      try {
-        const querySnapshot = await getDocs(collection(db, "projects"));
-        const projects = querySnapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data()
-        }));
-        setPricingData(projects);
-      } catch (error) {
-        console.error("Error fetching pricing data:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchPricing();
-  }, []);
-
-  if (loading) return <div>Loading pricing...</div>;
+const PricingList = ({ data }) => {
+  const navigate = useNavigate();
 
   return (
-    <section className="py-12 px-6 max-w-7xl mx-auto">
-      <h2 className="text-3xl font-bold mb-8 text-center">Pricing Plans</h2>
-      <PricingList data={pricingData} />
-    </section>
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      {data.map((item) => (
+        <div key={item.id} className="border rounded-lg p-6 shadow-md flex flex-col justify-between">
+          <div>
+            <h3 className="text-xl font-bold mb-2">{item.title}</h3>
+            <p className="mb-4">{item.description}</p>
+            <p className="text-2xl font-semibold mb-4">${item.price}</p>
+          </div>
+          <button
+            onClick={() => navigate(`/project/${item.id}`)}
+            className="mt-auto bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded"
+          >
+            Get Started
+          </button>
+        </div>
+      ))}
+    </div>
   );
 };
 
-export default Pricing;
+export default PricingList;
