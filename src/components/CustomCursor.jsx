@@ -8,16 +8,17 @@ import "./CustomCursor.css";
 
 const planetImages = [planet1, planet2, planet3, planet4, planet5];
 
+const lerp = (start, end, amt) => start + (end - start) * amt;
+
 const CustomCursor = () => {
-  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+  const [mousePos, setMousePos] = useState({ x: window.innerWidth / 2, y: window.innerHeight / 2 });
+  const [circlePos, setCirclePos] = useState({ x: window.innerWidth / 2, y: window.innerHeight / 2 });
   const [particles, setParticles] = useState([]);
   const [visible, setVisible] = useState(true);
-  const dotRef = useRef(null);
-  const circleRef = useRef(null);
-  const requestRef = useRef(null);
+  const requestRef = useRef();
   const planetIndex = useRef(0);
 
-  // Track mouse position
+  // Update mouse position instantly
   useEffect(() => {
     const handleMouseMove = (e) => {
       setMousePos({ x: e.clientX, y: e.clientY });
@@ -27,34 +28,30 @@ const CustomCursor = () => {
     return () => window.removeEventListener("mousemove", handleMouseMove);
   }, []);
 
-  // Animate circle follow with lerp smoothing
+  // Animate circle to follow dot smoothly
   useEffect(() => {
-    const moveCircle = () => {
-      if (circleRef.current) {
-        const circle = circleRef.current;
-        const cx = parseFloat(circle.style.left || 0);
-        const cy = parseFloat(circle.style.top || 0);
-        const dx = mousePos.x - cx;
-        const dy = mousePos.y - cy;
-        circle.style.left = `${cx + dx * 0.2}px`;
-        circle.style.top = `${cy + dy * 0.2}px`;
-      }
-      requestRef.current = requestAnimationFrame(moveCircle);
+    const animate = () => {
+      setCirclePos((prev) => {
+        const x = lerp(prev.x, mousePos.x, 0.15);
+        const y = lerp(prev.y, mousePos.y, 0.15);
+        return { x, y };
+      });
+      requestRef.current = requestAnimationFrame(animate);
     };
-    requestRef.current = requestAnimationFrame(moveCircle);
+    requestRef.current = requestAnimationFrame(animate);
     return () => cancelAnimationFrame(requestRef.current);
   }, [mousePos]);
 
-  // Fade out cursor on mouse leave window
+  // Fade cursor out/in on mouse leave/enter window
   useEffect(() => {
     const handleMouseLeave = () => setVisible(false);
     const handleMouseEnter = () => setVisible(true);
+
     window.addEventListener("mouseout", (e) => {
-      if (!e.relatedTarget || e.relatedTarget.nodeName === "HTML") {
-        handleMouseLeave();
-      }
+      if (!e.relatedTarget || e.relatedTarget.nodeName === "HTML") handleMouseLeave();
     });
     window.addEventListener("mouseenter", handleMouseEnter);
+
     return () => {
       window.removeEventListener("mouseout", handleMouseLeave);
       window.removeEventListener("mouseenter", handleMouseEnter);
@@ -65,24 +62,17 @@ const CustomCursor = () => {
   const handleClick = () => {
     setParticles((prev) => {
       if (prev.length >= 5) {
-        // Clear all particles if max reached
         return [];
       }
 
       const id = Date.now() + Math.random();
       const img = planetImages[planetIndex.current];
-      const newParticle = {
-        id,
-        x: mousePos.x,
-        y: mousePos.y,
-        img,
-      };
-
       planetIndex.current = (planetIndex.current + 1) % planetImages.length;
 
-      // Remove particle after 3 seconds
+      const newParticle = { id, x: mousePos.x, y: mousePos.y, img };
+
       setTimeout(() => {
-        setParticles((current) => current.filter((p) => p.id !== id));
+        setParticles((cur) => cur.filter((p) => p.id !== id));
       }, 3000);
 
       return [...prev, newParticle];
@@ -91,9 +81,8 @@ const CustomCursor = () => {
 
   return (
     <>
-      {/* Dot (cursor center) */}
+      {/* Dot: posisi langsung mouse */}
       <div
-        ref={dotRef}
         className="custom-cursor-dot"
         style={{
           left: mousePos.x,
@@ -102,21 +91,19 @@ const CustomCursor = () => {
         }}
       />
 
-      {/* Circle follower */}
+      {/* Lingkaran: posisi nge-lerp ngikutin dot */}
       <div
-        ref={circleRef}
         className="custom-cursor-circle"
         style={{
-          left: mousePos.x,
-          top: mousePos.y,
+          left: circlePos.x,
+          top: circlePos.y,
           opacity: visible ? 1 : 0,
         }}
       >
-        {/* Click text below */}
         <div className="custom-cursor-click-text">Click!</div>
       </div>
 
-      {/* Planets particles */}
+      {/* Partikel planet */}
       {particles.map((p) => (
         <img
           key={p.id}
@@ -127,15 +114,16 @@ const CustomCursor = () => {
             left: p.x,
             top: p.y,
           }}
+          draggable={false}
         />
       ))}
 
-      {/* Invisible full screen overlay to catch clicks */}
+      {/* Overlay full screen untuk catch click */}
       <div
         style={{
           position: "fixed",
           inset: 0,
-          zIndex: 9990,
+          zIndex: 9999,
           pointerEvents: "auto",
           backgroundColor: "transparent",
         }}
