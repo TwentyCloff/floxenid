@@ -1,16 +1,15 @@
-/* Cursor dot */
 .custom-cursor-dot {
   position: fixed;
   z-index: 9999;
-  width: 12px;
-  height: 12px;
+  width: 20px; /* lebih besar */
+  height: 20px;
   background-color: white;
   border-radius: 50%;
   pointer-events: none;
-  transition: opacity 0.2s ease;
+  transition: opacity 0.3s ease;
+  transform: translate(-50%, -50%);
 }
 
-/* Cursor circle */
 .custom-cursor-circle {
   position: fixed;
   z-index: 9998;
@@ -21,32 +20,38 @@
   pointer-events: none;
   backdrop-filter: blur(4px);
   background-color: rgba(255, 255, 255, 0.08);
-  transition: opacity 0.2s ease;
+  transition: opacity 0.3s ease;
+  transform: translate(0, 0);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  user-select: none;
 }
 
-/* Click text */
 .custom-cursor-text {
-  position: fixed;
-  z-index: 9997;
+  position: absolute;
+  bottom: -22px; /* di bawah lingkaran */
+  width: 100%;
+  text-align: center;
   color: white;
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 600;
   pointer-events: none;
   user-select: none;
-  transition: opacity 0.2s ease;
+  user-drag: none;
 }
 
-/* Planet particle */
 .planet-particle {
   position: fixed;
-  z-index: 9996;
-  width: 48px;
-  height: 48px;
+  z-index: 9997;
+  width: 64px; /* planet lebih besar */
+  height: 64px;
   pointer-events: none;
+  transform: translate(-50%, -50%);
   animation: pop-out 0.4s ease-out forwards;
 }
 
-/* Pop-out animation */
+/* Pop-out animation: scale from 1.2 to 1 with opacity 1 */
 @keyframes pop-out {
   0% {
     transform: translate(-50%, -50%) scale(1.2);
@@ -58,14 +63,22 @@
   }
 }
 
-/* Fade-out animation */
-@keyframes fade-out {
-  to {
-    opacity: 0;
-  }
+/* Fade-in fade-out & visibility control */
+.custom-cursor-dot,
+.custom-cursor-circle,
+.custom-cursor-text {
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+  opacity: 1;
+  visibility: visible;
 }
 
-/* Responsive disable cursor */
+.custom-cursor-dot[style*="opacity: 0"],
+.custom-cursor-circle[style*="opacity: 0"],
+.custom-cursor-text[style*="opacity: 0"] {
+  visibility: hidden;
+}
+
+/* Disable default cursor */
 body, *:not(.use-default-cursor) {
   cursor: none !important;
 }
