@@ -30,9 +30,9 @@ const Hero = () => {
         loop
         playsInline
         className="blackhole-video absolute left-1/2 transform -translate-x-1/2 w-[130vw] h-[130vh] object-cover z-[-10] pointer-events-none
-                   top-[-10%] sm:top-[-15%] md:top-[-10%] lg:top-[-10%]"
+                   top-[-30%] sm:top-[-30%] md:top-[-20%] lg:top-[-15%] xl:top-[-12%] 2xl:top-[-10%]"
         style={{
-          filter: "brightness(0.7)",
+          filter: "brightness(0.75)",
         }}
       >
         <source src={blackholeVideo} type="video/webm" />
@@ -42,13 +42,20 @@ const Hero = () => {
         {`
           @media (max-width: 640px) {
             .blackhole-video {
-              top: -30% !important;
-              filter: brightness(0.95) !important;
+              top: -50% !important;
+              filter: brightness(0.9) !important;
             }
           }
-          @media (min-width: 640px) {
-            #hero {
-              cursor: none;
+          @media (min-width: 1920px) {
+            .blackhole-video {
+              top: -12% !important;
+              transform: translateX(-50%) scale(1.1);
+            }
+          }
+          @media (min-width: 2560px) {
+            .blackhole-video {
+              top: -10% !important;
+              transform: translateX(-50%) scale(1.25);
             }
           }
         `}
