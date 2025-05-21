@@ -1,0 +1,75 @@
+/* Cursor dot */
+.custom-cursor-dot {
+  position: fixed;
+  z-index: 9999;
+  width: 12px;
+  height: 12px;
+  background-color: white;
+  border-radius: 50%;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+
+/* Cursor circle */
+.custom-cursor-circle {
+  position: fixed;
+  z-index: 9998;
+  width: 64px;
+  height: 64px;
+  border: 2px solid white;
+  border-radius: 50%;
+  pointer-events: none;
+  backdrop-filter: blur(4px);
+  background-color: rgba(255, 255, 255, 0.08);
+  transition: opacity 0.2s ease;
+}
+
+/* Click text */
+.custom-cursor-text {
+  position: fixed;
+  z-index: 9997;
+  color: white;
+  font-size: 14px;
+  font-weight: 500;
+  pointer-events: none;
+  user-select: none;
+  transition: opacity 0.2s ease;
+}
+
+/* Planet particle */
+.planet-particle {
+  position: fixed;
+  z-index: 9996;
+  width: 48px;
+  height: 48px;
+  pointer-events: none;
+  animation: pop-out 0.4s ease-out forwards;
+}
+
+/* Pop-out animation */
+@keyframes pop-out {
+  0% {
+    transform: translate(-50%, -50%) scale(1.2);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+  }
+}
+
+/* Fade-out animation */
+@keyframes fade-out {
+  to {
+    opacity: 0;
+  }
+}
+
+/* Responsive disable cursor */
+body, *:not(.use-default-cursor) {
+  cursor: none !important;
+}
+
+.use-default-cursor {
+  cursor: auto !important;
+}
