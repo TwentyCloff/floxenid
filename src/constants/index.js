@@ -243,16 +243,16 @@ export const pricing = [
 export const benefits = [
   {
     id: "0",
-    title: "Ask anything",
-    text: "Lets users quickly find answers to their questions without having to search through multiple sources.",
+    title: "Easy Setup",
+    text: "Qarvo provide product for high mobility user, it has tutorial and config for synchronize with your device so you can feel the best experience while using our product.",
     backgroundUrl: "/src/assets/benefits/card-1.svg",
     iconUrl: benefitIcon1,
     imageUrl: benefitImage2,
   },
   {
     id: "1",
-    title: "Improve everyday",
-    text: "The app uses natural language processing to understand user queries and provide accurate and relevant responses.",
+    title: "Community",
+    text: "Qarvo Provide a place for you to socialize with other member, you can share your config, play together,and trading area for you to trade your items u earn.",
     backgroundUrl: "/src/assets/benefits/card-2.svg",
     iconUrl: benefitIcon2,
     imageUrl: benefitImage2,
@@ -260,7 +260,7 @@ export const benefits = [
   },
   {
     id: "2",
-    title: "Connect everywhere",
+    title: "Support",
     text: "Connect with the AI chatbot from anywhere, on any device, making it more accessible and convenient.",
     backgroundUrl: "/src/assets/benefits/card-3.svg",
     iconUrl: benefitIcon3,
@@ -268,8 +268,8 @@ export const benefits = [
   },
   {
     id: "3",
-    title: "Fast responding",
-    text: "Lets users quickly find answers to their questions without having to search through multiple sources.",
+    title: "Support",
+    text: "Qarvo Provide Support up to 24/7, specially for our member we do provide a module that u can use to maxout product potential.",
     backgroundUrl: "/src/assets/benefits/card-4.svg",
     iconUrl: benefitIcon4,
     imageUrl: benefitImage2,
