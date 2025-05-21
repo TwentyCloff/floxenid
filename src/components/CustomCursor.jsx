@@ -26,22 +26,17 @@ const CustomCursor = () => {
       setVisible(false);
     };
 
-    const handleMouseEnter = () => {
-      setVisible(true);
-    };
-
     window.addEventListener("mousemove", handleMouseMove);
     window.addEventListener("mouseout", handleMouseLeave);
-    window.addEventListener("mouseenter", handleMouseEnter);
+    window.addEventListener("mouseenter", () => setVisible(true));
 
     return () => {
       window.removeEventListener("mousemove", handleMouseMove);
       window.removeEventListener("mouseout", handleMouseLeave);
-      window.removeEventListener("mouseenter", handleMouseEnter);
+      window.removeEventListener("mouseenter", () => setVisible(true));
     };
   }, []);
 
-  // Animasi lerp circle ke dot
   useEffect(() => {
     const lerp = (start, end, factor) => start + (end - start) * factor;
 
@@ -64,7 +59,6 @@ const CustomCursor = () => {
       const img = planetImages[planetIndex.current];
       planetIndex.current = (planetIndex.current + 1) % planetImages.length;
 
-      // Buat particle baru
       const newParticle = {
         id,
         x: mousePos.x,
@@ -72,7 +66,6 @@ const CustomCursor = () => {
         img,
       };
 
-      // Hapus particle setelah 3 detik
       setTimeout(() => {
         setParticles((cur) => cur.filter((p) => p.id !== id));
       }, 3000);
@@ -83,28 +76,29 @@ const CustomCursor = () => {
 
   return (
     <>
-      {/* Dot */}
+      {/* Dot dan Click! text */}
       <div
-        className={`custom-cursor-dot ${visible ? "visible" : "hidden"}`}
+        className="custom-cursor-dot"
         style={{
           left: mousePos.x,
           top: mousePos.y,
+          opacity: visible ? 1 : 0,
         }}
       >
-        {/* Text Click! di bawah dot */}
         <div className="custom-cursor-click-text">Click!</div>
       </div>
 
-      {/* Lingkaran ngikutin dot (lerp) */}
+      {/* Lingkaran outer */}
       <div
-        className={`custom-cursor-circle ${visible ? "visible" : "hidden"}`}
+        className="custom-cursor-circle"
         style={{
           left: circlePos.x,
           top: circlePos.y,
+          opacity: visible ? 1 : 0,
         }}
       />
 
-      {/* Planet particles */}
+      {/* Planet Particles */}
       {particles.map((p) => (
         <img
           key={p.id}
@@ -119,7 +113,7 @@ const CustomCursor = () => {
         />
       ))}
 
-      {/* Overlay untuk catch click */}
+      {/* Overlay */}
       <div
         style={{
           position: "fixed",
@@ -135,3 +129,4 @@ const CustomCursor = () => {
 };
 
 export default CustomCursor;
+
