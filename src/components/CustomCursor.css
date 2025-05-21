@@ -1,80 +1,26 @@
-/* Cursor dot */
-.custom-cursor-dot {
-  position: fixed;
-  z-index: 9999;
-  width: 10px;           /* lebih kecil sedikit */
-  height: 10px;
-  background-color: white;
-  border-radius: 50%;
-  pointer-events: none;
-  transition: opacity 0.2s ease, visibility 0.2s ease;
-  transform: translate(-50%, -50%);
+/* customCursor.css */
+
+.animate-popout {
+  animation: popout 0.25s ease-out, fadeout 0.25s ease-in 2.75s forwards;
 }
 
-/* Cursor circle */
-.custom-cursor-circle {
-  position: fixed;
-  z-index: 9998;
-  width: 64px;
-  height: 64px;
-  border: 2px solid white;
-  border-radius: 50%;
-  pointer-events: none;
-  backdrop-filter: blur(4px);
-  background-color: rgba(255, 255, 255, 0.08);
-  transition: opacity 0.2s ease, visibility 0.2s ease;
-  transform: translate(0, 0); /* posisi langsung di style React */
-}
-
-/* Click text */
-.custom-cursor-text {
-  position: fixed;
-  z-index: 9997;
-  color: white;
-  font-size: 14px;
-  font-weight: 500;
-  pointer-events: none;
-  user-select: none;
-  transition: opacity 0.2s ease, visibility 0.2s ease;
-  transform: translate(-50%, 0); /* agar teks center horisontal di bawah dot */
-  white-space: nowrap;
-}
-
-/* Planet particle */
-.planet-particle {
-  position: fixed;
-  z-index: 9996;
-  width: 64px;
-  height: 64px;
-  pointer-events: none;
-  transform: translate(-50%, -50%);
-  animation: pop-out 0.4s ease-out forwards;
-}
-
-/* Pop-out animation */
-@keyframes pop-out {
+@keyframes popout {
   0% {
-    transform: translate(-50%, -50%) scale(1.2);
-    opacity: 1;
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.7);
   }
   100% {
-    transform: translate(-50%, -50%) scale(1);
     opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
   }
 }
 
-/* Fade-out animation */
-@keyframes fade-out {
+@keyframes fadeout {
   to {
     opacity: 0;
   }
 }
 
-/* Disable default cursor everywhere except if element has .use-default-cursor */
-body, *:not(.use-default-cursor) {
+* {
   cursor: none !important;
-}
-
-.use-default-cursor {
-  cursor: auto !important;
 }
