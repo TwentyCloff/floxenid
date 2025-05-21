@@ -18,13 +18,13 @@ body {
   font-size: 12px;
   font-weight: bold;
   color: white;
-  margin-top: 28px; /* agak ke bawah */
+  margin-top: 28px; /* lebih kebawah sedikit */
   position: absolute;
   left: 50%;
   top: 100%;
   transform: translate(-50%, 0);
   white-space: nowrap;
-  user-select: none;
+  pointer-events: none;
 }
 
 .custom-cursor-circle {
@@ -33,15 +33,14 @@ body {
   height: 80px;
   border: 2px solid white;
   border-radius: 50%;
-  transform: translate(-50%, -50%) scale(1);
+  transform: translate(-50%, -50%);
   pointer-events: none;
   z-index: 9999;
   transition: opacity 0.2s ease;
-  will-change: transform;
 }
 
 .custom-cursor-circle.clicked {
-  animation: circle-click-zoom 0.4s ease forwards;
+  animation: circle-click-zoom 0.3s ease forwards;
 }
 
 @keyframes circle-click-zoom {
@@ -49,7 +48,7 @@ body {
     transform: translate(-50%, -50%) scale(1);
   }
   50% {
-    transform: translate(-50%, -50%) scale(1.6);
+    transform: translate(-50%, -50%) scale(1.4);
   }
   100% {
     transform: translate(-50%, -50%) scale(1);
@@ -61,35 +60,33 @@ body {
   width: 48px;
   height: 48px;
   pointer-events: none;
-  transform: translate(-50%, -50%) scale(0);
+  transform: translate(-50%, -50%) scale(1);
   z-index: 9999;
-  animation: planet-popin 0.15s forwards cubic-bezier(0.4, 0, 0.2, 1);
-  user-select: none;
-  -webkit-user-drag: none;
+  animation: planet-pop-in 0.15s ease forwards;
 }
 
-@keyframes planet-popin {
-  from {
+.custom-cursor-planet.exiting {
+  animation: planet-pop-out 0.1s ease forwards;
+}
+
+@keyframes planet-pop-in {
+  0% {
     opacity: 0;
     transform: translate(-50%, -50%) scale(0.5);
   }
-  to {
+  100% {
     opacity: 1;
     transform: translate(-50%, -50%) scale(1);
   }
 }
 
-@keyframes planet-popout {
-  from {
+@keyframes planet-pop-out {
+  0% {
     opacity: 1;
     transform: translate(-50%, -50%) scale(1);
   }
-  to {
+  100% {
     opacity: 0;
     transform: translate(-50%, -50%) scale(0.8);
   }
-}
-
-.planet-exit {
-  animation: planet-popout 0.1s forwards cubic-bezier(0.4, 0, 0.2, 1);
 }
