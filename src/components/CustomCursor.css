@@ -1,15 +1,17 @@
+/* Cursor dot */
 .custom-cursor-dot {
   position: fixed;
   z-index: 9999;
-  width: 16px; /* dikurangi */
-  height: 16px;
+  width: 10px;           /* lebih kecil sedikit */
+  height: 10px;
   background-color: white;
   border-radius: 50%;
   pointer-events: none;
-  transition: opacity 0.3s ease;
+  transition: opacity 0.2s ease, visibility 0.2s ease;
   transform: translate(-50%, -50%);
 }
 
+/* Cursor circle */
 .custom-cursor-circle {
   position: fixed;
   z-index: 9998;
@@ -20,24 +22,25 @@
   pointer-events: none;
   backdrop-filter: blur(4px);
   background-color: rgba(255, 255, 255, 0.08);
-  transition: opacity 0.3s ease;
-  transform: translate(0, 0);
-  user-select: none;
+  transition: opacity 0.2s ease, visibility 0.2s ease;
+  transform: translate(0, 0); /* posisi langsung di style React */
 }
 
+/* Click text */
 .custom-cursor-text {
   position: fixed;
   z-index: 9997;
   color: white;
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 500;
   pointer-events: none;
   user-select: none;
-  user-drag: none;
-  transform: translate(-50%, 0); /* supaya text center horizontal pada posisi left */
+  transition: opacity 0.2s ease, visibility 0.2s ease;
+  transform: translate(-50%, 0); /* agar teks center horisontal di bawah dot */
   white-space: nowrap;
 }
 
+/* Planet particle */
 .planet-particle {
   position: fixed;
   z-index: 9996;
@@ -48,6 +51,7 @@
   animation: pop-out 0.4s ease-out forwards;
 }
 
+/* Pop-out animation */
 @keyframes pop-out {
   0% {
     transform: translate(-50%, -50%) scale(1.2);
@@ -59,22 +63,14 @@
   }
 }
 
-/* Fade in/out visibility */
-.custom-cursor-dot,
-.custom-cursor-circle,
-.custom-cursor-text {
-  transition: opacity 0.3s ease, visibility 0.3s ease;
-  opacity: 1;
-  visibility: visible;
+/* Fade-out animation */
+@keyframes fade-out {
+  to {
+    opacity: 0;
+  }
 }
 
-.custom-cursor-dot[style*="opacity: 0"],
-.custom-cursor-circle[style*="opacity: 0"],
-.custom-cursor-text[style*="opacity: 0"] {
-  visibility: hidden;
-}
-
-/* Disable default cursor */
+/* Disable default cursor everywhere except if element has .use-default-cursor */
 body, *:not(.use-default-cursor) {
   cursor: none !important;
 }
