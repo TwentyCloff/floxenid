@@ -8,16 +8,24 @@ import "./CustomCursor.css";
 
 const planetImages = [planet1, planet2, planet3, planet4, planet5];
 
+// Preload images agar saat muncul nggak delay
+const preloadImages = (srcArray) => {
+  srcArray.forEach((src) => {
+    const img = new Image();
+    img.src = src;
+  });
+};
+preloadImages(planetImages);
+
 const CustomCursor = () => {
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const [circlePos, setCirclePos] = useState({ x: 0, y: 0 });
   const [visible, setVisible] = useState(true);
   const [particles, setParticles] = useState([]);
-  const [circleClicked, setCircleClicked] = useState(false);
   const planetIndex = useRef(0);
   const requestRef = useRef(null);
-  // Ref untuk simpan semua timeout agar bisa clear kalau perlu
   const timeoutsRef = useRef({});
+  const [circleClicked, setCircleClicked] = useState(false);
 
   useEffect(() => {
     const handleMouseMove = (e) => {
@@ -37,13 +45,12 @@ const CustomCursor = () => {
       window.removeEventListener("mouseout", handleMouseLeave);
       window.removeEventListener("mouseenter", handleMouseEnter);
 
-      // Clear semua timeout kalau component unmount
+      // Clear all timeouts when component unmounts
       Object.values(timeoutsRef.current).forEach(clearTimeout);
     };
   }, []);
 
   useEffect(() => {
-    // Smoothly follow mouse
     const lerp = (start, end, factor) => start + (end - start) * factor;
 
     const animate = () => {
@@ -59,17 +66,12 @@ const CustomCursor = () => {
   }, [mousePos]);
 
   const handleClick = () => {
+    // Trigger circle animation
     setCircleClicked(true);
-    setTimeout(() => setCircleClicked(false), 400);
+    setTimeout(() => setCircleClicked(false), 300); // durasi animation
 
     setParticles((prev) => {
-      if (prev.length >= 5) {
-        // Clear semua timeout lama dulu supaya gak numpuk delay lama
-        Object.values(timeoutsRef.current).forEach(clearTimeout);
-        timeoutsRef.current = {};
-
-        return [];
-      }
+      if (prev.length >= 5) return [];
 
       const id = Date.now() + Math.random();
       const img = planetImages[planetIndex.current];
@@ -83,23 +85,18 @@ const CustomCursor = () => {
         exiting: false,
       };
 
-      // Hapus timeout lama dulu kalau ada untuk particle ini
-      if (timeoutsRef.current[id]) {
-        clearTimeout(timeoutsRef.current[id]);
-      }
-
-      // Schedule popout animasi dan hapus state dengan cepat (0.1 detik animasi)
+      // Hilang dengan animasi pop out kecil setelah 3 detik
       timeoutsRef.current[id] = setTimeout(() => {
         setParticles((cur) =>
           cur.map((p) => (p.id === id ? { ...p, exiting: true } : p))
         );
 
-        // Hapus setelah animasi pop out 100ms
+        // Hapus partikel setelah animasi pop out 0.1s
         timeoutsRef.current[id] = setTimeout(() => {
           setParticles((cur) => cur.filter((p) => p.id !== id));
           delete timeoutsRef.current[id];
         }, 100);
-      }, 3000); // tetap 3 detik sebelum mulai pop out
+      }, 3000);
 
       return [...prev, newParticle];
     });
@@ -132,7 +129,7 @@ const CustomCursor = () => {
           key={p.id}
           src={p.img}
           alt="planet"
-          className={`custom-cursor-planet ${p.exiting ? "planet-exit" : ""}`}
+          className={`custom-cursor-planet ${p.exiting ? "exiting" : ""}`}
           style={{
             left: p.x,
             top: p.y,
@@ -141,7 +138,6 @@ const CustomCursor = () => {
         />
       ))}
 
-      {/* Fullscreen transparent div to catch clicks */}
       <div
         style={{
           position: "fixed",
