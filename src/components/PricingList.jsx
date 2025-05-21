@@ -1,5 +1,5 @@
 import { check } from "../assets";
-import { pricing } from "../constants";
+import { pricing } from "../contss";
 import Button from "./Button";
 import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
