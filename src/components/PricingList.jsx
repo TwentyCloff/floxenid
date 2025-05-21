@@ -11,6 +11,7 @@ const PricingList = () => {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [loadingId, setLoadingId] = useState(null);
 
   useEffect(() => {
     const fetchProjects = async () => {
@@ -33,11 +34,15 @@ const PricingList = () => {
   }, []);
 
   const handleGetStarted = (e, id) => {
+    e.preventDefault();
     if (!id) {
-      e.preventDefault();
       setError("Project details not available");
       setTimeout(() => setError(null), 3000);
+      return;
     }
+    setLoadingId(id);
+    // Navigate manually to ensure routing works
+    window.location.href = `/project/${id}`;
   };
 
   // Merge pricing plans with actual projects
@@ -95,12 +100,21 @@ const PricingList = () => {
                   to={`/project/${plan.id}`}
                   onClick={(e) => handleGetStarted(e, plan.id)}
                   className={`flex justify-center items-center px-8 py-4 rounded-full border font-code text-sm font-bold uppercase tracking-wider transition-colors mb-6 w-full ${
+                    loadingId === plan.id ? "opacity-50" : ""
+                  } ${
                     plan.premium
                       ? "bg-n-1 text-n-8 hover:bg-n-1/90"
                       : "bg-transparent text-n-1 border-n-1 hover:bg-n-1/10"
                   }`}
                 >
-                  Get started
+                  {loadingId === plan.id ? (
+                    <>
+                      <Loader2 className="animate-spin mr-2" size={16} />
+                      Loading...
+                    </>
+                  ) : (
+                    "Get started"
+                  )}
                 </Link>
               ) : (
                 <div className="text-center mb-6 text-sm text-n-1/50">
