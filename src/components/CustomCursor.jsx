@@ -1,140 +1,153 @@
-import React, { useEffect, useRef, useState } from 'react';
-import planet1 from '../assets/planet-1.png';
-import planet2 from '../assets/planet-2.png';
-import planet3 from '../assets/planet-3.png';
-import planet4 from '../assets/planet-4.png';
-import planet5 from '../assets/planet-5.png';
-import './CustomCursor.css';
+import { useEffect, useRef, useState } from "react";
+import planet1 from "../asseth/planet-1.png";
+import planet2 from "../asseth/planet-2.png";
+import planet3 from "../asseth/planet-3.png";
+import planet4 from "../asseth/planet-4.png";
+import planet5 from "../asseth/planet-5.png";
 
 const planetImages = [planet1, planet2, planet3, planet4, planet5];
 
 const CustomCursor = () => {
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+  const [particles, setParticles] = useState([]);
   const dotRef = useRef(null);
   const circleRef = useRef(null);
-  const textRef = useRef(null);
-  const [isVisible, setIsVisible] = useState(true);
-  const [particles, setParticles] = useState([]);
+  const requestRef = useRef(null);
   const planetIndex = useRef(0);
 
-  const pos = useRef({ x: window.innerWidth / 2, y: window.innerHeight / 2 });
-  const circlePos = useRef({ x: pos.current.x, y: pos.current.y });
-  const requestRef = useRef();
-
-  const animate = () => {
-    const lerp = (start, end, amt) => start + (end - start) * amt;
-    circlePos.current.x = lerp(circlePos.current.x, pos.current.x - 32, 0.15);
-    circlePos.current.y = lerp(circlePos.current.y, pos.current.y - 32, 0.15);
-
-    if (circleRef.current) {
-      circleRef.current.style.left = `${circlePos.current.x}px`;
-      circleRef.current.style.top = `${circlePos.current.y}px`;
-    }
-    if (textRef.current) {
-      textRef.current.style.left = `${pos.current.x}px`;
-      textRef.current.style.top = `${pos.current.y + 24}px`;
-    }
-
-    requestRef.current = requestAnimationFrame(animate);
-  };
+  useEffect(() => {
+    const handleMouseMove = (e) => {
+      setMousePos({ x: e.clientX, y: e.clientY });
+    };
+    window.addEventListener("mousemove", handleMouseMove);
+    return () => window.removeEventListener("mousemove", handleMouseMove);
+  }, []);
 
   useEffect(() => {
-    requestRef.current = requestAnimationFrame(animate);
+    const moveCircle = () => {
+      if (circleRef.current) {
+        const circle = circleRef.current;
+        const cx = parseFloat(circle.style.left || 0);
+        const cy = parseFloat(circle.style.top || 0);
+        const dx = mousePos.x - cx;
+        const dy = mousePos.y - cy;
+        circle.style.left = `${cx + dx * 0.2}px`;
+        circle.style.top = `${cy + dy * 0.2}px`;
+      }
+      requestRef.current = requestAnimationFrame(moveCircle);
+    };
+    requestRef.current = requestAnimationFrame(moveCircle);
     return () => cancelAnimationFrame(requestRef.current);
-  }, []);
+  }, [mousePos]);
 
-  useEffect(() => {
-    const moveCursor = (e) => {
-      pos.current.x = e.clientX;
-      pos.current.y = e.clientY;
-      if (dotRef.current) {
-        dotRef.current.style.left = `${e.clientX}px`;
-        dotRef.current.style.top = `${e.clientY}px`;
+  const handleClick = () => {
+    setParticles((prev) => {
+      if (prev.length >= 5) {
+        return [];
       }
-      // Set visible setiap mouse bergerak di window
-      setIsVisible(true);
-    };
 
-    const handleMouseOutWindow = (e) => {
-      if (
-        e.relatedTarget === null ||
-        e.clientY <= 0 ||
-        e.clientY >= window.innerHeight ||
-        e.clientX <= 0 ||
-        e.clientX >= window.innerWidth
-      ) {
-        setIsVisible(false);
-      }
-    };
+      const id = Date.now() + Math.random();
+      const img = planetImages[planetIndex.current];
+      const newParticle = {
+        id,
+        x: mousePos.x,
+        y: mousePos.y,
+        img,
+      };
 
-    window.addEventListener('mousemove', moveCursor);
-    window.addEventListener('mouseout', handleMouseOutWindow);
+      planetIndex.current = (planetIndex.current + 1) % planetImages.length;
 
-    // Hapus listener mouseenter, karena kadang gak trigger di beberapa browser
-    // setIsVisible(true) sudah di handle di mousemove
+      setTimeout(() => {
+        setParticles((current) => current.filter((p) => p.id !== id));
+      }, 3000);
 
-    return () => {
-      window.removeEventListener('mousemove', moveCursor);
-      window.removeEventListener('mouseout', handleMouseOutWindow);
-    };
-  }, []);
-
-  const handleClick = (e) => {
-    if (particles.length >= 5) {
-      setParticles([]);
-      planetIndex.current = 0;
-      return;
-    }
-
-    const image = planetImages[planetIndex.current % planetImages.length];
-    planetIndex.current++;
-
-    const id = Date.now();
-    const newParticle = {
-      id,
-      x: e.clientX,
-      y: e.clientY,
-      image,
-    };
-    setParticles((prev) => [...prev, newParticle]);
-
-    setTimeout(() => {
-      setParticles((prev) => prev.filter((p) => p.id !== id));
-    }, 3000);
+      return [...prev, newParticle];
+    });
   };
 
   return (
-    <div onClick={handleClick}>
+    <>
+      {/* Dot (cursor center) */}
       <div
         ref={dotRef}
-        className="custom-cursor-dot"
-        style={{ opacity: isVisible ? 1 : 0, visibility: isVisible ? 'visible' : 'hidden' }}
+        className="fixed w-[8px] h-[8px] bg-white rounded-full z-50 pointer-events-none"
+        style={{
+          left: mousePos.x,
+          top: mousePos.y,
+          transform: "translate(-50%, -50%)",
+        }}
       />
+
+      {/* Circle follower */}
       <div
         ref={circleRef}
-        className="custom-cursor-circle"
-        style={{ opacity: isVisible ? 1 : 0, visibility: isVisible ? 'visible' : 'hidden' }}
-      />
-      <div
-        ref={textRef}
-        className="custom-cursor-text"
-        style={{ opacity: isVisible ? 1 : 0, visibility: isVisible ? 'visible' : 'hidden' }}
+        className="fixed w-16 h-16 rounded-full border-2 border-white bg-white/10 z-40 pointer-events-none"
+        style={{
+          left: mousePos.x,
+          top: mousePos.y,
+          transform: "translate(-50%, -50%)",
+          // Hilangkan backdropBlur agar tidak blur di dalam lingkaran
+          backdropFilter: "none",
+        }}
       >
-        Click!
+        {/* Click text di bawah dot (di luar lingkaran) */}
+        <div
+          className="absolute left-1/2 top-full translate-x-[-50%] mt-4 text-white text-sm select-none pointer-events-none"
+          style={{ userSelect: "none" }}
+        >
+          Click!
+        </div>
       </div>
+
+      {/* Planets (particles) */}
       {particles.map((p) => (
         <img
           key={p.id}
-          src={p.image}
-          className="planet-particle"
+          src={p.img}
           alt="planet"
-          draggable={false}
+          className="fixed z-30 pointer-events-none animate-popout"
           style={{
-            left: p.x + 'px',
-            top: p.y + 'px',
+            left: p.x,
+            top: p.y,
+            width: "48px",
+            height: "48px",
+            transform: "translate(-50%, -50%)",
           }}
         />
       ))}
-    </div>
+
+      {/* CSS Animations */}
+      <style>{`
+        .animate-popout {
+          animation: popout 0.25s ease-out, fadeout 0.25s ease-in 2.75s forwards;
+        }
+        @keyframes popout {
+          0% {
+            opacity: 0;
+            transform: translate(-50%, -50%) scale(0.7);
+          }
+          100% {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+          }
+        }
+        @keyframes fadeout {
+          to {
+            opacity: 0;
+          }
+        }
+        * {
+          cursor: none !important;
+        }
+      `}</style>
+
+      {/* Click listener overlay */}
+      <div
+        className="fixed inset-0 z-10"
+        onClick={handleClick}
+        style={{ pointerEvents: "auto" }}
+      />
+    </>
   );
 };
 
