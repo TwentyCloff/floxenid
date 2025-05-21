@@ -13,6 +13,7 @@ const CustomCursor = () => {
   const [circlePos, setCirclePos] = useState({ x: 0, y: 0 });
   const [visible, setVisible] = useState(true);
   const [particles, setParticles] = useState([]);
+  const [circleClicked, setCircleClicked] = useState(false);
   const planetIndex = useRef(0);
   const requestRef = useRef(null);
 
@@ -53,6 +54,10 @@ const CustomCursor = () => {
   }, [mousePos]);
 
   const handleClick = () => {
+    // Trigger circle animation
+    setCircleClicked(true);
+    setTimeout(() => setCircleClicked(false), 400);
+
     setParticles((prev) => {
       if (prev.length >= 5) {
         // Clear all particles immediately if limit exceeded
@@ -102,7 +107,7 @@ const CustomCursor = () => {
       </div>
 
       <div
-        className="custom-cursor-circle"
+        className={`custom-cursor-circle ${circleClicked ? "clicked" : ""}`}
         style={{
           left: circlePos.x,
           top: circlePos.y,
