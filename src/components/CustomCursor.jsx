@@ -16,15 +16,12 @@ const CustomCursor = () => {
   const [particles, setParticles] = useState([]);
   const planetIndex = useRef(0);
 
-  // Positions for smooth animation
   const pos = useRef({ x: window.innerWidth / 2, y: window.innerHeight / 2 });
   const circlePos = useRef({ x: pos.current.x, y: pos.current.y });
   const requestRef = useRef();
 
-  // Animate circle following dot smoothly
   const animate = () => {
     const lerp = (start, end, amt) => start + (end - start) * amt;
-    // Circle center position = dot position minus half circle size (32)
     circlePos.current.x = lerp(circlePos.current.x, pos.current.x - 32, 0.15);
     circlePos.current.y = lerp(circlePos.current.y, pos.current.y - 32, 0.15);
 
@@ -33,9 +30,8 @@ const CustomCursor = () => {
       circleRef.current.style.top = `${circlePos.current.y}px`;
     }
     if (textRef.current) {
-      // Text under dot, offset 12px from dot bottom (dot size 16px, plus margin)
       textRef.current.style.left = `${pos.current.x}px`;
-      textRef.current.style.top = `${pos.current.y + 24}px`; // 16/2 + 12 margin + 4 extra
+      textRef.current.style.top = `${pos.current.y + 24}px`;
     }
 
     requestRef.current = requestAnimationFrame(animate);
@@ -54,33 +50,31 @@ const CustomCursor = () => {
         dotRef.current.style.left = `${e.clientX}px`;
         dotRef.current.style.top = `${e.clientY}px`;
       }
+      // Set visible setiap mouse bergerak di window
+      setIsVisible(true);
     };
 
     const handleMouseOutWindow = (e) => {
-      // Kalau mouse keluar viewport window (ke tab atas chrome, taskbar, dll), sembunyikan cursor
       if (
-        e.relatedTarget === null || // mouse keluar browser window
-        e.clientY <= 0 ||           // atas browser/tab
-        e.clientY >= window.innerHeight || // bawah layar
-        e.clientX <= 0 ||           // kiri layar
-        e.clientX >= window.innerWidth // kanan layar
+        e.relatedTarget === null ||
+        e.clientY <= 0 ||
+        e.clientY >= window.innerHeight ||
+        e.clientX <= 0 ||
+        e.clientX >= window.innerWidth
       ) {
         setIsVisible(false);
       }
     };
 
-    const handleMouseInWindow = () => {
-      setIsVisible(true);
-    };
-
     window.addEventListener('mousemove', moveCursor);
     window.addEventListener('mouseout', handleMouseOutWindow);
-    window.addEventListener('mouseenter', handleMouseInWindow);
+
+    // Hapus listener mouseenter, karena kadang gak trigger di beberapa browser
+    // setIsVisible(true) sudah di handle di mousemove
 
     return () => {
       window.removeEventListener('mousemove', moveCursor);
       window.removeEventListener('mouseout', handleMouseOutWindow);
-      window.removeEventListener('mouseenter', handleMouseInWindow);
     };
   }, []);
 
@@ -132,9 +126,12 @@ const CustomCursor = () => {
           key={p.id}
           src={p.image}
           className="planet-particle"
-          style={{ left: p.x, top: p.y }}
           alt="planet"
           draggable={false}
+          style={{
+            left: p.x + 'px',
+            top: p.y + 'px',
+          }}
         />
       ))}
     </div>
@@ -142,4 +139,3 @@ const CustomCursor = () => {
 };
 
 export default CustomCursor;
-
