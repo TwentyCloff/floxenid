@@ -1,4 +1,60 @@
-/* Animasi popout + fadeout */
+/* Hilangkan cursor asli */
+* {
+  cursor: none !important;
+}
+
+/* Dot (pusat kursor) */
+.custom-cursor-dot {
+  position: fixed;
+  width: 8px;
+  height: 8px;
+  background-color: white;
+  border-radius: 9999px;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  transition: opacity 0.3s ease;
+  z-index: 9999;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Tulisan "Click!" di bawah dot */
+.custom-cursor-click-text {
+  margin-top: 0.6rem;
+  color: white;
+  font-size: 0.875rem;
+  user-select: none;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+/* Lingkaran ngikutin dot (lerp) */
+.custom-cursor-circle {
+  position: fixed;
+  width: 64px;
+  height: 64px;
+  border: 2px solid white;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 9999px;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  transition: opacity 0.3s ease;
+  z-index: 9998;
+}
+
+/* Planet particles */
+.custom-cursor-planet {
+  position: fixed;
+  width: 48px;
+  height: 48px;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  animation: popout 0.25s ease-out, fadeout 0.25s ease-in 2.75s forwards;
+  z-index: 9997;
+}
+
 @keyframes popout {
   0% {
     opacity: 0;
@@ -14,62 +70,4 @@
   to {
     opacity: 0;
   }
-}
-
-/* Partikel planet */
-.custom-cursor-planet {
-  position: fixed;
-  width: 48px;
-  height: 48px;
-  pointer-events: none;
-  user-select: none;
-  transform: translate(-50%, -50%);
-  animation: popout 0.25s ease-out, fadeout 0.25s ease-in 2.75s forwards;
-  transition: opacity 0.3s ease;
-  z-index: 9997;
-}
-
-/* Hilangkan cursor default browser */
-* {
-  cursor: none !important;
-}
-
-/* Dot putih kecil */
-.custom-cursor-dot {
-  position: fixed;
-  width: 8px;
-  height: 8px;
-  background-color: white;
-  border-radius: 9999px;
-  pointer-events: none;
-  transform: translate(-50%, -50%);
-  transition: opacity 0.3s ease;
-  z-index: 9999;
-}
-
-/* Lingkaran luar */
-.custom-cursor-circle {
-  position: fixed;
-  width: 64px;
-  height: 64px;
-  border: 2px solid white;
-  background-color: rgba(255 255 255 / 0.1);
-  border-radius: 9999px;
-  pointer-events: none;
-  transform: translate(-50%, -50%);
-  transition: opacity 0.3s ease;
-  z-index: 9998;
-}
-
-/* Tulisan "Click!" di bawah lingkaran */
-.custom-cursor-click-text {
-  position: absolute;
-  top: 100%;
-  left: 50%;
-  transform: translateX(-50%);
-  margin-top: 1rem;
-  color: white;
-  font-size: 0.875rem;
-  user-select: none;
-  pointer-events: none;
 }
