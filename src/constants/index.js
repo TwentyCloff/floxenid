@@ -34,6 +34,7 @@ import {
   telegram,
   twitter,
   yourlogo,
+  verif8icon,
 } from "../assets";
 import { links } from "../config";
 
@@ -246,7 +247,7 @@ export const benefits = [
     title: "Advanced Capabilities",
     text: "Qarvo delivers cutting-edge tools engineered for peak performance. Each solution is built to enhance your efficiency, automate tasks, and give you a tactical advantage—no matter the environment.",
     backgroundUrl: "/src/assets/benefits/card-1.svg",
-    iconUrl: benefitIcon1,
+    iconUrl: verif8icon,
     imageUrl: benefitImage2,
   },
   {
@@ -254,7 +255,7 @@ export const benefits = [
     title: "Seamless Accessibility",
     text: "Access all Qarvo products instantly through our official website or Discord server. With support across multiple platforms, your toolkit is always within reach—anytime, anywhere.",
     backgroundUrl: "/src/assets/benefits/card-2.svg",
-    iconUrl: benefitIcon2,
+    iconUrl: verif8icon,
     imageUrl: benefitImage2,
     light: true,
   },
@@ -263,7 +264,7 @@ export const benefits = [
     title: "Continuous Innovation",
     text: "While others rely on outdated or patched methods, Qarvo continuously evolves. Our tools receive frequent updates to adapt to the latest game versions, bypass systems, and user needs.",
     backgroundUrl: "/src/assets/benefits/card-3.svg",
-    iconUrl: benefitIcon3,
+    iconUrl: verif8icon,
     imageUrl: benefitImage2,
   },
   {
@@ -271,7 +272,7 @@ export const benefits = [
     title: "Effortless Configuration",
     text: "Designed for mobility and speed, Qarvo products include guided setup processes, modular features, and customization options to fit your workflow across all devices.",
     backgroundUrl: "/src/assets/benefits/card-4.svg",
-    iconUrl: benefitIcon4,
+    iconUrl: verif8icon,
     imageUrl: benefitImage2,
     light: true,
   },
@@ -280,7 +281,7 @@ export const benefits = [
     title: "Connected Community",
     text: "Join a thriving network of developers, power users, and automation experts. Share configurations, collaborate on builds, and trade earned assets through our secure, community-driven platform.",
     backgroundUrl: "/src/assets/benefits/card-5.svg",
-    iconUrl: benefitIcon1,
+    iconUrl: verif8icon,
     imageUrl: benefitImage2,
   },
   {
@@ -288,7 +289,7 @@ export const benefits = [
     title: "24/7 Expert Support",
     text: "Our dedicated support team is available around the clock to assist with technical issues, script optimization, and advanced module configurations—ensuring you're always at peak performance.",
     backgroundUrl: "/src/assets/benefits/card-6.svg",
-    iconUrl: benefitIcon2,
+    iconUrl: verif8icon,
     imageUrl: benefitImage2,
   },
 ];
