@@ -1,8 +1,17 @@
 import { check } from "../assets";
 import { pricing } from "../constants";
 import Button from "./Button";
+import { Link } from "react-router-dom";
 
 const PricingList = () => {
+  const handleGetStarted = (e, plan) => {
+    if (!plan.id) {
+      console.log("ID kosong");
+      e.preventDefault();
+      alert("Product details are not available");
+    }
+  };
+
   return (
     <div className="flex gap-[1rem] max-lg:flex-wrap">
       {pricing.map((plan, i) => (
@@ -26,13 +35,28 @@ const PricingList = () => {
             )}
           </div>
 
-          <Button
-            className="w-full mb-6"
-            href={plan.price ? "#" : "mailto:info@example.com"}
-            white={!plan.premium}
-          >
-            {plan.price ? "Get started" : "Contact us"}
-          </Button>
+          {plan.price ? (
+            <Link
+              to={`/product/${plan.id}`}
+              onClick={(e) => handleGetStarted(e, plan)}
+              className="w-full mb-6"
+            >
+              <Button
+                as="div" // Menggunakan as="div" karena sudah dibungkus Link
+                white={!plan.premium}
+              >
+                Get started
+              </Button>
+            </Link>
+          ) : (
+            <Button
+              className="w-full mb-6"
+              href="mailto:info@example.com"
+              white={!plan.premium}
+            >
+              Contact us
+            </Button>
+          )}
 
           <ul>
             {plan.features.map((feature, j) => (
