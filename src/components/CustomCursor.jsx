@@ -1,152 +1,102 @@
-import { useEffect, useRef, useState } from "react";
-import planet1 from "../assets/planet-1.png";
-import planet2 from "../assets/planet-2.png";
-import planet3 from "../assets/planet-3.png";
-import planet4 from "../assets/planet-4.png";
-import planet5 from "../assets/planet-5.png";
+import React, { useEffect, useRef, useState } from 'react';
+import planet1 from '../assets/planet-1.png';
+import planet2 from '../assets/planet-2.png';
+import planet3 from '../assets/planet-3.png';
+import planet4 from '../assets/planet-4.png';
+import planet5 from '../assets/planet-5.png';
+import '../styles/CustomCursor.css'; // Pastikan kamu punya style yang sesuai
 
 const planetImages = [planet1, planet2, planet3, planet4, planet5];
 
 const CustomCursor = () => {
-  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
-  const [particles, setParticles] = useState([]);
   const dotRef = useRef(null);
   const circleRef = useRef(null);
-  const requestRef = useRef(null);
+  const [isVisible, setIsVisible] = useState(true);
+  const [particles, setParticles] = useState([]);
   const planetIndex = useRef(0);
 
-  // Track mouse
   useEffect(() => {
-    const handleMouseMove = (e) => {
-      setMousePos({ x: e.clientX, y: e.clientY });
+    const moveCursor = (e) => {
+      const { clientX, clientY } = e;
+      if (dotRef.current) {
+        dotRef.current.style.left = `${clientX}px`;
+        dotRef.current.style.top = `${clientY}px`;
+      }
+      if (circleRef.current) {
+        circleRef.current.animate([
+          { left: `${circleRef.current.style.left}`, top: `${circleRef.current.style.top}` },
+          { left: `${clientX - 20}px`, top: `${clientY - 20}px` }
+        ], {
+          duration: 150,
+          fill: 'forwards'
+        });
+        circleRef.current.style.left = `${clientX - 20}px`;
+        circleRef.current.style.top = `${clientY - 20}px`;
+      }
     };
-    window.addEventListener("mousemove", handleMouseMove);
-    return () => window.removeEventListener("mousemove", handleMouseMove);
+
+    const handleMouseLeave = () => setIsVisible(false);
+    const handleMouseEnter = () => setIsVisible(true);
+
+    window.addEventListener('mousemove', moveCursor);
+    window.addEventListener('mouseleave', handleMouseLeave);
+    window.addEventListener('mouseenter', handleMouseEnter);
+
+    return () => {
+      window.removeEventListener('mousemove', moveCursor);
+      window.removeEventListener('mouseleave', handleMouseLeave);
+      window.removeEventListener('mouseenter', handleMouseEnter);
+    };
   }, []);
 
-  // Circle follows dot
-  useEffect(() => {
-    const moveCircle = () => {
-      if (circleRef.current && dotRef.current) {
-        const circle = circleRef.current;
-        const dot = dotRef.current.getBoundingClientRect();
-        const cx = parseFloat(circle.style.left || 0);
-        const cy = parseFloat(circle.style.top || 0);
-        const dx = mousePos.x - cx;
-        const dy = mousePos.y - cy;
-        circle.style.left = `${cx + dx * 0.2}px`;
-        circle.style.top = `${cy + dy * 0.2}px`;
-      }
-      requestRef.current = requestAnimationFrame(moveCircle);
+  const handleClick = (e) => {
+    if (particles.length >= 5) {
+      setParticles([]);
+      planetIndex.current = 0;
+      return;
+    }
+
+    const { clientX, clientY } = e;
+    const image = planetImages[planetIndex.current % planetImages.length];
+    planetIndex.current++;
+
+    const id = Date.now();
+    const newParticle = {
+      id,
+      x: clientX,
+      y: clientY,
+      image
     };
-    requestRef.current = requestAnimationFrame(moveCircle);
-    return () => cancelAnimationFrame(requestRef.current);
-  }, [mousePos]);
+    setParticles((prev) => [...prev, newParticle]);
 
-  // On click: spawn particle
-  const handleClick = () => {
-    setParticles((prev) => {
-      if (prev.length >= 5) {
-        return [];
-      }
-
-      const id = Date.now() + Math.random();
-      const img = planetImages[planetIndex.current];
-      const newParticle = {
-        id,
-        x: mousePos.x,
-        y: mousePos.y,
-        img,
-      };
-
-      planetIndex.current = (planetIndex.current + 1) % planetImages.length;
-
-      // Schedule removal
-      setTimeout(() => {
-        setParticles((current) => current.filter((p) => p.id !== id));
-      }, 3000);
-
-      return [...prev, newParticle];
-    });
+    setTimeout(() => {
+      setParticles((prev) => prev.filter((p) => p.id !== id));
+    }, 3000);
   };
 
   return (
-    <>
-      {/* Dot (cursor center) */}
+    <div onClick={handleClick}>
       <div
         ref={dotRef}
-        className="fixed w-[6px] h-[6px] bg-white rounded-full z-50 pointer-events-none"
-        style={{
-          left: mousePos.x,
-          top: mousePos.y,
-          transform: "translate(-50%, -50%)",
-        }}
-      />
-
-      {/* Circle follower */}
+        className="cursor-dot"
+        style={{ opacity: isVisible ? 1 : 0 }}
+      ></div>
       <div
         ref={circleRef}
-        className="fixed w-12 h-12 rounded-full border-2 border-white bg-white/10 backdrop-blur-sm z-40 pointer-events-none"
-        style={{
-          left: mousePos.x,
-          top: mousePos.y,
-          transform: "translate(-50%, -50%)",
-        }}
+        className="cursor-circle"
+        style={{ opacity: isVisible ? 1 : 0 }}
       >
-        <div className="absolute left-1/2 top-full translate-x-[-50%] mt-1 text-white text-xs">
-          Click!
-        </div>
+        <div className="cursor-text">Click!</div>
       </div>
-
-      {/* Planets (particles) */}
       {particles.map((p) => (
         <img
           key={p.id}
-          src={p.img}
-          alt="planet"
-          className="fixed w-8 h-8 z-30 pointer-events-none animate-popout"
-          style={{
-            left: p.x,
-            top: p.y,
-            transform: "translate(-50%, -50%)",
-          }}
+          src={p.image}
+          className="cursor-particle"
+          style={{ left: p.x, top: p.y }}
         />
       ))}
-
-      <style>{`
-        .animate-popout {
-          animation: popout 0.25s ease-out, fadeout 0.25s ease-in 2.75s forwards;
-        }
-
-        @keyframes popout {
-          0% {
-            opacity: 0;
-            transform: translate(-50%, -50%) scale(0.7);
-          }
-          100% {
-            opacity: 1;
-            transform: translate(-50%, -50%) scale(1);
-          }
-        }
-
-        @keyframes fadeout {
-          to {
-            opacity: 0;
-          }
-        }
-
-        * {
-          cursor: none !important;
-        }
-      `}</style>
-
-      {/* Click listener */}
-      <div
-        className="fixed inset-0 z-10"
-        onClick={handleClick}
-        style={{ pointerEvents: "auto" }}
-      ></div>
-    </>
+    </div>
   );
 };
 
