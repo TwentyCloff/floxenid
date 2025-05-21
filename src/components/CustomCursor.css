@@ -1,9 +1,4 @@
-/* customCursor.css */
-
-.animate-popout {
-  animation: popout 0.25s ease-out, fadeout 0.25s ease-in 2.75s forwards;
-}
-
+/* Animations */
 @keyframes popout {
   0% {
     opacity: 0;
@@ -21,6 +16,60 @@
   }
 }
 
+/* Animate particle planets */
+.custom-cursor-planet {
+  position: fixed;
+  width: 48px;
+  height: 48px;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  animation: popout 0.25s ease-out, fadeout 0.25s ease-in 2.75s forwards;
+  transition: opacity 0.3s ease;
+  z-index: 9997;
+}
+
+/* Hide default cursor */
 * {
   cursor: none !important;
 }
+
+/* Dot small white cursor */
+.custom-cursor-dot {
+  position: fixed;
+  width: 8px;
+  height: 8px;
+  background-color: white;
+  border-radius: 9999px;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  transition: opacity 0.3s ease;
+  z-index: 9999;
+}
+
+/* Outer circle */
+.custom-cursor-circle {
+  position: fixed;
+  width: 64px;
+  height: 64px;
+  border: 2px solid white;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 9999px;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  transition: opacity 0.3s ease;
+  z-index: 9998;
+}
+
+/* Click! text below the circle */
+.custom-cursor-click-text {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-top: 1rem;
+  color: white;
+  font-size: 0.875rem;
+  user-select: none;
+  pointer-events: none;
+}
+
