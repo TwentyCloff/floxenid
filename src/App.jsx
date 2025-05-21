@@ -1,17 +1,16 @@
-import { lazy, Suspense } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import ButtonGradient from "./assets/svg/ButtonGradient";
 
-// Lazy-loaded components
-const Benefits = lazy(() => import("./components/Benefits"));
-const Collaboration = lazy(() => import("./components/Collaboration"));
-const Footer = lazy(() => import("./components/Footer"));
-const Header = lazy(() => import("./components/Header"));
-const Hero = lazy(() => import("./components/Hero"));
-const Pricing = lazy(() => import("./components/Pricing"));
-const Roadmap = lazy(() => import("./components/Roadmap"));
-const Services = lazy(() => import("./components/Services"));
-const PaymentPage = lazy(() => import("./components/PaymentPage")); // Tambahkan ini
+// Import langsung semua komponen
+import Benefits from "./components/Benefits";
+import Collaboration from "./components/Collaboration";
+import Footer from "./components/Footer";
+import Header from "./components/Header";
+import Hero from "./components/Hero";
+import Pricing from "./components/Pricing";
+import Roadmap from "./components/Roadmap";
+import Services from "./components/Services";
+import PaymentPage from "./components/PaymentPage"; // Pastikan file ini ada
 
 const Home = () => (
   <>
@@ -29,17 +28,13 @@ const Home = () => (
   </>
 );
 
-const Loading = () => <div className="flex justify-center items-center h-screen">Loading...</div>;
-
 const App = () => (
   <Router>
-    <Suspense fallback={<Loading />}>
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/payment" element={<PaymentPage />} /> {/* Tambahkan route ini */}
-        <Route path="*" element={<div>404 Not Found</div>} />
-      </Routes>
-    </Suspense>
+    <Routes>
+      <Route path="/" element={<Home />} />
+      <Route path="/payment" element={<PaymentPage />} />
+      <Route path="*" element={<div>404 Not Found</div>} />
+    </Routes>
   </Router>
 );
 
