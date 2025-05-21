@@ -1,6 +1,4 @@
-import { useEffect, useState } from "react";
-
-// Import gambar planet dari folder assets
+import { useEffect, useRef, useState } from "react";
 import planet1 from "../assets/planet-1.png";
 import planet2 from "../assets/planet-2.png";
 import planet3 from "../assets/planet-3.png";
@@ -10,130 +8,128 @@ import planet5 from "../assets/planet-5.png";
 const planetImages = [planet1, planet2, planet3, planet4, planet5];
 
 const CustomCursor = () => {
-  const [cursorPos, setCursorPos] = useState({ x: 0, y: 0 });
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const [particles, setParticles] = useState([]);
-  const [visible, setVisible] = useState(true);
+  const dotRef = useRef(null);
+  const circleRef = useRef(null);
+  const animationFrame = useRef(null);
+  const planetIndex = useRef(0);
 
+  // Mouse tracking & smooth circle follow
   useEffect(() => {
-    document.body.style.cursor = "none";
-
     const handleMouseMove = (e) => {
-      setCursorPos({ x: e.clientX, y: e.clientY });
-      setVisible(true);
+      setMousePos({ x: e.clientX, y: e.clientY });
     };
-
-    const handleClick = () => {
-      setParticles((prev) => {
-        if (prev.length >= 5) return [];
-
-        const planetIndex = prev.length % planetImages.length;
-        const id = Date.now() + Math.random();
-
-        const newParticle = {
-          id,
-          x: cursorPos.x,
-          y: cursorPos.y,
-          planetIndex,
-        };
-
-        const updatedParticles = [...prev, newParticle];
-
-        setTimeout(() => {
-          setParticles((current) =>
-            current.filter((p) => p.id !== newParticle.id)
-          );
-        }, 3000); // 3 detik
-
-        return updatedParticles;
-      });
-    };
-
-    const handleMouseLeave = () => setVisible(false);
-    const handleVisibilityChange = () => setVisible(!document.hidden);
 
     document.addEventListener("mousemove", handleMouseMove);
-    document.addEventListener("click", handleClick);
-    document.addEventListener("mouseleave", handleMouseLeave);
-    document.addEventListener("visibilitychange", handleVisibilityChange);
 
     return () => {
-      document.body.style.cursor = "auto";
       document.removeEventListener("mousemove", handleMouseMove);
-      document.removeEventListener("click", handleClick);
-      document.removeEventListener("mouseleave", handleMouseLeave);
-      document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
-  }, [cursorPos]);
+  }, []);
+
+  useEffect(() => {
+    const follow = () => {
+      if (circleRef.current && dotRef.current) {
+        const circle = circleRef.current;
+        const dot = dotRef.current;
+        const dotRect = dot.getBoundingClientRect();
+
+        const currentX = parseFloat(circle.style.left || 0);
+        const currentY = parseFloat(circle.style.top || 0);
+
+        const dx = mousePos.x - currentX;
+        const dy = mousePos.y - currentY;
+
+        circle.style.left = `${currentX + dx * 0.15}px`;
+        circle.style.top = `${currentY + dy * 0.15}px`;
+      }
+
+      animationFrame.current = requestAnimationFrame(follow);
+    };
+
+    animationFrame.current = requestAnimationFrame(follow);
+    return () => cancelAnimationFrame(animationFrame.current);
+  }, [mousePos]);
+
+  const handleClick = () => {
+    setParticles((prev) => {
+      // Reset if full
+      if (prev.length >= 5) {
+        return [];
+      }
+
+      const newParticle = {
+        id: Date.now() + Math.random(),
+        x: mousePos.x,
+        y: mousePos.y,
+        img: planetImages[planetIndex.current],
+      };
+
+      planetIndex.current = (planetIndex.current + 1) % planetImages.length;
+
+      // Schedule removal
+      setTimeout(() => {
+        setParticles((current) => current.filter((p) => p.id !== newParticle.id));
+      }, 3000);
+
+      return [...prev, newParticle];
+    });
+  };
 
   return (
     <>
-      {/* Lingkaran dan dot putih */}
+      {/* Dot (actual cursor center) */}
       <div
-        className="fixed z-50 pointer-events-none transition-opacity duration-200 sm:block hidden"
+        ref={dotRef}
+        className="fixed z-50 w-[6px] h-[6px] bg-white rounded-full pointer-events-none"
         style={{
-          left: cursorPos.x,
-          top: cursorPos.y,
+          left: mousePos.x,
+          top: mousePos.y,
           transform: "translate(-50%, -50%)",
-          width: "48px",
-          height: "48px",
-          borderRadius: "9999px",
-          border: "2px solid white",
-          backgroundColor: "rgba(255, 255, 255, 0.05)",
-          backdropFilter: "blur(4px)",
-          opacity: visible ? 1 : 0,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          flexDirection: "column",
+        }}
+      />
+
+      {/* Follower Circle */}
+      <div
+        ref={circleRef}
+        className="fixed z-40 w-[48px] h-[48px] rounded-full border-2 border-white bg-white/5 backdrop-blur-sm pointer-events-none transition-transform duration-75"
+        style={{
+          left: mousePos.x,
+          top: mousePos.y,
+          transform: "translate(-50%, -50%)",
         }}
       >
-        <div
-          style={{
-            width: "8px",
-            height: "8px",
-            backgroundColor: "white",
-            borderRadius: "50%",
-            marginBottom: "2px",
-          }}
-        />
-        <div
-          style={{
-            color: "white",
-            fontSize: "12px",
-            fontWeight: "bold",
-            marginTop: "4px",
-          }}
-        >
+        <div className="absolute text-xs text-white left-1/2 top-full translate-x-[-50%] mt-1">
           Click!
         </div>
       </div>
 
-      {/* Particle planet */}
+      {/* Planet Particles */}
       {particles.map((p) => (
         <img
           key={p.id}
-          src={planetImages[p.planetIndex]}
-          className="fixed z-40 pointer-events-none planet"
+          src={p.img}
+          alt="planet"
+          className="fixed w-8 h-8 z-30 pointer-events-none animate-popout"
           style={{
             left: p.x,
             top: p.y,
-            width: "64px",
-            height: "64px",
             transform: "translate(-50%, -50%)",
-            animation: "pop-out 0.4s ease-out",
           }}
-          alt={`Planet ${p.planetIndex + 1}`}
         />
       ))}
 
+      {/* Global styles */}
       <style>{`
-        @keyframes pop-out {
+        .animate-popout {
+          animation: popout 0.3s ease, fadeout 0.2s ease 2.8s forwards;
+        }
+
+        @keyframes popout {
           0% {
-            transform: translate(-50%, -50%) scale(0.8);
+            transform: translate(-50%, -50%) scale(0.6);
             opacity: 0;
-          }
-          30% {
-            opacity: 1;
           }
           100% {
             transform: translate(-50%, -50%) scale(1);
@@ -141,11 +137,14 @@ const CustomCursor = () => {
           }
         }
 
-        body, *:not(.use-default-cursor) {
-          cursor: none !important;
+        @keyframes fadeout {
+          to {
+            opacity: 0;
+          }
         }
-        .use-default-cursor {
-          cursor: auto !important;
+
+        * {
+          cursor: none !important;
         }
       `}</style>
     </>
