@@ -1,4 +1,3 @@
-// src/components/PricingList.jsx
 import React from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -7,11 +6,8 @@ const PricingList = ({ data }) => {
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-      {data.map((item) => (
-        <div
-          key={item.id}
-          className="border rounded-lg p-6 shadow-md flex flex-col justify-between"
-        >
+      {data.map(item => (
+        <div key={item.id} className="border rounded-lg p-6 shadow-md flex flex-col justify-between">
           <div>
             <h3 className="text-xl font-bold mb-2">{item.title}</h3>
             <p className="mb-4">{item.description}</p>
