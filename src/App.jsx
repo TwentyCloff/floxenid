@@ -1,7 +1,6 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 
 import ButtonGradient from "./assets/svg/ButtonGradient";
-
 import Benefits from "./components/Benefits";
 import Collaboration from "./components/Collaboration";
 import Footer from "./components/Footer";
@@ -13,7 +12,6 @@ import Services from "./components/Services";
 
 import PaymentPage from "./components/PaymentPage";
 import AdminDashboard from "./components/AdminDashboard";
-
 import LoginAdmin from "./components/LoginAdmin";
 import ProtectedRoute from "./components/ProtectedRoute";
 
@@ -55,7 +53,7 @@ const App = () => {
       {/* Jika akses /admin langsung, redirect ke login */}
       <Route path="/admin" element={<Navigate to="/admin/login" replace />} />
 
-      {/* 404 */}
+      {/* 404 fallback */}
       <Route
         path="*"
         element={
