@@ -2,7 +2,6 @@ import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { FiLock, FiEye, FiEyeOff, FiLogIn } from "react-icons/fi";
 import { motion, useAnimation, AnimatePresence } from "framer-motion";
-import { Engine } from "tsparticles-engine";
 import Particles from "react-tsparticles";
 import { loadFull } from "tsparticles";
 import { gsap } from "gsap";
@@ -16,10 +15,10 @@ const LoginAdmin = () => {
   const navigate = useNavigate();
   const controls = useAnimation();
   const cardRef = useRef();
-  const particlesRef = useRef<Engine>();
+  const particlesRef = useRef();
 
   // Initialize particles
-  const particlesInit = async (engine: Engine) => {
+  const particlesInit = async (engine) => {
     await loadFull(engine);
     particlesRef.current = engine;
   };
@@ -45,7 +44,7 @@ const LoginAdmin = () => {
     return () => clearInterval(interval);
   }, [accessLevel]);
 
-  const getParticleConfig = (level: number) => {
+  const getParticleConfig = (level) => {
     const baseDensity = 60 + (level * 20);
     return {
       fpsLimit: 120,
@@ -57,7 +56,7 @@ const LoginAdmin = () => {
         color: { value: ["#3b82f6", "#8b5cf6", "#ec4899"] },
         move: { 
           speed: 0.5 + (level * 0.2),
-          outMode: "bounce" as const
+          outMode: "bounce"
         },
         links: { 
           color: "#3b82f6",
@@ -114,11 +113,11 @@ const LoginAdmin = () => {
     setIsLoading(false);
   };
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
+  const handleKeyPress = (e) => {
     if (e.key === "Enter") handleLogin();
   };
 
-  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handlePasswordChange = (e) => {
     setPassword(e.target.value);
     // Increase access level perception as password length grows
     setAccessLevel(Math.min(Math.floor(e.target.value.length / 3), 3));
@@ -385,7 +384,7 @@ const LoginAdmin = () => {
             <span>ENCRYPTION: QUANTUM-256</span>
           </div>
           <div className="mt-2">
-            © {new Date().getFullYear()} Qarvo System • TOP SECURE
+            © {new Date().getFullYear()} QUANTUM SYSTEMS • TOP SECRET
           </div>
         </div>
       </motion.div>
