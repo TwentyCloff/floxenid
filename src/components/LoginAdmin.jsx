@@ -1,10 +1,9 @@
-import React, { useState, useRef } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FiLock, FiEye, FiEyeOff, FiLogIn } from "react-icons/fi";
 import { motion } from "framer-motion";
 import Particles from "react-tsparticles";
 import { loadFull } from "tsparticles";
-import { Engine } from "tsparticles-engine";
 
 const LoginAdmin = () => {
   const [password, setPassword] = useState("");
@@ -12,7 +11,10 @@ const LoginAdmin = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const navigate = useNavigate();
-  const particlesInit = async (engine: Engine) => await loadFull(engine);
+  
+  const particlesInit = async (engine) => {
+    await loadFull(engine);
+  };
 
   const handleLogin = async () => {
     if (!password) {
@@ -34,7 +36,7 @@ const LoginAdmin = () => {
     setIsLoading(false);
   };
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
+  const handleKeyPress = (e) => {
     if (e.key === "Enter") handleLogin();
   };
 
