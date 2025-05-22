@@ -1,571 +1,543 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
-import Button from "./Button";
-import { motion, AnimatePresence } from "framer-motion";
-import { FiCheck, FiLock, FiCreditCard, FiSmartphone, FiX } from "react-icons/fi";
-import { FaCcVisa, FaCcMastercard, FaCcAmex, FaQrcode } from "react-icons/fa";
+import { motion, AnimatePresence, LazyMotion, domAnimation } from "framer-motion";
+import { 
+  FiCheck, FiLock, FiCreditCard, FiSmartphone, FiX, FiShield, FiZap,
+  FiEye, FiEyeOff, FiGlobe, FiPocket, FiClock, FiAward, FiServer
+} from "react-icons/fi";
+import { 
+  FaCcVisa, FaCcMastercard, FaCcAmex, FaQrcode, FaBitcoin, FaEthereum,
+  FaFingerprint, FaRobot, FaSatelliteDish
+} from "react-icons/fa";
+import { SiDogecoin, SiLitecoin, SiRipple } from "react-icons/si";
 import blackholeVideo from "../assets/hero/blackhole.webm";
+import quantumFieldAudio from "../assets/audio/quantum-field.mp3";
+
+// Quantum Encryption Module
+const QuantumEncryption = {
+  generateEntanglement: () => {
+    const particles = ['photon', 'electron', 'quark'];
+    return particles[Math.floor(Math.random() * particles.length)] + 
+           '-' + Math.random().toString(36).substr(2, 9);
+  },
+  createQubitSignature: (data) => {
+    return btoa(data).split('').reverse().join('') + 
+           '::qbit::' + Date.now();
+  }
+};
 
 const PaymentPage = () => {
+  // Quantum State Variables
+  const [quantumState, setQuantumState] = useState({
+    entanglementId: '',
+    qubitSignature: '',
+    superposition: false,
+    coherenceTime: 0
+  });
+
+  // Biometric State
+  const [biometrics, setBiometrics] = useState({
+    fingerprintVerified: false,
+    facialScanComplete: false,
+    neuralPatternMatch: false
+  });
+
+  // Payment State
+  const [paymentStatus, setPaymentStatus] = useState({
+    quantumEncrypted: false,
+    blockchainConfirmed: false,
+    aiVerified: false
+  });
+
+  // Core Hooks
   const location = useLocation();
   const navigate = useNavigate();
   const videoRef = useRef(null);
+  const audioRef = useRef(null);
+  const quantumTimerRef = useRef(null);
+  const biometricScannerRef = useRef(null);
   const searchParams = new URLSearchParams(location.search);
-  
-  // Enhanced plan data with features
-  const planData = {
-    "Basic": { price: "9.99", features: ["Standard Support", "Basic Features"] },
-    "Pro": { price: "29.99", features: ["Priority Support", "Advanced Features", "API Access"] },
-    "Enterprise": { price: "99.99", features: ["24/7 Support", "All Features", "Dedicated Manager"] }
-  };
 
-  const plan = searchParams.get("plan") || "Pro";
-  const price = planData[plan]?.price || "29.99";
-  const features = planData[plan]?.features || [];
-  
-  // State management
-  const [selectedMethod, setSelectedMethod] = useState("card");
-  const [cardData, setCardData] = useState({
-    number: "",
-    expiry: "",
-    cvv: "",
-    name: ""
-  });
-  const [errors, setErrors] = useState({});
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [paymentSuccess, setPaymentSuccess] = useState(false);
-  const [activeCardType, setActiveCardType] = useState(null);
-  const [showCardBack, setShowCardBack] = useState(false);
-
-  // Video background setup
-  useEffect(() => {
-    if (videoRef.current) {
-      videoRef.current.playbackRate = 0.5;
-    }
-  }, []);
-
-  // Card type detection
-  useEffect(() => {
-    const number = cardData.number.replace(/\s+/g, '');
-    if (number.length > 0) {
-      const firstDigit = number[0];
-      if (firstDigit === '4') setActiveCardType('visa');
-      else if (firstDigit === '5') setActiveCardType('mastercard');
-      else if (firstDigit === '3') setActiveCardType('amex');
-      else setActiveCardType(null);
-    } else {
-      setActiveCardType(null);
-    }
-  }, [cardData.number]);
-
-  // Format card number with spaces every 4 digits
-  const formatCardNumber = (value) => {
-    const v = value.replace(/\s+/g, '').replace(/[^0-9]/gi, '');
-    const matches = v.match(/\d{4,16}/g);
-    const match = matches && matches[0] || '';
-    const parts = [];
-    
-    for (let i = 0, len = match.length; i < len; i += 4) {
-      parts.push(match.substring(i, i + 4));
-    }
-    
-    return parts.length ? parts.join(' ') : value;
-  };
-
-  // Auto-insert slash in expiry date
-  const formatExpiry = (value) => {
-    let v = value.replace(/[^0-9]/g, '');
-    if (v.length >= 3) {
-      v = v.substring(0, 2) + '/' + v.substring(2);
-    }
-    return v.substring(0, 5);
-  };
-
-  // Validate expiry date (MM/YY)
-  const validateExpiry = (value) => {
-    if (!value || value.length < 5) return false;
-    
-    const [month, year] = value.split('/');
-    const currentYear = new Date().getFullYear() % 100;
-    const currentMonth = new Date().getMonth() + 1;
-    
-    // Validate month (1-12)
-    if (month < 1 || month > 12) return false;
-    
-    // Validate year (not in past)
-    if (year < currentYear) return false;
-    if (year == currentYear && month < currentMonth) return false;
-    
-    return true;
-  };
-
-  // Validate card number using Luhn algorithm
-  const validateCardNumber = (number) => {
-    const cleaned = number.replace(/\s+/g, '');
-    if (!/^\d+$/.test(cleaned)) return false;
-    
-    let sum = 0;
-    let shouldDouble = false;
-    
-    for (let i = cleaned.length - 1; i >= 0; i--) {
-      let digit = parseInt(cleaned.charAt(i));
-      
-      if (shouldDouble) {
-        digit *= 2;
-        if (digit > 9) digit -= 9;
-      }
-      
-      sum += digit;
-      shouldDouble = !shouldDouble;
-    }
-    
-    return sum % 10 === 0;
-  };
-
-  // Handle input changes with validation
-  const handleInputChange = (field, value) => {
-    let formattedValue = value;
-    
-    if (field === 'number') {
-      formattedValue = formatCardNumber(value);
-    } else if (field === 'expiry') {
-      formattedValue = formatExpiry(value);
-    } else if (field === 'cvv') {
-      formattedValue = value.replace(/\D/g, '').slice(0, activeCardType === 'amex' ? 4 : 3);
-    }
-    
-    setCardData(prev => ({
-      ...prev,
-      [field]: formattedValue
-    }));
-    
-    // Clear error when typing
-    if (errors[field]) {
-      setErrors(prev => ({ ...prev, [field]: null }));
+  // Quantum Plan Data
+  const quantumPlanData = {
+    "Stellar": { 
+      price: "299.99", 
+      features: [
+        "Quantum Encryption", 
+        "Neural Biometrics",
+        "AI Fraud Detection",
+        "Interstellar Transfer"
+      ],
+      qbits: 1000
+    },
+    "Galactic": { 
+      price: "999.99", 
+      features: [
+        "All Stellar Features",
+        "Quantum Entanglement",
+        "Blockchain Settlement",
+        "Temporal Security"
+      ],
+      qbits: 5000
+    },
+    "Singularity": { 
+      price: "4999.99", 
+      features: [
+        "All Galactic Features",
+        "Neural Network Shield",
+        "Dark Web Monitoring",
+        "AI Personal Butler"
+      ],
+      qbits: 25000
     }
   };
 
-  // Validate all fields before submission
-  const validateForm = () => {
-    const newErrors = {};
-    
-    if (!cardData.name.trim()) {
-      newErrors.name = "Cardholder name is required";
+  // Initialize Quantum Payment
+  const initQuantumPayment = () => {
+    const entanglementId = QuantumEncryption.generateEntanglement();
+    const qubitSignature = QuantumEncryption.createQubitSignature(
+      `${plan}|${price}|${Date.now()}`
+    );
+
+    setQuantumState({
+      entanglementId,
+      qubitSignature,
+      superposition: true,
+      coherenceTime: 0
+    });
+
+    // Start quantum coherence timer
+    quantumTimerRef.current = setInterval(() => {
+      setQuantumState(prev => ({
+        ...prev,
+        coherenceTime: prev.coherenceTime + 1
+      }));
+    }, 1000);
+
+    // Play quantum field audio
+    if (audioRef.current) {
+      audioRef.current.volume = 0.3;
+      audioRef.current.play();
     }
-    
-    if (!cardData.number || !validateCardNumber(cardData.number)) {
-      newErrors.number = "Invalid card number";
-    }
-    
-    if (!cardData.expiry || !validateExpiry(cardData.expiry)) {
-      newErrors.expiry = "Invalid expiry date";
-    }
-    
-    if (!cardData.cvv || (activeCardType === 'amex' ? cardData.cvv.length !== 4 : cardData.cvv.length !== 3)) {
-      newErrors.cvv = activeCardType === 'amex' ? "4-digit CVV required" : "3-digit CVV required";
-    }
-    
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
   };
 
-  // Handle form submission
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    
-    if (validateForm()) {
-      setIsProcessing(true);
-      
-      // Simulate API call
+  // Verify Biometrics
+  const verifyBiometrics = async () => {
+    // Simulate biometric scanning
+    return new Promise(resolve => {
       setTimeout(() => {
-        setIsProcessing(false);
-        setPaymentSuccess(true);
+        setBiometrics({
+          fingerprintVerified: true,
+          facialScanComplete: true,
+          neuralPatternMatch: true
+        });
+        resolve(true);
+      }, 2000);
+    });
+  };
+
+  // Process Quantum Payment
+  const processQuantumPayment = async () => {
+    try {
+      // Step 1: Verify biometrics
+      await verifyBiometrics();
+      
+      // Step 2: Activate quantum encryption
+      setPaymentStatus(prev => ({
+        ...prev,
+        quantumEncrypted: true
+      }));
+      
+      // Step 3: Confirm on blockchain
+      setTimeout(() => {
+        setPaymentStatus(prev => ({
+          ...prev,
+          blockchainConfirmed: true
+        }));
+      }, 1500);
+      
+      // Step 4: AI verification
+      setTimeout(() => {
+        setPaymentStatus(prev => ({
+          ...prev,
+          aiVerified: true
+        }));
         
+        // Complete payment
         setTimeout(() => {
-          navigate("/success");
+          setPaymentComplete(true);
+          clearInterval(quantumTimerRef.current);
+          
+          // Navigate to success
+          setTimeout(() => {
+            navigate("/quantum-success");
+          }, 3000);
         }, 2000);
       }, 3000);
+    } catch (error) {
+      console.error("Quantum payment error:", error);
     }
   };
 
-  // Payment methods data
-  const paymentMethods = [
-    { id: "gopay", name: "Gopay", icon: <FiSmartphone className="w-5 h-5" /> },
-    { id: "dana", name: "Dana", icon: <FiSmartphone className="w-5 h-5" /> },
-    { id: "qris", name: "QRIS", icon: <FaQrcode className="w-5 h-5" /> },
-    { 
-      id: "card", 
-      name: "Credit Card", 
-      icon: <FiCreditCard className="w-5 h-5" />,
-      supportedCards: [
-        { type: "visa", icon: <FaCcVisa className="w-8 h-5" /> },
-        { type: "mastercard", icon: <FaCcMastercard className="w-8 h-5" /> },
-        { type: "amex", icon: <FaCcAmex className="w-8 h-5" /> }
-      ]
-    },
-  ];
+  // Cleanup
+  useEffect(() => {
+    return () => {
+      clearInterval(quantumTimerRef.current);
+      if (audioRef.current) {
+        audioRef.current.pause();
+      }
+    };
+  }, []);
 
   return (
-    <div className="fixed inset-0 overflow-y-auto bg-black z-50">
-      {/* Blackhole video background */}
-      <div className="fixed inset-0 overflow-hidden">
-        <video
-          ref={videoRef}
-          autoPlay
-          loop
-          muted
-          className="w-full h-full object-cover opacity-20"
-        >
-          <source src={blackholeVideo} type="video/webm" />
-        </video>
-        <div className="absolute inset-0 bg-gradient-to-b from-black/80 to-black/60"></div>
-      </div>
+    <LazyMotion features={domAnimation}>
+      <div className="fixed inset-0 overflow-y-auto z-[9999]">
+        {/* Quantum Tunnel Background */}
+        <div className="fixed inset-0 overflow-hidden">
+          <video
+            ref={videoRef}
+            autoPlay
+            loop
+            muted
+            className="w-full h-full object-cover opacity-80"
+          >
+            <source src={blackholeVideo} type="video/mp4" />
+          </video>
+          <div className="absolute inset-0 bg-gradient-to-b from-black/90 via-purple-900/30 to-black/90"></div>
+        </div>
 
-      <AnimatePresence>
-        {paymentSuccess ? (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.9 }}
-            className="relative z-10 bg-n-7 p-8 rounded-3xl max-w-lg w-full shadow-2xl border border-green-500/20 mx-auto my-16"
-          >
-            <div className="flex flex-col items-center text-center">
-              <div className="w-20 h-20 bg-green-500/20 rounded-full flex items-center justify-center mb-6">
-                <FiCheck className="w-10 h-10 text-green-500" />
-              </div>
-              <h2 className="text-3xl font-bold text-white mb-2">Payment Successful</h2>
-              <p className="text-n-4 mb-6">Thank you for your purchase!</p>
-              <div className="bg-n-6 rounded-xl p-4 w-full mb-6">
-                <div className="flex justify-between mb-2">
-                  <span className="text-n-4">Plan:</span>
-                  <span className="text-white font-medium">{plan}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-n-4">Amount:</span>
-                  <span className="text-white font-bold">${price}</span>
-                </div>
-              </div>
-              <Button className="w-full" onClick={() => navigate("/dashboard")}>
-                Go to Dashboard
-              </Button>
-            </div>
-          </motion.div>
-        ) : (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            className="relative z-10 bg-n-7 p-8 rounded-3xl max-w-4xl w-full shadow-2xl border border-n-6 mx-auto my-8"
-          >
-            {/* Close button */}
-            <button 
-              onClick={() => navigate(-1)}
-              className="absolute top-4 right-4 text-n-4 hover:text-white transition-colors"
+        {/* Quantum Audio Field */}
+        <audio ref={audioRef} loop>
+          <source src={quantumFieldAudio} type="audio/mpeg" />
+        </audio>
+
+        <AnimatePresence>
+          {paymentComplete ? (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 1.2 }}
+              className="relative z-10 bg-n-8/95 backdrop-blur-xl p-10 rounded-4xl max-w-2xl w-full shadow-2xl border-2 border-emerald-500/30 mx-auto my-16"
             >
-              <FiX className="w-6 h-6" />
-            </button>
-
-            <div className="flex flex-col md:flex-row gap-8">
-              {/* Left side - Plan details */}
-              <div className="md:w-1/3">
-                <div className="flex items-center mb-6">
-                  <FiLock className="w-5 h-5 text-blue-500 mr-2" />
-                  <h2 className="text-3xl font-bold text-white">Secure Payment</h2>
-                </div>
-
-                {/* Plan Info */}
-                <div className="bg-n-6 rounded-xl p-6 mb-8 relative overflow-hidden">
-                  <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 to-purple-500"></div>
-                  <p className="text-n-4 text-sm mb-1">You're subscribing to</p>
-                  <p className="text-white text-xl font-semibold mb-3">{plan} Plan</p>
-                  <div className="flex items-baseline mb-4">
-                    <span className="text-4xl font-bold text-white mr-2">${price}</span>
-                    <span className="text-n-4">/month</span>
+              <div className="flex flex-col items-center text-center">
+                <motion.div 
+                  initial={{ rotate: 0 }}
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
+                  className="w-28 h-28 bg-emerald-500/10 rounded-full flex items-center justify-center mb-8 border-2 border-emerald-500/30"
+                >
+                  <FiCheck className="w-16 h-16 text-emerald-500" />
+                </motion.div>
+                
+                <h2 className="text-4xl font-bold text-white mb-4 bg-clip-text text-transparent bg-gradient-to-r from-emerald-400 to-cyan-400">
+                  Quantum Payment Complete
+                </h2>
+                
+                <p className="text-n-3 mb-8 max-w-md">
+                  Your transaction has been secured across multiple quantum dimensions and verified by our AI network.
+                </p>
+                
+                <div className="bg-n-7/80 rounded-2xl p-6 w-full mb-8 border border-n-6">
+                  <div className="grid grid-cols-2 gap-4 mb-4">
+                    <div>
+                      <p className="text-n-4 text-sm">Plan:</p>
+                      <p className="text-white font-medium text-lg">{plan}</p>
+                    </div>
+                    <div>
+                      <p className="text-n-4 text-sm">Amount:</p>
+                      <p className="text-white font-bold text-xl">${price}</p>
+                    </div>
                   </div>
                   
-                  <ul className="space-y-2">
-                    {features.map((feature, index) => (
-                      <li key={index} className="flex items-center">
-                        <FiCheck className="w-4 h-4 text-green-500 mr-2" />
-                        <span className="text-n-2">{feature}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-
-                {/* Payment Method */}
-                <div className="mb-6">
-                  <h3 className="text-white text-sm font-medium mb-4">Payment Method</h3>
-                  <div className="grid grid-cols-2 gap-3">
-                    {paymentMethods.map((method) => (
-                      <motion.button
-                        key={method.id}
-                        type="button"
-                        whileHover={{ scale: 1.03 }}
-                        whileTap={{ scale: 0.98 }}
-                        onClick={() => setSelectedMethod(method.id)}
-                        className={`flex flex-col items-center px-4 py-3 rounded-xl border-2 transition-all duration-300 ${
-                          selectedMethod === method.id
-                            ? "border-blue-500 bg-blue-900/20 text-white shadow-lg shadow-blue-500/10"
-                            : "border-n-5 text-n-2 hover:border-blue-400"
-                        }`}
-                      >
-                        <div className="flex items-center mb-1">
-                          {method.icon}
-                          <span className="ml-2 font-medium">{method.name}</span>
-                        </div>
-                        {method.id === "card" && (
-                          <div className="flex mt-2 space-x-1">
-                            {method.supportedCards.map(card => (
-                              <div 
-                                key={card.type} 
-                                className={`p-1 rounded ${activeCardType === card.type ? 'bg-white/10' : 'opacity-30'}`}
-                              >
-                                {card.icon}
-                              </div>
-                            ))}
-                          </div>
-                        )}
-                      </motion.button>
-                    ))}
-                  </div>
-                </div>
-              </div>
-
-              {/* Right side - Payment form */}
-              <div className="md:w-2/3">
-                {selectedMethod === "card" ? (
-                  <form className="space-y-5" onSubmit={handleSubmit}>
-                    {/* Animated credit card preview */}
-                    <motion.div 
-                      className="relative h-48 bg-gradient-to-br from-n-6 to-n-7 rounded-2xl p-6 shadow-lg overflow-hidden cursor-pointer"
-                      whileHover={{ scale: 1.01 }}
-                      onClick={() => setShowCardBack(!showCardBack)}
-                      animate={{ rotateY: showCardBack ? 180 : 0 }}
-                      transition={{ duration: 0.6 }}
-                    >
-                      {/* Front of card */}
-                      {!showCardBack && (
-                        <div className="h-full flex flex-col justify-between">
-                          <div className="flex justify-between items-start">
-                            <div className="text-white font-bold text-xl">Premium Card</div>
-                            {activeCardType && (
-                              <div className="bg-white/10 p-1 rounded">
-                                {paymentMethods.find(m => m.id === 'card').supportedCards.find(c => c.type === activeCardType).icon}
-                              </div>
-                            )}
-                          </div>
-                          
-                          <div className="mt-4">
-                            <div className="text-white text-xl font-mono tracking-wider">
-                              {cardData.number ? cardData.number : '•••• •••• •••• ••••'}
-                            </div>
-                          </div>
-                          
-                          <div className="flex justify-between mt-6">
-                            <div>
-                              <div className="text-n-4 text-xs">Card Holder</div>
-                              <div className="text-white text-sm font-medium">
-                                {cardData.name || 'YOUR NAME'}
-                              </div>
-                            </div>
-                            <div>
-                              <div className="text-n-4 text-xs">Expires</div>
-                              <div className="text-white text-sm font-medium">
-                                {cardData.expiry || '••/••'}
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      )}
-                      
-                      {/* Back of card */}
-                      {showCardBack && (
-                        <div className="h-full flex flex-col justify-between transform rotate-y-180">
-                          <div className="h-8 bg-black w-full"></div>
-                          <div className="bg-n-5 h-10 flex items-center px-4">
-                            <div className="bg-n-8 h-8 w-full rounded-sm flex items-center justify-end pr-2">
-                              <span className="text-white font-mono text-sm">
-                                {cardData.cvv || '•••'}
-                              </span>
-                            </div>
-                          </div>
-                          <div className="flex justify-end">
-                            {activeCardType && (
-                              <div className="bg-white/10 p-1 rounded">
-                                {paymentMethods.find(m => m.id === 'card').supportedCards.find(c => c.type === activeCardType).icon}
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      )}
-                    </motion.div>
-
-                    {/* Cardholder Name */}
-                    <div>
-                      <label className="block text-sm text-white mb-2 font-medium">
-                        Cardholder Name <span className="text-red-500">*</span>
-                      </label>
-                      <input
-                        type="text"
-                        value={cardData.name}
-                        onChange={(e) => handleInputChange('name', e.target.value)}
-                        placeholder="John Doe"
-                        className={`w-full px-4 py-3 bg-n-6 border rounded-xl text-white placeholder:text-n-4 focus:border-blue-500 focus:ring-1 focus:ring-blue-500/50 transition-all ${
-                          errors.name ? 'border-red-500' : 'border-n-5'
-                        }`}
-                        required
-                      />
-                      {errors.name && (
-                        <p className="text-red-500 text-xs mt-1">{errors.name}</p>
-                      )}
-                    </div>
-
-                    {/* Card Number */}
-                    <div>
-                      <label className="block text-sm text-white mb-2 font-medium">
-                        Card Number <span className="text-red-500">*</span>
-                      </label>
-                      <div className="relative">
-                        <input
-                          type="text"
-                          value={cardData.number}
-                          onChange={(e) => handleInputChange('number', e.target.value)}
-                          placeholder="1234 5678 9012 3456"
-                          className={`w-full px-4 py-3 bg-n-6 border rounded-xl text-white placeholder:text-n-4 focus:border-blue-500 focus:ring-1 focus:ring-blue-500/50 transition-all pl-12 ${
-                            errors.number ? 'border-red-500' : 'border-n-5'
-                          }`}
-                          maxLength={19}
-                          required
-                        />
-                        <div className="absolute left-3 top-1/2 transform -translate-y-1/2">
-                          <FiCreditCard className="w-5 h-5 text-n-4" />
-                        </div>
-                      </div>
-                      {errors.number && (
-                        <p className="text-red-500 text-xs mt-1">{errors.number}</p>
-                      )}
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-4">
-                      {/* Expiry Date */}
-                      <div>
-                        <label className="block text-sm text-white mb-2 font-medium">
-                          Expiry Date <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                          type="text"
-                          value={cardData.expiry}
-                          onChange={(e) => handleInputChange('expiry', e.target.value)}
-                          placeholder="MM/YY"
-                          className={`w-full px-4 py-3 bg-n-6 border rounded-xl text-white placeholder:text-n-4 focus:border-blue-500 focus:ring-1 focus:ring-blue-500/50 transition-all ${
-                            errors.expiry ? 'border-red-500' : 'border-n-5'
-                          }`}
-                          required
-                        />
-                        {errors.expiry && (
-                          <p className="text-red-500 text-xs mt-1">{errors.expiry}</p>
-                        )}
-                      </div>
-
-                      {/* CVV */}
-                      <div>
-                        <label className="block text-sm text-white mb-2 font-medium">
-                          CVV <span className="text-red-500">*</span>
-                        </label>
-                        <div className="relative">
-                          <input
-                            type="text"
-                            value={cardData.cvv}
-                            onChange={(e) => handleInputChange('cvv', e.target.value)}
-                            placeholder={activeCardType === 'amex' ? '4 digits' : '3 digits'}
-                            className={`w-full px-4 py-3 bg-n-6 border rounded-xl text-white placeholder:text-n-4 focus:border-blue-500 focus:ring-1 focus:ring-blue-500/50 transition-all ${
-                              errors.cvv ? 'border-red-500' : 'border-n-5'
-                            }`}
-                            onFocus={() => setShowCardBack(true)}
-                            onBlur={() => setShowCardBack(false)}
-                            required
-                          />
-                          <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                            <FiLock className="w-4 h-4 text-n-4" />
-                          </div>
-                        </div>
-                        {errors.cvv && (
-                          <p className="text-red-500 text-xs mt-1">{errors.cvv}</p>
-                        )}
-                      </div>
-                    </div>
-
-                    <Button 
-                      className="w-full mt-6" 
-                      white
-                      disabled={isProcessing}
-                    >
-                      {isProcessing ? (
-                        <div className="flex items-center justify-center">
-                          <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                          </svg>
-                          Processing...
-                        </div>
-                      ) : (
-                        `Pay $${price}`
-                      )}
-                    </Button>
-
-                    <div className="flex items-center justify-center mt-4">
-                      <FiLock className="w-4 h-4 text-n-4 mr-2" />
-                      <span className="text-xs text-n-4">Payments are secure and encrypted</span>
-                    </div>
-                  </form>
-                ) : (
-                  <div className="flex flex-col items-center text-center space-y-5 mt-6">
-                    <p className="text-white text-sm">
-                      Scan the QR code using your <strong className="text-blue-400">{selectedMethod.toUpperCase()}</strong> app to complete payment.
+                  <div className="border-t border-n-6 pt-4">
+                    <p className="text-n-4 text-sm mb-2">Quantum Signature:</p>
+                    <p className="text-cyan-400 font-mono text-xs truncate">
+                      {quantumState.qubitSignature}
                     </p>
+                  </div>
+                </div>
+                
+                <Button 
+                  className="w-full mt-2" 
+                  gradient
+                  onClick={() => navigate("/quantum-dashboard")}
+                >
+                  Access Quantum Dashboard
+                </Button>
+              </div>
+            </motion.div>
+          ) : (
+            <motion.div
+              initial={{ opacity: 0, y: 40 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -40 }}
+              className="relative z-10 bg-n-8/95 backdrop-blur-xl p-10 rounded-4xl max-w-6xl w-full shadow-2xl border-2 border-purple-500/30 mx-auto my-8"
+            >
+              {/* Quantum Header */}
+              <div className="flex justify-between items-start mb-12">
+                <div>
+                  <h1 className="text-4xl font-bold text-white mb-2 flex items-center">
+                    <FiZap className="text-purple-500 mr-3" />
+                    <span className="bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-400">
+                      Quantum Payment Portal
+                    </span>
+                  </h1>
+                  <p className="text-n-3">
+                    Secure cross-dimensional transaction interface
+                  </p>
+                </div>
+                
+                <button 
+                  onClick={() => navigate(-1)}
+                  className="text-n-3 hover:text-white transition-colors p-2 rounded-full hover:bg-n-7"
+                >
+                  <FiX className="w-6 h-6" />
+                </button>
+              </div>
+
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
+                {/* Quantum Plan Overview */}
+                <div className="lg:col-span-1">
+                  <div className="bg-n-7/80 rounded-3xl p-8 border-2 border-purple-500/20 relative overflow-hidden">
+                    <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-purple-500 to-pink-500"></div>
                     
-                    <motion.div 
-                      className="w-56 h-56 bg-white rounded-2xl flex flex-col items-center justify-center p-4 relative overflow-hidden"
-                      whileHover={{ scale: 1.02 }}
-                    >
-                      <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-blue-500 to-purple-500"></div>
-                      <FaQrcode className="w-24 h-24 text-black mb-3" />
-                      <div className="text-black font-semibold">{selectedMethod.toUpperCase()}</div>
-                      <div className="text-xs text-n-7 mt-1">${price}</div>
-                    </motion.div>
+                    <h2 className="text-2xl font-bold text-white mb-6">
+                      <FiAward className="inline mr-2 text-purple-400" />
+                      {plan} Quantum Plan
+                    </h2>
                     
-                    <div className="bg-n-6 rounded-xl p-4 w-full text-left">
-                      <div className="flex justify-between mb-1">
-                        <span className="text-n-4 text-sm">Plan:</span>
-                        <span className="text-white text-sm font-medium">{plan}</span>
+                    <div className="flex items-baseline mb-8">
+                      <span className="text-5xl font-bold text-white mr-2">
+                        ${price}
+                      </span>
+                      <span className="text-n-3">/quantum cycle</span>
+                    </div>
+                    
+                    <ul className="space-y-4 mb-8">
+                      {quantumPlanData[plan]?.features.map((feature, index) => (
+                        <li key={index} className="flex items-start">
+                          <FiCheck className="w-5 h-5 text-green-500 mr-3 mt-0.5 flex-shrink-0" />
+                          <span className="text-n-1">{feature}</span>
+                        </li>
+                      ))}
+                    </ul>
+                    
+                    <div className="bg-n-8/50 rounded-xl p-4 border border-n-7">
+                      <div className="flex justify-between items-center mb-2">
+                        <span className="text-n-3">Quantum Bits:</span>
+                        <span className="text-purple-400 font-bold">
+                          {quantumPlanData[plan]?.qbits.toLocaleString()}
+                        </span>
                       </div>
-                      <div className="flex justify-between">
-                        <span className="text-n-4 text-sm">Amount:</span>
-                        <span className="text-white text-sm font-bold">${price}</span>
+                      <div className="flex justify-between items-center">
+                        <span className="text-n-3">Temporal Security:</span>
+                        <span className="text-green-400 font-bold">Active</span>
                       </div>
                     </div>
-
-                    <Button 
-                      className="w-full mt-2" 
-                      white
-                      onClick={() => {
-                        setIsProcessing(true);
-                        setTimeout(() => {
-                          setPaymentSuccess(true);
-                        }, 1500);
-                      }}
-                    >
-                      I've Completed the Payment
-                    </Button>
                   </div>
-                )}
+                  
+                  {/* Quantum Security Status */}
+                  <div className="mt-6 bg-n-7/80 rounded-3xl p-6 border-2 border-cyan-500/20">
+                    <h3 className="text-xl font-bold text-white mb-4 flex items-center">
+                      <FiShield className="text-cyan-400 mr-2" />
+                      Quantum Security
+                    </h3>
+                    
+                    <div className="space-y-4">
+                      <div className="flex justify-between">
+                        <span className="text-n-3">Entanglement ID:</span>
+                        <span className="text-cyan-400 font-mono text-xs">
+                          {quantumState.entanglementId || "Not established"}
+                        </span>
+                      </div>
+                      
+                      <div className="flex justify-between">
+                        <span className="text-n-3">Coherence Time:</span>
+                        <span className="text-white">
+                          {quantumState.coherenceTime}s
+                        </span>
+                      </div>
+                      
+                      <div className="flex justify-between">
+                        <span className="text-n-3">Superposition:</span>
+                        <span className={quantumState.superposition ? "text-green-400" : "text-red-400"}>
+                          {quantumState.superposition ? "Active" : "Inactive"}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Quantum Payment Interface */}
+                <div className="lg:col-span-2">
+                  <div className="bg-n-7/80 rounded-3xl p-8 border-2 border-blue-500/20">
+                    <h2 className="text-2xl font-bold text-white mb-6 flex items-center">
+                      <FiCreditCard className="text-blue-400 mr-2" />
+                      Quantum Payment Channel
+                    </h2>
+                    
+                    {/* Biometric Verification */}
+                    <div className="mb-8">
+                      <h3 className="text-lg font-semibold text-white mb-4 flex items-center">
+                        <FaFingerprint className="text-pink-400 mr-2" />
+                        Biometric Verification
+                      </h3>
+                      
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                        <div className={`p-4 rounded-xl border-2 ${biometrics.fingerprintVerified ? "border-green-500/30 bg-green-500/10" : "border-n-6"}`}>
+                          <div className="flex items-center mb-2">
+                            <FaFingerprint className={`mr-2 ${biometrics.fingerprintVerified ? "text-green-400" : "text-n-4"}`} />
+                            <span className={`font-medium ${biometrics.fingerprintVerified ? "text-white" : "text-n-3"}`}>
+                              Fingerprint
+                            </span>
+                          </div>
+                          <div className="text-xs text-n-4">
+                            {biometrics.fingerprintVerified ? "Quantum verified" : "Pending scan"}
+                          </div>
+                        </div>
+                        
+                        <div className={`p-4 rounded-xl border-2 ${biometrics.facialScanComplete ? "border-blue-500/30 bg-blue-500/10" : "border-n-6"}`}>
+                          <div className="flex items-center mb-2">
+                            <FiEye className={`mr-2 ${biometrics.facialScanComplete ? "text-blue-400" : "text-n-4"}`} />
+                            <span className={`font-medium ${biometrics.facialScanComplete ? "text-white" : "text-n-3"}`}>
+                              Facial Scan
+                            </span>
+                          </div>
+                          <div className="text-xs text-n-4">
+                            {biometrics.facialScanComplete ? "Multidimensional match" : "Awaiting scan"}
+                          </div>
+                        </div>
+                        
+                        <div className={`p-4 rounded-xl border-2 ${biometrics.neuralPatternMatch ? "border-purple-500/30 bg-purple-500/10" : "border-n-6"}`}>
+                          <div className="flex items-center mb-2">
+                            <FaRobot className={`mr-2 ${biometrics.neuralPatternMatch ? "text-purple-400" : "text-n-4"}`} />
+                            <span className={`font-medium ${biometrics.neuralPatternMatch ? "text-white" : "text-n-3"}`}>
+                              Neural Pattern
+                            </span>
+                          </div>
+                          <div className="text-xs text-n-4">
+                            {biometrics.neuralPatternMatch ? "Quantum entangled" : "Calibrating"}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    {/* Quantum Payment Progress */}
+                    <div className="mb-8">
+                      <h3 className="text-lg font-semibold text-white mb-4 flex items-center">
+                        <FiServer className="text-amber-400 mr-2" />
+                        Quantum Transaction Process
+                      </h3>
+                      
+                      <div className="space-y-6">
+                        <div className={`p-4 rounded-xl border-2 ${paymentStatus.quantumEncrypted ? "border-green-500/30 bg-green-500/10" : "border-n-6"}`}>
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center">
+                              <div className={`w-8 h-8 rounded-full flex items-center justify-center mr-3 ${paymentStatus.quantumEncrypted ? "bg-green-500/20 text-green-400" : "bg-n-7 text-n-4"}`}>
+                                {paymentStatus.quantumEncrypted ? <FiCheck className="w-4 h-4" /> : <FiClock className="w-4 h-4" />}
+                              </div>
+                              <div>
+                                <h4 className={`font-medium ${paymentStatus.quantumEncrypted ? "text-white" : "text-n-3"}`}>
+                                  Quantum Encryption
+                                </h4>
+                                <p className="text-xs text-n-4">
+                                  {paymentStatus.quantumEncrypted ? "Entangled across dimensions" : "Initializing qubits"}
+                                </p>
+                              </div>
+                            </div>
+                            {paymentStatus.quantumEncrypted && (
+                              <span className="text-xs bg-green-500/20 text-green-400 px-2 py-1 rounded-full">
+                                Secure
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                        
+                        <div className={`p-4 rounded-xl border-2 ${paymentStatus.blockchainConfirmed ? "border-blue-500/30 bg-blue-500/10" : "border-n-6"}`}>
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center">
+                              <div className={`w-8 h-8 rounded-full flex items-center justify-center mr-3 ${paymentStatus.blockchainConfirmed ? "bg-blue-500/20 text-blue-400" : "bg-n-7 text-n-4"}`}>
+                                {paymentStatus.blockchainConfirmed ? <FiCheck className="w-4 h-4" /> : <FiClock className="w-4 h-4" />}
+                              </div>
+                              <div>
+                                <h4 className={`font-medium ${paymentStatus.blockchainConfirmed ? "text-white" : "text-n-3"}`}>
+                                  Blockchain Settlement
+                                </h4>
+                                <p className="text-xs text-n-4">
+                                  {paymentStatus.blockchainConfirmed ? "Interstellar ledger updated" : "Connecting to quantum nodes"}
+                                </p>
+                              </div>
+                            </div>
+                            {paymentStatus.blockchainConfirmed && (
+                              <span className="text-xs bg-blue-500/20 text-blue-400 px-2 py-1 rounded-full">
+                                Immutable
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                        
+                        <div className={`p-4 rounded-xl border-2 ${paymentStatus.aiVerified ? "border-purple-500/30 bg-purple-500/10" : "border-n-6"}`}>
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center">
+                              <div className={`w-8 h-8 rounded-full flex items-center justify-center mr-3 ${paymentStatus.aiVerified ? "bg-purple-500/20 text-purple-400" : "bg-n-7 text-n-4"}`}>
+                                {paymentStatus.aiVerified ? <FiCheck className="w-4 h-4" /> : <FiClock className="w-4 h-4" />}
+                              </div>
+                              <div>
+                                <h4 className={`font-medium ${paymentStatus.aiVerified ? "text-white" : "text-n-3"}`}>
+                                  AI Verification
+                                </h4>
+                                <p className="text-xs text-n-4">
+                                  {paymentStatus.aiVerified ? "Neural network confirmed" : "Analyzing quantum patterns"}
+                                </p>
+                              </div>
+                            </div>
+                            {paymentStatus.aiVerified && (
+                              <span className="text-xs bg-purple-500/20 text-purple-400 px-2 py-1 rounded-full">
+                                Verified
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    {/* Quantum Initiation */}
+                    <div className="flex justify-end">
+                      {!quantumState.entanglementId ? (
+                        <Button 
+                          gradient
+                          onClick={initQuantumPayment}
+                          className="flex items-center"
+                        >
+                          <FiZap className="mr-2" />
+                          Initialize Quantum Payment
+                        </Button>
+                      ) : (
+                        <Button 
+                          gradient
+                          onClick={processQuantumPayment}
+                          disabled={paymentStatus.aiVerified}
+                          className="flex items-center"
+                        >
+                          {paymentStatus.aiVerified ? (
+                            "Payment Complete"
+                          ) : (
+                            <>
+                              <FaSatelliteDish className="mr-2" />
+                              {paymentStatus.quantumEncrypted ? "Confirm Transaction" : "Engage Quantum Lock"}
+                            </>
+                          )}
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                </div>
               </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+    </LazyMotion>
   );
 };
 
