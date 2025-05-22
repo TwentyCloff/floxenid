@@ -3,18 +3,18 @@ import { useState } from "react";
 import { motion, AnimatePresence, LazyMotion, domAnimation } from "framer-motion";
 import { 
   FiCheck, FiLock, FiCreditCard, FiX, FiShield,
-  FiUser, FiMail, FiSmartphone, FiUpload, FiCamera
+  FiUser, FiMail, FiSmartphone, FiLoader
 } from "react-icons/fi";
 import { FaQrcode } from "react-icons/fa";
-import { db, storage } from "../config/firebaseConfig";
+import { db } from "../config/firebaseConfig";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
-import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import paymentVideo from "../assets/hero/payment-bg.mp4";
 import Button from "./Button";
 
 const PaymentPage = () => {
-  const [step, setStep] = useState(1);
+  const [step, setStep] = useState(1); // 1: Personal info, 2: Payment, 3: Confirm
   const [paymentComplete, setPaymentComplete] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState("qris");
   const [personalInfo, setPersonalInfo] = useState({
     name: "",
@@ -22,9 +22,6 @@ const PaymentPage = () => {
     discord: "",
     phone: "",
   });
-  const [paymentProof, setPaymentProof] = useState(null);
-  const [uploadProgress, setUploadProgress] = useState(0);
-  const [isSubmitting, setIsSubmitting] = useState(false);
   
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
@@ -73,59 +70,31 @@ const PaymentPage = () => {
     return null;
   };
 
-  const handlePaymentProofChange = (e) => {
-    const file = e.target.files[0];
-    if (file && file.size < 5 * 1024 * 1024) {
-      setPaymentProof(file);
-    } else {
-      alert("File terlalu besar. Maksimal 5MB");
-    }
-  };
-
   const submitPayment = async () => {
-    setIsSubmitting(true);
+    setIsProcessing(true);
     
     try {
-      // 1. Upload payment proof
-      const storageRef = ref(storage, `payment-proofs/${Date.now()}_${paymentProof.name}`);
-      const uploadTask = uploadBytesResumable(storageRef, paymentProof);
-      
-      uploadTask.on('state_changed',
-        (snapshot) => {
-          const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-          setUploadProgress(progress);
-        },
-        (error) => {
-          console.error("Upload error:", error);
-          throw error;
-        }
-      );
-
-      await uploadTask;
-      const proofUrl = await getDownloadURL(storageRef);
-
-      // 2. Save transaction to Firestore
+      // Save transaction to Firestore
       const transactionData = {
         customer: {
           name: personalInfo.name,
           email: personalInfo.email,
           discord: personalInfo.discord,
           phone: personalInfo.phone,
-          userId: ""
+          userId: "" // Empty if no auth
         },
         transactionDetails: {
           plan,
           amount: Number(price),
           paymentMethod,
-          paymentProofUrl: proofUrl,
-          status: "completed",
+          status: "pending",
           invoiceNumber: `INV-${Date.now()}`,
           adminFee: 0
         },
         systemInfo: {
           createdAt: serverTimestamp(),
           updatedAt: serverTimestamp(),
-          ipAddress: ""
+          ipAddress: "" // Empty string
         },
         notes: {
           adminNotes: "",
@@ -135,13 +104,15 @@ const PaymentPage = () => {
 
       await addDoc(collection(db, "transactions"), transactionData);
 
+      // Simulate processing delay
+      await new Promise(resolve => setTimeout(resolve, 3000));
+      
       setPaymentComplete(true);
-      setTimeout(() => navigate("/payment-success"), 2000);
     } catch (error) {
       console.error("Payment error:", error);
       alert(`Pembayaran gagal: ${error.message}`);
     } finally {
-      setIsSubmitting(false);
+      setIsProcessing(false);
     }
   };
 
@@ -176,7 +147,7 @@ const PaymentPage = () => {
                 </h2>
                 
                 <p className="text-gray-400 mb-6">
-                  Terima kasih telah berlangganan {plan}. Kami telah mengirimkan konfirmasi ke {personalInfo.email}.
+                  Terima kasih telah berlangganan {plan}. Admin akan segera memverifikasi pembayaran Anda.
                 </p>
                 
                 <Button 
@@ -185,6 +156,36 @@ const PaymentPage = () => {
                 >
                   Ke Dashboard
                 </Button>
+              </div>
+            </motion.div>
+          ) : isProcessing ? (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="relative z-10 bg-gray-800/95 backdrop-blur-xl p-8 rounded-2xl max-w-md w-full mx-auto my-16 text-center"
+            >
+              <div className="flex flex-col items-center">
+                <motion.div
+                  animate={{ rotate: 360 }}
+                  transition={{ repeat: Infinity, duration: 2, ease: "linear" }}
+                  className="w-20 h-20 mb-6 text-blue-400"
+                >
+                  <FiLoader className="w-full h-full" />
+                </motion.div>
+                
+                <h2 className="text-2xl font-bold text-white mb-2">
+                  Memproses Pembayaran
+                </h2>
+                
+                <p className="text-gray-400 mb-6">
+                  Harap tunggu sebentar, sistem sedang memproses transaksi Anda...
+                </p>
+                
+                <div className="w-full bg-gray-700 rounded-full h-2">
+                  <div 
+                    className="bg-blue-600 h-2 rounded-full animate-pulse" 
+                  ></div>
+                </div>
               </div>
             </motion.div>
           ) : (
@@ -221,16 +222,6 @@ const PaymentPage = () => {
                   ))}
                 </div>
               </div>
-
-              {/* Progress Bar */}
-              {isSubmitting && (
-                <div className="w-full bg-gray-700 rounded-full h-2 mb-4">
-                  <div 
-                    className="bg-blue-600 h-2 rounded-full" 
-                    style={{ width: `${uploadProgress}%` }}
-                  ></div>
-                </div>
-              )}
 
               {/* Step 1: Personal Info */}
               {step === 1 && (
@@ -377,51 +368,58 @@ const PaymentPage = () => {
                     <Button
                       onClick={() => setStep(3)}
                     >
-                      Saya Sudah Transfer
+                      Konfirmasi Pembayaran
                     </Button>
                   </div>
                 </div>
               )}
 
-              {/* Step 3: Payment Proof */}
+              {/* Step 3: Confirmation */}
               {step === 3 && (
                 <div className="space-y-6">
-                  <div className="bg-gray-700/80 rounded-lg p-5 border border-gray-600">
-                    <h3 className="text-lg font-bold text-white mb-3">
-                      Upload Bukti Pembayaran
+                  <div className="bg-gray-700/80 rounded-xl p-6 border border-gray-600">
+                    <h3 className="text-lg font-bold text-white mb-4">
+                      Konfirmasi Data Pembayaran
                     </h3>
                     
-                    {paymentProof ? (
-                      <div className="relative">
-                        <img
-                          src={URL.createObjectURL(paymentProof)}
-                          alt="Bukti Pembayaran"
-                          className="w-full h-auto rounded-lg border border-gray-600"
-                        />
-                        <button
-                          onClick={() => setPaymentProof(null)}
-                          className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full"
-                        >
-                          <FiX size={18} />
-                        </button>
-                      </div>
-                    ) : (
-                      <label className="flex flex-col items-center justify-center w-full h-48 border-2 border-dashed border-gray-600 rounded-lg cursor-pointer hover:border-blue-500 transition-colors">
-                        <div className="flex flex-col items-center justify-center p-5">
-                          <FiUpload className="w-10 h-10 text-gray-400 mb-3" />
-                          <p className="text-sm text-gray-400 text-center">
-                            Klik untuk upload bukti transfer<br />
-                            <span className="text-xs text-gray-500">Format JPG/PNG (maks. 5MB)</span>
-                          </p>
+                    <div className="space-y-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <p className="text-gray-400 text-sm">Nama Lengkap</p>
+                          <p className="text-white font-medium">{personalInfo.name}</p>
                         </div>
-                        <input
-                          type="file"
-                          className="hidden"
-                          accept="image/*"
-                          onChange={handlePaymentProofChange}
-                        />
-                      </label>
-                    )}
+                        <div>
+                          <p className="text-gray-400 text-sm">Email</p>
+                          <p className="text-white font-medium">{personalInfo.email}</p>
+                        </div>
+                        <div>
+                          <p className="text-gray-400 text-sm">Discord</p>
+                          <p className="text-white font-medium">{personalInfo.discord}</p>
+                        </div>
+                        <div>
+                          <p className="text-gray-400 text-sm">WhatsApp</p>
+                          <p className="text-white font-medium">{personalInfo.phone}</p>
+                        </div>
+                      </div>
+                      
+                      <div className="border-t border-gray-600 pt-4 mt-4">
+                        <p className="text-gray-400 text-sm">Metode Pembayaran</p>
+                        <p className="text-blue-400 font-medium">
+                          {paymentMethods[paymentMethod].name}
+                        </p>
+                      </div>
+                      
+                      <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700">
+                        <div className="flex justify-between">
+                          <p className="text-gray-400">Paket</p>
+                          <p className="text-white font-medium">{plan}</p>
+                        </div>
+                        <div className="flex justify-between mt-2">
+                          <p className="text-gray-400">Total Pembayaran</p>
+                          <p className="text-white font-bold">Rp{price}</p>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                   
                   <div className="flex justify-between pt-4">
@@ -433,10 +431,8 @@ const PaymentPage = () => {
                     </Button>
                     <Button
                       onClick={submitPayment}
-                      disabled={!paymentProof || isSubmitting}
-                      isLoading={isSubmitting}
                     >
-                      {isSubmitting ? "Memproses..." : "Konfirmasi Pembayaran"}
+                      Konfirmasi & Bayar
                     </Button>
                   </div>
                 </div>
