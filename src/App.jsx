@@ -1,4 +1,5 @@
 import { Routes, Route } from "react-router-dom";
+
 import ButtonGradient from "./assets/svg/ButtonGradient";
 
 import Benefits from "./components/Benefits";
@@ -9,7 +10,9 @@ import Hero from "./components/Hero";
 import Pricing from "./components/Pricing";
 import Roadmap from "./components/Roadmap";
 import Services from "./components/Services";
-import PaymentPage from "./components/PaymentPage"; // Pastikan file ini ada
+
+import PaymentPage from "./components/PaymentPage";
+import AdminDashboard from "./components/AdminDashboard";
 
 const Home = () => (
   <>
@@ -32,6 +35,7 @@ const App = () => {
     <Routes>
       <Route path="/" element={<Home />} />
       <Route path="/payment" element={<PaymentPage />} />
+      <Route path="/admin" element={<AdminDashboard />} />
       <Route
         path="*"
         element={
