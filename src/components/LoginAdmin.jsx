@@ -2,10 +2,10 @@ import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { FiLock, FiEye, FiEyeOff, FiLogIn } from "react-icons/fi";
 import { motion, useAnimation, AnimatePresence } from "framer-motion";
+import { Engine } from "tsparticles-engine";
 import Particles from "react-tsparticles";
 import { loadFull } from "tsparticles";
 import { gsap } from "gsap";
-import loginBg from "../assets/login-bg.mp4";
 
 const LoginAdmin = () => {
   const [password, setPassword] = useState("");
@@ -16,10 +16,10 @@ const LoginAdmin = () => {
   const navigate = useNavigate();
   const controls = useAnimation();
   const cardRef = useRef();
-  const particlesRef = useRef();
+  const particlesRef = useRef<Engine>();
 
   // Initialize particles
-  const particlesInit = async (engine) => {
+  const particlesInit = async (engine: Engine) => {
     await loadFull(engine);
     particlesRef.current = engine;
   };
@@ -37,14 +37,15 @@ const LoginAdmin = () => {
     // Particle density increases with access level
     const interval = setInterval(() => {
       if (particlesRef.current && accessLevel > 0) {
-        particlesRef.current.loadJSON("particles", getParticleConfig(accessLevel));
+        const config = getParticleConfig(accessLevel);
+        particlesRef.current.options.load(config);
       }
     }, 1000);
     
     return () => clearInterval(interval);
   }, [accessLevel]);
 
-  const getParticleConfig = (level) => {
+  const getParticleConfig = (level: number) => {
     const baseDensity = 60 + (level * 20);
     return {
       fpsLimit: 120,
@@ -56,7 +57,7 @@ const LoginAdmin = () => {
         color: { value: ["#3b82f6", "#8b5cf6", "#ec4899"] },
         move: { 
           speed: 0.5 + (level * 0.2),
-          outMode: "bounce" 
+          outMode: "bounce" as const
         },
         links: { 
           color: "#3b82f6",
@@ -92,7 +93,7 @@ const LoginAdmin = () => {
       
       // Create particle explosion effect
       if (particlesRef.current) {
-        particlesRef.current.loadJSON("particles", {
+        particlesRef.current.options.load({
           particles: {
             number: { value: 0 },
             move: { speed: 10 }
@@ -113,11 +114,11 @@ const LoginAdmin = () => {
     setIsLoading(false);
   };
 
-  const handleKeyPress = (e) => {
+  const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === "Enter") handleLogin();
   };
 
-  const handlePasswordChange = (e) => {
+  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setPassword(e.target.value);
     // Increase access level perception as password length grows
     setAccessLevel(Math.min(Math.floor(e.target.value.length / 3), 3));
@@ -127,15 +128,8 @@ const LoginAdmin = () => {
     <div className="relative flex items-center justify-center min-h-screen bg-gray-900 overflow-hidden">
       {/* Quantum Matrix Background */}
       <div className="absolute inset-0 z-0 overflow-hidden">
-        <video
-          autoPlay
-          loop
-          muted
-          playsInline
-          className="absolute inset-0 w-full h-full object-cover opacity-10"
-        >
-          <source src={loginBg} type="video/mp4" />
-        </video>
+        {/* Removed video background for now since it might be causing issues */}
+        <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-blue-900/80 to-indigo-900/90 opacity-70"></div>
         
         {/* Animated Quantum Grid */}
         <div className="absolute inset-0 grid grid-cols-20 grid-rows-20 pointer-events-none">
@@ -391,7 +385,7 @@ const LoginAdmin = () => {
             <span>ENCRYPTION: QUANTUM-256</span>
           </div>
           <div className="mt-2">
-            © {new Date().getFullYear()} QUANTUM SYSTEMS • TOP SECRET
+            © {new Date().getFullYear()} Qarvo System • TOP SECURE
           </div>
         </div>
       </motion.div>
