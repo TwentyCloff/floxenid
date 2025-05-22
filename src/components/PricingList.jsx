@@ -7,7 +7,6 @@ const PricingList = () => {
   const navigate = useNavigate();
 
   const handleGetStarted = (planTitle, planPrice) => {
-    // Navigasi ke halaman pembayaran dengan parameter query
     navigate(`/payment?plan=${encodeURIComponent(planTitle)}&price=${planPrice}`);
   };
 
@@ -49,12 +48,7 @@ const PricingList = () => {
                 key={`plan-${i}-feature-${j}`}
                 className="flex items-start py-5 border-t border-n-6"
               >
-                <img
-                  src={check}
-                  alt="Check"
-                  width={24}
-                  height={24}
-                />
+                <img src={check} alt="Check" width={24} height={24} />
                 <p className="body-2 ml-4">{feature}</p>
               </li>
             ))}
