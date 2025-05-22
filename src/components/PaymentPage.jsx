@@ -12,6 +12,7 @@ import {
 import { SiDogecoin, SiLitecoin, SiRipple } from "react-icons/si";
 import blackholeVideo from "../assets/hero/blackhole.webm";
 import quantumFieldAudio from "../assets/audio/quantum-field.mp3";
+import Button from "./Button";
 
 // Quantum Encryption Module
 const QuantumEncryption = {
@@ -27,6 +28,15 @@ const QuantumEncryption = {
 };
 
 const PaymentPage = () => {
+  // State for payment completion
+  const [paymentComplete, setPaymentComplete] = useState(false);
+  
+  // Get plan and price from URL params
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
+  const plan = searchParams.get('plan');
+  const price = searchParams.get('price');
+
   // Quantum State Variables
   const [quantumState, setQuantumState] = useState({
     entanglementId: '',
@@ -49,14 +59,11 @@ const PaymentPage = () => {
     aiVerified: false
   });
 
-  // Core Hooks
-  const location = useLocation();
+  // Refs
   const navigate = useNavigate();
   const videoRef = useRef(null);
   const audioRef = useRef(null);
   const quantumTimerRef = useRef(null);
-  const biometricScannerRef = useRef(null);
-  const searchParams = new URLSearchParams(location.search);
 
   // Quantum Plan Data
   const quantumPlanData = {
@@ -117,13 +124,12 @@ const PaymentPage = () => {
     // Play quantum field audio
     if (audioRef.current) {
       audioRef.current.volume = 0.3;
-      audioRef.current.play();
+      audioRef.current.play().catch(e => console.log("Audio play error:", e));
     }
   };
 
   // Verify Biometrics
   const verifyBiometrics = async () => {
-    // Simulate biometric scanning
     return new Promise(resolve => {
       setTimeout(() => {
         setBiometrics({
@@ -139,16 +145,13 @@ const PaymentPage = () => {
   // Process Quantum Payment
   const processQuantumPayment = async () => {
     try {
-      // Step 1: Verify biometrics
       await verifyBiometrics();
       
-      // Step 2: Activate quantum encryption
       setPaymentStatus(prev => ({
         ...prev,
         quantumEncrypted: true
       }));
       
-      // Step 3: Confirm on blockchain
       setTimeout(() => {
         setPaymentStatus(prev => ({
           ...prev,
@@ -156,19 +159,16 @@ const PaymentPage = () => {
         }));
       }, 1500);
       
-      // Step 4: AI verification
       setTimeout(() => {
         setPaymentStatus(prev => ({
           ...prev,
           aiVerified: true
         }));
         
-        // Complete payment
         setTimeout(() => {
           setPaymentComplete(true);
           clearInterval(quantumTimerRef.current);
           
-          // Navigate to success
           setTimeout(() => {
             navigate("/quantum-success");
           }, 3000);
@@ -201,7 +201,7 @@ const PaymentPage = () => {
             muted
             className="w-full h-full object-cover opacity-80"
           >
-            <source src={blackholeVideo} type="video/mp4" />
+            <source src={blackholeVideo} type="video/webm" />
           </video>
           <div className="absolute inset-0 bg-gradient-to-b from-black/90 via-purple-900/30 to-black/90"></div>
         </div>
