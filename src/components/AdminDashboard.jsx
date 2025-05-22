@@ -53,7 +53,7 @@ const AdminDashboard = () => {
       await updateDoc(doc(db, "transactions", paymentId), {
         "transactionDetails.status": editStatus,
         "systemInfo.updatedAt": new Date()
-      };
+      });
       setIsEditing(null);
     } catch (error) {
       console.error("Error updating status: ", error);
