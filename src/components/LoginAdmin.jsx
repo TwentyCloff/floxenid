@@ -27,7 +27,7 @@ const LoginAdmin = () => {
     
     await new Promise(resolve => setTimeout(resolve, 800));
     
-    if (password === "AcaiGayDenganNier") {
+    if (password === "AcaiAndMichaelGay") {
       navigate("/admin/dashboard");
     } else {
       setError("Invalid access credentials");
