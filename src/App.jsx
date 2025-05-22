@@ -1,4 +1,4 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 
 import ButtonGradient from "./assets/svg/ButtonGradient";
 
@@ -13,6 +13,9 @@ import Services from "./components/Services";
 
 import PaymentPage from "./components/PaymentPage";
 import AdminDashboard from "./components/AdminDashboard";
+
+import LoginAdmin from "./components/LoginAdmin";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 const Home = () => (
   <>
@@ -35,7 +38,24 @@ const App = () => {
     <Routes>
       <Route path="/" element={<Home />} />
       <Route path="/payment" element={<PaymentPage />} />
-      <Route path="/admin" element={<AdminDashboard />} />
+
+      {/* Login admin */}
+      <Route path="/admin/login" element={<LoginAdmin />} />
+
+      {/* Protected admin dashboard */}
+      <Route
+        path="/admin/dashboard"
+        element={
+          <ProtectedRoute>
+            <AdminDashboard />
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Jika akses /admin langsung, redirect ke login */}
+      <Route path="/admin" element={<Navigate to="/admin/login" replace />} />
+
+      {/* 404 */}
       <Route
         path="*"
         element={
