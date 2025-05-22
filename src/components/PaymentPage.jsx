@@ -10,7 +10,6 @@ import {
   FaPaypal
 } from "react-icons/fa";
 import { SiApplepay, SiGooglepay } from "react-icons/si";
-import paymentVideo from "../assets/hero/payment-bg.mp4";
 import Button from "./Button";
 
 const PaymentPage = () => {
@@ -113,20 +112,9 @@ const PaymentPage = () => {
   return (
     <LazyMotion features={domAnimation}>
       <div className="fixed inset-0 overflow-y-auto z-[9999]">
-        {/* Background */}
-        <div className="fixed inset-0 overflow-hidden">
-          <video
-            ref={videoRef}
-            autoPlay
-            loop
-            muted
-            className="w-full h-full object-cover opacity-20"
-          >
-            <source src={paymentVideo} type="video/mp4" />
-          </video>
-          <div className="absolute inset-0 bg-gradient-to-b from-gray-900/90 via-gray-800/30 to-gray-900/90"></div>
-        </div>
-
+        {/* Background (tanpa video) */}
+        <div className="fixed inset-0 overflow-hidden bg-gradient-to-b from-gray-900/90 via-gray-800/30 to-gray-900/90"></div>
+        
         <AnimatePresence>
           {paymentComplete ? (
             <motion.div
