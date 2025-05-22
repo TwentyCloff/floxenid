@@ -1,5 +1,5 @@
 import { useLocation, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence, LazyMotion, domAnimation } from "framer-motion";
 import { 
   FiCheck, FiLock, FiCreditCard, FiX, FiShield,
@@ -23,6 +23,7 @@ const PaymentPage = () => {
     phone: "",
   });
   const [errors, setErrors] = useState({});
+  const [touched, setTouched] = useState({});
   
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
@@ -36,67 +37,101 @@ const PaymentPage = () => {
       icon: <FaQrcode className="w-6 h-6" />,
       instructions: "Scan QR code below to complete payment",
       account: "",
-      note: ""
+      note: "Pembayaran via QRIS akan diproses otomatis",
+      color: "from-purple-500 to-indigo-600"
     },
     "gopay": {
       name: "Gopay",
       icon: <FiSmartphone className="w-6 h-6" />,
-      instructions: "SILAHKAN TRANSFER KE NOMOR DIBAWAH INI",
-      account: "08123456789 (A/N Aku Nier, Aku Gay, Aku Sigma)",
-      note: "*Jangan lupa screenshot bukti pembayaran*"
+      instructions: "Transfer ke nomor berikut",
+      account: "08123456789 (A/N Customer Service)",
+      note: "Harap screenshot bukti transfer dan kirim ke admin",
+      color: "from-green-500 to-teal-600"
     },
     "dana": {
       name: "DANA",
       icon: <FiSmartphone className="w-6 h-6" />,
-      instructions: "SILAHKAN TRANSFER KE NOMOR DIBAWAH INI",
-      account: "08198765432 (A/N Gween Learn)",
-      note: "*Harap screenshot bukti transfer*"
+      instructions: "Transfer ke nomor berikut",
+      account: "08198765432 (A/N Customer Service)",
+      note: "Harap screenshot bukti transfer dan kirim ke admin",
+      color: "from-blue-500 to-cyan-600"
     }
+  };
+
+  useEffect(() => {
+    // Validate fields when they lose focus
+    if (Object.keys(touched).length > 0) {
+      validatePersonalInfo();
+    }
+  }, [personalInfo, touched]);
+
+  const handleBlur = (field) => {
+    setTouched(prev => ({ ...prev, [field]: true }));
   };
 
   const handlePersonalInfoChange = (e) => {
     const { name, value } = e.target;
+    
+    // Phone number validation - only allow numbers
+    if (name === "phone") {
+      const numericValue = value.replace(/[^0-9]/g, '');
+      setPersonalInfo(prev => ({ ...prev, [name]: numericValue }));
+      return;
+    }
+    
     setPersonalInfo(prev => ({
       ...prev,
       [name]: value
     }));
-    // Clear error when user types
-    if (errors[name]) {
-      setErrors(prev => ({
-        ...prev,
-        [name]: null
-      }));
-    }
   };
 
   const validatePersonalInfo = () => {
     const newErrors = {};
     const { name, email, discord, phone } = personalInfo;
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     
-    if (!name.trim()) newErrors.name = "Nama harus diisi";
-    if (!email.includes("@")) newErrors.email = "Email harus valid";
-    if (!discord.trim()) newErrors.discord = "Discord harus diisi";
-    if (phone.length < 10) newErrors.phone = "Nomor telepon minimal 10 digit";
+    if (!name.trim()) newErrors.name = "Nama lengkap wajib diisi";
+    else if (name.length < 3) newErrors.name = "Nama terlalu pendek";
+    
+    if (!email) newErrors.email = "Email wajib diisi";
+    else if (!emailRegex.test(email)) newErrors.email = "Format email tidak valid";
+    
+    if (!discord.trim()) newErrors.discord = "Username Discord wajib diisi";
+    else if (!/^[a-zA-Z0-9_.-]+$/.test(discord)) newErrors.discord = "Username tidak valid";
+    
+    if (!phone) newErrors.phone = "Nomor WhatsApp wajib diisi";
+    else if (phone.length < 10) newErrors.phone = "Nomor terlalu pendek";
+    else if (phone.length > 15) newErrors.phone = "Nomor terlalu panjang";
     
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const submitPayment = async () => {
+    if (!validatePersonalInfo()) {
+      // Scroll to first error
+      const firstError = Object.keys(errors)[0];
+      if (firstError) {
+        document.querySelector(`[name="${firstError}"]`)?.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center'
+        });
+      }
+      return;
+    }
+    
     setIsProcessing(true);
     
     try {
-      // Generate unique invoice number
       const invoiceNumber = `INV-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
       
-      // Prepare transaction data
       const transactionData = {
         customer: {
           name: personalInfo.name,
           email: personalInfo.email,
           discord: personalInfo.discord,
           phone: personalInfo.phone,
-          userId: "" // Empty if no auth
+          userId: ""
         },
         transactionDetails: {
           plan: plan || "Unknown Plan",
@@ -110,7 +145,7 @@ const PaymentPage = () => {
         systemInfo: {
           createdAt: serverTimestamp(),
           updatedAt: serverTimestamp(),
-          ipAddress: "" // Can be filled if you track IP
+          ipAddress: ""
         },
         notes: {
           adminNotes: "",
@@ -123,14 +158,11 @@ const PaymentPage = () => {
         }
       };
 
-      // Add document to Firestore
       const docRef = await addDoc(collection(db, "transactions"), transactionData);
       console.log("Transaction saved with ID: ", docRef.id);
 
-      // Simulate processing delay (remove in production)
       await new Promise(resolve => setTimeout(resolve, 2000));
       
-      // Mark payment as complete
       setPaymentComplete(true);
       
     } catch (error) {
@@ -144,15 +176,17 @@ const PaymentPage = () => {
   return (
     <LazyMotion features={domAnimation}>
       <div className="fixed inset-0 overflow-y-auto z-[9999] bg-gray-900">
-        {/* Background Video */}
-        <video
-          autoPlay
-          loop
-          muted
-          className="fixed inset-0 w-full h-full object-cover opacity-20"
-        >
-          <source src={paymentVideo} type="video/mp4" />
-        </video>
+        {/* Enhanced Background with Purple Overlay */}
+        <div className="fixed inset-0 w-full h-full bg-gradient-to-br from-purple-900/80 to-gray-900/90">
+          <video
+            autoPlay
+            loop
+            muted
+            className="absolute inset-0 w-full h-full object-cover opacity-20"
+          >
+            <source src={paymentVideo} type="video/mp4" />
+          </video>
+        </div>
 
         <AnimatePresence>
           {paymentComplete ? (
@@ -160,29 +194,29 @@ const PaymentPage = () => {
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 1.2 }}
-              className="relative z-10 bg-gray-800/95 backdrop-blur-xl p-8 rounded-2xl max-w-md w-full mx-auto my-16 border border-emerald-500/30"
+              className="relative z-10 bg-gray-800/95 backdrop-blur-xl p-8 rounded-2xl max-w-md w-full mx-auto my-16 border border-purple-500/30 shadow-xl shadow-purple-900/20"
             >
               <div className="flex flex-col items-center text-center">
-                <div className="w-24 h-24 bg-emerald-500/10 rounded-full flex items-center justify-center mb-6 border border-emerald-500/30">
-                  <FiCheck className="w-12 h-12 text-emerald-500" />
+                <div className="w-24 h-24 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-full flex items-center justify-center mb-6 shadow-lg">
+                  <FiCheck className="w-12 h-12 text-white" />
                 </div>
                 
                 <h2 className="text-3xl font-bold text-white mb-4">
                   Pembayaran Berhasil!
                 </h2>
                 
-                <p className="text-gray-400 mb-6">
-                  Terima kasih telah berlangganan <span className="text-emerald-400 font-medium">{plan}</span>. Admin akan segera memverifikasi pembayaran Anda.
+                <p className="text-gray-300 mb-6">
+                  Terima kasih telah berlangganan <span className="text-purple-300 font-medium">{plan}</span>. Admin akan segera memverifikasi pembayaran Anda.
                 </p>
                 
                 <div className="w-full bg-gray-700/50 rounded-lg p-4 mb-6 border border-gray-600">
-                  <p className="text-sm text-gray-300">Nomor Invoice:</p>
-                  <p className="text-white font-mono">INV-{Date.now()}</p>
+                  <p className="text-sm text-gray-300 mb-1">Nomor Invoice:</p>
+                  <p className="text-white font-mono text-lg tracking-wider">INV-{Date.now()}</p>
                 </div>
                 
                 <Button 
                   onClick={() => navigate("/dashboard")}
-                  className="w-full bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700"
+                  className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 shadow-lg"
                 >
                   Ke Dashboard
                 </Button>
@@ -192,13 +226,13 @@ const PaymentPage = () => {
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              className="relative z-10 bg-gray-800/95 backdrop-blur-xl p-8 rounded-2xl max-w-md w-full mx-auto my-16 text-center"
+              className="relative z-10 bg-gray-800/95 backdrop-blur-xl p-8 rounded-2xl max-w-md w-full mx-auto my-16 text-center border border-purple-500/30 shadow-xl"
             >
               <div className="flex flex-col items-center">
                 <motion.div
                   animate={{ rotate: 360 }}
                   transition={{ repeat: Infinity, duration: 2, ease: "linear" }}
-                  className="w-20 h-20 mb-6 text-blue-400"
+                  className="w-20 h-20 mb-6 text-purple-400"
                 >
                   <FiLoader className="w-full h-full" />
                 </motion.div>
@@ -207,18 +241,20 @@ const PaymentPage = () => {
                   Memproses Pembayaran
                 </h2>
                 
-                <p className="text-gray-400 mb-6">
+                <p className="text-gray-300 mb-6">
                   Harap tunggu sebentar, sistem sedang memproses transaksi Anda...
                 </p>
                 
-                <div className="w-full bg-gray-700 rounded-full h-2.5 mb-6">
-                  <div 
-                    className="bg-gradient-to-r from-blue-500 to-purple-600 h-2.5 rounded-full animate-pulse" 
-                    style={{ width: "70%" }}
-                  ></div>
+                <div className="w-full bg-gray-700 rounded-full h-2.5 mb-6 overflow-hidden">
+                  <motion.div 
+                    initial={{ width: "10%" }}
+                    animate={{ width: ["10%", "70%", "90%"] }}
+                    transition={{ duration: 2, repeat: Infinity, repeatType: "reverse" }}
+                    className="bg-gradient-to-r from-purple-500 to-indigo-600 h-2.5 rounded-full" 
+                  ></motion.div>
                 </div>
                 
-                <div className="text-sm text-gray-500">
+                <div className="text-sm text-gray-400">
                   <p>Jangan tutup atau refresh halaman ini</p>
                 </div>
               </div>
@@ -227,33 +263,39 @@ const PaymentPage = () => {
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="relative z-10 bg-gray-800/95 backdrop-blur-xl p-6 rounded-2xl max-w-4xl w-full mx-auto my-8 border border-gray-700"
+              className="relative z-10 bg-gray-800/95 backdrop-blur-xl p-6 rounded-2xl max-w-4xl w-full mx-auto my-8 border border-gray-700 shadow-2xl shadow-purple-900/20"
             >
-              {/* Header */}
-              <div className="flex justify-between items-center mb-6">
+              {/* Header with improved design */}
+              <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
                 <div>
-                  <h1 className="text-2xl font-bold text-white">
+                  <h1 className="text-2xl md:text-3xl font-bold text-white">
                     {step === 1 ? "Data Diri" : step === 2 ? "Metode Pembayaran" : "Konfirmasi Pembayaran"}
                   </h1>
-                  <p className="text-gray-400">
-                    Langganan <span className="text-emerald-400">{plan}</span> - <span className="font-bold">Rp{Number(price).toLocaleString('id-ID')}</span>
+                  <p className="text-gray-300">
+                    Langganan <span className="text-purple-300 font-medium">{plan}</span> - <span className="font-bold text-white">Rp{Number(price).toLocaleString('id-ID')}</span>
                   </p>
                 </div>
                 
-                <div className="flex space-x-2">
+                <div className="flex items-center space-x-2 bg-gray-900/50 px-3 py-2 rounded-full border border-gray-700">
                   {[1, 2, 3].map((stepNumber) => (
-                    <div
-                      key={stepNumber}
-                      className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
-                        step === stepNumber
-                          ? "bg-gradient-to-br from-blue-500 to-indigo-600 text-white shadow-lg"
-                          : step > stepNumber
-                          ? "bg-gradient-to-br from-emerald-500 to-teal-600 text-white"
-                          : "bg-gray-700 text-gray-400"
-                      }`}
-                    >
-                      {step > stepNumber ? <FiCheck size={14} /> : stepNumber}
-                    </div>
+                    <React.Fragment key={stepNumber}>
+                      <div
+                        className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-all ${
+                          step === stepNumber
+                            ? "bg-gradient-to-br from-purple-500 to-indigo-600 text-white shadow-md"
+                            : step > stepNumber
+                            ? "bg-gradient-to-br from-green-500 to-teal-600 text-white"
+                            : "bg-gray-700 text-gray-400"
+                        }`}
+                      >
+                        {step > stepNumber ? <FiCheck size={14} /> : stepNumber}
+                      </div>
+                      {stepNumber < 3 && (
+                        <div className={`w-6 h-[2px] rounded-full ${
+                          step > stepNumber ? 'bg-green-500' : 'bg-gray-700'
+                        }`}></div>
+                      )}
+                    </React.Fragment>
                   ))}
                 </div>
               </div>
@@ -263,72 +305,121 @@ const PaymentPage = () => {
                 <div className="space-y-5">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-gray-400 text-sm mb-2">Nama Lengkap <span className="text-red-500">*</span></label>
+                      <label className="block text-gray-300 text-sm mb-2 font-medium">
+                        Nama Lengkap <span className="text-red-400">*</span>
+                      </label>
                       <div className="relative">
+                        <div className={`absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none ${
+                          errors.name ? 'text-red-400' : 'text-gray-400'
+                        }`}>
+                          <FiUser className="w-5 h-5" />
+                        </div>
                         <input
                           type="text"
                           name="name"
                           value={personalInfo.name}
                           onChange={handlePersonalInfoChange}
-                          className={`w-full bg-gray-700 border ${errors.name ? 'border-red-500' : 'border-gray-600'} rounded-lg py-2 px-3 pl-10 text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all`}
-                          placeholder="Nama Kamu"
-                          required
+                          onBlur={() => handleBlur('name')}
+                          className={`w-full bg-gray-700/70 border ${
+                            errors.name ? 'border-red-500 focus:ring-red-500/30' : 'border-gray-600 focus:ring-purple-500/30'
+                          } rounded-lg py-2.5 px-4 pl-10 text-white focus:ring-2 focus:outline-none transition-all`}
+                          placeholder="Nama lengkap Anda"
                         />
-                        <FiUser className="absolute left-3 top-3 text-gray-400" />
                       </div>
-                      {errors.name && <p className="text-red-400 text-xs mt-1">{errors.name}</p>}
+                      {errors.name && (
+                        <p className="mt-1 text-sm text-red-400 flex items-center">
+                          <FiX className="mr-1" /> {errors.name}
+                        </p>
+                      )}
                     </div>
                     
                     <div>
-                      <label className="block text-gray-400 text-sm mb-2">Email <span className="text-red-500">*</span></label>
+                      <label className="block text-gray-300 text-sm mb-2 font-medium">
+                        Email <span className="text-red-400">*</span>
+                      </label>
                       <div className="relative">
+                        <div className={`absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none ${
+                          errors.email ? 'text-red-400' : 'text-gray-400'
+                        }`}>
+                          <FiMail className="w-5 h-5" />
+                        </div>
                         <input
                           type="email"
                           name="email"
                           value={personalInfo.email}
                           onChange={handlePersonalInfoChange}
-                          className={`w-full bg-gray-700 border ${errors.email ? 'border-red-500' : 'border-gray-600'} rounded-lg py-2 px-3 pl-10 text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all`}
+                          onBlur={() => handleBlur('email')}
+                          className={`w-full bg-gray-700/70 border ${
+                            errors.email ? 'border-red-500 focus:ring-red-500/30' : 'border-gray-600 focus:ring-purple-500/30'
+                          } rounded-lg py-2.5 px-4 pl-10 text-white focus:ring-2 focus:outline-none transition-all`}
                           placeholder="email@domain.com"
-                          required
                         />
-                        <FiMail className="absolute left-3 top-3 text-gray-400" />
                       </div>
-                      {errors.email && <p className="text-red-400 text-xs mt-1">{errors.email}</p>}
+                      {errors.email && (
+                        <p className="mt-1 text-sm text-red-400 flex items-center">
+                          <FiX className="mr-1" /> {errors.email}
+                        </p>
+                      )}
                     </div>
                     
                     <div>
-                      <label className="block text-gray-400 text-sm mb-2">Username Discord <span className="text-red-500">*</span></label>
+                      <label className="block text-gray-300 text-sm mb-2 font-medium">
+                        Username Discord <span className="text-red-400">*</span>
+                      </label>
                       <div className="relative">
+                        <div className={`absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none ${
+                          errors.discord ? 'text-red-400' : 'text-gray-400'
+                        }`}>
+                          <FaDiscord className="w-5 h-5" />
+                        </div>
                         <input
                           type="text"
                           name="discord"
                           value={personalInfo.discord}
                           onChange={handlePersonalInfoChange}
-                          className={`w-full bg-gray-700 border ${errors.discord ? 'border-red-500' : 'border-gray-600'} rounded-lg py-2 px-3 pl-10 text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all`}
+                          onBlur={() => handleBlur('discord')}
+                          className={`w-full bg-gray-700/70 border ${
+                            errors.discord ? 'border-red-500 focus:ring-red-500/30' : 'border-gray-600 focus:ring-purple-500/30'
+                          } rounded-lg py-2.5 px-4 pl-10 text-white focus:ring-2 focus:outline-none transition-all`}
                           placeholder="username"
-                          required
                         />
-                        <FaDiscord className="absolute left-3 top-3 text-gray-400" />
                       </div>
-                      {errors.discord && <p className="text-red-400 text-xs mt-1">{errors.discord}</p>}
-                      <p className="text-gray-500 text-xs mt-1">Masukkan username Discord Anda (tanpa #)</p>
+                      {errors.discord && (
+                        <p className="mt-1 text-sm text-red-400 flex items-center">
+                          <FiX className="mr-1" /> {errors.discord}
+                        </p>
+                      )}
+                      <p className="mt-1 text-xs text-gray-500">Contoh: nierautomata</p>
                     </div>
                     
                     <div>
-                      <label className="block text-gray-400 text-sm mb-2">Nomor WhatsApp <span className="text-red-500">*</span></label>
+                      <label className="block text-gray-300 text-sm mb-2 font-medium">
+                        Nomor WhatsApp <span className="text-red-400">*</span>
+                      </label>
                       <div className="relative">
+                        <div className={`absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none ${
+                          errors.phone ? 'text-red-400' : 'text-gray-400'
+                        }`}>
+                          <FiSmartphone className="w-5 h-5" />
+                        </div>
                         <input
                           type="tel"
                           name="phone"
                           value={personalInfo.phone}
                           onChange={handlePersonalInfoChange}
-                          className={`w-full bg-gray-700 border ${errors.phone ? 'border-red-500' : 'border-gray-600'} rounded-lg py-2 px-3 pl-10 text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all`}
+                          onBlur={() => handleBlur('phone')}
+                          className={`w-full bg-gray-700/70 border ${
+                            errors.phone ? 'border-red-500 focus:ring-red-500/30' : 'border-gray-600 focus:ring-purple-500/30'
+                          } rounded-lg py-2.5 px-4 pl-10 text-white focus:ring-2 focus:outline-none transition-all`}
                           placeholder="08123456789"
-                          required
+                          maxLength={15}
                         />
-                        <FiSmartphone className="absolute left-3 top-3 text-gray-400" />
                       </div>
-                      {errors.phone && <p className="text-red-400 text-xs mt-1">{errors.phone}</p>}
+                      {errors.phone && (
+                        <p className="mt-1 text-sm text-red-400 flex items-center">
+                          <FiX className="mr-1" /> {errors.phone}
+                        </p>
+                      )}
                     </div>
                   </div>
                   
@@ -336,7 +427,7 @@ const PaymentPage = () => {
                     <Button
                       onClick={() => navigate(-1)}
                       variant="outline"
-                      className="border-gray-600 hover:bg-gray-700/50"
+                      className="border-gray-600 hover:bg-gray-700/50 text-gray-300 hover:text-white"
                     >
                       Kembali
                     </Button>
@@ -346,7 +437,7 @@ const PaymentPage = () => {
                           setStep(2);
                         }
                       }}
-                      className="bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700"
+                      className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 shadow-lg"
                     >
                       Lanjut ke Pembayaran
                     </Button>
@@ -354,65 +445,71 @@ const PaymentPage = () => {
                 </div>
               )}
 
-              {/* Step 2: Payment Method */}
+              {/* Step 2: Payment Method - Improved Design */}
               {step === 2 && (
                 <div className="space-y-6">
-                  <h3 className="text-lg font-medium text-gray-300 mb-2">Pilih Metode Pembayaran</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                    {Object.entries(paymentMethods).map(([key, method]) => (
-                      <button
-                        key={key}
-                        onClick={() => setPaymentMethod(key)}
-                        className={`p-4 rounded-lg border flex flex-col items-center transition-all ${
-                          paymentMethod === key
-                            ? "border-blue-500 bg-blue-500/10 shadow-lg shadow-blue-500/10"
-                            : "border-gray-600 hover:border-gray-500 hover:bg-gray-700/50"
-                        }`}
-                      >
-                        <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-3 ${
-                          paymentMethod === key 
-                            ? "bg-blue-500/20 text-blue-400" 
-                            : "bg-gray-700 text-gray-400"
-                        }`}>
-                          {method.icon}
-                        </div>
-                        <span className={`font-medium ${
-                          paymentMethod === key ? "text-white" : "text-gray-400"
-                        }`}>
-                          {method.name}
-                        </span>
-                      </button>
-                    ))}
+                  <div className="mb-6">
+                    <h3 className="text-lg font-bold text-white mb-3">Pilih Metode Pembayaran</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                      {Object.entries(paymentMethods).map(([key, method]) => (
+                        <button
+                          key={key}
+                          onClick={() => setPaymentMethod(key)}
+                          className={`p-4 rounded-xl border-2 transition-all duration-200 flex flex-col items-center ${
+                            paymentMethod === key
+                              ? `border-transparent bg-gradient-to-br ${method.color} shadow-lg`
+                              : "border-gray-600 hover:border-gray-500 hover:bg-gray-700/30"
+                          }`}
+                        >
+                          <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-3 ${
+                            paymentMethod === key 
+                              ? "bg-white/20 text-white" 
+                              : "bg-gray-700 text-gray-400"
+                          }`}>
+                            {method.icon}
+                          </div>
+                          <span className={`font-semibold ${
+                            paymentMethod === key ? "text-white" : "text-gray-300"
+                          }`}>
+                            {method.name}
+                          </span>
+                        </button>
+                      ))}
+                    </div>
                   </div>
                   
-                  <div className="bg-gray-700/80 rounded-xl p-5 border border-gray-600">
-                    <div className="flex items-center justify-center mb-4">
-                      <div className="bg-blue-500/10 p-2 rounded-lg border border-blue-500/30">
+                  <div className="bg-gray-700/50 rounded-xl p-5 border border-gray-600 shadow-inner">
+                    <div className="flex flex-col items-center text-center mb-5">
+                      <div className={`w-14 h-14 rounded-full flex items-center justify-center mb-3 bg-gradient-to-br ${paymentMethods[paymentMethod].color} text-white shadow-md`}>
                         {paymentMethods[paymentMethod].icon}
                       </div>
-                      <h3 className="text-lg font-bold text-white ml-3">
+                      <h3 className="text-xl font-bold text-white">
                         {paymentMethods[paymentMethod].instructions}
                       </h3>
                     </div>
                     
                     {paymentMethod === "qris" ? (
                       <div className="flex flex-col items-center py-4">
-                        <div className="w-48 h-48 bg-white rounded-xl flex items-center justify-center mb-4 p-4 shadow-lg">
+                        <div className="w-52 h-52 bg-white rounded-xl flex items-center justify-center mb-4 p-4 shadow-lg relative overflow-hidden">
                           <FaQrcode className="w-full h-full text-black" />
+                          <div className="absolute inset-0 border-2 border-dashed border-purple-400 rounded-xl animate-pulse pointer-events-none"></div>
                         </div>
-                        <p className="text-gray-400 text-center text-sm max-w-md">
+                        <p className="text-gray-300 text-center max-w-md">
                           Scan QR code di atas menggunakan aplikasi e-wallet atau mobile banking Anda yang mendukung QRIS
                         </p>
                       </div>
                     ) : (
                       <div className="space-y-4">
-                        <div className="bg-gray-800/50 rounded-xl p-4 border border-gray-700 text-center">
-                          <p className="text-xl font-bold text-white font-mono">
+                        <div className="bg-gray-800/70 rounded-xl p-5 border border-gray-600 text-center relative overflow-hidden">
+                          <div className="absolute inset-0 bg-gradient-to-br from-purple-900/10 to-indigo-900/10 pointer-events-none"></div>
+                          <p className="text-gray-400 text-sm mb-1">Nomor {paymentMethods[paymentMethod].name}</p>
+                          <p className="text-xl font-bold text-white font-mono tracking-wide">
                             {paymentMethods[paymentMethod].account}
                           </p>
                         </div>
-                        <div className="bg-yellow-500/10 rounded-lg p-3 border border-yellow-500/30">
-                          <p className="text-yellow-400 text-center text-sm">
+                        <div className="bg-yellow-500/10 rounded-lg p-3 border border-yellow-500/30 flex items-start">
+                          <FiMessageSquare className="flex-shrink-0 mt-0.5 mr-2 text-yellow-400" />
+                          <p className="text-yellow-300 text-sm">
                             {paymentMethods[paymentMethod].note}
                           </p>
                         </div>
@@ -424,13 +521,13 @@ const PaymentPage = () => {
                     <Button
                       onClick={() => setStep(1)}
                       variant="outline"
-                      className="border-gray-600 hover:bg-gray-700/50"
+                      className="border-gray-600 hover:bg-gray-700/50 text-gray-300 hover:text-white"
                     >
                       Kembali
                     </Button>
                     <Button
                       onClick={() => setStep(3)}
-                      className="bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700"
+                      className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 shadow-lg"
                     >
                       Konfirmasi Pembayaran
                     </Button>
@@ -438,80 +535,86 @@ const PaymentPage = () => {
                 </div>
               )}
 
-              {/* Step 3: Confirmation */}
+              {/* Step 3: Confirmation - Enhanced Design */}
               {step === 3 && (
                 <div className="space-y-6">
-                  <div className="bg-gray-700/80 rounded-xl p-6 border border-gray-600">
-                    <div className="flex items-center mb-4">
-                      <FiShield className="w-6 h-6 text-emerald-500 mr-2" />
-                      <h3 className="text-lg font-bold text-white">
+                  <div className="bg-gray-700/50 rounded-xl p-6 border border-gray-600 shadow-inner">
+                    <div className="flex items-center mb-5">
+                      <div className="bg-gradient-to-br from-purple-500 to-indigo-600 p-2 rounded-lg mr-3">
+                        <FiShield className="w-5 h-5 text-white" />
+                      </div>
+                      <h3 className="text-xl font-bold text-white">
                         Konfirmasi Data Pembayaran
                       </h3>
                     </div>
                     
-                    <div className="space-y-4">
+                    <div className="space-y-5">
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="bg-gray-800/30 p-3 rounded-lg">
-                          <p className="text-gray-400 text-sm">Nama Lengkap</p>
-                          <p className="text-white font-medium">{personalInfo.name}</p>
+                        <div className="bg-gray-800/50 p-4 rounded-lg border border-gray-700">
+                          <p className="text-gray-400 text-sm mb-1">Nama Lengkap</p>
+                          <p className="text-white font-medium text-lg">{personalInfo.name}</p>
                         </div>
-                        <div className="bg-gray-800/30 p-3 rounded-lg">
-                          <p className="text-gray-400 text-sm">Email</p>
-                          <p className="text-white font-medium">{personalInfo.email}</p>
+                        <div className="bg-gray-800/50 p-4 rounded-lg border border-gray-700">
+                          <p className="text-gray-400 text-sm mb-1">Email</p>
+                          <p className="text-white font-medium text-lg">{personalInfo.email}</p>
                         </div>
-                        <div className="bg-gray-800/30 p-3 rounded-lg">
-                          <p className="text-gray-400 text-sm">Discord</p>
-                          <p className="text-white font-medium">{personalInfo.discord}</p>
+                        <div className="bg-gray-800/50 p-4 rounded-lg border border-gray-700">
+                          <p className="text-gray-400 text-sm mb-1">Discord</p>
+                          <p className="text-white font-medium text-lg">{personalInfo.discord}</p>
                         </div>
-                        <div className="bg-gray-800/30 p-3 rounded-lg">
-                          <p className="text-gray-400 text-sm">WhatsApp</p>
-                          <p className="text-white font-medium">{personalInfo.phone}</p>
+                        <div className="bg-gray-800/50 p-4 rounded-lg border border-gray-700">
+                          <p className="text-gray-400 text-sm mb-1">WhatsApp</p>
+                          <p className="text-white font-medium text-lg">{personalInfo.phone}</p>
                         </div>
                       </div>
                       
-                      <div className="border-t border-gray-600 pt-4 mt-4">
-                        <div className="flex items-center mb-2">
-                          {paymentMethods[paymentMethod].icon}
-                          <p className="text-gray-400 ml-2">Metode Pembayaran</p>
+                      <div className="border-t border-gray-600 pt-5 mt-2">
+                        <div className="flex items-center mb-3">
+                          <div className={`w-10 h-10 rounded-full flex items-center justify-center mr-3 bg-gradient-to-br ${paymentMethods[paymentMethod].color} text-white`}>
+                            {paymentMethods[paymentMethod].icon}
+                          </div>
+                          <div>
+                            <p className="text-gray-400 text-sm">Metode Pembayaran</p>
+                            <p className="text-white font-bold text-lg">
+                              {paymentMethods[paymentMethod].name}
+                            </p>
+                          </div>
                         </div>
-                        <p className="text-blue-400 font-medium text-lg">
-                          {paymentMethods[paymentMethod].name}
-                        </p>
                       </div>
                       
-                      <div className="bg-gray-800/50 rounded-xl p-4 border border-gray-700">
-                        <div className="flex justify-between mb-2">
+                      <div className="bg-gray-800/70 rounded-xl p-5 border border-gray-600">
+                        <div className="flex justify-between mb-3">
                           <p className="text-gray-400">Paket Langganan</p>
                           <p className="text-white font-medium">{plan}</p>
                         </div>
                         <div className="flex justify-between items-center">
                           <p className="text-gray-400">Total Pembayaran</p>
-                          <p className="text-white font-bold text-xl">Rp{Number(price).toLocaleString('id-ID')}</p>
+                          <p className="text-white font-bold text-2xl">Rp{Number(price).toLocaleString('id-ID')}</p>
                         </div>
                       </div>
                     </div>
                   </div>
                   
-                  <div className="bg-blue-500/10 rounded-lg p-4 border border-blue-500/30">
-                    <div className="flex items-start">
-                      <FiLock className="w-5 h-5 text-blue-400 mt-0.5 mr-2 flex-shrink-0" />
-                      <p className="text-gray-300 text-sm">
-                        Data Anda aman dan dilindungi. Pembayaran akan diproses secara otomatis dan aman melalui sistem kami.
-                      </p>
+                  <div className="bg-purple-500/10 rounded-lg p-4 border border-purple-500/30 flex items-start">
+                    <div className="bg-purple-500/20 p-1.5 rounded-lg mr-3">
+                      <FiLock className="w-4 h-4 text-purple-300" />
                     </div>
+                    <p className="text-gray-300 text-sm">
+                      Data Anda aman dan dilindungi. Pembayaran akan diproses secara otomatis dan aman melalui sistem kami.
+                    </p>
                   </div>
                   
                   <div className="flex justify-between pt-4 border-t border-gray-700">
                     <Button
                       onClick={() => setStep(2)}
                       variant="outline"
-                      className="border-gray-600 hover:bg-gray-700/50"
+                      className="border-gray-600 hover:bg-gray-700/50 text-gray-300 hover:text-white"
                     >
                       Kembali
                     </Button>
                     <Button
                       onClick={submitPayment}
-                      className="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700"
+                      className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 shadow-lg"
                     >
                       Konfirmasi & Bayar Sekarang
                     </Button>
