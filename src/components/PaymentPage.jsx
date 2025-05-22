@@ -2,13 +2,12 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import Button from "./Button";
 import { motion, AnimatePresence } from "framer-motion";
-import { FiCheck, FiLock, FiCreditCard, FiSmartphone, FiQrCode } from "react-icons/fi";
+import { FiCheck, FiLock, FiCreditCard, FiSmartphone } from "react-icons/fi";
 import { FaCcVisa, FaCcMastercard, FaCcAmex } from "react-icons/fa";
 
 const paymentMethods = [
   { id: "gopay", name: "Gopay", icon: <FiSmartphone className="w-5 h-5" /> },
   { id: "dana", name: "Dana", icon: <FiSmartphone className="w-5 h-5" /> },
-  { id: "qris", name: "QRIS", icon: <FiQrCode className="w-5 h-5" /> },
   { 
     id: "card", 
     name: "Credit Card", 
@@ -53,26 +52,20 @@ const PaymentPage = () => {
     const matches = v.match(/\d{4,16}/g);
     const match = matches && matches[0] || '';
     const parts = [];
-    
-    for (let i = 0, len = match.length; i < len; i += 4) {
+    for (let i = 0; i < match.length; i += 4) {
       parts.push(match.substring(i, i + 4));
     }
-    
-    if (parts.length) {
-      return parts.join(' ');
-    } else {
-      return value;
-    }
+    return parts.length ? parts.join(' ') : value;
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
     setIsProcessing(true);
-    
+
     setTimeout(() => {
       setIsProcessing(false);
       setPaymentSuccess(true);
-      
+
       setTimeout(() => {
         navigate("/success");
       }, 2000);
@@ -122,6 +115,7 @@ const PaymentPage = () => {
               <h2 className="text-3xl font-bold text-center text-white">Secure Payment</h2>
             </div>
 
+            {/* Plan Info */}
             <div className="bg-n-6 rounded-xl p-6 text-center mb-8 relative overflow-hidden">
               <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 to-purple-500"></div>
               <p className="text-n-4 text-sm mb-1">You're subscribing to</p>
@@ -132,6 +126,7 @@ const PaymentPage = () => {
               </div>
             </div>
 
+            {/* Payment Method */}
             <div className="mb-8">
               <h3 className="text-white text-sm font-medium mb-4">Payment Method</h3>
               <div className="grid grid-cols-2 gap-3">
@@ -169,6 +164,7 @@ const PaymentPage = () => {
               </div>
             </div>
 
+            {/* Payment Form */}
             {selectedMethod === "card" ? (
               <form className="space-y-5" onSubmit={handleSubmit}>
                 <div>
@@ -189,60 +185,60 @@ const PaymentPage = () => {
                   <label className="block text-sm text-white mb-2 font-medium">
                     Card Number <span className="text-red-500">*</span>
                   </label>
-                  <div className="relative">
-                    <input
-                      type="text"
-                      value={formatCardNumber(cardNumber)}
-                      onChange={(e) => setCardNumber(e.target.value.replace(/\s+/g, ''))}
-                      placeholder="1234 5678 9012 3456"
-                      className="w-full px-4 py-3 bg-n-6 border border-n-5 rounded-xl text-white placeholder:text-n-4 focus:border-blue-500 focus:ring-1 focus:ring-blue-500/50 transition-all pl-12"
-                      maxLength={19}
-                      required
-                    />
-                    <div className="absolute left-3 top-1/2 transform -translate-y-1/2">
-                      <FiCreditCard className="w-5 h-5 text-n-4" />
-                    </div>
-                  </div>
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    value={cardNumber}
+                    onChange={(e) => setCardNumber(formatCardNumber(e.target.value))}
+                    placeholder="1234 5678 9012 3456"
+                    maxLength={19}
+                    className="w-full px-4 py-3 bg-n-6 border border-n-5 rounded-xl text-white placeholder:text-n-4 focus:border-blue-500 focus:ring-1 focus:ring-blue-500/50 transition-all"
+                    required
+                  />
                 </div>
 
-                <div className="flex gap-4">
-                  <div className="flex-1">
+                <div className="grid grid-cols-3 gap-4">
+                  <div>
                     <label className="block text-sm text-white mb-2 font-medium">
                       Expiry Date <span className="text-red-500">*</span>
                     </label>
                     <input
                       type="text"
+                      placeholder="MM/YY"
                       value={expiry}
                       onChange={(e) => setExpiry(e.target.value)}
-                      placeholder="MM/YY"
+                      maxLength={5}
                       className="w-full px-4 py-3 bg-n-6 border border-n-5 rounded-xl text-white placeholder:text-n-4 focus:border-blue-500 focus:ring-1 focus:ring-blue-500/50 transition-all"
                       required
                     />
                   </div>
-                  <div className="flex-1">
+
+                  <div>
                     <label className="block text-sm text-white mb-2 font-medium">
                       CVV <span className="text-red-500">*</span>
                     </label>
                     <input
                       type="password"
+                      placeholder="123"
                       value={cvv}
                       onChange={(e) => setCvv(e.target.value)}
-                      placeholder="123"
                       maxLength={4}
                       className="w-full px-4 py-3 bg-n-6 border border-n-5 rounded-xl text-white placeholder:text-n-4 focus:border-blue-500 focus:ring-1 focus:ring-blue-500/50 transition-all"
                       required
                     />
                   </div>
+
+                  <div></div>
                 </div>
 
-                <Button type="submit" className="w-full" disabled={isProcessing}>
-                  {isProcessing ? "Processing..." : "Pay Now"}
+                <Button type="submit" disabled={isProcessing} className="w-full">
+                  {isProcessing ? "Processing..." : `Pay $${price}`}
                 </Button>
               </form>
             ) : (
-              <Button className="w-full" onClick={handleSubmit}>
-                Pay with {selectedMethod.charAt(0).toUpperCase() + selectedMethod.slice(1)}
-              </Button>
+              <div className="text-n-4 text-center italic">
+                Payment form for "{selectedMethod}" is not implemented yet.
+              </div>
             )}
           </motion.div>
         )}
