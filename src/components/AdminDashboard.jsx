@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { collection, query, onSnapshot, orderBy } from "firebase/firestore";
-import { db, storage } from "../config/firebase";
+import { db, storage } from "../config/firebaseConfig";
 
 const AdminDashboard = () => {
   const [payments, setPayments] = useState([]);
