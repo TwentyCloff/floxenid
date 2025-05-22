@@ -1,3 +1,4 @@
+import gsap from "gsap";
 import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { FiLock, FiEye, FiEyeOff, FiLogIn } from "react-icons/fi";
