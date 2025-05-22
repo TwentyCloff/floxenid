@@ -1,5 +1,7 @@
+// src/config/firebase.js
 import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
+import { getStorage } from "firebase/storage";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDP6XNlI1jUgHN3pVWIXNZjGT3YWXKSdes",
@@ -8,10 +10,11 @@ const firebaseConfig = {
   storageBucket: "gweenlearn.firebasestorage.app",
   messagingSenderId: "915816429541",
   appId: "1:915816429541:web:65c885efda4472930c210c",
-  measurementId: "G-RSGBWRE6BD"
+  measurementId: "G-RSGBWRE6BD",
 };
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+const storage = getStorage(app);
 
-export { db };
+export { db, storage };
