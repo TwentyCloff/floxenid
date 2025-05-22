@@ -1,4 +1,3 @@
-// src/pages/AdminLogin.jsx
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -11,10 +10,10 @@ const AdminLogin = () => {
   const handleLogin = (e) => {
     e.preventDefault();
 
-    // Ganti autentikasi ini sesuai kebutuhanmu
-    if (username === "Acai" && password === "Donghua") {
-      localStorage.setItem("admin-auth", "true");
-      navigate("/admin");
+    if (username === "Makan Siang Gratis" && password === "MichaelGay123") {
+      sessionStorage.setItem("admin-auth", "true");
+      console.log("Login sukses:", sessionStorage.getItem("admin-auth"));
+      navigate("/admin/dashboard");
     } else {
       setError("Username atau password salah.");
     }
