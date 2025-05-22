@@ -37,7 +37,6 @@ const PaymentPage = () => {
   const [activeCardType, setActiveCardType] = useState(null);
 
   useEffect(() => {
-    // Detect card type based on first digit
     if (cardNumber.length > 0) {
       const firstDigit = cardNumber[0];
       if (firstDigit === '4') setActiveCardType('visa');
@@ -70,12 +69,10 @@ const PaymentPage = () => {
     e.preventDefault();
     setIsProcessing(true);
     
-    // Simulate payment processing
     setTimeout(() => {
       setIsProcessing(false);
       setPaymentSuccess(true);
       
-      // Redirect after success
       setTimeout(() => {
         navigate("/success");
       }, 2000);
@@ -125,7 +122,6 @@ const PaymentPage = () => {
               <h2 className="text-3xl font-bold text-center text-white">Secure Payment</h2>
             </div>
 
-            {/* Plan Info */}
             <div className="bg-n-6 rounded-xl p-6 text-center mb-8 relative overflow-hidden">
               <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 to-purple-500"></div>
               <p className="text-n-4 text-sm mb-1">You're subscribing to</p>
@@ -136,7 +132,6 @@ const PaymentPage = () => {
               </div>
             </div>
 
-            {/* Payment Method */}
             <div className="mb-8">
               <h3 className="text-white text-sm font-medium mb-4">Payment Method</h3>
               <div className="grid grid-cols-2 gap-3">
@@ -174,7 +169,6 @@ const PaymentPage = () => {
               </div>
             </div>
 
-            {/* Payment Form */}
             {selectedMethod === "card" ? (
               <form className="space-y-5" onSubmit={handleSubmit}>
                 <div>
@@ -219,102 +213,36 @@ const PaymentPage = () => {
                     <input
                       type="text"
                       value={expiry}
-                      onChange={(e) => {
-                        let value = e.target.value;
-                        if (value.length === 2 && !value.includes('/')) {
-                          value = value + '/';
-                        }
-                        setExpiry(value.replace(/[^0-9/]/g, '').slice(0, 5));
-                      }}
+                      onChange={(e) => setExpiry(e.target.value)}
                       placeholder="MM/YY"
                       className="w-full px-4 py-3 bg-n-6 border border-n-5 rounded-xl text-white placeholder:text-n-4 focus:border-blue-500 focus:ring-1 focus:ring-blue-500/50 transition-all"
                       required
                     />
                   </div>
-
                   <div className="flex-1">
                     <label className="block text-sm text-white mb-2 font-medium">
                       CVV <span className="text-red-500">*</span>
                     </label>
-                    <div className="relative">
-                      <input
-                        type="text"
-                        value={cvv}
-                        onChange={(e) => setCvv(e.target.value.replace(/\D/g, '').slice(0, 4))}
-                        placeholder="•••"
-                        className="w-full px-4 py-3 bg-n-6 border border-n-5 rounded-xl text-white placeholder:text-n-4 focus:border-blue-500 focus:ring-1 focus:ring-blue-500/50 transition-all"
-                        required
-                      />
-                      <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                        <FiLock className="w-4 h-4 text-n-4" />
-                      </div>
-                    </div>
+                    <input
+                      type="password"
+                      value={cvv}
+                      onChange={(e) => setCvv(e.target.value)}
+                      placeholder="123"
+                      maxLength={4}
+                      className="w-full px-4 py-3 bg-n-6 border border-n-5 rounded-xl text-white placeholder:text-n-4 focus:border-blue-500 focus:ring-1 focus:ring-blue-500/50 transition-all"
+                      required
+                    />
                   </div>
                 </div>
 
-                <Button 
-                  className="w-full mt-6" 
-                  white
-                  disabled={isProcessing}
-                >
-                  {isProcessing ? (
-                    <div className="flex items-center justify-center">
-                      <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                      </svg>
-                      Processing...
-                    </div>
-                  ) : (
-                    `Pay $${price}`
-                  )}
+                <Button type="submit" className="w-full" disabled={isProcessing}>
+                  {isProcessing ? "Processing..." : "Pay Now"}
                 </Button>
-
-                <div className="flex items-center justify-center mt-4">
-                  <FiLock className="w-4 h-4 text-n-4 mr-2" />
-                  <span className="text-xs text-n-4">Payments are secure and encrypted</span>
-                </div>
               </form>
             ) : (
-              <div className="flex flex-col items-center text-center space-y-5 mt-6">
-                <p className="text-white text-sm">
-                  Scan the QR code using your <strong className="text-blue-400">{selectedMethod.toUpperCase()}</strong> app to complete payment.
-                </p>
-                
-                <motion.div 
-                  className="w-56 h-56 bg-white rounded-2xl flex flex-col items-center justify-center p-4 relative overflow-hidden"
-                  whileHover={{ scale: 1.02 }}
-                >
-                  <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-blue-500 to-purple-500"></div>
-                  <FiQrCode className="w-24 h-24 text-black mb-3" />
-                  <div className="text-black font-semibold">{selectedMethod.toUpperCase()}</div>
-                  <div className="text-xs text-n-7 mt-1">${price}</div>
-                </motion.div>
-                
-                <div className="bg-n-6 rounded-xl p-4 w-full text-left">
-                  <div className="flex justify-between mb-1">
-                    <span className="text-n-4 text-sm">Plan:</span>
-                    <span className="text-white text-sm font-medium">{plan}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-n-4 text-sm">Amount:</span>
-                    <span className="text-white text-sm font-bold">${price}</span>
-                  </div>
-                </div>
-
-                <Button 
-                  className="w-full mt-2" 
-                  white
-                  onClick={() => {
-                    setIsProcessing(true);
-                    setTimeout(() => {
-                      setPaymentSuccess(true);
-                    }, 1500);
-                  }}
-                >
-                  I've Completed the Payment
-                </Button>
-              </div>
+              <Button className="w-full" onClick={handleSubmit}>
+                Pay with {selectedMethod.charAt(0).toUpperCase() + selectedMethod.slice(1)}
+              </Button>
             )}
           </motion.div>
         )}
