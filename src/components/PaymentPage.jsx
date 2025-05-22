@@ -3,7 +3,7 @@ import { FiCreditCard, FiEye, FiEyeOff, FiCheck } from "react-icons/fi";
 import { FaPaypal } from "react-icons/fa";
 import { motion, AnimatePresence } from "framer-motion";
 
-import { db, storage } from "../config/firebase";
+import { db, storage } from "../config/firebaseConfig";
 import {
   collection,
   addDoc,
