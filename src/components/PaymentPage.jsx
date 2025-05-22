@@ -271,7 +271,7 @@ const PaymentPage = () => {
                           value={personalInfo.name}
                           onChange={handlePersonalInfoChange}
                           className={`w-full bg-gray-700 border ${errors.name ? 'border-red-500' : 'border-gray-600'} rounded-lg py-2 px-3 pl-10 text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all`}
-                          placeholder="Nama sesuai KTP"
+                          placeholder="Nama Kamu"
                           required
                         />
                         <FiUser className="absolute left-3 top-3 text-gray-400" />
