@@ -53,8 +53,12 @@ const AdminDashboard = () => {
     if (searchTerm) {
       results = results.filter(
         (payment) =>
-          payment.customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          payment.customer.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          payment.customer.name
+            .toLowerCase()
+            .includes(searchTerm.toLowerCase()) ||
+          payment.customer.email
+            .toLowerCase()
+            .includes(searchTerm.toLowerCase()) ||
           payment.transactionDetails.invoiceNumber
             .toLowerCase()
             .includes(searchTerm.toLowerCase())
@@ -77,6 +81,7 @@ const AdminDashboard = () => {
         "systemInfo.updatedAt": new Date(),
       });
       setIsEditing(null);
+      setEditStatus("");
     } catch (error) {
       console.error("Error updating status: ", error);
     }
@@ -133,12 +138,11 @@ const AdminDashboard = () => {
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
       <div className="bg-gray-900 rounded-xl shadow-lg overflow-hidden">
-        {/* Header */}
         <div className="px-6 py-5 border-b border-gray-800 bg-gradient-to-r from-gray-800 to-gray-900">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between">
             <div>
               <h1 className="text-2xl font-bold text-white">Payment Transactions</h1>
-              <p className="text-gray-400 mt-1">Manage all customer payments</p>
+              <p className="text-gray-400 mt-1">Manage all customer payments and subscriptions</p>
             </div>
             <div className="mt-4 md:mt-0 flex space-x-3">
               <div className="relative">
@@ -148,13 +152,13 @@ const AdminDashboard = () => {
                 <input
                   type="text"
                   placeholder="Search transactions..."
-                  className="pl-10 pr-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white"
+                  className="pl-10 pr-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
               </div>
               <select
-                className="bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white"
+                className="bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
               >
@@ -167,7 +171,6 @@ const AdminDashboard = () => {
           </div>
         </div>
 
-        {/* Table */}
         <div className="overflow-x-auto">
           {filteredPayments.length === 0 ? (
             <div className="p-8 text-center">
@@ -177,33 +180,35 @@ const AdminDashboard = () => {
             <table className="min-w-full divide-y divide-gray-800">
               <thead className="bg-gray-800">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-400">Customer</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-400">Plan & Invoice</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-400">Payment Details</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-400">Status</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-400">Actions</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase">Customer</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase">Plan & Invoice</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase">Payment</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase">Status</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase">Actions</th>
                 </tr>
               </thead>
               <tbody className="bg-gray-900 divide-y divide-gray-800">
                 {filteredPayments.map((payment) => (
                   <tr key={payment.id}>
-                    <td className="px-6 py-4 text-sm text-white">
-                      <div className="font-medium">{payment.customer.name}</div>
-                      <div className="text-gray-400">{payment.customer.email}</div>
+                    <td className="px-6 py-4">
+                      <div className="text-white font-medium">{payment.customer.name}</div>
+                      <div className="text-gray-400 text-sm">{payment.customer.email}</div>
+                      <div className="text-gray-400 text-sm">{payment.customer.phone}</div>
+                      <div className="text-gray-400 text-sm">{payment.customer.discord}</div>
                     </td>
-                    <td className="px-6 py-4 text-sm text-white">
-                      {payment.transactionDetails.plan}
-                      <div className="text-xs text-gray-400">{payment.transactionDetails.invoiceNumber}</div>
-                      <div className="text-sm">{formatCurrency(payment.transactionDetails.amount)}</div>
+                    <td className="px-6 py-4">
+                      <div className="text-white">{payment.transactionDetails.plan}</div>
+                      <div className="text-gray-400">{formatCurrency(payment.transactionDetails.amount)}</div>
+                      <div className="text-xs text-gray-500 font-mono">{payment.transactionDetails.invoiceNumber}</div>
                     </td>
-                    <td className="px-6 py-4 text-sm text-white">
-                      {payment.transactionDetails.paymentMethod}
-                      <div className="text-gray-400 text-xs">{formatDate(payment.timestamp)}</div>
+                    <td className="px-6 py-4">
+                      <div className="text-white capitalize">{payment.transactionDetails.paymentMethod}</div>
+                      <div className="text-gray-400">{formatDate(payment.timestamp)}</div>
                     </td>
                     <td className="px-6 py-4">
                       {isEditing === payment.id ? (
                         <select
-                          className="bg-gray-800 border border-gray-700 text-white px-2 py-1 rounded-md text-sm"
+                          className="bg-gray-800 text-white rounded px-2 py-1"
                           value={editStatus}
                           onChange={(e) => setEditStatus(e.target.value)}
                         >
@@ -220,13 +225,13 @@ const AdminDashboard = () => {
                         <>
                           <button
                             onClick={() => handleStatusUpdate(payment.id)}
-                            className="px-3 py-1 bg-green-600 hover:bg-green-700 text-white text-sm rounded-md"
+                            className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm"
                           >
                             Save
                           </button>
                           <button
                             onClick={() => setIsEditing(null)}
-                            className="px-3 py-1 bg-gray-700 hover:bg-gray-600 text-white text-sm rounded-md"
+                            className="bg-gray-600 hover:bg-gray-700 text-white px-3 py-1 rounded text-sm"
                           >
                             Cancel
                           </button>
@@ -237,9 +242,9 @@ const AdminDashboard = () => {
                             setIsEditing(payment.id);
                             setEditStatus(payment.transactionDetails.status);
                           }}
-                          className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded-md flex items-center"
+                          className="text-yellow-400 hover:text-yellow-500"
                         >
-                          <FiEdit className="mr-1" /> Edit
+                          <FiEdit size={18} />
                         </button>
                       )}
                     </td>
