@@ -1,12 +1,16 @@
 import React, { useEffect, useState } from "react";
-import { collection, query, onSnapshot, orderBy, updateDoc, doc } from "firebase/firestore";
+import { collection, query, onSnapshot, orderBy, doc, updateDoc } from "firebase/firestore";
 import { db } from "../config/firebaseConfig";
-import { FiEdit, FiCheck, FiX, FiLoader } from "react-icons/fi";
+import { FiEdit, FiSearch, FiClock, FiCheckCircle, FiXCircle, FiDollarSign, FiUser, FiMail, FiPhone, FiCreditCard } from "react-icons/fi";
+import { FaDiscord } from "react-icons/fa";
 
 const AdminDashboard = () => {
   const [payments, setPayments] = useState([]);
-  const [editingId, setEditingId] = useState(null);
-  const [newStatus, setNewStatus] = useState("");
+  const [filteredPayments, setFilteredPayments] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [isEditing, setIsEditing] = useState(null);
+  const [editStatus, setEditStatus] = useState("");
 
   useEffect(() => {
     const q = query(collection(db, "transactions"), orderBy("systemInfo.createdAt", "desc"));
@@ -14,141 +18,271 @@ const AdminDashboard = () => {
       const data = snapshot.docs.map((doc) => ({ 
         id: doc.id, 
         ...doc.data(),
-        createdAt: doc.data().systemInfo?.createdAt?.toDate(),
-        updatedAt: doc.data().systemInfo?.updatedAt?.toDate()
+        timestamp: doc.data().systemInfo?.createdAt?.toDate() 
       }));
       setPayments(data);
+      setFilteredPayments(data);
     });
     return () => unsub();
   }, []);
 
-  const handleEditClick = (payment) => {
-    setEditingId(payment.id);
-    setNewStatus(payment.transactionDetails.status);
-  };
+  useEffect(() => {
+    let results = payments;
+    
+    // Apply search filter
+    if (searchTerm) {
+      results = results.filter(payment => 
+        payment.customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        payment.customer.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        payment.transactionDetails.invoiceNumber.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+    
+    // Apply status filter
+    if (statusFilter !== "all") {
+      results = results.filter(payment => 
+        payment.transactionDetails.status === statusFilter
+      );
+    }
+    
+    setFilteredPayments(results);
+  }, [searchTerm, statusFilter, payments]);
 
   const handleStatusUpdate = async (paymentId) => {
     try {
-      const paymentRef = doc(db, "transactions", paymentId);
-      await updateDoc(paymentRef, {
-        "transactionDetails.status": newStatus,
-        "systemInfo.updatedAt": serverTimestamp()
-      });
-      setEditingId(null);
+      await updateDoc(doc(db, "transactions", paymentId), {
+        "transactionDetails.status": editStatus,
+        "systemInfo.updatedAt": new Date()
+      };
+      setIsEditing(null);
     } catch (error) {
-      console.error("Error updating status:", error);
-      alert("Failed to update status");
+      console.error("Error updating status: ", error);
     }
   };
 
-  const getStatusColor = (status) => {
+  const getStatusBadge = (status) => {
     switch (status) {
-      case "completed":
-        return "bg-green-500/20 text-green-400";
       case "pending":
-        return "bg-yellow-500/20 text-yellow-400";
+        return (
+          <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-yellow-500/20 text-yellow-400">
+            <FiClock className="mr-1" /> Pending
+          </span>
+        );
+      case "completed":
+        return (
+          <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-500/20 text-green-400">
+            <FiCheckCircle className="mr-1" /> Completed
+          </span>
+        );
       case "failed":
-        return "bg-red-500/20 text-red-400";
-      case "refunded":
-        return "bg-purple-500/20 text-purple-400";
+        return (
+          <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-red-500/20 text-red-400">
+            <FiXCircle className="mr-1" /> Failed
+          </span>
+        );
       default:
-        return "bg-gray-500/20 text-gray-400";
+        return (
+          <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gray-500/20 text-gray-400">
+            Unknown
+          </span>
+        );
     }
+  };
+
+  const formatDate = (date) => {
+    if (!date) return "-";
+    return new Date(date).toLocaleString("id-ID", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit"
+    });
+  };
+
+  const formatCurrency = (amount) => {
+    return new Intl.NumberFormat("id-ID", {
+      style: "currency",
+      currency: "IDR",
+      minimumFractionDigits: 0
+    }).format(amount);
   };
 
   return (
-    <div className="max-w-7xl mx-auto p-4 md:p-8 bg-gray-900 rounded-lg min-h-screen">
-      <div className="flex justify-between items-center mb-8">
-        <h1 className="text-2xl md:text-4xl font-bold text-white">Admin Dashboard</h1>
-        <div className="text-gray-400">
-          Total Transactions: {payments.length}
+    <div className="max-w-7xl mx-auto px-4 py-8">
+      <div className="bg-gray-900 rounded-xl shadow-lg overflow-hidden">
+        {/* Dashboard Header */}
+        <div className="px-6 py-5 border-b border-gray-800 bg-gradient-to-r from-gray-800 to-gray-900">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between">
+            <div>
+              <h1 className="text-2xl font-bold text-white">Payment Transactions</h1>
+              <p className="text-gray-400 mt-1">Manage all customer payments and subscriptions</p>
+            </div>
+            <div className="mt-4 md:mt-0 flex space-x-3">
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <FiSearch className="text-gray-500" />
+                </div>
+                <input
+                  type="text"
+                  placeholder="Search transactions..."
+                  className="pl-10 pr-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+              </div>
+              <select
+                className="bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+              >
+                <option value="all">All Status</option>
+                <option value="pending">Pending</option>
+                <option value="completed">Completed</option>
+                <option value="failed">Failed</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        {/* Dashboard Content */}
+        <div className="overflow-x-auto">
+          {filteredPayments.length === 0 ? (
+            <div className="p-8 text-center">
+              <p className="text-gray-500">No transactions found</p>
+            </div>
+          ) : (
+            <table className="min-w-full divide-y divide-gray-800">
+              <thead className="bg-gray-800">
+                <tr>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+                    Customer
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+                    Plan & Invoice
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+                    Payment Details
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+                    Status
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="bg-gray-900 divide-y divide-gray-800">
+                {filteredPayments.map((payment) => (
+                  <tr key={payment.id} className="hover:bg-gray-800/50 transition-colors">
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center">
+                        <div className="flex-shrink-0 h-10 w-10 rounded-full bg-blue-500/10 flex items-center justify-center text-blue-400">
+                          <FiUser size={18} />
+                        </div>
+                        <div className="ml-4">
+                          <div className="text-sm font-medium text-white">{payment.customer.name}</div>
+                          <div className="text-sm text-gray-400 flex items-center mt-1">
+                            <FiMail className="mr-1.5" size={14} />
+                            {payment.customer.email}
+                          </div>
+                          <div className="text-sm text-gray-400 flex items-center mt-1">
+                            <FiPhone className="mr-1.5" size={14} />
+                            {payment.customer.phone}
+                          </div>
+                          <div className="text-sm text-gray-400 flex items-center mt-1">
+                            <FaDiscord className="mr-1.5" size={14} />
+                            {payment.customer.discord}
+                          </div>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm font-medium text-white">{payment.transactionDetails.plan}</div>
+                      <div className="text-sm text-gray-400 mt-1">
+                        {formatCurrency(payment.transactionDetails.amount)}
+                      </div>
+                      <div className="text-xs text-gray-500 mt-2 font-mono">
+                        {payment.transactionDetails.invoiceNumber}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center">
+                        <div className="flex-shrink-0 h-8 w-8 rounded-full bg-purple-500/10 flex items-center justify-center text-purple-400 mr-3">
+                          {payment.transactionDetails.paymentMethod === "qris" ? (
+                            <FiCreditCard size={16} />
+                          ) : (
+                            <FiDollarSign size={16} />
+                          )}
+                        </div>
+                        <div>
+                          <div className="text-sm text-white capitalize">
+                            {payment.transactionDetails.paymentMethod}
+                          </div>
+                          <div className="text-sm text-gray-400">
+                            {formatDate(payment.timestamp)}
+                          </div>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      {isEditing === payment.id ? (
+                        <select
+                          className="bg-gray-800 border border-gray-700 rounded-md px-2 py-1 text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          value={editStatus}
+                          onChange={(e) => setEditStatus(e.target.value)}
+                        >
+                          <option value="pending">Pending</option>
+                          <option value="completed">Completed</option>
+                          <option value="failed">Failed</option>
+                        </select>
+                      ) : (
+                        getStatusBadge(payment.transactionDetails.status)
+                      )}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                      {isEditing === payment.id ? (
+                        <div className="flex space-x-2">
+                          <button
+                            onClick={() => handleStatusUpdate(payment.id)}
+                            className="text-green-400 hover:text-green-300 bg-green-500/10 px-3 py-1 rounded-md text-sm"
+                          >
+                            Save
+                          </button>
+                          <button
+                            onClick={() => setIsEditing(null)}
+                            className="text-gray-400 hover:text-gray-300 bg-gray-500/10 px-3 py-1 rounded-md text-sm"
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      ) : (
+                        <button
+                          onClick={() => {
+                            setIsEditing(payment.id);
+                            setEditStatus(payment.transactionDetails.status);
+                          }}
+                          className="text-blue-400 hover:text-blue-300 bg-blue-500/10 px-3 py-1 rounded-md text-sm flex items-center"
+                        >
+                          <FiEdit className="mr-1" size={14} /> Edit
+                        </button>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </div>
+
+        {/* Dashboard Footer */}
+        <div className="px-6 py-4 border-t border-gray-800 bg-gray-900/50 text-right">
+          <p className="text-sm text-gray-500">
+            Showing <span className="font-medium">{filteredPayments.length}</span> of{' '}
+            <span className="font-medium">{payments.length}</span> transactions
+          </p>
         </div>
       </div>
-
-      {payments.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-16">
-          <FiLoader className="w-12 h-12 text-gray-400 animate-spin mb-4" />
-          <p className="text-gray-400">Loading transactions...</p>
-        </div>
-      ) : (
-        <div className="overflow-x-auto">
-          <table className="min-w-full border-collapse table-auto">
-            <thead>
-              <tr className="border-b border-gray-700">
-                <th className="py-3 px-4 text-left text-gray-400 font-medium">Customer</th>
-                <th className="py-3 px-4 text-left text-gray-400 font-medium">Plan</th>
-                <th className="py-3 px-4 text-left text-gray-400 font-medium">Amount</th>
-                <th className="py-3 px-4 text-left text-gray-400 font-medium">Method</th>
-                <th className="py-3 px-4 text-left text-gray-400 font-medium">Date</th>
-                <th className="py-3 px-4 text-left text-gray-400 font-medium">Status</th>
-                <th className="py-3 px-4 text-left text-gray-400 font-medium">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {payments.map((payment) => (
-                <tr key={payment.id} className="border-b border-gray-700 hover:bg-gray-800/50 transition">
-                  <td className="py-4 px-4">
-                    <div className="font-medium text-white">{payment.customer.name}</div>
-                    <div className="text-sm text-gray-400">{payment.customer.email}</div>
-                    <div className="text-xs text-gray-500 mt-1">{payment.customer.phone}</div>
-                  </td>
-                  <td className="py-4 px-4 text-white">{payment.transactionDetails.plan}</td>
-                  <td className="py-4 px-4 text-white">Rp{payment.transactionDetails.amount.toLocaleString()}</td>
-                  <td className="py-4 px-4 text-white capitalize">{payment.transactionDetails.paymentMethod}</td>
-                  <td className="py-4 px-4 text-gray-400 text-sm">
-                    {payment.createdAt?.toLocaleDateString()}
-                    <br />
-                    {payment.createdAt?.toLocaleTimeString()}
-                  </td>
-                  <td className="py-4 px-4">
-                    {editingId === payment.id ? (
-                      <select
-                        value={newStatus}
-                        onChange={(e) => setNewStatus(e.target.value)}
-                        className="bg-gray-700 border border-gray-600 rounded px-2 py-1 text-white"
-                      >
-                        <option value="pending">Pending</option>
-                        <option value="completed">Completed</option>
-                        <option value="failed">Failed</option>
-                        <option value="refunded">Refunded</option>
-                      </select>
-                    ) : (
-                      <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(payment.transactionDetails.status)}`}>
-                        {payment.transactionDetails.status}
-                      </span>
-                    )}
-                  </td>
-                  <td className="py-4 px-4">
-                    {editingId === payment.id ? (
-                      <div className="flex space-x-2">
-                        <button
-                          onClick={() => handleStatusUpdate(payment.id)}
-                          className="p-1 text-green-400 hover:text-green-300"
-                        >
-                          <FiCheck size={18} />
-                        </button>
-                        <button
-                          onClick={() => setEditingId(null)}
-                          className="p-1 text-red-400 hover:text-red-300"
-                        >
-                          <FiX size={18} />
-                        </button>
-                      </div>
-                    ) : (
-                      <button
-                        onClick={() => handleEditClick(payment)}
-                        className="p-1 text-blue-400 hover:text-blue-300"
-                      >
-                        <FiEdit size={18} />
-                      </button>
-                    )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
     </div>
   );
 };
