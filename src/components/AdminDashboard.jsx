@@ -1,7 +1,25 @@
 import React, { useEffect, useState } from "react";
-import { collection, query, onSnapshot, orderBy, doc, updateDoc } from "firebase/firestore";
+import {
+  collection,
+  query,
+  onSnapshot,
+  orderBy,
+  doc,
+  updateDoc,
+} from "firebase/firestore";
 import { db } from "../config/firebaseConfig";
-import { FiEdit, FiSearch, FiClock, FiCheckCircle, FiXCircle, FiDollarSign, FiUser, FiMail, FiPhone, FiCreditCard } from "react-icons/fi";
+import {
+  FiEdit,
+  FiSearch,
+  FiClock,
+  FiCheckCircle,
+  FiXCircle,
+  FiDollarSign,
+  FiUser,
+  FiMail,
+  FiPhone,
+  FiCreditCard,
+} from "react-icons/fi";
 import { FaDiscord } from "react-icons/fa";
 
 const AdminDashboard = () => {
@@ -13,12 +31,15 @@ const AdminDashboard = () => {
   const [editStatus, setEditStatus] = useState("");
 
   useEffect(() => {
-    const q = query(collection(db, "transactions"), orderBy("systemInfo.createdAt", "desc"));
+    const q = query(
+      collection(db, "transactions"),
+      orderBy("systemInfo.createdAt", "desc")
+    );
     const unsub = onSnapshot(q, (snapshot) => {
-      const data = snapshot.docs.map((doc) => ({ 
-        id: doc.id, 
+      const data = snapshot.docs.map((doc) => ({
+        id: doc.id,
         ...doc.data(),
-        timestamp: doc.data().systemInfo?.createdAt?.toDate() 
+        timestamp: doc.data().systemInfo?.createdAt?.toDate(),
       }));
       setPayments(data);
       setFilteredPayments(data);
@@ -28,23 +49,24 @@ const AdminDashboard = () => {
 
   useEffect(() => {
     let results = payments;
-    
-    // Apply search filter
+
     if (searchTerm) {
-      results = results.filter(payment => 
-        payment.customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        payment.customer.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        payment.transactionDetails.invoiceNumber.toLowerCase().includes(searchTerm.toLowerCase())
+      results = results.filter(
+        (payment) =>
+          payment.customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          payment.customer.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          payment.transactionDetails.invoiceNumber
+            .toLowerCase()
+            .includes(searchTerm.toLowerCase())
       );
     }
-    
-    // Apply status filter
+
     if (statusFilter !== "all") {
-      results = results.filter(payment => 
-        payment.transactionDetails.status === statusFilter
+      results = results.filter(
+        (payment) => payment.transactionDetails.status === statusFilter
       );
     }
-    
+
     setFilteredPayments(results);
   }, [searchTerm, statusFilter, payments]);
 
@@ -52,7 +74,7 @@ const AdminDashboard = () => {
     try {
       await updateDoc(doc(db, "transactions", paymentId), {
         "transactionDetails.status": editStatus,
-        "systemInfo.updatedAt": new Date()
+        "systemInfo.updatedAt": new Date(),
       });
       setIsEditing(null);
     } catch (error) {
@@ -96,7 +118,7 @@ const AdminDashboard = () => {
       month: "short",
       year: "numeric",
       hour: "2-digit",
-      minute: "2-digit"
+      minute: "2-digit",
     });
   };
 
@@ -104,19 +126,19 @@ const AdminDashboard = () => {
     return new Intl.NumberFormat("id-ID", {
       style: "currency",
       currency: "IDR",
-      minimumFractionDigits: 0
+      minimumFractionDigits: 0,
     }).format(amount);
   };
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
       <div className="bg-gray-900 rounded-xl shadow-lg overflow-hidden">
-        {/* Dashboard Header */}
+        {/* Header */}
         <div className="px-6 py-5 border-b border-gray-800 bg-gradient-to-r from-gray-800 to-gray-900">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between">
             <div>
               <h1 className="text-2xl font-bold text-white">Payment Transactions</h1>
-              <p className="text-gray-400 mt-1">Manage all customer payments and subscriptions</p>
+              <p className="text-gray-400 mt-1">Manage all customer payments</p>
             </div>
             <div className="mt-4 md:mt-0 flex space-x-3">
               <div className="relative">
@@ -126,13 +148,13 @@ const AdminDashboard = () => {
                 <input
                   type="text"
                   placeholder="Search transactions..."
-                  className="pl-10 pr-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="pl-10 pr-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
               </div>
               <select
-                className="bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white"
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
               >
@@ -145,7 +167,7 @@ const AdminDashboard = () => {
           </div>
         </div>
 
-        {/* Dashboard Content */}
+        {/* Table */}
         <div className="overflow-x-auto">
           {filteredPayments.length === 0 ? (
             <div className="p-8 text-center">
@@ -155,80 +177,33 @@ const AdminDashboard = () => {
             <table className="min-w-full divide-y divide-gray-800">
               <thead className="bg-gray-800">
                 <tr>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
-                    Customer
-                  </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
-                    Plan & Invoice
-                  </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
-                    Payment Details
-                  </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
-                    Status
-                  </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
-                    Actions
-                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-400">Customer</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-400">Plan & Invoice</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-400">Payment Details</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-400">Status</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-400">Actions</th>
                 </tr>
               </thead>
               <tbody className="bg-gray-900 divide-y divide-gray-800">
                 {filteredPayments.map((payment) => (
-                  <tr key={payment.id} className="hover:bg-gray-800/50 transition-colors">
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center">
-                        <div className="flex-shrink-0 h-10 w-10 rounded-full bg-blue-500/10 flex items-center justify-center text-blue-400">
-                          <FiUser size={18} />
-                        </div>
-                        <div className="ml-4">
-                          <div className="text-sm font-medium text-white">{payment.customer.name}</div>
-                          <div className="text-sm text-gray-400 flex items-center mt-1">
-                            <FiMail className="mr-1.5" size={14} />
-                            {payment.customer.email}
-                          </div>
-                          <div className="text-sm text-gray-400 flex items-center mt-1">
-                            <FiPhone className="mr-1.5" size={14} />
-                            {payment.customer.phone}
-                          </div>
-                          <div className="text-sm text-gray-400 flex items-center mt-1">
-                            <FaDiscord className="mr-1.5" size={14} />
-                            {payment.customer.discord}
-                          </div>
-                        </div>
-                      </div>
+                  <tr key={payment.id}>
+                    <td className="px-6 py-4 text-sm text-white">
+                      <div className="font-medium">{payment.customer.name}</div>
+                      <div className="text-gray-400">{payment.customer.email}</div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-medium text-white">{payment.transactionDetails.plan}</div>
-                      <div className="text-sm text-gray-400 mt-1">
-                        {formatCurrency(payment.transactionDetails.amount)}
-                      </div>
-                      <div className="text-xs text-gray-500 mt-2 font-mono">
-                        {payment.transactionDetails.invoiceNumber}
-                      </div>
+                    <td className="px-6 py-4 text-sm text-white">
+                      {payment.transactionDetails.plan}
+                      <div className="text-xs text-gray-400">{payment.transactionDetails.invoiceNumber}</div>
+                      <div className="text-sm">{formatCurrency(payment.transactionDetails.amount)}</div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center">
-                        <div className="flex-shrink-0 h-8 w-8 rounded-full bg-purple-500/10 flex items-center justify-center text-purple-400 mr-3">
-                          {payment.transactionDetails.paymentMethod === "qris" ? (
-                            <FiCreditCard size={16} />
-                          ) : (
-                            <FiDollarSign size={16} />
-                          )}
-                        </div>
-                        <div>
-                          <div className="text-sm text-white capitalize">
-                            {payment.transactionDetails.paymentMethod}
-                          </div>
-                          <div className="text-sm text-gray-400">
-                            {formatDate(payment.timestamp)}
-                          </div>
-                        </div>
-                      </div>
+                    <td className="px-6 py-4 text-sm text-white">
+                      {payment.transactionDetails.paymentMethod}
+                      <div className="text-gray-400 text-xs">{formatDate(payment.timestamp)}</div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td className="px-6 py-4">
                       {isEditing === payment.id ? (
                         <select
-                          className="bg-gray-800 border border-gray-700 rounded-md px-2 py-1 text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          className="bg-gray-800 border border-gray-700 text-white px-2 py-1 rounded-md text-sm"
                           value={editStatus}
                           onChange={(e) => setEditStatus(e.target.value)}
                         >
@@ -240,31 +215,31 @@ const AdminDashboard = () => {
                         getStatusBadge(payment.transactionDetails.status)
                       )}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                    <td className="px-6 py-4 space-x-2">
                       {isEditing === payment.id ? (
-                        <div className="flex space-x-2">
+                        <>
                           <button
                             onClick={() => handleStatusUpdate(payment.id)}
-                            className="text-green-400 hover:text-green-300 bg-green-500/10 px-3 py-1 rounded-md text-sm"
+                            className="px-3 py-1 bg-green-600 hover:bg-green-700 text-white text-sm rounded-md"
                           >
                             Save
                           </button>
                           <button
                             onClick={() => setIsEditing(null)}
-                            className="text-gray-400 hover:text-gray-300 bg-gray-500/10 px-3 py-1 rounded-md text-sm"
+                            className="px-3 py-1 bg-gray-700 hover:bg-gray-600 text-white text-sm rounded-md"
                           >
                             Cancel
                           </button>
-                        </div>
+                        </>
                       ) : (
                         <button
                           onClick={() => {
                             setIsEditing(payment.id);
                             setEditStatus(payment.transactionDetails.status);
                           }}
-                          className="text-blue-400 hover:text-blue-300 bg-blue-500/10 px-3 py-1 rounded-md text-sm flex items-center"
+                          className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded-md flex items-center"
                         >
-                          <FiEdit className="mr-1" size={14} /> Edit
+                          <FiEdit className="mr-1" /> Edit
                         </button>
                       )}
                     </td>
@@ -273,14 +248,6 @@ const AdminDashboard = () => {
               </tbody>
             </table>
           )}
-        </div>
-
-        {/* Dashboard Footer */}
-        <div className="px-6 py-4 border-t border-gray-800 bg-gray-900/50 text-right">
-          <p className="text-sm text-gray-500">
-            Showing <span className="font-medium">{filteredPayments.length}</span> of{' '}
-            <span className="font-medium">{payments.length}</span> transactions
-          </p>
         </div>
       </div>
     </div>
