@@ -74,7 +74,10 @@ const PaymentPage = () => {
     setIsProcessing(true);
     
     try {
-      // Save transaction to Firestore
+      // Generate unique invoice number
+      const invoiceNumber = `INV-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+      
+      // Prepare transaction data
       const transactionData = {
         customer: {
           name: personalInfo.name,
@@ -84,32 +87,42 @@ const PaymentPage = () => {
           userId: "" // Empty if no auth
         },
         transactionDetails: {
-          plan,
-          amount: Number(price),
-          paymentMethod,
+          plan: plan || "Unknown Plan",
+          amount: Number(price) || 0,
+          paymentMethod: paymentMethod || "unknown",
           status: "pending",
-          invoiceNumber: `INV-${Date.now()}`,
-          adminFee: 0
+          invoiceNumber: invoiceNumber,
+          adminFee: 0,
+          currency: "IDR"
         },
         systemInfo: {
           createdAt: serverTimestamp(),
           updatedAt: serverTimestamp(),
-          ipAddress: "" // Empty string
+          ipAddress: "" // Can be filled if you track IP
         },
         notes: {
           adminNotes: "",
-          userNotes: ""
+          userNotes: "",
+          paymentNote: paymentMethods[paymentMethod]?.note || ""
+        },
+        metadata: {
+          appVersion: "1.0.0",
+          source: "web"
         }
       };
 
-      await addDoc(collection(db, "transactions"), transactionData);
+      // Add document to Firestore
+      const docRef = await addDoc(collection(db, "transactions"), transactionData);
+      console.log("Transaction saved with ID: ", docRef.id);
 
-      // Simulate processing delay
-      await new Promise(resolve => setTimeout(resolve, 3000));
+      // Simulate processing delay (remove in production)
+      await new Promise(resolve => setTimeout(resolve, 2000));
       
+      // Mark payment as complete
       setPaymentComplete(true);
+      
     } catch (error) {
-      console.error("Payment error:", error);
+      console.error("Payment processing error:", error);
       alert(`Pembayaran gagal: ${error.message}`);
     } finally {
       setIsProcessing(false);
