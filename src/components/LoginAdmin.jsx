@@ -1,10 +1,10 @@
-import gsap from "gsap";
 import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { FiLock, FiEye, FiEyeOff, FiLogIn } from "react-icons/fi";
 import { motion, useAnimation, AnimatePresence } from "framer-motion";
 import Particles from "react-tsparticles";
 import { loadFull } from "tsparticles";
+import { gsap } from "gsap";
 import loginBg from "../assets/login-bg.mp4";
 
 const LoginAdmin = () => {
