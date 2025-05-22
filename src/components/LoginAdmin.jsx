@@ -11,7 +11,7 @@ const LoginAdmin = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const navigate = useNavigate();
-  
+
   const particlesInit = async (engine) => {
     await loadFull(engine);
   };
@@ -24,15 +24,15 @@ const LoginAdmin = () => {
 
     setIsLoading(true);
     setError("");
-    
-    await new Promise(resolve => setTimeout(resolve, 800));
-    
+
+    await new Promise((resolve) => setTimeout(resolve, 800));
+
     if (password === "Donghua") {
       navigate("/admin/dashboard");
     } else {
       setError("Invalid access credentials");
     }
-    
+
     setIsLoading(false);
   };
 
@@ -53,8 +53,8 @@ const LoginAdmin = () => {
               number: { value: 40, density: { enable: true, area: 800 } },
               color: { value: ["#3b82f6", "#8b5cf6", "#ec4899"] },
               move: { speed: 0.5, outMode: "bounce" },
-              links: { color: "#3b82f6", opacity: 0.3 }
-            }
+              links: { color: "#3b82f6", opacity: 0.3 },
+            },
           }}
         />
       </div>
@@ -71,17 +71,13 @@ const LoginAdmin = () => {
           <h2 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-300">
             ADMIN PORTAL
           </h2>
-          <p className="text-blue-200/80 mt-2 font-light">
-            Restricted Access Only
-          </p>
+          <p className="text-blue-200/80 mt-2 font-light">Restricted Access Only</p>
         </div>
 
         {/* Form */}
         <div className="p-8">
           <div className="mb-6">
-            <label className="block text-gray-400 text-sm font-medium mb-2">
-              ACCESS CODE
-            </label>
+            <label className="block text-gray-400 text-sm font-medium mb-2">ACCESS CODE</label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                 <FiLock className="text-blue-400/80" />
@@ -94,7 +90,7 @@ const LoginAdmin = () => {
                 } rounded-lg text-white focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500/50 transition-all`}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                onKeyPress={handleKeyPress}
+                onKeyDown={handleKeyPress}
               />
               <button
                 type="button"
@@ -108,12 +104,7 @@ const LoginAdmin = () => {
                 )}
               </button>
             </div>
-            
-            {error && (
-              <p className="text-red-400/90 text-sm mt-2">
-                {error}
-              </p>
-            )}
+            {error && <p className="text-red-400/90 text-sm mt-2">{error}</p>}
           </div>
 
           {/* Login Button */}
@@ -121,6 +112,7 @@ const LoginAdmin = () => {
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             onClick={handleLogin}
+            onTouchStart={handleLogin} // ✅ Support mobile touch
             disabled={isLoading}
             className={`w-full flex items-center justify-center py-3 px-6 rounded-lg font-medium ${
               isLoading
