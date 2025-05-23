@@ -548,7 +548,7 @@ const PaymentPage = () => {
                 )}
                 <div className="mt-1 flex items-center text-xs text-gray-500">
                   <span>How To Get Discord ID ?</span>
-                  <a href="#" className="ml-2 text-purple-400 hover:text-purple-300 flex items-center">
+                  <a href="https://youtu.be/T2LGHXV5scE?si=wOyIWS7E7A_hCfy-" className="ml-2 text-purple-400 hover:text-purple-300 flex items-center">
                     Click Here <FiExternalLink className="ml-1 w-3 h-3" />
                   </a>
                 </div>
