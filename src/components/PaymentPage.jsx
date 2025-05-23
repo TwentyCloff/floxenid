@@ -501,7 +501,7 @@ const PaymentPage = () => {
                   </p>
                 )}
                 <div className="mt-1 flex items-center text-xs text-gray-500">
-                  <span>How To Get Discord ID</span>
+                  <span>How To Get Discord ID ?</span>
                   <a href="#" className="ml-2 text-purple-400 hover:text-purple-300 flex items-center">
                     Click Here <FiExternalLink className="ml-1 w-3 h-3" />
                   </a>
@@ -540,9 +540,12 @@ const PaymentPage = () => {
             </div>
             
             <div className="bg-gray-700/50 rounded-lg p-4 border border-gray-600">
-              <h3 className="text-lg font-bold text-white mb-2">Rules Rules</h3>
+              <h3 className="text-lg font-bold text-white mb-2">RULES</h3>
               <p className="text-gray-300 text-sm">
-                Harap baca dan pahami rules sebelum melanjutkan pembayaran. Dengan melanjutkan, Anda menyetujui semua ketentuan yang berlaku.
+                Harap isi data diri lengkap kalian dengan benar, karena jika ada kesalahan 1 huruf/angka transaksi akan hangus 
+              </p>
+               <p className="text-gray-300 text-sm">
+                Demi kenyamanan bersama, pastikan User ID Kalian sesuai dengan discord account kalian, jika tidak transaksi kalian akan hangus dan tidak akan di proses!
               </p>
             </div>
             
