@@ -11,8 +11,8 @@ import { db } from "../config/firebaseConfig";
 import { doc, setDoc, serverTimestamp } from "firebase/firestore";
 import paymentVideo from "../assets/hero/payment-bg.mp4";
 import Button from "./Button";
-import gopayLogo from "../assets/selectz/gopay.jpeg";
-import danaLogo from "../assets/selectz/dana.jpg";
+import gopayLogo from "../assets/selectz/gopay.png";
+import danaLogo from "../assets/selectz/dana.png";
 
 const PaymentPage = () => {
   const [step, setStep] = useState(1);
