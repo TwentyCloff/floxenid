@@ -542,7 +542,7 @@ const PaymentPage = () => {
             <div className="bg-gray-700/50 rounded-lg p-4 border border-gray-600">
               <h3 className="text-lg font-bold text-white mb-2">RULES</h3>
               <p className="text-gray-300 text-sm">
-                Harap isi data diri lengkap kalian dengan benar, karena jika ada kesalahan 1 huruf/angka transaksi akan hangus 
+                Harap isi data diri lengkap kalian dengan benar, karena jika ada kesalahan 1 huruf/angka transaksi akan hangus !<br/>
               </p>
                <p className="text-gray-300 text-sm">
                 Demi kenyamanan bersama, pastikan User ID Kalian sesuai dengan discord account kalian, jika tidak transaksi kalian akan hangus dan tidak akan di proses!
