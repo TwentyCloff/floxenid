@@ -4,22 +4,18 @@ import { useState, useEffect } from "react";
 import { 
   FiCheck, FiLock, FiCreditCard, FiX, FiShield,
   FiUser, FiMail, FiSmartphone, FiLoader, FiMessageSquare,
-  FiCopy, FiExternalLink, FiArrowLeft, FiChevronRight
+  FiCopy, FiExternalLink, FiChevronDown
 } from "react-icons/fi";
 import { FaQrcode, FaDiscord } from "react-icons/fa";
 import { db } from "../config/firebaseConfig";
 import { doc, setDoc, serverTimestamp } from "firebase/firestore";
+import paymentVideo from "../assets/hero/payment-bg.mp4";
 import Button from "./Button";
-
-// Import game icons
-import growtopiaIcon from "../assets/selectz/growtopia-icon.webp";
-import robloxIcon from "../assets/selectz/roblox-icon.jpeg";
 import gopayLogo from "../assets/selectz/gopay.jpeg";
 import danaLogo from "../assets/selectz/dana.jpg";
 
 const PaymentPage = () => {
-  const [step, setStep] = useState(0);
-  const [selectedGame, setSelectedGame] = useState(null);
+  const [step, setStep] = useState(1);
   const [paymentComplete, setPaymentComplete] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState("qris");
@@ -28,6 +24,8 @@ const PaymentPage = () => {
     email: "",
     discord: "",
     phone: "",
+    game: "",
+    category: ""
   });
   const [errors, setErrors] = useState({});
   const [touched, setTouched] = useState({});
@@ -36,6 +34,8 @@ const PaymentPage = () => {
   const [showCopyNotification, setShowCopyNotification] = useState(false);
   const [copiedIndex, setCopiedIndex] = useState(null);
   const [invoiceNumber, setInvoiceNumber] = useState("");
+  const [showGameDropdown, setShowGameDropdown] = useState(false);
+  const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
   
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
@@ -43,35 +43,8 @@ const PaymentPage = () => {
   const price = searchParams.get('price');
   const navigate = useNavigate();
 
-  // Store selected game in localStorage to persist on refresh
-  useEffect(() => {
-    if (selectedGame) {
-      localStorage.setItem('selectedGame', selectedGame);
-    }
-  }, [selectedGame]);
-
-  // Retrieve selected game from localStorage on component mount
-  useEffect(() => {
-    const savedGame = localStorage.getItem('selectedGame');
-    if (savedGame) {
-      setSelectedGame(savedGame);
-    }
-  }, []);
-
-  const games = {
-    "growtopia": {
-      name: "Growtopia",
-      icon: growtopiaIcon,
-      color: "from-emerald-500 to-teal-600",
-      gradient: "bg-gradient-to-br from-emerald-500 to-teal-600"
-    },
-    "roblox": {
-      name: "Roblox",
-      icon: robloxIcon,
-      color: "from-red-500 to-pink-600",
-      gradient: "bg-gradient-to-br from-red-500 to-pink-600"
-    }
-  };
+  const games = ["Roblox", "Growtopia"];
+  const categories = ["Script", "Item"];
 
   const paymentMethods = {
     "qris": {
@@ -79,29 +52,29 @@ const PaymentPage = () => {
       icon: <FaQrcode className="w-6 h-6" />,
       instructions: "Scan QR code below to complete payment",
       account: "",
-      note: "Pembayaran via QRIS akan diproses otomatis",
+      note: "Payment via QRIS will be processed automatically",
       color: "from-purple-500 to-indigo-600",
-      gradient: "bg-gradient-to-br from-purple-500 to-indigo-600"
+      logo: null
     },
     "gopay": {
       name: "Gopay",
       icon: <img src={gopayLogo} alt="Gopay" className="w-6 h-6 object-contain" />,
-      instructions: "Transfer ke nomor berikut",
+      instructions: "Transfer to the following number",
       account: "08123456789",
-      accountName: "A/N Customer Service",
-      note: "Harap screenshot bukti transfer dan kirim ke admin",
+      accountName: "Customer Service",
+      note: "Please screenshot the payment proof and send to admin",
       color: "from-green-500 to-teal-600",
-      gradient: "bg-gradient-to-br from-green-500 to-teal-600"
+      logo: gopayLogo
     },
     "dana": {
       name: "DANA",
       icon: <img src={danaLogo} alt="DANA" className="w-6 h-6 object-contain" />,
-      instructions: "Transfer ke nomor berikut",
+      instructions: "Transfer to the following number",
       account: "08198765432",
-      accountName: "A/N Customer Service",
-      note: "Harap screenshot bukti transfer dan kirim ke admin",
+      accountName: "Customer Service",
+      note: "Please screenshot the payment proof and send to admin",
       color: "from-blue-500 to-cyan-600",
-      gradient: "bg-gradient-to-br from-blue-500 to-cyan-600"
+      logo: danaLogo
     }
   };
 
@@ -129,7 +102,13 @@ const PaymentPage = () => {
   const handlePersonalInfoChange = (e) => {
     const { name, value } = e.target;
     
-    if (name === "phone" || name === "discord") {
+    if (name === "phone") {
+      const numericValue = value.replace(/[^0-9]/g, '');
+      setPersonalInfo(prev => ({ ...prev, [name]: numericValue }));
+      return;
+    }
+    
+    if (name === "discord") {
       const numericValue = value.replace(/[^0-9]/g, '');
       setPersonalInfo(prev => ({ ...prev, [name]: numericValue }));
       return;
@@ -141,24 +120,47 @@ const PaymentPage = () => {
     }));
   };
 
+  const selectGame = (game) => {
+    setPersonalInfo(prev => ({ ...prev, game }));
+    setShowGameDropdown(false);
+  };
+
+  const selectCategory = (category) => {
+    setPersonalInfo(prev => ({ ...prev, category }));
+    setShowCategoryDropdown(false);
+  };
+
   const validatePersonalInfo = () => {
     const newErrors = {};
-    const { name, email, discord, phone } = personalInfo;
+    const { name, email, discord, phone, game, category } = personalInfo;
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const discordRegex = /^\d{17,19}$/;
+    const phoneRegex = /^\d{10,15}$/;
     
-    if (!name.trim()) newErrors.name = "Nama lengkap wajib diisi";
-    else if (name.length < 3) newErrors.name = "Nama terlalu pendek";
+    // Name validation
+    if (!name.trim()) newErrors.name = "Full name is required";
+    else if (name.length < 3) newErrors.name = "Name is too short";
+    else if (name.length > 50) newErrors.name = "Name is too long";
+    else if (!/^[a-zA-Z\s]+$/.test(name)) newErrors.name = "Name can only contain letters and spaces";
     
-    if (!email) newErrors.email = "Email wajib diisi";
-    else if (!emailRegex.test(email)) newErrors.email = "Format email tidak valid";
+    // Email validation
+    if (!email) newErrors.email = "Email is required";
+    else if (!emailRegex.test(email)) newErrors.email = "Invalid email format";
+    else if (email.length > 100) newErrors.email = "Email is too long";
     
-    if (!discord.trim()) newErrors.discord = "User ID Discord wajib diisi";
-    else if (discord.length > 19) newErrors.discord = "User ID terlalu panjang";
-    else if (!/^\d+$/.test(discord)) newErrors.discord = "Hanya boleh berisi angka";
+    // Discord validation
+    if (!discord.trim()) newErrors.discord = "Discord User ID is required";
+    else if (!discordRegex.test(discord)) newErrors.discord = "Must be 17-19 digits";
     
-    if (!phone) newErrors.phone = "Nomor WhatsApp wajib diisi";
-    else if (phone.length < 10) newErrors.phone = "Nomor terlalu pendek";
-    else if (phone.length > 15) newErrors.phone = "Nomor terlalu panjang";
+    // Phone validation
+    if (!phone) newErrors.phone = "WhatsApp number is required";
+    else if (!phoneRegex.test(phone)) newErrors.phone = "Invalid phone number format";
+    
+    // Game validation
+    if (!game) newErrors.game = "Game selection is required";
+    
+    // Category validation
+    if (!category) newErrors.category = "Category selection is required";
     
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -184,6 +186,14 @@ const PaymentPage = () => {
         setShowConfirmation(true);
       } else {
         setStep(2);
+      }
+    } else {
+      const firstError = Object.keys(errors)[0];
+      if (firstError) {
+        document.querySelector(`[name="${firstError}"]`)?.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center'
+        });
       }
     }
   };
@@ -211,6 +221,8 @@ const PaymentPage = () => {
           email: personalInfo.email,
           discord: personalInfo.discord,
           phone: personalInfo.phone,
+          game: personalInfo.game,
+          category: personalInfo.category,
           userId: ""
         },
         transactionDetails: {
@@ -219,9 +231,9 @@ const PaymentPage = () => {
           paymentMethod: paymentMethod || "unknown",
           status: "pending",
           invoiceNumber: invoiceNum,
-          adminFee: 0,
+          adminFee: 500,
           currency: "IDR",
-          game: selectedGame || "unknown"
+          totalAmount: Number(price) + 500
         },
         systemInfo: {
           createdAt: serverTimestamp(),
@@ -244,7 +256,7 @@ const PaymentPage = () => {
       setPaymentComplete(true);
     } catch (error) {
       console.error("Payment processing error:", error);
-      alert(`Pembayaran gagal: ${error.message}`);
+      alert(`Payment failed: ${error.message}`);
     } finally {
       setIsProcessing(false);
     }
@@ -252,23 +264,34 @@ const PaymentPage = () => {
 
   if (paymentComplete) {
     return (
-      <div className="fixed inset-0 overflow-y-auto z-[9999] bg-gray-900 flex items-center justify-center p-4">
-        <div className="relative z-10 bg-gray-800/95 backdrop-blur-xl p-8 rounded-2xl max-w-md w-full border border-gray-700 shadow-2xl">
+      <div className="fixed inset-0 overflow-y-auto z-[9999] bg-gray-900 flex items-center justify-center">
+        <div className="fixed inset-0 w-full h-full bg-gradient-to-br from-purple-900/80 to-gray-900/90">
+          <video
+            autoPlay
+            loop
+            muted
+            className="absolute inset-0 w-full h-full object-cover opacity-20"
+          >
+            <source src={paymentVideo} type="video/mp4" />
+          </video>
+        </div>
+
+        <div className="relative z-10 bg-gray-800/95 backdrop-blur-xl p-8 rounded-2xl max-w-md w-full mx-4 border border-purple-500/30 shadow-xl shadow-purple-900/20">
           <div className="flex flex-col items-center text-center">
             <div className="w-24 h-24 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-full flex items-center justify-center mb-6 shadow-lg">
               <FiCheck className="w-12 h-12 text-white" />
             </div>
             
             <h2 className="text-3xl font-bold text-white mb-4">
-              Pembayaran Berhasil!
+              Payment Successful!
             </h2>
             
             <p className="text-gray-300 mb-6">
-              Terima kasih telah berlangganan <span className="text-purple-300 font-medium">{plan}</span>. Admin akan segera memverifikasi pembayaran Anda.
+              Thank you for subscribing to <span className="text-purple-300 font-medium">{plan}</span>. Admin will verify your payment shortly.
             </p>
             
             <div className="w-full bg-gray-700/50 rounded-lg p-4 mb-6 border border-gray-600">
-              <p className="text-sm text-gray-300 mb-1">Nomor Invoice:</p>
+              <p className="text-sm text-gray-300 mb-1">Invoice Number:</p>
               <p className="text-white font-mono text-lg tracking-wider">{invoiceNumber}</p>
             </div>
             
@@ -276,7 +299,7 @@ const PaymentPage = () => {
               onClick={() => navigate("/dashboard")}
               className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 shadow-lg"
             >
-              Ke Dashboard
+              Go to Dashboard
             </Button>
           </div>
         </div>
@@ -286,17 +309,28 @@ const PaymentPage = () => {
 
   if (isProcessing) {
     return (
-      <div className="fixed inset-0 overflow-y-auto z-[9999] bg-gray-900 flex items-center justify-center p-4">
-        <div className="relative z-10 bg-gray-800/95 backdrop-blur-xl p-8 rounded-2xl max-w-md w-full border border-gray-700 shadow-2xl text-center">
+      <div className="fixed inset-0 overflow-y-auto z-[9999] bg-gray-900 flex items-center justify-center">
+        <div className="fixed inset-0 w-full h-full bg-gradient-to-br from-purple-900/80 to-gray-900/90">
+          <video
+            autoPlay
+            loop
+            muted
+            className="absolute inset-0 w-full h-full object-cover opacity-20"
+          >
+            <source src={paymentVideo} type="video/mp4" />
+          </video>
+        </div>
+
+        <div className="relative z-10 bg-gray-800/95 backdrop-blur-xl p-8 rounded-2xl max-w-md w-full mx-4 text-center border border-purple-500/30 shadow-xl">
           <div className="flex flex-col items-center">
             <FiLoader className="w-20 h-20 mb-6 text-purple-400 animate-spin" />
             
             <h2 className="text-2xl font-bold text-white mb-2">
-              Memproses Pembayaran
+              Processing Payment
             </h2>
             
             <p className="text-gray-300 mb-6">
-              Harap tunggu sebentar, sistem sedang memproses transaksi Anda...
+              Please wait while we process your transaction...
             </p>
             
             <div className="w-full bg-gray-700 rounded-full h-2.5 mb-6 overflow-hidden">
@@ -304,7 +338,7 @@ const PaymentPage = () => {
             </div>
             
             <div className="text-sm text-gray-400">
-              <p>Jangan tutup atau refresh halaman ini</p>
+              <p>Do not close or refresh this page</p>
             </div>
           </div>
         </div>
@@ -313,7 +347,18 @@ const PaymentPage = () => {
   }
 
   return (
-    <div className="fixed inset-0 overflow-y-auto z-[9999] bg-gray-900 p-4">
+    <div className="fixed inset-0 overflow-y-auto z-[9999] bg-gray-900">
+      <div className="fixed inset-0 w-full h-full bg-gradient-to-br from-purple-900/80 to-gray-900/90">
+        <video
+          autoPlay
+          loop
+          muted
+          className="absolute inset-0 w-full h-full object-cover opacity-20"
+        >
+          <source src={paymentVideo} type="video/mp4" />
+        </video>
+      </div>
+
       {showCopyNotification && (
         <div className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none">
           <div className="bg-gray-800/90 backdrop-blur-sm rounded-xl p-6 max-w-xs w-full mx-4 border border-green-500/30 shadow-lg">
@@ -321,22 +366,22 @@ const PaymentPage = () => {
               <div className="w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center mb-3 border border-green-500/30">
                 <FiCheck className="w-8 h-8 text-green-400" />
               </div>
-              <p className="text-white font-medium">Nomor Berhasil Di Salin Di Clipboard</p>
+              <p className="text-white font-medium">Copied to clipboard</p>
             </div>
           </div>
         </div>
       )}
 
       {showConfirmation && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
-          <div className="bg-gray-800 rounded-xl p-6 max-w-md w-full border border-gray-700 shadow-xl">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
+          <div className="bg-gray-800 rounded-xl p-6 max-w-md w-full mx-4 border border-purple-500/30 shadow-xl">
             <div className="flex items-start mb-4">
               <div className="bg-purple-500/20 p-2 rounded-lg mr-3">
                 <FiShield className="w-5 h-5 text-purple-300" />
               </div>
               <div>
-                <h3 className="text-xl font-bold text-white mb-1">Konfirmasi</h3>
-                <p className="text-gray-300">Pastikan Sudah Membaca Rules</p>
+                <h3 className="text-xl font-bold text-white mb-1">Confirmation</h3>
+                <p className="text-gray-300">Please make sure you've read the rules</p>
               </div>
             </div>
             
@@ -348,7 +393,7 @@ const PaymentPage = () => {
                   onChange={(e) => setDontShowAgain(e.target.checked)}
                   className="mr-2 rounded bg-gray-700 border-gray-600 text-purple-500 focus:ring-purple-500"
                 />
-                Jangan Ingatkan Saya Lagi
+                Don't show this again
               </label>
               
               <div className="flex space-x-3">
@@ -357,7 +402,7 @@ const PaymentPage = () => {
                   variant="outline"
                   className="border-gray-600 hover:bg-gray-700/50 text-gray-300 hover:text-white"
                 >
-                  Batal
+                  Cancel
                 </Button>
                 <Button
                   onClick={() => {
@@ -374,153 +419,50 @@ const PaymentPage = () => {
         </div>
       )}
 
-      <div className="relative z-10 bg-gray-800/95 backdrop-blur-xl p-6 rounded-2xl max-w-4xl w-full mx-auto my-8 border border-gray-700 shadow-2xl">
-        {step === 0 && (
-          <div className="space-y-8">
-            <div className="flex justify-between items-center">
-              <Button
-                onClick={() => navigate(-1)}
-                variant="outline"
-                className="border-gray-600 hover:bg-gray-700/50 text-gray-300 hover:text-white flex items-center"
-              >
-                <FiArrowLeft className="mr-2" /> Kembali
-              </Button>
-              
-              <div className="text-right">
-                <p className="text-gray-300">
-                  Langganan <span className="text-purple-300 font-medium">{plan}</span>
-                </p>
-                <p className="font-bold text-white text-xl">Rp{Number(price).toLocaleString('id-ID')}</p>
-              </div>
-            </div>
-            
-            <div className="text-center">
-              <h1 className="text-3xl md:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-white mb-4">
-                Pilih Game Anda
-              </h1>
-              <p className="text-gray-400 max-w-lg mx-auto">
-                Silakan pilih game yang ingin Anda beli item/langganannya
-              </p>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
-              {Object.entries(games).map(([key, game]) => (
-                <div 
-                  key={key}
-                  onClick={() => setSelectedGame(key)}
-                  className={`relative overflow-hidden rounded-2xl border transition-all duration-300 cursor-pointer group ${
-                    selectedGame === key 
-                      ? `border-transparent ${game.gradient} shadow-xl scale-[1.02]`
-                      : "border-gray-700 hover:border-gray-600 hover:bg-gray-700/30"
+      <div className="relative z-10 bg-gray-800/95 backdrop-blur-xl p-6 rounded-2xl max-w-4xl w-full mx-auto my-8 border border-gray-700 shadow-2xl shadow-purple-900/20">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+          <div>
+            <h1 className="text-2xl md:text-3xl font-bold text-white">
+              {step === 1 ? "Personal Information" : step === 2 ? "Payment Method" : "Payment Confirmation"}
+            </h1>
+            <p className="text-gray-300">
+              Subscription <span className="text-purple-300 font-medium">{plan}</span> - <span className="font-bold text-white">Rp{Number(price).toLocaleString('id-ID')}</span>
+            </p>
+          </div>
+          
+          <div className="flex items-center space-x-2 bg-gray-900/50 px-3 py-2 rounded-full border border-gray-700">
+            {[1, 2, 3].map((stepNumber) => (
+              <React.Fragment key={stepNumber}>
+                <div
+                  className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium relative transition-all duration-300 ${
+                    step === stepNumber
+                      ? "bg-gradient-to-br from-purple-500 to-indigo-600 text-white shadow-md transform scale-110"
+                      : step > stepNumber
+                      ? "bg-gradient-to-br from-green-500 to-teal-600 text-white"
+                      : "bg-gray-700 text-gray-400"
                   }`}
                 >
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent z-10"></div>
-                  <div className="absolute inset-0 flex flex-col items-center justify-center z-20 p-6">
-                    <div className={`w-24 h-24 rounded-full mb-4 flex items-center justify-center transition-all duration-300 ${
-                      selectedGame === key ? "bg-white/20 backdrop-blur-sm" : "bg-gray-800/70"
-                    }`}>
-                      <img 
-                        src={game.icon} 
-                        alt={game.name} 
-                        className="w-16 h-16 object-contain"
-                      />
-                    </div>
-                    <h3 className={`text-2xl font-bold mb-2 transition-all duration-300 ${
-                      selectedGame === key ? "text-white" : "text-gray-300"
-                    }`}>
-                      {game.name}
-                    </h3>
-                    <div className={`w-8 h-1 rounded-full mb-4 transition-all duration-300 ${
-                      selectedGame === key ? "bg-white" : "bg-gray-500"
-                    }`}></div>
-                    <div className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ${
-                      selectedGame === key 
-                        ? "bg-white text-gray-900" 
-                        : "bg-gray-700/70 text-gray-300"
-                    }`}>
-                      Pilih Game
-                    </div>
-                  </div>
-                  <div className="absolute inset-0 opacity-20 group-hover:opacity-30 transition-opacity duration-300">
-                    <div className="absolute inset-0 bg-gradient-radial from-transparent via-transparent to-black/50"></div>
-                    <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjJnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4xIj48cGF0aCBkPSJNMzYgMzRINnYtOGgzMHY4em0xNi0xNkg2di04aDM2djh6TTYgNTZoMzZ2OEg2di04eiIvPjwvZz48L2c+PC9zdmc+')] opacity-10"></div>
-                  </div>
-                  <div className="h-64 w-full bg-gray-800"></div>
-                </div>
-              ))}
-            </div>
-            
-            <div className="flex justify-center pt-8">
-              <Button
-                onClick={() => selectedGame && setStep(1)}
-                disabled={!selectedGame}
-                className={`bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 shadow-lg transition-all ${
-                  !selectedGame ? "opacity-50 cursor-not-allowed" : ""
-                }`}
-              >
-                Lanjut ke Data Diri
-              </Button>
-            </div>
-          </div>
-        )}
-
-        {step >= 1 && (
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
-            <div>
-              <h1 className="text-2xl md:text-3xl font-bold text-white">
-                {step === 1 ? "Data Diri" : step === 2 ? "Metode Pembayaran" : "Konfirmasi Pembayaran"}
-              </h1>
-              <div className="flex items-center flex-wrap gap-2 mt-1">
-                <p className="text-gray-300">
-                  <span className="text-purple-300 font-medium">{plan}</span> - <span className="font-bold text-white">Rp{Number(price).toLocaleString('id-ID')}</span>
-                </p>
-                {selectedGame && (
-                  <div className="flex items-center bg-gray-700/50 px-3 py-1 rounded-full">
-                    <img 
-                      src={games[selectedGame].icon} 
-                      alt={games[selectedGame].name} 
-                      className="w-4 h-4 object-contain mr-2 rounded"
-                    />
-                    <span className="text-gray-300 text-sm">{games[selectedGame].name}</span>
-                  </div>
-                )}
-              </div>
-            </div>
-            
-            <div className="flex items-center space-x-2 bg-gray-900/50 px-3 py-2 rounded-full border border-gray-700">
-              {[1, 2, 3].map((stepNumber) => (
-                <React.Fragment key={stepNumber}>
-                  <div
-                    className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium relative transition-all duration-300 ${
-                      step === stepNumber
-                        ? "bg-gradient-to-br from-purple-500 to-indigo-600 text-white shadow-md transform scale-110"
-                        : step > stepNumber
-                        ? "bg-gradient-to-br from-green-500 to-teal-600 text-white"
-                        : "bg-gray-700 text-gray-400"
-                    }`}
-                  >
-                    {step > stepNumber ? <FiCheck size={14} /> : stepNumber}
-                    {step === stepNumber && (
-                      <span className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-4 h-0.5 bg-purple-300 rounded-full animate-pulse"></span>
-                    )}
-                  </div>
-                  {stepNumber < 3 && (
-                    <div className={`w-6 h-[2px] rounded-full transition-all duration-300 ${
-                      step > stepNumber ? 'bg-green-500' : 'bg-gray-700'
-                    }`}></div>
+                  {step > stepNumber ? <FiCheck size={14} /> : stepNumber}
+                  {step === stepNumber && (
+                    <span className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-4 h-0.5 bg-purple-300 rounded-full animate-pulse"></span>
                   )}
-                </React.Fragment>
-              ))}
-            </div>
+                </div>
+                {stepNumber < 3 && (
+                  <div className={`w-6 h-[2px] rounded-full transition-all duration-300 ${
+                    step > stepNumber ? 'bg-green-500' : 'bg-gray-700'
+                  }`}></div>
+                )}
+              </React.Fragment>
+            ))}
           </div>
-        )}
+        </div>
 
         {step === 1 && (
           <div className="space-y-5">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-gray-300 text-sm mb-2 font-medium">
-                  Nama Lengkap <span className="text-red-400">*</span>
+                  Full Name <span className="text-red-400">*</span>
                 </label>
                 <div className="relative">
                   <div className={`absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none ${
@@ -537,7 +479,7 @@ const PaymentPage = () => {
                     className={`w-full bg-gray-700/70 border ${
                       errors.name ? 'border-red-500 focus:ring-red-500/30' : 'border-gray-600 focus:ring-purple-500/30'
                     } rounded-lg py-2.5 px-4 pl-10 text-white focus:ring-2 focus:outline-none transition-all`}
-                    placeholder="Nama lengkap Anda"
+                    placeholder="Your full name"
                   />
                 </div>
                 {errors.name && (
@@ -614,7 +556,7 @@ const PaymentPage = () => {
               
               <div>
                 <label className="block text-gray-300 text-sm mb-2 font-medium">
-                  Nomor WhatsApp <span className="text-red-400">*</span>
+                  WhatsApp Number <span className="text-red-400">*</span>
                 </label>
                 <div className="relative">
                   <div className={`absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none ${
@@ -641,35 +583,113 @@ const PaymentPage = () => {
                   </p>
                 )}
               </div>
+
+              <div>
+                <label className="block text-gray-300 text-sm mb-2 font-medium">
+                  Select Game <span className="text-red-400">*</span>
+                </label>
+                <div className="relative">
+                  <button
+                    onClick={() => setShowGameDropdown(!showGameDropdown)}
+                    className={`w-full bg-gray-700/70 border ${
+                      errors.game ? 'border-red-500' : 'border-gray-600'
+                    } rounded-lg py-2.5 px-4 text-white text-left flex justify-between items-center`}
+                  >
+                    {personalInfo.game || "Select a game"}
+                    <FiChevronDown className={`transition-transform ${showGameDropdown ? 'rotate-180' : ''}`} />
+                  </button>
+                  {showGameDropdown && (
+                    <div className="absolute z-10 mt-1 w-full bg-gray-800 border border-gray-600 rounded-lg shadow-lg">
+                      {games.map((game) => (
+                        <div
+                          key={game}
+                          onClick={() => selectGame(game)}
+                          className="px-4 py-2 hover:bg-gray-700 cursor-pointer text-white"
+                        >
+                          {game}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+                {errors.game && (
+                  <p className="mt-1 text-sm text-red-400 flex items-center">
+                    <FiX className="mr-1" /> {errors.game}
+                  </p>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-gray-300 text-sm mb-2 font-medium">
+                  Select Category <span className="text-red-400">*</span>
+                </label>
+                <div className="relative">
+                  <button
+                    onClick={() => setShowCategoryDropdown(!showCategoryDropdown)}
+                    className={`w-full bg-gray-700/70 border ${
+                      errors.category ? 'border-red-500' : 'border-gray-600'
+                    } rounded-lg py-2.5 px-4 text-white text-left flex justify-between items-center`}
+                  >
+                    {personalInfo.category || "Select a category"}
+                    <FiChevronDown className={`transition-transform ${showCategoryDropdown ? 'rotate-180' : ''}`} />
+                  </button>
+                  {showCategoryDropdown && (
+                    <div className="absolute z-10 mt-1 w-full bg-gray-800 border border-gray-600 rounded-lg shadow-lg">
+                      {categories.map((category) => (
+                        <div
+                          key={category}
+                          onClick={() => selectCategory(category)}
+                          className="px-4 py-2 hover:bg-gray-700 cursor-pointer text-white"
+                        >
+                          {category}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+                {errors.category && (
+                  <p className="mt-1 text-sm text-red-400 flex items-center">
+                    <FiX className="mr-1" /> {errors.category}
+                  </p>
+                )}
+              </div>
             </div>
             
             <div className="bg-gray-700/50 rounded-lg p-4 border border-gray-600">
-              <h3 className="text-lg font-bold text-white mb-2">RULES</h3>
+              <h3 className="text-lg font-bold text-white mb-2">RULES & TERMS</h3>
               <ul className="text-gray-300 text-sm space-y-2">
                 <li className="flex items-start">
-                  <FiChevronRight className="flex-shrink-0 mt-1 mr-2 text-purple-400 w-4 h-4" />
-                  <span>Harap isi data diri lengkap dengan benar, kesalahan 1 huruf/angka akan membuat transaksi hangus</span>
+                  <span className="text-purple-400 mr-2">•</span>
+                  Please fill in your personal data correctly, if there is an error in 1 letter/number the transaction will be void!
                 </li>
                 <li className="flex items-start">
-                  <FiChevronRight className="flex-shrink-0 mt-1 mr-2 text-purple-400 w-4 h-4" />
-                  <span>Pastikan User ID sesuai dengan discord account Anda</span>
+                  <span className="text-purple-400 mr-2">•</span>
+                  For mutual comfort, make sure your User ID matches your Discord account, if not your transaction will be void and will not be processed!
+                </li>
+                <li className="flex items-start">
+                  <span className="text-purple-400 mr-2">•</span>
+                  All transactions are final and non-refundable once processed.
+                </li>
+                <li className="flex items-start">
+                  <span className="text-purple-400 mr-2">•</span>
+                  We are not responsible for any account bans or suspensions.
                 </li>
               </ul>
             </div>
             
             <div className="flex justify-between pt-4 border-t border-gray-700">
               <Button
-                onClick={() => setStep(0)}
+                onClick={() => navigate(-1)}
                 variant="outline"
                 className="border-gray-600 hover:bg-gray-700/50 text-gray-300 hover:text-white"
               >
-                Kembali
+                Back
               </Button>
               <Button
                 onClick={handleProceedToPayment}
                 className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 shadow-lg"
               >
-                Lanjut ke Pembayaran
+                Proceed to Payment
               </Button>
             </div>
           </div>
@@ -678,15 +698,15 @@ const PaymentPage = () => {
         {step === 2 && (
           <div className="space-y-6">
             <div className="mb-6">
-              <h3 className="text-lg font-bold text-white mb-3">Pilih Metode Pembayaran</h3>
+              <h3 className="text-lg font-bold text-white mb-3">Select Payment Method</h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                 {Object.entries(paymentMethods).map(([key, method]) => (
                   <button
                     key={key}
                     onClick={() => setPaymentMethod(key)}
-                    className={`p-4 rounded-xl border transition-all duration-200 flex flex-col items-center ${
+                    className={`p-4 rounded-xl border-2 transition-all duration-200 flex flex-col items-center ${
                       paymentMethod === key
-                        ? `border-transparent ${method.gradient} shadow-lg`
+                        ? `border-transparent bg-gradient-to-br ${method.color} shadow-lg`
                         : "border-gray-600 hover:border-gray-500 hover:bg-gray-700/30"
                     }`}
                   >
@@ -707,9 +727,9 @@ const PaymentPage = () => {
               </div>
             </div>
             
-            <div className="bg-gray-700/50 rounded-xl p-5 border border-gray-600">
+            <div className="bg-gray-700/50 rounded-xl p-5 border border-gray-600 shadow-inner">
               <div className="flex flex-col items-center text-center mb-5">
-                <div className={`w-14 h-14 rounded-full flex items-center justify-center mb-3 ${paymentMethods[paymentMethod].gradient} text-white shadow-md`}>
+                <div className={`w-14 h-14 rounded-full flex items-center justify-center mb-3 bg-gradient-to-br ${paymentMethods[paymentMethod].color} text-white shadow-md`}>
                   {paymentMethods[paymentMethod].icon}
                 </div>
                 <h3 className="text-xl font-bold text-white">
@@ -723,26 +743,26 @@ const PaymentPage = () => {
                     <FaQrcode className="w-full h-full text-black" />
                   </div>
                   <p className="text-gray-300 text-center max-w-md">
-                    Scan QR code di atas menggunakan aplikasi e-wallet atau mobile banking Anda yang mendukung QRIS
+                    Scan the QR code above using your e-wallet or mobile banking app that supports QRIS
                   </p>
                 </div>
               ) : (
                 <div className="space-y-4">
                   <div className="bg-gray-800/70 rounded-xl p-5 border border-gray-600">
-                    <p className="text-gray-400 text-sm mb-1">Nomor {paymentMethods[paymentMethod].name}</p>
+                    <p className="text-gray-400 text-sm mb-1">{paymentMethods[paymentMethod].name} Number:</p>
                     <div className="flex justify-between items-center">
                       <div>
                         <p className="text-lg font-bold text-white font-mono tracking-wide">
                           {paymentMethods[paymentMethod].account}
                         </p>
                         <p className="text-gray-300 text-sm mt-1">
-                          {paymentMethods[paymentMethod].accountName}
+                          Atas Nama: {paymentMethods[paymentMethod].accountName}
                         </p>
                       </div>
                       <button 
                         onClick={() => copyToClipboard(paymentMethods[paymentMethod].account, paymentMethod)}
                         className="p-2 rounded-lg bg-gray-700 hover:bg-gray-600 text-gray-300 hover:text-white transition-colors"
-                        title="Salin nomor"
+                        title="Copy number"
                       >
                         {copiedIndex === paymentMethod ? (
                           <FiCheck className="w-5 h-5 text-green-400" />
@@ -752,41 +772,39 @@ const PaymentPage = () => {
                       </button>
                     </div>
                   </div>
-                  
-                  <div className="space-y-4">
-                    <div className="bg-gray-900/50 rounded-lg p-4 border border-gray-700">
-                      <h4 className="text-lg font-bold text-white mb-3">Shopping Summary</h4>
-                      <div className="space-y-3">
-                        <div className="flex justify-between">
-                          <span className="text-gray-400">Paket Langganan</span>
-                          <span className="text-white">{plan}</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-gray-400">Game</span>
-                          <span className="text-white">{games[selectedGame]?.name || '-'}</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-gray-400">Total Harga</span>
-                          <span className="text-white">Rp{Number(price).toLocaleString('id-ID')}</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-gray-400">Biaya Layanan</span>
-                          <span className="text-white">Rp500</span>
-                        </div>
-                        <div className="h-px w-full bg-gray-600 my-2"></div>
-                        <div className="flex justify-between items-center">
-                          <span className="text-gray-300 font-medium">Total Pembayaran:</span>
-                          <span className="text-white font-bold text-xl">Rp{(Number(price) + 500).toLocaleString('id-ID')}</span>
-                        </div>
+
+                  <div className="bg-gray-800/70 rounded-xl p-5 border border-gray-600">
+                    <h4 className="text-lg font-bold text-white mb-3">Shopping Summary</h4>
+                    <div className="space-y-3">
+                      <div className="flex justify-between">
+                        <span className="text-gray-400">Total Price</span>
+                        <span className="text-white font-medium">Rp{Number(price).toLocaleString('id-ID')}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-400">Game Category</span>
+                        <span className="text-white font-medium">{personalInfo.game}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-400">Product</span>
+                        <span className="text-white font-medium">{personalInfo.category}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-400">Service Fee</span>
+                        <span className="text-white font-medium">Rp500</span>
+                      </div>
+                      <div className="border-t border-gray-600 my-2"></div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-400">Shopping Total:</span>
+                        <span className="text-white font-bold text-lg">Rp{(Number(price) + 500).toLocaleString('id-ID')}</span>
                       </div>
                     </div>
-                    
-                    <div className="bg-yellow-500/10 rounded-lg p-3 border border-yellow-500/30 flex items-start">
-                      <FiMessageSquare className="flex-shrink-0 mt-0.5 mr-2 text-yellow-400" />
-                      <p className="text-yellow-300 text-sm">
-                        {paymentMethods[paymentMethod].note}
-                      </p>
-                    </div>
+                  </div>
+
+                  <div className="bg-yellow-500/10 rounded-lg p-3 border border-yellow-500/30 flex items-start">
+                    <FiMessageSquare className="flex-shrink-0 mt-0.5 mr-2 text-yellow-400" />
+                    <p className="text-yellow-300 text-sm">
+                      {paymentMethods[paymentMethod].note}
+                    </p>
                   </div>
                 </div>
               )}
@@ -798,13 +816,13 @@ const PaymentPage = () => {
                 variant="outline"
                 className="border-gray-600 hover:bg-gray-700/50 text-gray-300 hover:text-white"
               >
-                Kembali
+                Back
               </Button>
               <Button
                 onClick={() => setStep(3)}
                 className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 shadow-lg"
               >
-                Konfirmasi Pembayaran
+                Confirm Payment
               </Button>
             </div>
           </div>
@@ -812,20 +830,20 @@ const PaymentPage = () => {
 
         {step === 3 && (
           <div className="space-y-6">
-            <div className="bg-gray-700/50 rounded-xl p-6 border border-gray-600">
+            <div className="bg-gray-700/50 rounded-xl p-6 border border-gray-600 shadow-inner">
               <div className="flex items-center mb-5">
                 <div className="bg-gradient-to-br from-purple-500 to-indigo-600 p-2 rounded-lg mr-3">
                   <FiShield className="w-5 h-5 text-white" />
                 </div>
                 <h3 className="text-xl font-bold text-white">
-                  Konfirmasi Data Pembayaran
+                  Payment Data Confirmation
                 </h3>
               </div>
               
               <div className="space-y-5">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="bg-gray-800/50 p-4 rounded-lg border border-gray-700">
-                    <p className="text-gray-400 text-sm mb-1">Nama Lengkap</p>
+                    <p className="text-gray-400 text-sm mb-1">Full Name</p>
                     <p className="text-white font-medium text-lg">{personalInfo.name}</p>
                   </div>
                   <div className="bg-gray-800/50 p-4 rounded-lg border border-gray-700">
@@ -840,15 +858,23 @@ const PaymentPage = () => {
                     <p className="text-gray-400 text-sm mb-1">WhatsApp</p>
                     <p className="text-white font-medium text-lg">{personalInfo.phone}</p>
                   </div>
+                  <div className="bg-gray-800/50 p-4 rounded-lg border border-gray-700">
+                    <p className="text-gray-400 text-sm mb-1">Game</p>
+                    <p className="text-white font-medium text-lg">{personalInfo.game}</p>
+                  </div>
+                  <div className="bg-gray-800/50 p-4 rounded-lg border border-gray-700">
+                    <p className="text-gray-400 text-sm mb-1">Category</p>
+                    <p className="text-white font-medium text-lg">{personalInfo.category}</p>
+                  </div>
                 </div>
                 
                 <div className="border-t border-gray-600 pt-5 mt-2">
                   <div className="flex items-center mb-3">
-                    <div className={`w-10 h-10 rounded-full flex items-center justify-center mr-3 ${paymentMethods[paymentMethod].gradient} text-white`}>
+                    <div className={`w-10 h-10 rounded-full flex items-center justify-center mr-3 bg-gradient-to-br ${paymentMethods[paymentMethod].color} text-white`}>
                       {paymentMethods[paymentMethod].icon}
                     </div>
                     <div>
-                      <p className="text-gray-400 text-sm">Metode Pembayaran</p>
+                      <p className="text-gray-400 text-sm">Payment Method</p>
                       <p className="text-white font-bold text-lg">
                         {paymentMethods[paymentMethod].name}
                       </p>
@@ -858,16 +884,17 @@ const PaymentPage = () => {
                 
                 <div className="bg-gray-800/70 rounded-xl p-5 border border-gray-600">
                   <div className="flex justify-between mb-3">
-                    <p className="text-gray-400">Paket Langganan</p>
+                    <p className="text-gray-400">Subscription Package</p>
                     <p className="text-white font-medium">{plan}</p>
                   </div>
                   <div className="flex justify-between mb-3">
-                    <p className="text-gray-400">Game</p>
-                    <p className="text-white font-medium">{games[selectedGame]?.name || '-'}</p>
+                    <p className="text-gray-400">Service Fee</p>
+                    <p className="text-white font-medium">Rp500</p>
                   </div>
+                  <div className="border-t border-gray-600 my-3"></div>
                   <div className="flex justify-between items-center">
-                    <p className="text-gray-400">Total Pembayaran</p>
-                    <p className="text-white font-bold text-2xl">Rp{Number(price).toLocaleString('id-ID')}</p>
+                    <p className="text-gray-400">Total Payment</p>
+                    <p className="text-white font-bold text-2xl">Rp{(Number(price) + 500).toLocaleString('id-ID')}</p>
                   </div>
                 </div>
               </div>
@@ -878,7 +905,7 @@ const PaymentPage = () => {
                 <FiLock className="w-4 h-4 text-purple-300" />
               </div>
               <p className="text-gray-300 text-sm">
-                Data Anda aman dan dilindungi. Pembayaran akan diproses secara otomatis dan aman melalui sistem kami.
+                Your data is secure and protected. Payment will be processed automatically and securely through our system.
               </p>
             </div>
             
@@ -888,13 +915,13 @@ const PaymentPage = () => {
                 variant="outline"
                 className="border-gray-600 hover:bg-gray-700/50 text-gray-300 hover:text-white"
               >
-                Kembali
+                Back
               </Button>
               <Button
                 onClick={submitPayment}
                 className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 shadow-lg"
               >
-                Konfirmasi & Bayar Sekarang
+                Confirm & Pay Now
               </Button>
             </div>
           </div>
