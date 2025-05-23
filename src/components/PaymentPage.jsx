@@ -8,7 +8,7 @@ import {
 } from "react-icons/fi";
 import { FaQrcode, FaDiscord } from "react-icons/fa";
 import { db } from "../config/firebaseConfig";
-import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+import { doc, setDoc, serverTimestamp } from "firebase/firestore";
 import paymentVideo from "../assets/hero/payment-bg.mp4";
 import Button from "./Button";
 
@@ -29,6 +29,7 @@ const PaymentPage = () => {
   const [dontShowAgain, setDontShowAgain] = useState(false);
   const [showCopyNotification, setShowCopyNotification] = useState(false);
   const [copiedIndex, setCopiedIndex] = useState(null);
+  const [invoiceNumber, setInvoiceNumber] = useState("");
   
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
@@ -70,6 +71,17 @@ const PaymentPage = () => {
       validatePersonalInfo();
     }
   }, [personalInfo, touched]);
+
+  const generateInvoiceNumber = () => {
+    const now = new Date();
+    const datePart = now.getFullYear().toString().slice(-2) + 
+                    (now.getMonth() + 1).toString().padStart(2, '0') + 
+                    now.getDate().toString().padStart(2, '0');
+    const randomPart = Math.floor(1000 + Math.random() * 9000);
+    const generatedNumber = `INV-${datePart}${randomPart}`;
+    setInvoiceNumber(generatedNumber);
+    return generatedNumber;
+  };
 
   const handleBlur = (field) => {
     setTouched(prev => ({ ...prev, [field]: true }));
@@ -158,7 +170,7 @@ const PaymentPage = () => {
     setIsProcessing(true);
     
     try {
-      const invoiceNumber = `INV-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+      const invoiceNum = generateInvoiceNumber();
       
       const transactionData = {
         customer: {
@@ -173,7 +185,7 @@ const PaymentPage = () => {
           amount: Number(price) || 0,
           paymentMethod: paymentMethod || "unknown",
           status: "pending",
-          invoiceNumber: invoiceNumber,
+          invoiceNumber: invoiceNum,
           adminFee: 0,
           currency: "IDR"
         },
@@ -193,7 +205,7 @@ const PaymentPage = () => {
         }
       };
 
-      await addDoc(collection(db, "transactions"), transactionData);
+      await setDoc(doc(db, "transactions", invoiceNum), transactionData);
       await new Promise(resolve => setTimeout(resolve, 2000));
       setPaymentComplete(true);
     } catch (error) {
@@ -234,7 +246,7 @@ const PaymentPage = () => {
             
             <div className="w-full bg-gray-700/50 rounded-lg p-4 mb-6 border border-gray-600">
               <p className="text-sm text-gray-300 mb-1">Nomor Invoice:</p>
-              <p className="text-white font-mono text-lg tracking-wider">INV-{Date.now()}</p>
+              <p className="text-white font-mono text-lg tracking-wider">{invoiceNumber}</p>
             </div>
             
             <Button 
@@ -301,7 +313,6 @@ const PaymentPage = () => {
         </video>
       </div>
 
-      {/* Copy Notification Popup */}
       {showCopyNotification && (
         <div className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none">
           <div className="bg-gray-800/90 backdrop-blur-sm rounded-xl p-6 max-w-xs w-full mx-4 border border-green-500/30 shadow-lg">
@@ -315,7 +326,6 @@ const PaymentPage = () => {
         </div>
       )}
 
-      {/* Confirmation Popup */}
       {showConfirmation && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
           <div className="bg-gray-800 rounded-xl p-6 max-w-md w-full mx-4 border border-purple-500/30 shadow-xl">
@@ -364,7 +374,6 @@ const PaymentPage = () => {
       )}
 
       <div className="relative z-10 bg-gray-800/95 backdrop-blur-xl p-6 rounded-2xl max-w-4xl w-full mx-auto my-8 border border-gray-700 shadow-2xl shadow-purple-900/20">
-        {/* Header */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
           <div>
             <h1 className="text-2xl md:text-3xl font-bold text-white">
@@ -375,7 +384,6 @@ const PaymentPage = () => {
             </p>
           </div>
           
-          {/* Animated Step Indicator */}
           <div className="flex items-center space-x-2 bg-gray-900/50 px-3 py-2 rounded-full border border-gray-700">
             {[1, 2, 3].map((stepNumber) => (
               <React.Fragment key={stepNumber}>
@@ -403,7 +411,6 @@ const PaymentPage = () => {
           </div>
         </div>
 
-        {/* Step 1: Personal Info */}
         {step === 1 && (
           <div className="space-y-5">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -532,7 +539,6 @@ const PaymentPage = () => {
               </div>
             </div>
             
-            {/* Rules Section */}
             <div className="bg-gray-700/50 rounded-lg p-4 border border-gray-600">
               <h3 className="text-lg font-bold text-white mb-2">Rules Rules</h3>
               <p className="text-gray-300 text-sm">
@@ -558,7 +564,6 @@ const PaymentPage = () => {
           </div>
         )}
 
-        {/* Step 2: Payment Method */}
         {step === 2 && (
           <div className="space-y-6">
             <div className="mb-6">
@@ -664,7 +669,6 @@ const PaymentPage = () => {
           </div>
         )}
 
-        {/* Step 3: Confirmation */}
         {step === 3 && (
           <div className="space-y-6">
             <div className="bg-gray-700/50 rounded-xl p-6 border border-gray-600 shadow-inner">
