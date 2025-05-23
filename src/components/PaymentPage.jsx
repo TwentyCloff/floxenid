@@ -1,9 +1,10 @@
-import React from 'react'; // Tambahkan ini
+import React from 'react';
 import { useLocation, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { 
   FiCheck, FiLock, FiCreditCard, FiX, FiShield,
-  FiUser, FiMail, FiSmartphone, FiLoader, FiMessageSquare
+  FiUser, FiMail, FiSmartphone, FiLoader, FiMessageSquare,
+  FiCopy, FiExternalLink
 } from "react-icons/fi";
 import { FaQrcode, FaDiscord } from "react-icons/fa";
 import { db } from "../config/firebaseConfig";
@@ -24,6 +25,8 @@ const PaymentPage = () => {
   });
   const [errors, setErrors] = useState({});
   const [touched, setTouched] = useState({});
+  const [showConfirmation, setShowConfirmation] = useState(false);
+  const [dontShowAgain, setDontShowAgain] = useState(false);
   
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
@@ -44,7 +47,8 @@ const PaymentPage = () => {
       name: "Gopay",
       icon: <FiSmartphone className="w-6 h-6" />,
       instructions: "Transfer ke nomor berikut",
-      account: "08123456789 (A/N Customer Service)",
+      account: "08123456789",
+      accountName: "A/N Customer Service",
       note: "Harap screenshot bukti transfer dan kirim ke admin",
       color: "from-green-500 to-teal-600"
     },
@@ -52,7 +56,8 @@ const PaymentPage = () => {
       name: "DANA",
       icon: <FiSmartphone className="w-6 h-6" />,
       instructions: "Transfer ke nomor berikut",
-      account: "08198765432 (A/N Customer Service)",
+      account: "08198765432",
+      accountName: "A/N Customer Service",
       note: "Harap screenshot bukti transfer dan kirim ke admin",
       color: "from-blue-500 to-cyan-600"
     }
@@ -77,6 +82,12 @@ const PaymentPage = () => {
       return;
     }
     
+    if (name === "discord") {
+      const numericValue = value.replace(/[^0-9]/g, '');
+      setPersonalInfo(prev => ({ ...prev, [name]: numericValue }));
+      return;
+    }
+    
     setPersonalInfo(prev => ({
       ...prev,
       [name]: value
@@ -94,8 +105,9 @@ const PaymentPage = () => {
     if (!email) newErrors.email = "Email wajib diisi";
     else if (!emailRegex.test(email)) newErrors.email = "Format email tidak valid";
     
-    if (!discord.trim()) newErrors.discord = "Username Discord wajib diisi";
-    else if (!/^[a-zA-Z0-9_.-]+$/.test(discord)) newErrors.discord = "Username tidak valid";
+    if (!discord.trim()) newErrors.discord = "User ID Discord wajib diisi";
+    else if (discord.length > 19) newErrors.discord = "User ID terlalu panjang";
+    else if (!/^\d+$/.test(discord)) newErrors.discord = "Hanya boleh berisi angka";
     
     if (!phone) newErrors.phone = "Nomor WhatsApp wajib diisi";
     else if (phone.length < 10) newErrors.phone = "Nomor terlalu pendek";
@@ -103,6 +115,21 @@ const PaymentPage = () => {
     
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
+  };
+
+  const copyToClipboard = (text) => {
+    navigator.clipboard.writeText(text);
+    // You can add a toast notification here if needed
+  };
+
+  const handleProceedToPayment = () => {
+    if (validatePersonalInfo()) {
+      if (!dontShowAgain) {
+        setShowConfirmation(true);
+      } else {
+        setStep(2);
+      }
+    }
   };
 
   const submitPayment = async () => {
@@ -263,6 +290,54 @@ const PaymentPage = () => {
         </video>
       </div>
 
+      {/* Confirmation Popup */}
+      {showConfirmation && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
+          <div className="bg-gray-800 rounded-xl p-6 max-w-md w-full mx-4 border border-purple-500/30 shadow-xl">
+            <div className="flex items-start mb-4">
+              <div className="bg-purple-500/20 p-2 rounded-lg mr-3">
+                <FiShield className="w-5 h-5 text-purple-300" />
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-white mb-1">Konfirmasi</h3>
+                <p className="text-gray-300">Pastikan Sudah Membaca Rules</p>
+              </div>
+            </div>
+            
+            <div className="flex justify-between items-center mt-6">
+              <label className="flex items-center text-gray-300 text-sm cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={dontShowAgain}
+                  onChange={(e) => setDontShowAgain(e.target.checked)}
+                  className="mr-2 rounded bg-gray-700 border-gray-600 text-purple-500 focus:ring-purple-500"
+                />
+                Jangan Ingatkan Saya Lagi
+              </label>
+              
+              <div className="flex space-x-3">
+                <Button
+                  onClick={() => setShowConfirmation(false)}
+                  variant="outline"
+                  className="border-gray-600 hover:bg-gray-700/50 text-gray-300 hover:text-white"
+                >
+                  Batal
+                </Button>
+                <Button
+                  onClick={() => {
+                    setShowConfirmation(false);
+                    setStep(2);
+                  }}
+                  className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700"
+                >
+                  Confirm
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="relative z-10 bg-gray-800/95 backdrop-blur-xl p-6 rounded-2xl max-w-4xl w-full mx-auto my-8 border border-gray-700 shadow-2xl shadow-purple-900/20">
         {/* Header */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
@@ -275,22 +350,26 @@ const PaymentPage = () => {
             </p>
           </div>
           
+          {/* Animated Step Indicator */}
           <div className="flex items-center space-x-2 bg-gray-900/50 px-3 py-2 rounded-full border border-gray-700">
             {[1, 2, 3].map((stepNumber) => (
               <React.Fragment key={stepNumber}>
                 <div
-                  className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
+                  className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium relative transition-all duration-300 ${
                     step === stepNumber
-                      ? "bg-gradient-to-br from-purple-500 to-indigo-600 text-white shadow-md"
+                      ? "bg-gradient-to-br from-purple-500 to-indigo-600 text-white shadow-md transform scale-110"
                       : step > stepNumber
                       ? "bg-gradient-to-br from-green-500 to-teal-600 text-white"
                       : "bg-gray-700 text-gray-400"
                   }`}
                 >
                   {step > stepNumber ? <FiCheck size={14} /> : stepNumber}
+                  {step === stepNumber && (
+                    <span className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-4 h-0.5 bg-purple-300 rounded-full animate-pulse"></span>
+                  )}
                 </div>
                 {stepNumber < 3 && (
-                  <div className={`w-6 h-[2px] rounded-full ${
+                  <div className={`w-6 h-[2px] rounded-full transition-all duration-300 ${
                     step > stepNumber ? 'bg-green-500' : 'bg-gray-700'
                   }`}></div>
                 )}
@@ -363,7 +442,7 @@ const PaymentPage = () => {
               
               <div>
                 <label className="block text-gray-300 text-sm mb-2 font-medium">
-                  Username Discord <span className="text-red-400">*</span>
+                  Discord User ID <span className="text-red-400">*</span>
                 </label>
                 <div className="relative">
                   <div className={`absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none ${
@@ -380,7 +459,8 @@ const PaymentPage = () => {
                     className={`w-full bg-gray-700/70 border ${
                       errors.discord ? 'border-red-500 focus:ring-red-500/30' : 'border-gray-600 focus:ring-purple-500/30'
                     } rounded-lg py-2.5 px-4 pl-10 text-white focus:ring-2 focus:outline-none transition-all`}
-                    placeholder="username"
+                    placeholder="1234567890123456789"
+                    maxLength={19}
                   />
                 </div>
                 {errors.discord && (
@@ -388,7 +468,12 @@ const PaymentPage = () => {
                     <FiX className="mr-1" /> {errors.discord}
                   </p>
                 )}
-                <p className="mt-1 text-xs text-gray-500">Contoh: nierautomata</p>
+                <div className="mt-1 flex items-center text-xs text-gray-500">
+                  <span>How To Get Discord ID</span>
+                  <a href="#" className="ml-2 text-purple-400 hover:text-purple-300 flex items-center">
+                    Click Here <FiExternalLink className="ml-1 w-3 h-3" />
+                  </a>
+                </div>
               </div>
               
               <div>
@@ -422,6 +507,14 @@ const PaymentPage = () => {
               </div>
             </div>
             
+            {/* Rules Section */}
+            <div className="bg-gray-700/50 rounded-lg p-4 border border-gray-600">
+              <h3 className="text-lg font-bold text-white mb-2">Rules Rules</h3>
+              <p className="text-gray-300 text-sm">
+                Harap baca dan pahami rules sebelum melanjutkan pembayaran. Dengan melanjutkan, Anda menyetujui semua ketentuan yang berlaku.
+              </p>
+            </div>
+            
             <div className="flex justify-between pt-4 border-t border-gray-700">
               <Button
                 onClick={() => navigate(-1)}
@@ -431,11 +524,7 @@ const PaymentPage = () => {
                 Kembali
               </Button>
               <Button
-                onClick={() => {
-                  if (validatePersonalInfo()) {
-                    setStep(2);
-                  }
-                }}
+                onClick={handleProceedToPayment}
                 className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 shadow-lg"
               >
                 Lanjut ke Pembayaran
@@ -498,11 +587,25 @@ const PaymentPage = () => {
                 </div>
               ) : (
                 <div className="space-y-4">
-                  <div className="bg-gray-800/70 rounded-xl p-5 border border-gray-600 text-center">
+                  <div className="bg-gray-800/70 rounded-xl p-5 border border-gray-600">
                     <p className="text-gray-400 text-sm mb-1">Nomor {paymentMethods[paymentMethod].name}</p>
-                    <p className="text-xl font-bold text-white font-mono tracking-wide">
-                      {paymentMethods[paymentMethod].account}
-                    </p>
+                    <div className="flex justify-between items-center">
+                      <div>
+                        <p className="text-lg font-bold text-white font-mono tracking-wide">
+                          {paymentMethods[paymentMethod].account}
+                        </p>
+                        <p className="text-gray-300 text-sm mt-1">
+                          {paymentMethods[paymentMethod].accountName}
+                        </p>
+                      </div>
+                      <button 
+                        onClick={() => copyToClipboard(paymentMethods[paymentMethod].account)}
+                        className="p-2 rounded-lg bg-gray-700 hover:bg-gray-600 text-gray-300 hover:text-white transition-colors"
+                        title="Salin nomor"
+                      >
+                        <FiCopy className="w-5 h-5" />
+                      </button>
+                    </div>
                   </div>
                   <div className="bg-yellow-500/10 rounded-lg p-3 border border-yellow-500/30 flex items-start">
                     <FiMessageSquare className="flex-shrink-0 mt-0.5 mr-2 text-yellow-400" />
