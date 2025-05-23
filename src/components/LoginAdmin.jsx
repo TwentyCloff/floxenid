@@ -10,7 +10,7 @@ const AdminLogin = () => {
   const handleLogin = (e) => {
     e.preventDefault();
 
-    if (username === "Makan Siang Gratis" && password === "MichaelGay123") {
+    if (username === "acai" && password === "gay123") {
       sessionStorage.setItem("admin-auth", "true");
       console.log("Login sukses:", sessionStorage.getItem("admin-auth"));
       navigate("/admin/dashboard");
