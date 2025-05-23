@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { 
   FiCheck, FiLock, FiCreditCard, FiX, FiShield,
   FiUser, FiMail, FiSmartphone, FiLoader, FiMessageSquare,
-  FiCopy, FiExternalLink
+  FiCopy, FiExternalLink, FiArrowLeft
 } from "react-icons/fi";
 import { FaQrcode, FaDiscord } from "react-icons/fa";
 import { db } from "../config/firebaseConfig";
@@ -12,8 +12,17 @@ import { doc, setDoc, serverTimestamp } from "firebase/firestore";
 import paymentVideo from "../assets/hero/payment-bg.mp4";
 import Button from "./Button";
 
+// Import game icons and backgrounds
+import growtopiaIcon from "../assets/selectz/growtopia-icon.webp";
+import robloxIcon from "../assets/selectz/roblox-icon.jpeg";
+import growtopiaBg from "../assets/selectz/growtopia-background.png";
+import robloxBg from "../assets/selectz/roblox-background.png";
+import gopayLogo from "../assets/selectz/gopay.jpeg";
+import danaLogo from "../assets/selectz/dana.jpg";
+
 const PaymentPage = () => {
-  const [step, setStep] = useState(1);
+  const [step, setStep] = useState(0); // Step 0 is for game selection
+  const [selectedGame, setSelectedGame] = useState(null);
   const [paymentComplete, setPaymentComplete] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState("qris");
@@ -37,6 +46,21 @@ const PaymentPage = () => {
   const price = searchParams.get('price');
   const navigate = useNavigate();
 
+  const games = {
+    "growtopia": {
+      name: "Growtopia",
+      icon: growtopiaIcon,
+      bg: growtopiaBg,
+      color: "from-emerald-500 to-teal-600"
+    },
+    "roblox": {
+      name: "Roblox",
+      icon: robloxIcon,
+      bg: robloxBg,
+      color: "from-red-500 to-pink-600"
+    }
+  };
+
   const paymentMethods = {
     "qris": {
       name: "QRIS",
@@ -48,7 +72,7 @@ const PaymentPage = () => {
     },
     "gopay": {
       name: "Gopay",
-      icon: <FiSmartphone className="w-6 h-6" />,
+      icon: <img src={gopayLogo} alt="Gopay" className="w-6 h-6 object-contain" />,
       instructions: "Transfer ke nomor berikut",
       account: "08123456789",
       accountName: "A/N Customer Service",
@@ -57,7 +81,7 @@ const PaymentPage = () => {
     },
     "dana": {
       name: "DANA",
-      icon: <FiSmartphone className="w-6 h-6" />,
+      icon: <img src={danaLogo} alt="DANA" className="w-6 h-6 object-contain" />,
       instructions: "Transfer ke nomor berikut",
       account: "08198765432",
       accountName: "A/N Customer Service",
@@ -187,7 +211,8 @@ const PaymentPage = () => {
           status: "pending",
           invoiceNumber: invoiceNum,
           adminFee: 0,
-          currency: "IDR"
+          currency: "IDR",
+          game: selectedGame || "unknown"
         },
         systemInfo: {
           createdAt: serverTimestamp(),
@@ -374,45 +399,166 @@ const PaymentPage = () => {
       )}
 
       <div className="relative z-10 bg-gray-800/95 backdrop-blur-xl p-6 rounded-2xl max-w-4xl w-full mx-auto my-8 border border-gray-700 shadow-2xl shadow-purple-900/20">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
-          <div>
-            <h1 className="text-2xl md:text-3xl font-bold text-white">
-              {step === 1 ? "Data Diri" : step === 2 ? "Metode Pembayaran" : "Konfirmasi Pembayaran"}
-            </h1>
-            <p className="text-gray-300">
-              Langganan <span className="text-purple-300 font-medium">{plan}</span> - <span className="font-bold text-white">Rp{Number(price).toLocaleString('id-ID')}</span>
-            </p>
-          </div>
-          
-          <div className="flex items-center space-x-2 bg-gray-900/50 px-3 py-2 rounded-full border border-gray-700">
-            {[1, 2, 3].map((stepNumber) => (
-              <React.Fragment key={stepNumber}>
-                <div
-                  className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium relative transition-all duration-300 ${
-                    step === stepNumber
-                      ? "bg-gradient-to-br from-purple-500 to-indigo-600 text-white shadow-md transform scale-110"
-                      : step > stepNumber
-                      ? "bg-gradient-to-br from-green-500 to-teal-600 text-white"
-                      : "bg-gray-700 text-gray-400"
+        {step === 0 && (
+          <div className="space-y-8">
+            <div className="flex justify-between items-center">
+              <Button
+                onClick={() => navigate(-1)}
+                variant="outline"
+                className="border-gray-600 hover:bg-gray-700/50 text-gray-300 hover:text-white flex items-center"
+              >
+                <FiArrowLeft className="mr-2" /> Kembali
+              </Button>
+              
+              <div className="text-right">
+                <p className="text-gray-300">
+                  Langganan <span className="text-purple-300 font-medium">{plan}</span>
+                </p>
+                <p className="font-bold text-white text-xl">Rp{Number(price).toLocaleString('id-ID')}</p>
+              </div>
+            </div>
+            
+            <div className="text-center">
+              <h1 className="text-3xl md:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-white mb-4">
+                Pilih Game Anda
+              </h1>
+              <p className="text-gray-400 max-w-lg mx-auto">
+                Silakan pilih game yang ingin Anda beli item/langganannya
+              </p>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
+              {Object.entries(games).map(([key, game]) => (
+                <div 
+                  key={key}
+                  onClick={() => setSelectedGame(key)}
+                  className={`relative overflow-hidden rounded-2xl border-2 transition-all duration-300 cursor-pointer group ${
+                    selectedGame === key 
+                      ? `border-transparent bg-gradient-to-br ${game.color} shadow-xl scale-[1.02]`
+                      : "border-gray-700 hover:border-gray-600 hover:bg-gray-700/30"
                   }`}
                 >
-                  {step > stepNumber ? <FiCheck size={14} /> : stepNumber}
-                  {step === stepNumber && (
-                    <span className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-4 h-0.5 bg-purple-300 rounded-full animate-pulse"></span>
-                  )}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent z-10"></div>
+                  <div className="absolute inset-0 flex flex-col items-center justify-center z-20 p-6">
+                    <div className={`w-24 h-24 rounded-full mb-4 flex items-center justify-center transition-all duration-300 ${
+                      selectedGame === key ? "bg-white/20 backdrop-blur-sm" : "bg-gray-800/70"
+                    }`}>
+                      <img 
+                        src={game.icon} 
+                        alt={game.name} 
+                        className="w-16 h-16 object-contain"
+                      />
+                    </div>
+                    <h3 className={`text-2xl font-bold mb-2 transition-all duration-300 ${
+                      selectedGame === key ? "text-white" : "text-gray-300"
+                    }`}>
+                      {game.name}
+                    </h3>
+                    <div className={`w-8 h-1 rounded-full mb-4 transition-all duration-300 ${
+                      selectedGame === key ? "bg-white" : "bg-gray-500"
+                    }`}></div>
+                    <div className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ${
+                      selectedGame === key 
+                        ? "bg-white text-gray-900" 
+                        : "bg-gray-700/70 text-gray-300"
+                    }`}>
+                      Pilih Game
+                    </div>
+                  </div>
+                  <div className="absolute inset-0 opacity-20 group-hover:opacity-30 transition-opacity duration-300">
+                    <div className="absolute inset-0 bg-gradient-radial from-transparent via-transparent to-black/50"></div>
+                    <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4xIj48cGF0aCBkPSJNMzYgMzRINnYtOGgzMHY4em0xNi0xNkg2di04aDM2djh6TTYgNTZoMzZ2OEg2di04eiIvPjwvZz48L2c+PC9zdmc+')] opacity-10"></div>
+                  </div>
+                  <div className="h-64 w-full bg-gray-800"></div>
                 </div>
-                {stepNumber < 3 && (
-                  <div className={`w-6 h-[2px] rounded-full transition-all duration-300 ${
-                    step > stepNumber ? 'bg-green-500' : 'bg-gray-700'
-                  }`}></div>
-                )}
-              </React.Fragment>
-            ))}
+              ))}
+            </div>
+            
+            <div className="flex justify-center pt-8">
+              <Button
+                onClick={() => selectedGame && setStep(1)}
+                disabled={!selectedGame}
+                className={`bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 shadow-lg transition-all ${
+                  !selectedGame ? "opacity-50 cursor-not-allowed" : ""
+                }`}
+              >
+                Lanjut ke Data Diri
+              </Button>
+            </div>
           </div>
-        </div>
+        )}
+
+        {step >= 1 && (
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+            <div>
+              <h1 className="text-2xl md:text-3xl font-bold text-white">
+                {step === 1 ? "Data Diri" : step === 2 ? "Metode Pembayaran" : "Konfirmasi Pembayaran"}
+              </h1>
+              <p className="text-gray-300">
+                Langganan <span className="text-purple-300 font-medium">{plan}</span> - <span className="font-bold text-white">Rp{Number(price).toLocaleString('id-ID')}</span>
+              </p>
+              {selectedGame && step === 1 && (
+                <div className="mt-2 flex items-center">
+                  <img 
+                    src={games[selectedGame].icon} 
+                    alt={games[selectedGame].name} 
+                    className="w-5 h-5 object-contain mr-2 rounded"
+                  />
+                  <span className="text-gray-400 text-sm">{games[selectedGame].name}</span>
+                </div>
+              )}
+            </div>
+            
+            <div className="flex items-center space-x-2 bg-gray-900/50 px-3 py-2 rounded-full border border-gray-700">
+              {[1, 2, 3].map((stepNumber) => (
+                <React.Fragment key={stepNumber}>
+                  <div
+                    className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium relative transition-all duration-300 ${
+                      step === stepNumber
+                        ? "bg-gradient-to-br from-purple-500 to-indigo-600 text-white shadow-md transform scale-110"
+                        : step > stepNumber
+                        ? "bg-gradient-to-br from-green-500 to-teal-600 text-white"
+                        : "bg-gray-700 text-gray-400"
+                    }`}
+                  >
+                    {step > stepNumber ? <FiCheck size={14} /> : stepNumber}
+                    {step === stepNumber && (
+                      <span className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-4 h-0.5 bg-purple-300 rounded-full animate-pulse"></span>
+                    )}
+                  </div>
+                  {stepNumber < 3 && (
+                    <div className={`w-6 h-[2px] rounded-full transition-all duration-300 ${
+                      step > stepNumber ? 'bg-green-500' : 'bg-gray-700'
+                    }`}></div>
+                  )}
+                </React.Fragment>
+              ))}
+            </div>
+          </div>
+        )}
 
         {step === 1 && (
           <div className="space-y-5">
+            {selectedGame && (
+              <div className="relative rounded-xl overflow-hidden h-32 mb-6">
+                <img 
+                  src={games[selectedGame].bg} 
+                  alt={games[selectedGame].name} 
+                  className="w-full h-full object-cover opacity-30"
+                />
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="flex items-center bg-gray-800/70 backdrop-blur-sm px-4 py-2 rounded-full border border-gray-700">
+                    <img 
+                      src={games[selectedGame].icon} 
+                      alt={games[selectedGame].name} 
+                      className="w-6 h-6 object-contain mr-2"
+                    />
+                    <span className="text-white font-medium">{games[selectedGame].name}</span>
+                  </div>
+                </div>
+              </div>
+            )}
+            
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-gray-300 text-sm mb-2 font-medium">
@@ -551,7 +697,7 @@ const PaymentPage = () => {
             
             <div className="flex justify-between pt-4 border-t border-gray-700">
               <Button
-                onClick={() => navigate(-1)}
+                onClick={() => setStep(0)}
                 variant="outline"
                 className="border-gray-600 hover:bg-gray-700/50 text-gray-300 hover:text-white"
               >
@@ -644,11 +790,31 @@ const PaymentPage = () => {
                       </button>
                     </div>
                   </div>
-                  <div className="bg-yellow-500/10 rounded-lg p-3 border border-yellow-500/30 flex items-start">
-                    <FiMessageSquare className="flex-shrink-0 mt-0.5 mr-2 text-yellow-400" />
-                    <p className="text-yellow-300 text-sm">
-                      {paymentMethods[paymentMethod].note}
-                    </p>
+                  
+                  <div className="space-y-4">
+                    <div className="bg-gray-900/50 rounded-lg p-4 border border-gray-700">
+                      <h4 className="text-lg font-bold text-white mb-3">Shopping Summary</h4>
+                      <div className="flex justify-between mb-2">
+                        <span className="text-gray-400">Total Harga (1 Barang)</span>
+                        <span className="text-white">Rp{Number(price).toLocaleString('id-ID')}</span>
+                      </div>
+                      <div className="flex justify-between mb-3">
+                        <span className="text-gray-400">Biaya Layanan</span>
+                        <span className="text-white">Rp500</span>
+                      </div>
+                      <div className="h-px w-full bg-gray-600 my-2"></div>
+                      <div className="flex justify-between items-center mt-3">
+                        <span className="text-gray-300 font-medium">Shopping Total:</span>
+                        <span className="text-white font-bold text-xl">Rp{(Number(price) + 500).toLocaleString('id-ID')}</span>
+                      </div>
+                    </div>
+                    
+                    <div className="bg-yellow-500/10 rounded-lg p-3 border border-yellow-500/30 flex items-start">
+                      <FiMessageSquare className="flex-shrink-0 mt-0.5 mr-2 text-yellow-400" />
+                      <p className="text-yellow-300 text-sm">
+                        {paymentMethods[paymentMethod].note}
+                      </p>
+                    </div>
                   </div>
                 </div>
               )}
