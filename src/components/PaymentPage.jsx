@@ -27,6 +27,8 @@ const PaymentPage = () => {
   const [touched, setTouched] = useState({});
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [dontShowAgain, setDontShowAgain] = useState(false);
+  const [showCopyNotification, setShowCopyNotification] = useState(false);
+  const [copiedIndex, setCopiedIndex] = useState(null);
   
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
@@ -117,9 +119,18 @@ const PaymentPage = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const copyToClipboard = (text) => {
+  const copyToClipboard = (text, index) => {
     navigator.clipboard.writeText(text);
-    // You can add a toast notification here if needed
+    setCopiedIndex(index);
+    setShowCopyNotification(true);
+    
+    setTimeout(() => {
+      setShowCopyNotification(false);
+    }, 2000);
+    
+    setTimeout(() => {
+      setCopiedIndex(null);
+    }, 3000);
   };
 
   const handleProceedToPayment = () => {
@@ -289,6 +300,20 @@ const PaymentPage = () => {
           <source src={paymentVideo} type="video/mp4" />
         </video>
       </div>
+
+      {/* Copy Notification Popup */}
+      {showCopyNotification && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none">
+          <div className="bg-gray-800/90 backdrop-blur-sm rounded-xl p-6 max-w-xs w-full mx-4 border border-green-500/30 shadow-lg">
+            <div className="flex flex-col items-center">
+              <div className="w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center mb-3 border border-green-500/30">
+                <FiCheck className="w-8 h-8 text-green-400" />
+              </div>
+              <p className="text-white font-medium">Nomor Berhasil Di Salin Di Clipboard</p>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Confirmation Popup */}
       {showConfirmation && (
@@ -599,11 +624,15 @@ const PaymentPage = () => {
                         </p>
                       </div>
                       <button 
-                        onClick={() => copyToClipboard(paymentMethods[paymentMethod].account)}
+                        onClick={() => copyToClipboard(paymentMethods[paymentMethod].account, paymentMethod)}
                         className="p-2 rounded-lg bg-gray-700 hover:bg-gray-600 text-gray-300 hover:text-white transition-colors"
                         title="Salin nomor"
                       >
-                        <FiCopy className="w-5 h-5" />
+                        {copiedIndex === paymentMethod ? (
+                          <FiCheck className="w-5 h-5 text-green-400" />
+                        ) : (
+                          <FiCopy className="w-5 h-5" />
+                        )}
                       </button>
                     </div>
                   </div>
