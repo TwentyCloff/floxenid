@@ -42,7 +42,7 @@ export default {
         sans: ["var(--font-sora)", ...fontFamily.sans],
         code: "var(--font-code)",
         grotesk: "var(--font-grotesk)",
-        circular: ["Circular Std", "sans-serif"], // Tambahkan font Circular
+        circular: ["var(--font-circular)", "sans-serif"],
       },
       letterSpacing: {
         tagline: ".15em",
@@ -86,7 +86,11 @@ export default {
   },
   plugins: [
     plugin(function ({ addBase, addComponents, addUtilities }) {
-      addBase({});
+      addBase({
+        html: {
+          fontFamily: 'var(--font-circular), sans-serif',
+        }
+      });
       addComponents({
         ".container": {
           "@apply max-w-[77.5rem] mx-auto px-5 md:px-10 lg:px-15 xl:max-w-[87.5rem]":
@@ -132,12 +136,11 @@ export default {
         ".button": {
           "@apply font-code text-xs font-bold uppercase tracking-wider": {},
         },
-        // Tambahan untuk komponen Services
         ".bento-title": {
           "@apply text-[32px] leading-tight font-medium tracking-tight": {},
         },
-        ".special-font": {
-          "@apply font-circular": {}, // Menggunakan font Circular
+        ".circular-font": {
+          "@apply font-circular": {},
         },
       });
       addUtilities({
