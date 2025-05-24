@@ -28,9 +28,9 @@ export default {
           3: "#ADA8C3",
           4: "#757185",
           5: "#3F3A52",
-          6: "#0a0a0a",  // diganti dari "#252134"
-          7: "#0a0a0a",  // diganti dari "#15131D"
-          8: "#0a0a0a",  // diganti dari "#0E0C15"
+          6: "#0a0a0a",
+          7: "#0a0a0a",
+          8: "#0a0a0a",
           9: "#474060",
           10: "#43435C",
           11: "#1B1B2E",
@@ -42,6 +42,7 @@ export default {
         sans: ["var(--font-sora)", ...fontFamily.sans],
         code: "var(--font-code)",
         grotesk: "var(--font-grotesk)",
+        circular: ["Circular Std", "sans-serif"], // Tambahkan font Circular
       },
       letterSpacing: {
         tagline: ".15em",
@@ -130,6 +131,13 @@ export default {
         },
         ".button": {
           "@apply font-code text-xs font-bold uppercase tracking-wider": {},
+        },
+        // Tambahan untuk komponen Services
+        ".bento-title": {
+          "@apply text-[32px] leading-tight font-medium tracking-tight": {},
+        },
+        ".special-font": {
+          "@apply font-circular": {}, // Menggunakan font Circular
         },
       });
       addUtilities({
