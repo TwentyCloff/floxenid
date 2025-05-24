@@ -5,8 +5,8 @@ import { disablePageScroll, enablePageScroll } from "scroll-lock";
 import MenuSvg from "../assets/svg/MenuSvg";
 import { links } from "../config";
 import { navigation } from "../constants";
-import Button from "./Button";
-import { HambugerMenu } from "./design/Header";
+import Button from "../components/Button";
+import { HambugerMenu } from "../components/design/Header";
 
 const Header = () => {
   const pathname = useLocation();
@@ -43,6 +43,7 @@ const Header = () => {
         style={{ height: "68px" }}
       >
         <div className="flex items-center px-5 lg:px-7.5 xl:px-10 py-3 h-full">
+          {/* Logo */}
           <a
             className="block w-auto xl:mr-8 text-3xl font-bold bg-gradient-to-r from-purple-500 to-indigo-500 text-transparent bg-clip-text"
             href="#hero"
@@ -50,6 +51,7 @@ const Header = () => {
             Qarvo
           </a>
 
+          {/* Navigation */}
           <nav
             className={`${
               openNavigation ? "flex" : "hidden"
@@ -79,10 +81,12 @@ const Header = () => {
             <HambugerMenu />
           </nav>
 
+          {/* Source Code button on desktop */}
           <Button className="hidden lg:flex" href={links.sourceCode} external>
             Source Code
           </Button>
 
+          {/* Mobile Menu button */}
           <Button
             onClick={toggleNavigation}
             className="ml-auto lg:hidden"
