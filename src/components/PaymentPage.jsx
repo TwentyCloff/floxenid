@@ -1,20 +1,20 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from "react-router-dom";
-import { useState, useEffect } from "react";
 import { 
-  FiCheck, FiLock, FiCreditCard, FiX, FiShield,
-  FiUser, FiMail, FiSmartphone, FiLoader, FiMessageSquare,
-  FiCopy, FiExternalLink, FiChevronDown
+  FiCheck, FiLock, FiX, FiShield, FiUser, 
+  FiMail, FiSmartphone, FiLoader, FiMessageSquare,
+  FiCopy, FiExternalLink, FiChevronDown, FiCreditCard
 } from "react-icons/fi";
 import { FaQrcode, FaDiscord } from "react-icons/fa";
 import { db } from "../config/firebaseConfig";
 import { doc, setDoc, serverTimestamp } from "firebase/firestore";
 import paymentVideo from "../assets/hero/payment-bg.mp4";
 import Button from "./Button";
-import gopayLogo from "../assets/selectz/gopay.png";
-import danaLogo from "../assets/selectz/dana.png";
+import gopayLogo from "../assets/selectz/gopay.jpeg";
+import danaLogo from "../assets/selectz/dana.jpg";
 
 const PaymentPage = () => {
+  // State management
   const [step, setStep] = useState(1);
   const [paymentComplete, setPaymentComplete] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -37,62 +37,72 @@ const PaymentPage = () => {
   const [showGameDropdown, setShowGameDropdown] = useState(false);
   const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
   
+  // Router and query params
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
   const plan = searchParams.get('plan');
   const price = searchParams.get('price');
   const navigate = useNavigate();
 
+  // Constants
   const games = ["Roblox", "Growtopia"];
   const categories = ["Script", "Item"];
+  const serviceFee = 500;
 
+  // Payment methods configuration
   const paymentMethods = {
     "qris": {
       name: "QRIS",
-      icon: <FaQrcode className="w-6 h-6" />,
-      instructions: "Scan QR code below to complete payment",
+      icon: <FaQrcode className="w-6 h-6 text-emerald-400" />,
+      instructions: "Scan QR code to complete payment",
       account: "",
-      note: "Payment via QRIS will be processed automatically",
-      color: "from-purple-500 to-indigo-600",
-      logo: null
+      note: "Instant processing • No additional fees",
+      color: "from-emerald-500 to-teal-600",
+      borderColor: "border-emerald-500/30",
+      logo: null,
+      accountName: "AUTOMATIC PROCESSING"
     },
     "gopay": {
-      name: "Gopay",
+      name: "GOPAY",
       icon: <img src={gopayLogo} alt="Gopay" className="w-6 h-6 object-contain" />,
-      instructions: "Transfer to the following number",
+      instructions: "Transfer to following number",
       account: "08123456789",
-      accountName: "Customer Service",
-      note: "Please screenshot the payment proof and send to admin",
-      color: "from-green-500 to-teal-600",
-      logo: gopayLogo
+      note: "Screenshot required • Processing time 5-15 minutes",
+      color: "from-blue-500 to-indigo-600",
+      borderColor: "border-blue-500/30",
+      logo: gopayLogo,
+      accountName: "CUSTOMER SERVICE"
     },
     "dana": {
       name: "DANA",
       icon: <img src={danaLogo} alt="DANA" className="w-6 h-6 object-contain" />,
-      instructions: "Transfer to the following number",
+      instructions: "Transfer to following number",
       account: "08198765432",
-      accountName: "Customer Service",
-      note: "Please screenshot the payment proof and send to admin",
-      color: "from-blue-500 to-cyan-600",
-      logo: danaLogo
+      note: "Screenshot required • Processing time 5-15 minutes",
+      color: "from-purple-500 to-fuchsia-600",
+      borderColor: "border-purple-500/30",
+      logo: danaLogo,
+      accountName: "CUSTOMER SERVICE"
     }
   };
 
+  // Effects
   useEffect(() => {
     if (Object.keys(touched).length > 0) {
       validatePersonalInfo();
     }
   }, [personalInfo, touched]);
 
+  // Helper functions
   const generateInvoiceNumber = () => {
     const now = new Date();
     const datePart = now.getFullYear().toString().slice(-2) + 
                     (now.getMonth() + 1).toString().padStart(2, '0') + 
                     now.getDate().toString().padStart(2, '0');
+    const timePart = now.getHours().toString().padStart(2, '0') + 
+                     now.getMinutes().toString().padStart(2, '0');
     const randomPart = Math.floor(1000 + Math.random() * 9000);
-    const generatedNumber = `INV-${datePart}${randomPart}`;
-    setInvoiceNumber(generatedNumber);
-    return generatedNumber;
+    return `INV-${datePart}${timePart}-${randomPart}`;
   };
 
   const handleBlur = (field) => {
@@ -102,13 +112,7 @@ const PaymentPage = () => {
   const handlePersonalInfoChange = (e) => {
     const { name, value } = e.target;
     
-    if (name === "phone") {
-      const numericValue = value.replace(/[^0-9]/g, '');
-      setPersonalInfo(prev => ({ ...prev, [name]: numericValue }));
-      return;
-    }
-    
-    if (name === "discord") {
+    if (name === "phone" || name === "discord") {
       const numericValue = value.replace(/[^0-9]/g, '');
       setPersonalInfo(prev => ({ ...prev, [name]: numericValue }));
       return;
@@ -123,44 +127,45 @@ const PaymentPage = () => {
   const selectGame = (game) => {
     setPersonalInfo(prev => ({ ...prev, game }));
     setShowGameDropdown(false);
+    setTouched(prev => ({ ...prev, game: true }));
   };
 
   const selectCategory = (category) => {
     setPersonalInfo(prev => ({ ...prev, category }));
     setShowCategoryDropdown(false);
+    setTouched(prev => ({ ...prev, category: true }));
   };
 
+  // Validation functions
   const validatePersonalInfo = () => {
     const newErrors = {};
     const { name, email, discord, phone, game, category } = personalInfo;
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    const discordRegex = /^\d{17,19}$/;
-    const phoneRegex = /^\d{10,15}$/;
     
-    // Name validation
+    // Name validation (3-50 chars, letters and spaces only)
     if (!name.trim()) newErrors.name = "Full name is required";
-    else if (name.length < 3) newErrors.name = "Name is too short";
-    else if (name.length > 50) newErrors.name = "Name is too long";
-    else if (!/^[a-zA-Z\s]+$/.test(name)) newErrors.name = "Name can only contain letters and spaces";
+    else if (name.length < 3) newErrors.name = "Minimum 3 characters";
+    else if (name.length > 50) newErrors.name = "Maximum 50 characters";
+    else if (!/^[a-zA-Z\s.'-]+$/.test(name)) newErrors.name = "Invalid characters";
     
-    // Email validation
+    // Email validation (standard format)
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!email) newErrors.email = "Email is required";
     else if (!emailRegex.test(email)) newErrors.email = "Invalid email format";
-    else if (email.length > 100) newErrors.email = "Email is too long";
+    else if (email.length > 100) newErrors.email = "Email too long";
     
-    // Discord validation
-    if (!discord.trim()) newErrors.discord = "Discord User ID is required";
-    else if (!discordRegex.test(discord)) newErrors.discord = "Must be 17-19 digits";
+    // Discord validation (exactly 17-19 digits)
+    if (!discord.trim()) newErrors.discord = "Discord ID is required";
+    else if (!/^\d{17,19}$/.test(discord)) newErrors.discord = "Must be 17-19 digits";
     
-    // Phone validation
+    // Phone validation (10-15 digits)
     if (!phone) newErrors.phone = "WhatsApp number is required";
-    else if (!phoneRegex.test(phone)) newErrors.phone = "Invalid phone number format";
+    else if (!/^\d{10,15}$/.test(phone)) newErrors.phone = "Invalid phone number";
     
-    // Game validation
-    if (!game) newErrors.game = "Game selection is required";
+    // Game selection validation
+    if (!game) newErrors.game = "Please select a game";
     
-    // Category validation
-    if (!category) newErrors.category = "Category selection is required";
+    // Category selection validation
+    if (!category) newErrors.category = "Please select a category";
     
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -170,16 +175,11 @@ const PaymentPage = () => {
     navigator.clipboard.writeText(text);
     setCopiedIndex(index);
     setShowCopyNotification(true);
-    
-    setTimeout(() => {
-      setShowCopyNotification(false);
-    }, 2000);
-    
-    setTimeout(() => {
-      setCopiedIndex(null);
-    }, 3000);
+    setTimeout(() => setShowCopyNotification(false), 2000);
+    setTimeout(() => setCopiedIndex(null), 3000);
   };
 
+  // Navigation functions
   const handleProceedToPayment = () => {
     if (validatePersonalInfo()) {
       if (!dontShowAgain) {
@@ -188,25 +188,24 @@ const PaymentPage = () => {
         setStep(2);
       }
     } else {
-      const firstError = Object.keys(errors)[0];
-      if (firstError) {
-        document.querySelector(`[name="${firstError}"]`)?.scrollIntoView({
-          behavior: 'smooth',
-          block: 'center'
-        });
-      }
+      scrollToFirstError();
     }
   };
 
+  const scrollToFirstError = () => {
+    const firstError = Object.keys(errors)[0];
+    if (firstError) {
+      document.querySelector(`[name="${firstError}"]`)?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center'
+      });
+    }
+  };
+
+  // Payment submission
   const submitPayment = async () => {
     if (!validatePersonalInfo()) {
-      const firstError = Object.keys(errors)[0];
-      if (firstError) {
-        document.querySelector(`[name="${firstError}"]`)?.scrollIntoView({
-          behavior: 'smooth',
-          block: 'center'
-        });
-      }
+      scrollToFirstError();
       return;
     }
     
@@ -214,6 +213,7 @@ const PaymentPage = () => {
     
     try {
       const invoiceNum = generateInvoiceNumber();
+      setInvoiceNumber(invoiceNum);
       
       const transactionData = {
         customer: {
@@ -228,17 +228,19 @@ const PaymentPage = () => {
         transactionDetails: {
           plan: plan || "Unknown Plan",
           amount: Number(price) || 0,
-          paymentMethod: paymentMethod || "unknown",
+          paymentMethod: paymentMethod,
           status: "pending",
           invoiceNumber: invoiceNum,
-          adminFee: 500,
+          adminFee: serviceFee,
           currency: "IDR",
-          totalAmount: Number(price) + 500
+          totalAmount: Number(price) + serviceFee,
+          timestamp: serverTimestamp()
         },
         systemInfo: {
           createdAt: serverTimestamp(),
           updatedAt: serverTimestamp(),
-          ipAddress: ""
+          ipAddress: "",
+          userAgent: navigator.userAgent
         },
         notes: {
           adminNotes: "",
@@ -247,12 +249,13 @@ const PaymentPage = () => {
         },
         metadata: {
           appVersion: "1.0.0",
-          source: "web"
+          source: "web",
+          securityLevel: "standard"
         }
       };
 
       await setDoc(doc(db, "transactions", invoiceNum), transactionData);
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      await new Promise(resolve => setTimeout(resolve, 1500));
       setPaymentComplete(true);
     } catch (error) {
       console.error("Payment processing error:", error);
@@ -262,42 +265,46 @@ const PaymentPage = () => {
     }
   };
 
+  // Success Screen
   if (paymentComplete) {
     return (
-      <div className="fixed inset-0 overflow-y-auto z-[9999] bg-gray-900 flex items-center justify-center">
-        <div className="fixed inset-0 w-full h-full bg-gradient-to-br from-purple-900/80 to-gray-900/90">
-          <video
-            autoPlay
-            loop
-            muted
-            className="absolute inset-0 w-full h-full object-cover opacity-20"
-          >
+      <div className="fixed inset-0 overflow-y-auto z-[9999] bg-black flex items-center justify-center p-4">
+        <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-black to-gray-900 opacity-95">
+          <video autoPlay loop muted className="absolute inset-0 w-full h-full object-cover opacity-10">
             <source src={paymentVideo} type="video/mp4" />
           </video>
         </div>
 
-        <div className="relative z-10 bg-gray-800/95 backdrop-blur-xl p-8 rounded-2xl max-w-md w-full mx-4 border border-purple-500/30 shadow-xl shadow-purple-900/20">
-          <div className="flex flex-col items-center text-center">
-            <div className="w-24 h-24 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-full flex items-center justify-center mb-6 shadow-lg">
-              <FiCheck className="w-12 h-12 text-white" />
+        <div className="relative z-10 bg-gray-900/95 backdrop-blur-2xl p-8 rounded-xl max-w-md w-full border border-emerald-500/20 shadow-2xl shadow-emerald-900/10">
+          <div className="flex flex-col items-center text-center space-y-6">
+            <div className="relative">
+              <div className="absolute inset-0 bg-emerald-500/20 blur-xl rounded-full"></div>
+              <div className="relative w-24 h-24 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-full flex items-center justify-center shadow-lg">
+                <FiCheck className="w-12 h-12 text-white" />
+              </div>
             </div>
             
-            <h2 className="text-3xl font-bold text-white mb-4">
-              Payment Successful!
-            </h2>
+            <div className="space-y-2">
+              <h2 className="text-3xl font-bold text-white">
+                Payment Successful
+              </h2>
+              <p className="text-gray-400">
+                Invoice: <span className="font-mono text-emerald-400">{invoiceNumber}</span>
+              </p>
+            </div>
             
-            <p className="text-gray-300 mb-6">
-              Thank you for subscribing to <span className="text-purple-300 font-medium">{plan}</span>. Admin will verify your payment shortly.
-            </p>
-            
-            <div className="w-full bg-gray-700/50 rounded-lg p-4 mb-6 border border-gray-600">
-              <p className="text-sm text-gray-300 mb-1">Invoice Number:</p>
-              <p className="text-white font-mono text-lg tracking-wider">{invoiceNumber}</p>
+            <div className="w-full bg-gray-800/50 rounded-lg p-4 border border-gray-700/50">
+              <p className="text-gray-300">
+                Thank you for purchasing <span className="text-emerald-300 font-medium">{plan}</span>.
+              </p>
+              <p className="text-gray-400 text-sm mt-1">
+                Our team will verify your payment within 1-15 minutes.
+              </p>
             </div>
             
             <Button 
               onClick={() => navigate("/dashboard")}
-              className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 shadow-lg"
+              className="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 shadow-lg transition-all duration-300 hover:shadow-emerald-500/20"
             >
               Go to Dashboard
             </Button>
@@ -307,100 +314,120 @@ const PaymentPage = () => {
     );
   }
 
+  // Processing Screen
   if (isProcessing) {
     return (
-      <div className="fixed inset-0 overflow-y-auto z-[9999] bg-gray-900 flex items-center justify-center">
-        <div className="fixed inset-0 w-full h-full bg-gradient-to-br from-purple-900/80 to-gray-900/90">
-          <video
-            autoPlay
-            loop
-            muted
-            className="absolute inset-0 w-full h-full object-cover opacity-20"
-          >
+      <div className="fixed inset-0 overflow-y-auto z-[9999] bg-black flex items-center justify-center p-4">
+        <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-black to-gray-900 opacity-95">
+          <video autoPlay loop muted className="absolute inset-0 w-full h-full object-cover opacity-10">
             <source src={paymentVideo} type="video/mp4" />
           </video>
         </div>
 
-        <div className="relative z-10 bg-gray-800/95 backdrop-blur-xl p-8 rounded-2xl max-w-md w-full mx-4 text-center border border-purple-500/30 shadow-xl">
-          <div className="flex flex-col items-center">
-            <FiLoader className="w-20 h-20 mb-6 text-purple-400 animate-spin" />
+        <div className="relative z-10 bg-gray-900/95 backdrop-blur-2xl p-8 rounded-xl max-w-md w-full text-center border border-blue-500/20 shadow-2xl">
+          <div className="flex flex-col items-center space-y-6">
+            <div className="relative">
+              <div className="absolute inset-0 bg-blue-500/20 blur-xl rounded-full animate-pulse"></div>
+              <FiLoader className="relative w-20 h-20 text-blue-400 animate-spin" />
+            </div>
             
-            <h2 className="text-2xl font-bold text-white mb-2">
-              Processing Payment
-            </h2>
+            <div className="space-y-2">
+              <h2 className="text-2xl font-bold text-white">
+                Processing Payment
+              </h2>
+              <p className="text-gray-400">
+                Please wait while we secure your transaction...
+              </p>
+            </div>
             
-            <p className="text-gray-300 mb-6">
-              Please wait while we process your transaction...
+            <div className="w-full bg-gray-800/50 rounded-full h-2 overflow-hidden">
+              <div className="bg-gradient-to-r from-blue-500 to-indigo-600 h-2 rounded-full animate-progress"></div>
+            </div>
+            
+            <p className="text-xs text-gray-500 font-mono tracking-wider">
+              SECURE CONNECTION • ENCRYPTED TRANSACTION
             </p>
-            
-            <div className="w-full bg-gray-700 rounded-full h-2.5 mb-6 overflow-hidden">
-              <div className="bg-gradient-to-r from-purple-500 to-indigo-600 h-2.5 rounded-full w-3/4"></div>
-            </div>
-            
-            <div className="text-sm text-gray-400">
-              <p>Do not close or refresh this page</p>
-            </div>
           </div>
         </div>
       </div>
     );
   }
 
+  // Main Payment Form
   return (
-    <div className="fixed inset-0 overflow-y-auto z-[9999] bg-gray-900">
-      <div className="fixed inset-0 w-full h-full bg-gradient-to-br from-purple-900/80 to-gray-900/90">
+    <div className="fixed inset-0 overflow-y-auto z-[9999] bg-black">
+      {/* Background video with overlay */}
+      <div className="fixed inset-0 w-full h-full bg-gradient-to-br from-gray-900 via-black to-gray-900">
         <video
           autoPlay
           loop
           muted
-          className="absolute inset-0 w-full h-full object-cover opacity-20"
+          className="absolute inset-0 w-full h-full object-cover opacity-10"
         >
           <source src={paymentVideo} type="video/mp4" />
         </video>
       </div>
 
+      {/* Copy notification */}
       {showCopyNotification && (
         <div className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none">
-          <div className="bg-gray-800/90 backdrop-blur-sm rounded-xl p-6 max-w-xs w-full mx-4 border border-green-500/30 shadow-lg">
-            <div className="flex flex-col items-center">
-              <div className="w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center mb-3 border border-green-500/30">
-                <FiCheck className="w-8 h-8 text-green-400" />
-              </div>
+          <div className="bg-gray-900/90 backdrop-blur-sm rounded-lg p-4 max-w-xs w-full mx-4 border border-emerald-500/30 shadow-lg">
+            <div className="flex items-center justify-center space-x-2">
+              <FiCheck className="w-5 h-5 text-emerald-400" />
               <p className="text-white font-medium">Copied to clipboard</p>
             </div>
           </div>
         </div>
       )}
 
+      {/* Rules confirmation modal */}
       {showConfirmation && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
-          <div className="bg-gray-800 rounded-xl p-6 max-w-md w-full mx-4 border border-purple-500/30 shadow-xl">
-            <div className="flex items-start mb-4">
-              <div className="bg-purple-500/20 p-2 rounded-lg mr-3">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+          <div className="bg-gray-900 rounded-xl p-6 max-w-md w-full border border-purple-500/30 shadow-2xl">
+            <div className="flex items-start space-x-3 mb-4">
+              <div className="bg-purple-500/20 p-2 rounded-lg flex-shrink-0">
                 <FiShield className="w-5 h-5 text-purple-300" />
               </div>
               <div>
-                <h3 className="text-xl font-bold text-white mb-1">Confirmation</h3>
-                <p className="text-gray-300">Please make sure you've read the rules</p>
+                <h3 className="text-xl font-bold text-white mb-1">Confirm Submission</h3>
+                <p className="text-gray-400">Please verify your information</p>
               </div>
             </div>
             
-            <div className="flex justify-between items-center mt-6">
-              <label className="flex items-center text-gray-300 text-sm cursor-pointer">
+            <div className="bg-gray-800/50 rounded-lg p-4 mb-5 border border-gray-700/50">
+              <h4 className="text-sm font-semibold text-gray-300 mb-2 uppercase tracking-wider">IMPORTANT NOTICE</h4>
+              <ul className="text-gray-400 text-sm space-y-2">
+                <li className="flex items-start">
+                  <span className="text-purple-400 mr-2">•</span>
+                  All transactions are final and non-refundable
+                </li>
+                <li className="flex items-start">
+                  <span className="text-purple-400 mr-2">•</span>
+                  Double-check your Discord ID and WhatsApp number
+                </li>
+                <li className="flex items-start">
+                  <span className="text-purple-400 mr-2">•</span>
+                  Invalid information will void your transaction
+                </li>
+              </ul>
+            </div>
+            
+            <div className="flex justify-between items-center">
+              <label className="flex items-center text-gray-400 text-sm cursor-pointer">
                 <input
                   type="checkbox"
                   checked={dontShowAgain}
                   onChange={(e) => setDontShowAgain(e.target.checked)}
-                  className="mr-2 rounded bg-gray-700 border-gray-600 text-purple-500 focus:ring-purple-500"
+                  className="mr-2 rounded bg-gray-800 border-gray-700 text-purple-500 focus:ring-purple-500"
                 />
-                Don't show this again
+                Don't show again
               </label>
               
               <div className="flex space-x-3">
                 <Button
                   onClick={() => setShowConfirmation(false)}
                   variant="outline"
-                  className="border-gray-600 hover:bg-gray-700/50 text-gray-300 hover:text-white"
+                  className="border-gray-700 hover:bg-gray-800/50 text-gray-300 hover:text-white"
                 >
                   Cancel
                 </Button>
@@ -409,7 +436,7 @@ const PaymentPage = () => {
                     setShowConfirmation(false);
                     setStep(2);
                   }}
-                  className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700"
+                  className="bg-gradient-to-r from-purple-600 to-fuchsia-600 hover:from-purple-700 hover:to-fuchsia-700"
                 >
                   Confirm
                 </Button>
@@ -419,37 +446,42 @@ const PaymentPage = () => {
         </div>
       )}
 
-      <div className="relative z-10 bg-gray-800/95 backdrop-blur-xl p-6 rounded-2xl max-w-4xl w-full mx-auto my-8 border border-gray-700 shadow-2xl shadow-purple-900/20">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+      {/* Main payment container */}
+      <div className="relative z-10 bg-gray-900/95 backdrop-blur-2xl p-6 rounded-xl max-w-4xl w-full mx-auto my-8 border border-gray-700/50 shadow-2xl">
+        {/* Header with progress steps */}
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
           <div>
             <h1 className="text-2xl md:text-3xl font-bold text-white">
-              {step === 1 ? "Personal Information" : step === 2 ? "Payment Method" : "Payment Confirmation"}
+              {step === 1 ? "Customer Information" : 
+               step === 2 ? "Payment Details" : 
+               "Order Confirmation"}
             </h1>
-            <p className="text-gray-300">
-              Subscription <span className="text-purple-300 font-medium">{plan}</span> - <span className="font-bold text-white">Rp{Number(price).toLocaleString('id-ID')}</span>
+            <p className="text-gray-400">
+              Purchasing <span className="text-emerald-300 font-medium">{plan}</span> • 
+              <span className="font-bold text-white ml-1">Rp{Number(price).toLocaleString('id-ID')}</span>
             </p>
           </div>
           
-          <div className="flex items-center space-x-2 bg-gray-900/50 px-3 py-2 rounded-full border border-gray-700">
+          <div className="flex items-center space-x-2 bg-gray-800/50 px-3 py-2 rounded-full border border-gray-700/50">
             {[1, 2, 3].map((stepNumber) => (
               <React.Fragment key={stepNumber}>
                 <div
                   className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium relative transition-all duration-300 ${
                     step === stepNumber
-                      ? "bg-gradient-to-br from-purple-500 to-indigo-600 text-white shadow-md transform scale-110"
+                      ? "bg-gradient-to-br from-blue-500 to-indigo-600 text-white shadow-md transform scale-110"
                       : step > stepNumber
-                      ? "bg-gradient-to-br from-green-500 to-teal-600 text-white"
-                      : "bg-gray-700 text-gray-400"
+                      ? "bg-gradient-to-br from-emerald-500 to-teal-600 text-white"
+                      : "bg-gray-800 text-gray-500"
                   }`}
                 >
                   {step > stepNumber ? <FiCheck size={14} /> : stepNumber}
                   {step === stepNumber && (
-                    <span className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-4 h-0.5 bg-purple-300 rounded-full animate-pulse"></span>
+                    <span className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-4 h-0.5 bg-blue-300 rounded-full animate-pulse"></span>
                   )}
                 </div>
                 {stepNumber < 3 && (
                   <div className={`w-6 h-[2px] rounded-full transition-all duration-300 ${
-                    step > stepNumber ? 'bg-green-500' : 'bg-gray-700'
+                    step > stepNumber ? 'bg-emerald-500' : 'bg-gray-700'
                   }`}></div>
                 )}
               </React.Fragment>
@@ -457,16 +489,18 @@ const PaymentPage = () => {
           </div>
         </div>
 
+        {/* Step 1: Personal Information */}
         {step === 1 && (
-          <div className="space-y-5">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-gray-300 text-sm mb-2 font-medium">
+          <div className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              {/* Name Field */}
+              <div className="space-y-2">
+                <label className="block text-gray-400 text-sm font-medium">
                   Full Name <span className="text-red-400">*</span>
                 </label>
                 <div className="relative">
                   <div className={`absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none ${
-                    errors.name ? 'text-red-400' : 'text-gray-400'
+                    errors.name ? 'text-red-400' : 'text-gray-500'
                   }`}>
                     <FiUser className="w-5 h-5" />
                   </div>
@@ -476,26 +510,27 @@ const PaymentPage = () => {
                     value={personalInfo.name}
                     onChange={handlePersonalInfoChange}
                     onBlur={() => handleBlur('name')}
-                    className={`w-full bg-gray-700/70 border ${
-                      errors.name ? 'border-red-500 focus:ring-red-500/30' : 'border-gray-600 focus:ring-purple-500/30'
-                    } rounded-lg py-2.5 px-4 pl-10 text-white focus:ring-2 focus:outline-none transition-all`}
-                    placeholder="Your full name"
+                    className={`w-full bg-gray-800/70 border ${
+                      errors.name ? 'border-red-500/70 focus:ring-red-500/20' : 'border-gray-700/70 focus:ring-blue-500/20'
+                    } rounded-lg py-2.5 px-4 pl-10 text-white focus:ring-2 focus:outline-none transition-all placeholder-gray-500`}
+                    placeholder="John Doe"
                   />
                 </div>
                 {errors.name && (
-                  <p className="mt-1 text-sm text-red-400 flex items-center">
-                    <FiX className="mr-1" /> {errors.name}
+                  <p className="text-sm text-red-400 flex items-center mt-1">
+                    <FiX className="mr-1 flex-shrink-0" /> {errors.name}
                   </p>
                 )}
               </div>
               
-              <div>
-                <label className="block text-gray-300 text-sm mb-2 font-medium">
+              {/* Email Field */}
+              <div className="space-y-2">
+                <label className="block text-gray-400 text-sm font-medium">
                   Email <span className="text-red-400">*</span>
                 </label>
                 <div className="relative">
                   <div className={`absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none ${
-                    errors.email ? 'text-red-400' : 'text-gray-400'
+                    errors.email ? 'text-red-400' : 'text-gray-500'
                   }`}>
                     <FiMail className="w-5 h-5" />
                   </div>
@@ -505,26 +540,27 @@ const PaymentPage = () => {
                     value={personalInfo.email}
                     onChange={handlePersonalInfoChange}
                     onBlur={() => handleBlur('email')}
-                    className={`w-full bg-gray-700/70 border ${
-                      errors.email ? 'border-red-500 focus:ring-red-500/30' : 'border-gray-600 focus:ring-purple-500/30'
-                    } rounded-lg py-2.5 px-4 pl-10 text-white focus:ring-2 focus:outline-none transition-all`}
-                    placeholder="email@domain.com"
+                    className={`w-full bg-gray-800/70 border ${
+                      errors.email ? 'border-red-500/70 focus:ring-red-500/20' : 'border-gray-700/70 focus:ring-blue-500/20'
+                    } rounded-lg py-2.5 px-4 pl-10 text-white focus:ring-2 focus:outline-none transition-all placeholder-gray-500`}
+                    placeholder="your@email.com"
                   />
                 </div>
                 {errors.email && (
-                  <p className="mt-1 text-sm text-red-400 flex items-center">
-                    <FiX className="mr-1" /> {errors.email}
+                  <p className="text-sm text-red-400 flex items-center mt-1">
+                    <FiX className="mr-1 flex-shrink-0" /> {errors.email}
                   </p>
                 )}
               </div>
               
-              <div>
-                <label className="block text-gray-300 text-sm mb-2 font-medium">
+              {/* Discord Field */}
+              <div className="space-y-2">
+                <label className="block text-gray-400 text-sm font-medium">
                   Discord User ID <span className="text-red-400">*</span>
                 </label>
                 <div className="relative">
                   <div className={`absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none ${
-                    errors.discord ? 'text-red-400' : 'text-gray-400'
+                    errors.discord ? 'text-red-400' : 'text-gray-500'
                   }`}>
                     <FaDiscord className="w-5 h-5" />
                   </div>
@@ -534,33 +570,34 @@ const PaymentPage = () => {
                     value={personalInfo.discord}
                     onChange={handlePersonalInfoChange}
                     onBlur={() => handleBlur('discord')}
-                    className={`w-full bg-gray-700/70 border ${
-                      errors.discord ? 'border-red-500 focus:ring-red-500/30' : 'border-gray-600 focus:ring-purple-500/30'
-                    } rounded-lg py-2.5 px-4 pl-10 text-white focus:ring-2 focus:outline-none transition-all`}
+                    className={`w-full bg-gray-800/70 border ${
+                      errors.discord ? 'border-red-500/70 focus:ring-red-500/20' : 'border-gray-700/70 focus:ring-blue-500/20'
+                    } rounded-lg py-2.5 px-4 pl-10 text-white focus:ring-2 focus:outline-none transition-all placeholder-gray-500`}
                     placeholder="1234567890123456789"
                     maxLength={19}
                   />
                 </div>
                 {errors.discord && (
-                  <p className="mt-1 text-sm text-red-400 flex items-center">
-                    <FiX className="mr-1" /> {errors.discord}
+                  <p className="text-sm text-red-400 flex items-center mt-1">
+                    <FiX className="mr-1 flex-shrink-0" /> {errors.discord}
                   </p>
                 )}
-                <div className="mt-1 flex items-center text-xs text-gray-500">
-                  <span>How To Get Discord ID ?</span>
-                  <a href="https://youtu.be/T2LGHXV5scE?si=wOyIWS7E7A_hCfy-" className="ml-2 text-purple-400 hover:text-purple-300 flex items-center">
-                    Click Here <FiExternalLink className="ml-1 w-3 h-3" />
+                <div className="flex items-center text-xs text-gray-500 mt-1">
+                  <span>How to find your Discord ID?</span>
+                  <a href="#" className="ml-2 text-blue-400 hover:text-blue-300 flex items-center">
+                    Guide <FiExternalLink className="ml-1 w-3 h-3" />
                   </a>
                 </div>
               </div>
               
-              <div>
-                <label className="block text-gray-300 text-sm mb-2 font-medium">
+              {/* Phone Field */}
+              <div className="space-y-2">
+                <label className="block text-gray-400 text-sm font-medium">
                   WhatsApp Number <span className="text-red-400">*</span>
                 </label>
                 <div className="relative">
                   <div className={`absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none ${
-                    errors.phone ? 'text-red-400' : 'text-gray-400'
+                    errors.phone ? 'text-red-400' : 'text-gray-500'
                   }`}>
                     <FiSmartphone className="w-5 h-5" />
                   </div>
@@ -570,41 +607,44 @@ const PaymentPage = () => {
                     value={personalInfo.phone}
                     onChange={handlePersonalInfoChange}
                     onBlur={() => handleBlur('phone')}
-                    className={`w-full bg-gray-700/70 border ${
-                      errors.phone ? 'border-red-500 focus:ring-red-500/30' : 'border-gray-600 focus:ring-purple-500/30'
-                    } rounded-lg py-2.5 px-4 pl-10 text-white focus:ring-2 focus:outline-none transition-all`}
+                    className={`w-full bg-gray-800/70 border ${
+                      errors.phone ? 'border-red-500/70 focus:ring-red-500/20' : 'border-gray-700/70 focus:ring-blue-500/20'
+                    } rounded-lg py-2.5 px-4 pl-10 text-white focus:ring-2 focus:outline-none transition-all placeholder-gray-500`}
                     placeholder="08123456789"
                     maxLength={15}
                   />
                 </div>
                 {errors.phone && (
-                  <p className="mt-1 text-sm text-red-400 flex items-center">
-                    <FiX className="mr-1" /> {errors.phone}
+                  <p className="text-sm text-red-400 flex items-center mt-1">
+                    <FiX className="mr-1 flex-shrink-0" /> {errors.phone}
                   </p>
                 )}
               </div>
 
-              <div>
-                <label className="block text-gray-300 text-sm mb-2 font-medium">
+              {/* Game Selection */}
+              <div className="space-y-2">
+                <label className="block text-gray-400 text-sm font-medium">
                   Select Game <span className="text-red-400">*</span>
                 </label>
                 <div className="relative">
                   <button
                     onClick={() => setShowGameDropdown(!showGameDropdown)}
-                    className={`w-full bg-gray-700/70 border ${
-                      errors.game ? 'border-red-500' : 'border-gray-600'
+                    className={`w-full bg-gray-800/70 border ${
+                      errors.game ? 'border-red-500/70' : 'border-gray-700/70'
                     } rounded-lg py-2.5 px-4 text-white text-left flex justify-between items-center`}
                   >
-                    {personalInfo.game || "Select a game"}
-                    <FiChevronDown className={`transition-transform ${showGameDropdown ? 'rotate-180' : ''}`} />
+                    <span className={personalInfo.game ? "text-white" : "text-gray-500"}>
+                      {personalInfo.game || "Select a game"}
+                    </span>
+                    <FiChevronDown className={`transition-transform ${showGameDropdown ? 'rotate-180' : ''} text-gray-400`} />
                   </button>
                   {showGameDropdown && (
-                    <div className="absolute z-10 mt-1 w-full bg-gray-800 border border-gray-600 rounded-lg shadow-lg">
+                    <div className="absolute z-10 mt-1 w-full bg-gray-800 border border-gray-700/70 rounded-lg shadow-lg overflow-hidden">
                       {games.map((game) => (
                         <div
                           key={game}
                           onClick={() => selectGame(game)}
-                          className="px-4 py-2 hover:bg-gray-700 cursor-pointer text-white"
+                          className="px-4 py-2.5 hover:bg-gray-700/50 cursor-pointer text-white transition-colors"
                         >
                           {game}
                         </div>
@@ -613,33 +653,36 @@ const PaymentPage = () => {
                   )}
                 </div>
                 {errors.game && (
-                  <p className="mt-1 text-sm text-red-400 flex items-center">
-                    <FiX className="mr-1" /> {errors.game}
+                  <p className="text-sm text-red-400 flex items-center mt-1">
+                    <FiX className="mr-1 flex-shrink-0" /> {errors.game}
                   </p>
                 )}
               </div>
 
-              <div>
-                <label className="block text-gray-300 text-sm mb-2 font-medium">
+              {/* Category Selection */}
+              <div className="space-y-2">
+                <label className="block text-gray-400 text-sm font-medium">
                   Select Category <span className="text-red-400">*</span>
                 </label>
                 <div className="relative">
                   <button
                     onClick={() => setShowCategoryDropdown(!showCategoryDropdown)}
-                    className={`w-full bg-gray-700/70 border ${
-                      errors.category ? 'border-red-500' : 'border-gray-600'
+                    className={`w-full bg-gray-800/70 border ${
+                      errors.category ? 'border-red-500/70' : 'border-gray-700/70'
                     } rounded-lg py-2.5 px-4 text-white text-left flex justify-between items-center`}
                   >
-                    {personalInfo.category || "Select a category"}
-                    <FiChevronDown className={`transition-transform ${showCategoryDropdown ? 'rotate-180' : ''}`} />
+                    <span className={personalInfo.category ? "text-white" : "text-gray-500"}>
+                      {personalInfo.category || "Select a category"}
+                    </span>
+                    <FiChevronDown className={`transition-transform ${showCategoryDropdown ? 'rotate-180' : ''} text-gray-400`} />
                   </button>
                   {showCategoryDropdown && (
-                    <div className="absolute z-10 mt-1 w-full bg-gray-800 border border-gray-600 rounded-lg shadow-lg">
+                    <div className="absolute z-10 mt-1 w-full bg-gray-800 border border-gray-700/70 rounded-lg shadow-lg overflow-hidden">
                       {categories.map((category) => (
                         <div
                           key={category}
                           onClick={() => selectCategory(category)}
-                          className="px-4 py-2 hover:bg-gray-700 cursor-pointer text-white"
+                          className="px-4 py-2.5 hover:bg-gray-700/50 cursor-pointer text-white transition-colors"
                         >
                           {category}
                         </div>
@@ -648,57 +691,64 @@ const PaymentPage = () => {
                   )}
                 </div>
                 {errors.category && (
-                  <p className="mt-1 text-sm text-red-400 flex items-center">
-                    <FiX className="mr-1" /> {errors.category}
+                  <p className="text-sm text-red-400 flex items-center mt-1">
+                    <FiX className="mr-1 flex-shrink-0" /> {errors.category}
                   </p>
                 )}
               </div>
             </div>
             
-            <div className="bg-gray-700/50 rounded-lg p-4 border border-gray-600">
-              <h3 className="text-lg font-bold text-white mb-2">RULES & TERMS</h3>
-              <ul className="text-gray-300 text-sm space-y-2">
+            {/* Rules Section */}
+            <div className="bg-gray-800/50 rounded-lg p-5 border border-gray-700/50">
+              <h3 className="text-lg font-bold text-white mb-3 flex items-center">
+                <FiShield className="text-purple-400 mr-2" />
+                Terms & Conditions
+              </h3>
+              <ul className="text-gray-400 text-sm space-y-3">
                 <li className="flex items-start">
-                  <span className="text-purple-400 mr-2">•</span>
-                  Please fill in your personal data correctly, if there is an error in 1 letter/number the transaction will be void!
+                  <span className="text-purple-400 mr-2 mt-0.5">•</span>
+                  All information must be accurate. Transactions with incorrect data will be voided without refund.
                 </li>
                 <li className="flex items-start">
-                  <span className="text-purple-400 mr-2">•</span>
-                  For mutual comfort, make sure your User ID matches your Discord account, if not your transaction will be void and will not be processed!
+                  <span className="text-purple-400 mr-2 mt-0.5">•</span>
+                  Your Discord User ID must match your account exactly. We cannot assist with deliveries to incorrect accounts.
                 </li>
                 <li className="flex items-start">
-                  <span className="text-purple-400 mr-2">•</span>
-                  All transactions are final and non-refundable once processed.
+                  <span className="text-purple-400 mr-2 mt-0.5">•</span>
+                  Payments are processed within 1-15 minutes during business hours (9AM-10PM WIB).
                 </li>
                 <li className="flex items-start">
-                  <span className="text-purple-400 mr-2">•</span>
-                  We are not responsible for any account bans or suspensions.
+                  <span className="text-purple-400 mr-2 mt-0.5">•</span>
+                  For Gopay/DANA payments, you must send payment proof to our admin via WhatsApp.
                 </li>
               </ul>
             </div>
             
-            <div className="flex justify-between pt-4 border-t border-gray-700">
+            {/* Navigation Buttons */}
+            <div className="flex justify-between pt-5 border-t border-gray-700/50">
               <Button
                 onClick={() => navigate(-1)}
                 variant="outline"
-                className="border-gray-600 hover:bg-gray-700/50 text-gray-300 hover:text-white"
+                className="border-gray-700 hover:bg-gray-800/50 text-gray-300 hover:text-white"
               >
                 Back
               </Button>
               <Button
                 onClick={handleProceedToPayment}
-                className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 shadow-lg"
+                className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 shadow-lg hover:shadow-blue-500/20"
+                disabled={Object.keys(errors).length > 0}
               >
-                Proceed to Payment
+                Continue to Payment
               </Button>
             </div>
           </div>
         )}
 
+        {/* Step 2: Payment Method */}
         {step === 2 && (
           <div className="space-y-6">
-            <div className="mb-6">
-              <h3 className="text-lg font-bold text-white mb-3">Select Payment Method</h3>
+            <div className="space-y-5">
+              <h3 className="text-lg font-bold text-white">Select Payment Method</h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                 {Object.entries(paymentMethods).map(([key, method]) => (
                   <button
@@ -707,13 +757,13 @@ const PaymentPage = () => {
                     className={`p-4 rounded-xl border-2 transition-all duration-200 flex flex-col items-center ${
                       paymentMethod === key
                         ? `border-transparent bg-gradient-to-br ${method.color} shadow-lg`
-                        : "border-gray-600 hover:border-gray-500 hover:bg-gray-700/30"
+                        : "border-gray-700 hover:border-gray-600 hover:bg-gray-800/30"
                     }`}
                   >
                     <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-3 ${
                       paymentMethod === key 
-                        ? "bg-white/20 text-white" 
-                        : "bg-gray-700 text-gray-400"
+                        ? "bg-white/10 text-white" 
+                        : "bg-gray-800 text-gray-400"
                     }`}>
                       {method.icon}
                     </div>
@@ -727,14 +777,18 @@ const PaymentPage = () => {
               </div>
             </div>
             
-            <div className="bg-gray-700/50 rounded-xl p-5 border border-gray-600 shadow-inner">
-              <div className="flex flex-col items-center text-center mb-5">
+            {/* Payment Details */}
+            <div className="bg-gray-800/50 rounded-xl p-5 border border-gray-700/50">
+              <div className="flex flex-col items-center text-center mb-6">
                 <div className={`w-14 h-14 rounded-full flex items-center justify-center mb-3 bg-gradient-to-br ${paymentMethods[paymentMethod].color} text-white shadow-md`}>
                   {paymentMethods[paymentMethod].icon}
                 </div>
-                <h3 className="text-xl font-bold text-white">
+                <h3 className="text-xl font-bold text-white mb-1">
                   {paymentMethods[paymentMethod].instructions}
                 </h3>
+                <p className="text-gray-400 text-sm">
+                  {paymentMethods[paymentMethod].note}
+                </p>
               </div>
               
               {paymentMethod === "qris" ? (
@@ -742,30 +796,33 @@ const PaymentPage = () => {
                   <div className="w-52 h-52 bg-white rounded-xl flex items-center justify-center mb-4 p-4 shadow-lg">
                     <FaQrcode className="w-full h-full text-black" />
                   </div>
-                  <p className="text-gray-300 text-center max-w-md">
-                    Scan the QR code above using your e-wallet or mobile banking app that supports QRIS
+                  <p className="text-gray-400 text-center max-w-md text-sm">
+                    Scan using your mobile banking or e-wallet app that supports QRIS
                   </p>
                 </div>
               ) : (
-                <div className="space-y-4">
-                  <div className="bg-gray-800/70 rounded-xl p-5 border border-gray-600">
-                    <p className="text-gray-400 text-sm mb-1">{paymentMethods[paymentMethod].name} Number:</p>
+                <div className="space-y-5">
+                  {/* Payment Account */}
+                  <div className="bg-gray-800 rounded-xl p-5 border border-gray-700/50">
+                    <p className="text-gray-400 text-sm mb-1 uppercase tracking-wider">
+                      {paymentMethods[paymentMethod].name} Number
+                    </p>
                     <div className="flex justify-between items-center">
                       <div>
                         <p className="text-lg font-bold text-white font-mono tracking-wide">
                           {paymentMethods[paymentMethod].account}
                         </p>
-                        <p className="text-gray-300 text-sm mt-1">
+                        <p className="text-gray-400 text-sm mt-1">
                           Atas Nama: {paymentMethods[paymentMethod].accountName}
                         </p>
                       </div>
                       <button 
                         onClick={() => copyToClipboard(paymentMethods[paymentMethod].account, paymentMethod)}
-                        className="p-2 rounded-lg bg-gray-700 hover:bg-gray-600 text-gray-300 hover:text-white transition-colors"
+                        className="p-2 rounded-lg bg-gray-700 hover:bg-gray-600/50 text-gray-300 hover:text-white transition-colors border border-gray-600/50"
                         title="Copy number"
                       >
                         {copiedIndex === paymentMethod ? (
-                          <FiCheck className="w-5 h-5 text-green-400" />
+                          <FiCheck className="w-5 h-5 text-emerald-400" />
                         ) : (
                           <FiCopy className="w-5 h-5" />
                         )}
@@ -773,54 +830,65 @@ const PaymentPage = () => {
                     </div>
                   </div>
 
-                  <div className="bg-gray-800/70 rounded-xl p-5 border border-gray-600">
-                    <h4 className="text-lg font-bold text-white mb-3">Shopping Summary</h4>
+                  {/* Order Summary */}
+                  <div className="bg-gray-800 rounded-xl p-5 border border-gray-700/50">
+                    <h4 className="text-lg font-bold text-white mb-4 flex items-center">
+                      <FiCreditCard className="text-blue-400 mr-2" />
+                      Order Summary
+                    </h4>
                     <div className="space-y-3">
                       <div className="flex justify-between">
-                        <span className="text-gray-400">Total Price</span>
-                        <span className="text-white font-medium">Rp{Number(price).toLocaleString('id-ID')}</span>
+                        <span className="text-gray-400">Product</span>
+                        <span className="text-white font-medium">{plan}</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-gray-400">Game Category</span>
+                        <span className="text-gray-400">Game</span>
                         <span className="text-white font-medium">{personalInfo.game}</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-gray-400">Product</span>
+                        <span className="text-gray-400">Category</span>
                         <span className="text-white font-medium">{personalInfo.category}</span>
+                      </div>
+                      <div className="border-t border-gray-700/50 my-2"></div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-400">Product Price</span>
+                        <span className="text-white font-medium">Rp{Number(price).toLocaleString('id-ID')}</span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-gray-400">Service Fee</span>
-                        <span className="text-white font-medium">Rp500</span>
+                        <span className="text-white font-medium">Rp{serviceFee.toLocaleString('id-ID')}</span>
                       </div>
-                      <div className="border-t border-gray-600 my-2"></div>
+                      <div className="border-t border-gray-700/50 my-2"></div>
                       <div className="flex justify-between">
-                        <span className="text-gray-400">Shopping Total:</span>
-                        <span className="text-white font-bold text-lg">Rp{(Number(price) + 500).toLocaleString('id-ID')}</span>
+                        <span className="text-gray-400">Total Payment</span>
+                        <span className="text-white font-bold text-lg">Rp{(Number(price) + serviceFee).toLocaleString('id-ID')}</span>
                       </div>
                     </div>
                   </div>
 
-                  <div className="bg-yellow-500/10 rounded-lg p-3 border border-yellow-500/30 flex items-start">
-                    <FiMessageSquare className="flex-shrink-0 mt-0.5 mr-2 text-yellow-400" />
+                  {/* Important Note */}
+                  <div className="bg-yellow-500/10 rounded-lg p-4 border border-yellow-500/20 flex items-start">
+                    <FiMessageSquare className="flex-shrink-0 mt-0.5 mr-3 text-yellow-400" />
                     <p className="text-yellow-300 text-sm">
-                      {paymentMethods[paymentMethod].note}
+                      {paymentMethods[paymentMethod].note} Please save your payment proof.
                     </p>
                   </div>
                 </div>
               )}
             </div>
             
-            <div className="flex justify-between pt-4 border-t border-gray-700">
+            {/* Navigation Buttons */}
+            <div className="flex justify-between pt-5 border-t border-gray-700/50">
               <Button
                 onClick={() => setStep(1)}
                 variant="outline"
-                className="border-gray-600 hover:bg-gray-700/50 text-gray-300 hover:text-white"
+                className="border-gray-700 hover:bg-gray-800/50 text-gray-300 hover:text-white"
               >
                 Back
               </Button>
               <Button
                 onClick={() => setStep(3)}
-                className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 shadow-lg"
+                className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 shadow-lg hover:shadow-blue-500/20"
               >
                 Confirm Payment
               </Button>
@@ -828,98 +896,115 @@ const PaymentPage = () => {
           </div>
         )}
 
+        {/* Step 3: Confirmation */}
         {step === 3 && (
           <div className="space-y-6">
-            <div className="bg-gray-700/50 rounded-xl p-6 border border-gray-600 shadow-inner">
-              <div className="flex items-center mb-5">
-                <div className="bg-gradient-to-br from-purple-500 to-indigo-600 p-2 rounded-lg mr-3">
+            <div className="bg-gray-800/50 rounded-xl p-6 border border-gray-700/50">
+              <div className="flex items-center mb-6">
+                <div className="bg-gradient-to-br from-blue-500 to-indigo-600 p-2 rounded-lg mr-3">
                   <FiShield className="w-5 h-5 text-white" />
                 </div>
                 <h3 className="text-xl font-bold text-white">
-                  Payment Data Confirmation
+                  Confirm Your Order
                 </h3>
               </div>
               
-              <div className="space-y-5">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="bg-gray-800/50 p-4 rounded-lg border border-gray-700">
-                    <p className="text-gray-400 text-sm mb-1">Full Name</p>
-                    <p className="text-white font-medium text-lg">{personalInfo.name}</p>
-                  </div>
-                  <div className="bg-gray-800/50 p-4 rounded-lg border border-gray-700">
-                    <p className="text-gray-400 text-sm mb-1">Email</p>
-                    <p className="text-white font-medium text-lg">{personalInfo.email}</p>
-                  </div>
-                  <div className="bg-gray-800/50 p-4 rounded-lg border border-gray-700">
-                    <p className="text-gray-400 text-sm mb-1">Discord</p>
-                    <p className="text-white font-medium text-lg">{personalInfo.discord}</p>
-                  </div>
-                  <div className="bg-gray-800/50 p-4 rounded-lg border border-gray-700">
-                    <p className="text-gray-400 text-sm mb-1">WhatsApp</p>
-                    <p className="text-white font-medium text-lg">{personalInfo.phone}</p>
-                  </div>
-                  <div className="bg-gray-800/50 p-4 rounded-lg border border-gray-700">
-                    <p className="text-gray-400 text-sm mb-1">Game</p>
-                    <p className="text-white font-medium text-lg">{personalInfo.game}</p>
-                  </div>
-                  <div className="bg-gray-800/50 p-4 rounded-lg border border-gray-700">
-                    <p className="text-gray-400 text-sm mb-1">Category</p>
-                    <p className="text-white font-medium text-lg">{personalInfo.category}</p>
-                  </div>
-                </div>
-                
-                <div className="border-t border-gray-600 pt-5 mt-2">
-                  <div className="flex items-center mb-3">
-                    <div className={`w-10 h-10 rounded-full flex items-center justify-center mr-3 bg-gradient-to-br ${paymentMethods[paymentMethod].color} text-white`}>
-                      {paymentMethods[paymentMethod].icon}
+              <div className="space-y-6">
+                {/* Customer Information */}
+                <div className="space-y-3">
+                  <h4 className="text-lg font-bold text-white flex items-center">
+                    <FiUser className="text-blue-400 mr-2" />
+                    Customer Information
+                  </h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="bg-gray-800/70 p-4 rounded-lg border border-gray-700/50">
+                      <p className="text-gray-400 text-sm mb-1">Full Name</p>
+                      <p className="text-white font-medium">{personalInfo.name}</p>
                     </div>
-                    <div>
-                      <p className="text-gray-400 text-sm">Payment Method</p>
-                      <p className="text-white font-bold text-lg">
-                        {paymentMethods[paymentMethod].name}
-                      </p>
+                    <div className="bg-gray-800/70 p-4 rounded-lg border border-gray-700/50">
+                      <p className="text-gray-400 text-sm mb-1">Email</p>
+                      <p className="text-white font-medium">{personalInfo.email}</p>
+                    </div>
+                    <div className="bg-gray-800/70 p-4 rounded-lg border border-gray-700/50">
+                      <p className="text-gray-400 text-sm mb-1">Discord ID</p>
+                      <p className="text-white font-medium">{personalInfo.discord}</p>
+                    </div>
+                    <div className="bg-gray-800/70 p-4 rounded-lg border border-gray-700/50">
+                      <p className="text-gray-400 text-sm mb-1">WhatsApp</p>
+                      <p className="text-white font-medium">{personalInfo.phone}</p>
+                    </div>
+                    <div className="bg-gray-800/70 p-4 rounded-lg border border-gray-700/50">
+                      <p className="text-gray-400 text-sm mb-1">Game</p>
+                      <p className="text-white font-medium">{personalInfo.game}</p>
+                    </div>
+                    <div className="bg-gray-800/70 p-4 rounded-lg border border-gray-700/50">
+                      <p className="text-gray-400 text-sm mb-1">Category</p>
+                      <p className="text-white font-medium">{personalInfo.category}</p>
                     </div>
                   </div>
                 </div>
                 
-                <div className="bg-gray-800/70 rounded-xl p-5 border border-gray-600">
-                  <div className="flex justify-between mb-3">
-                    <p className="text-gray-400">Subscription Package</p>
-                    <p className="text-white font-medium">{plan}</p>
+                {/* Payment Information */}
+                <div className="space-y-3">
+                  <h4 className="text-lg font-bold text-white flex items-center">
+                    <FiCreditCard className="text-blue-400 mr-2" />
+                    Payment Information
+                  </h4>
+                  <div className="bg-gray-800/70 rounded-xl p-5 border border-gray-700/50">
+                    <div className="flex items-center mb-4">
+                      <div className={`w-10 h-10 rounded-full flex items-center justify-center mr-3 bg-gradient-to-br ${paymentMethods[paymentMethod].color} text-white`}>
+                        {paymentMethods[paymentMethod].icon}
+                      </div>
+                      <div>
+                        <p className="text-gray-400 text-sm">Payment Method</p>
+                        <p className="text-white font-bold">
+                          {paymentMethods[paymentMethod].name}
+                        </p>
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-3">
+                      <div className="flex justify-between">
+                        <span className="text-gray-400">Product</span>
+                        <span className="text-white">{plan}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-400">Service Fee</span>
+                        <span className="text-white">Rp{serviceFee.toLocaleString('id-ID')}</span>
+                      </div>
+                      <div className="border-t border-gray-700/50 my-2"></div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-gray-400">Total Amount</span>
+                        <span className="text-white font-bold text-xl">Rp{(Number(price) + serviceFee).toLocaleString('id-ID')}</span>
+                      </div>
+                    </div>
                   </div>
-                  <div className="flex justify-between mb-3">
-                    <p className="text-gray-400">Service Fee</p>
-                    <p className="text-white font-medium">Rp500</p>
+                </div>
+                
+                {/* Security Note */}
+                <div className="bg-blue-500/10 rounded-lg p-4 border border-blue-500/20 flex items-start">
+                  <div className="bg-blue-500/20 p-1.5 rounded-lg mr-3 flex-shrink-0">
+                    <FiLock className="w-4 h-4 text-blue-400" />
                   </div>
-                  <div className="border-t border-gray-600 my-3"></div>
-                  <div className="flex justify-between items-center">
-                    <p className="text-gray-400">Total Payment</p>
-                    <p className="text-white font-bold text-2xl">Rp{(Number(price) + 500).toLocaleString('id-ID')}</p>
-                  </div>
+                  <p className="text-gray-300 text-sm">
+                    Your transaction is secured with 256-bit encryption. By confirming, you agree to our Terms of Service and Privacy Policy.
+                  </p>
                 </div>
               </div>
             </div>
             
-            <div className="bg-purple-500/10 rounded-lg p-4 border border-purple-500/30 flex items-start">
-              <div className="bg-purple-500/20 p-1.5 rounded-lg mr-3">
-                <FiLock className="w-4 h-4 text-purple-300" />
-              </div>
-              <p className="text-gray-300 text-sm">
-                Your data is secure and protected. Payment will be processed automatically and securely through our system.
-              </p>
-            </div>
-            
-            <div className="flex justify-between pt-4 border-t border-gray-700">
+            {/* Navigation Buttons */}
+            <div className="flex justify-between pt-5 border-t border-gray-700/50">
               <Button
                 onClick={() => setStep(2)}
                 variant="outline"
-                className="border-gray-600 hover:bg-gray-700/50 text-gray-300 hover:text-white"
+                className="border-gray-700 hover:bg-gray-800/50 text-gray-300 hover:text-white"
               >
                 Back
               </Button>
               <Button
                 onClick={submitPayment}
-                className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 shadow-lg"
+                className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 shadow-lg hover:shadow-emerald-500/20"
               >
                 Confirm & Pay Now
               </Button>
