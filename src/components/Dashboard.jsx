@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { db } from '../config/firebaseConfig';
-import { doc, getDoc, onSnapshot } from 'firebase/firestore';
+import { doc, getDoc, collection, query, where, onSnapshot } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
 import { 
   FiUser, FiShoppingBag, FiClock, FiCheckCircle, 
   FiDownload, FiExternalLink, FiChevronRight, 
-  FiCreditCard, FiHome, FiLogOut, FiX
-} from 'react-icons/fi';
-import { FaDiscord } from 'react-icons/fa';
+  FiCreditCard, FiHome, FiLogOut, FiX,
+  FiShield, FiMail, FiSmartphone
+} from "react-icons/fi";
+import { FaDiscord, FaQrcode } from "react-icons/fa";
 
 const Dashboard = () => {
   const [userData, setUserData] = useState(null);
@@ -17,38 +18,54 @@ const Dashboard = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Simulasi data user (dalam implementasi nyata, ini akan diambil dari auth atau localStorage)
     const fetchUserData = async () => {
       try {
-        // Contoh user ID - dalam implementasi nyata, ini harus diambil dari sistem auth
-        const userId = "exampleUserId";
+        // Dalam implementasi nyata, gunakan ID user dari sistem auth
+        // Contoh ini menggunakan email dari localStorage sebagai referensi
+        const userEmail = localStorage.getItem('userEmail') || 'example@email.com';
         
-        // Fetch user data
-        const userDoc = await getDoc(doc(db, "users", userId));
-        if (userDoc.exists()) {
-          setUserData(userDoc.data());
-        } else {
-          setError("User data not found");
-        }
-
-        // Setup realtime listener for transactions
-        const unsubscribe = onSnapshot(
-          doc(db, "userTransactions", userId),
-          (doc) => {
-            if (doc.exists()) {
-              const data = doc.data();
-              setTransactions(data.transactions || []);
-            }
-            setLoading(false);
-          },
-          (err) => {
-            console.error("Error listening to transactions:", err);
-            setError("Failed to load transaction data");
+        // 1. Fetch user data berdasarkan email
+        const usersRef = collection(db, 'users');
+        const q = query(usersRef, where('email', '==', userEmail));
+        
+        const unsubscribeUser = onSnapshot(q, (querySnapshot) => {
+          if (!querySnapshot.empty) {
+            const userDoc = querySnapshot.docs[0];
+            setUserData({ id: userDoc.id, ...userDoc.data() });
+            
+            // 2. Fetch transactions untuk user ini
+            const transactionsRef = collection(db, 'transactions');
+            const transactionsQuery = query(
+              transactionsRef, 
+              where('customer.email', '==', userEmail),
+              where('transactionDetails.status', 'in', ['pending', 'completed', 'failed'])
+            );
+            
+            const unsubscribeTransactions = onSnapshot(transactionsQuery, (snapshot) => {
+              const transactionsData = snapshot.docs.map(doc => ({
+                id: doc.id,
+                ...doc.data()
+              }));
+              setTransactions(transactionsData);
+              setLoading(false);
+            }, (err) => {
+              console.error("Error listening to transactions:", err);
+              setError("Failed to load transaction data");
+              setLoading(false);
+            });
+            
+            return () => unsubscribeTransactions();
+          } else {
+            setError("User data not found");
             setLoading(false);
           }
-        );
-
-        return () => unsubscribe();
+        }, (err) => {
+          console.error("Error listening to user data:", err);
+          setError("Failed to load user data");
+          setLoading(false);
+        });
+        
+        return () => unsubscribeUser();
       } catch (err) {
         console.error("Error fetching data:", err);
         setError("Failed to load data");
@@ -61,6 +78,7 @@ const Dashboard = () => {
 
   const handleLogout = () => {
     // Implement logout logic here
+    localStorage.removeItem('userEmail');
     navigate('/');
   };
 
@@ -250,28 +268,54 @@ const Dashboard = () => {
                   </div>
                 ) : (
                   <div className="divide-y divide-gray-200">
-                    {transactions.map((transaction, index) => (
-                      <div key={index} className="p-6">
+                    {transactions.map((transaction) => (
+                      <div key={transaction.id} className="p-6">
                         <div className="flex flex-col md:flex-row md:items-center md:justify-between">
                           <div className="mb-4 md:mb-0">
-                            <h3 className="text-lg font-medium text-gray-900">{transaction.plan}</h3>
+                            <h3 className="text-lg font-medium text-gray-900">
+                              {transaction.transactionDetails?.plan || 'Unknown Plan'}
+                            </h3>
                             <p className="text-sm text-gray-500">
-                              Invoice: {transaction.invoiceNumber}
+                              Invoice: {transaction.transactionDetails?.invoiceNumber || 'N/A'}
                             </p>
                             <p className="text-sm text-gray-500 mt-1">
-                              {transaction.createdAt ? formatDate(transaction.createdAt) : 'N/A'}
+                              {transaction.transactionDetails?.timestamp ? 
+                                formatDate(transaction.transactionDetails.timestamp) : 'N/A'}
                             </p>
                           </div>
                           <div className="flex flex-col items-end">
                             <div className="text-xl font-bold text-gray-900 mb-2">
-                              Rp{(transaction.totalAmount || 0).toLocaleString('id-ID')}
+                              Rp{transaction.transactionDetails?.totalAmount?.toLocaleString('id-ID') || '0'}
                             </div>
-                            {getStatusBadge(transaction.status)}
+                            {getStatusBadge(transaction.transactionDetails?.status)}
+                          </div>
+                        </div>
+
+                        {/* Product details */}
+                        <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div className="bg-gray-50 p-4 rounded-lg">
+                            <h4 className="text-sm font-medium text-gray-500 mb-2">Game Details</h4>
+                            <p className="text-gray-900">
+                              <span className="font-medium">Game:</span> {transaction.customer?.game || 'N/A'}
+                            </p>
+                            <p className="text-gray-900">
+                              <span className="font-medium">Category:</span> {transaction.customer?.category || 'N/A'}
+                            </p>
+                          </div>
+                          
+                          <div className="bg-gray-50 p-4 rounded-lg">
+                            <h4 className="text-sm font-medium text-gray-500 mb-2">Payment Method</h4>
+                            <p className="text-gray-900">
+                              <span className="font-medium">Method:</span> {transaction.transactionDetails?.paymentMethod || 'N/A'}
+                            </p>
+                            <p className="text-gray-900">
+                              <span className="font-medium">Status:</span> {transaction.transactionDetails?.status || 'N/A'}
+                            </p>
                           </div>
                         </div>
 
                         {/* Product Link (only shown when status is completed) */}
-                        {transaction.status === 'completed' && transaction.link && (
+                        {transaction.transactionDetails?.status === 'completed' && transaction.notes?.adminNotes && (
                           <div className="mt-6 bg-green-50 rounded-lg p-4 border border-green-100">
                             <div className="flex items-start">
                               <div className="flex-shrink-0">
@@ -282,40 +326,55 @@ const Dashboard = () => {
                                   Your product is ready!
                                 </h3>
                                 <div className="mt-2">
-                                  <a
-                                    href={transaction.link}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="inline-flex items-center text-sm font-medium text-green-700 hover:text-green-600"
-                                  >
-                                    Click here to access your product
-                                    <FiExternalLink className="ml-1" />
-                                  </a>
+                                  <p className="text-sm text-green-700">
+                                    {transaction.notes.adminNotes}
+                                  </p>
+                                  {transaction.notes.link && (
+                                    <a
+                                      href={transaction.notes.link}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="inline-flex items-center text-sm font-medium text-green-700 hover:text-green-600 mt-2"
+                                    >
+                                      Click here to access your product
+                                      <FiExternalLink className="ml-1" />
+                                    </a>
+                                  )}
                                 </div>
                               </div>
                             </div>
                           </div>
                         )}
 
-                        {/* Download Section (only shown when status is completed and has download) */}
-                        {transaction.status === 'completed' && transaction.downloadUrl && (
-                          <div className="mt-4 bg-blue-50 rounded-lg p-4 border border-blue-100">
+                        {/* Admin message for pending/failed */}
+                        {transaction.transactionDetails?.status !== 'completed' && transaction.notes?.adminNotes && (
+                          <div className={`mt-6 rounded-lg p-4 border ${
+                            transaction.transactionDetails?.status === 'pending' ? 
+                              'bg-yellow-50 border-yellow-100' : 
+                              'bg-red-50 border-red-100'
+                          }`}>
                             <div className="flex items-start">
                               <div className="flex-shrink-0">
-                                <FiDownload className="h-5 w-5 text-blue-500" />
+                                {transaction.transactionDetails?.status === 'pending' ? 
+                                  <FiClock className="h-5 w-5 text-yellow-500" /> : 
+                                  <FiX className="h-5 w-5 text-red-500" />
+                                }
                               </div>
                               <div className="ml-3 flex-1">
-                                <h3 className="text-sm font-medium text-blue-800">
-                                  Download your files
+                                <h3 className="text-sm font-medium ${
+                                  transaction.transactionDetails?.status === 'pending' ? 
+                                    'text-yellow-800' : 'text-red-800'
+                                }">
+                                  {transaction.transactionDetails?.status === 'pending' ? 
+                                    'Payment in progress' : 'Payment failed'}
                                 </h3>
                                 <div className="mt-2">
-                                  <a
-                                    href={transaction.downloadUrl}
-                                    className="inline-flex items-center text-sm font-medium text-blue-700 hover:text-blue-600"
-                                  >
-                                    Download now
-                                    <FiExternalLink className="ml-1" />
-                                  </a>
+                                  <p className={`text-sm ${
+                                    transaction.transactionDetails?.status === 'pending' ? 
+                                      'text-yellow-700' : 'text-red-700'
+                                  }`}>
+                                    {transaction.notes.adminNotes}
+                                  </p>
                                 </div>
                               </div>
                             </div>
@@ -335,7 +394,7 @@ const Dashboard = () => {
       <footer className="bg-white border-t border-gray-200 mt-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <p className="text-center text-sm text-gray-500">
-            &copy; {new Date().getFullYear()} Qarvo. All rights reserved.
+            &copy; {new Date().getFullYear()} Your Company. All rights reserved.
           </p>
         </div>
       </footer>
