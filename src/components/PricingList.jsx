@@ -1,4 +1,4 @@
-import { FaCheck, FaTimes, FaCrown, FaStar, FaBolt } from "react-icons/fa";
+import { FaCheck, FaTimes, FaCrown, FaStar, FaBolt, FaListUl } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 
 const PricingList = () => {
@@ -42,13 +42,13 @@ const PricingList = () => {
   ];
 
   const featureAvailability = [
-    [true, true, true],    // Unlimited Script Access
-    [false, true, true],   // Priority Support
-    [false, false, true],  // Private Build Request
-    [true, true, true],    // Multi-Device Login
-    [false, true, true],   // Early Feature Access
-    [false, false, true],  // Advanced UI Customization
-    [true, true, true]     // Encrypted API Key
+    [true, true, true],
+    [false, true, true],
+    [false, false, true],
+    [true, true, true],
+    [false, true, true],
+    [false, false, true],
+    [true, true, true]
   ];
 
   const handleBuy = (planName, planPrice) => {
@@ -69,34 +69,40 @@ const PricingList = () => {
 
       {/* Pricing Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-        {/* Feature Column */}
+        {/* Feature Column - Now perfectly matches Origin Qi styling */}
         <div className="hidden lg:block">
           <div className="bg-gray-800 rounded-xl border border-gray-700 overflow-hidden h-full">
-            {/* Feature Header with Icon */}
-            <div className="h-[180px] border-b border-gray-700 flex flex-col items-center justify-center p-6">
+            {/* Feature Header - Matches Origin Qi exactly */}
+            <div className="h-[180px] border-b border-gray-700 flex flex-col items-center justify-center p-6 text-center">
               <div className="w-14 h-14 rounded-full bg-gray-700/50 flex items-center justify-center mb-4">
-                <FaBolt className="text-purple-400" size={20} />
+                <FaListUl className="text-purple-400" size={20} />
               </div>
-              <h3 className="text-sm font-medium text-gray-400 uppercase tracking-wider">
+              <h3 className="text-xl font-bold text-purple-400">
                 Features
               </h3>
+              <p className="mt-2 text-sm text-gray-400">
+                All plan comparisons
+              </p>
             </div>
             
-            {/* Price Label */}
-            <div className="h-20 border-b border-gray-700 flex items-center justify-center">
-              <span className="text-sm font-medium text-gray-400 uppercase tracking-wider">
+            {/* Price Label - Matches pricing section styling */}
+            <div className="h-20 border-t border-b border-gray-700 flex flex-col items-center justify-center bg-gray-800/30">
+              <div className="text-2xl font-bold text-purple-300">
                 Price
-              </span>
+              </div>
+              <div className="text-xs text-gray-400 mt-1">
+                (Lifetime Access)
+              </div>
             </div>
             
-            {/* Feature List */}
+            {/* Feature List - Perfectly aligned with checkmarks */}
             <div>
               {features.map((feature, index) => (
                 <div 
                   key={index}
                   className="h-[60px] border-b border-gray-700 flex items-center px-6"
                 >
-                  <span className="text-gray-300 text-sm whitespace-nowrap">
+                  <span className="text-gray-300 text-sm font-medium whitespace-nowrap">
                     {feature}
                   </span>
                 </div>
