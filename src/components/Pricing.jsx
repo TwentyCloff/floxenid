@@ -3,8 +3,12 @@ import { LeftLine, RightLine } from "./design/Pricing";
 import Heading from "./Heading";
 import PricingList from "./PricingList";
 import Section from "./Section";
+import Button from "./Button";
+import { useNavigate } from "react-router-dom";
 
 const Pricing = () => {
+  const navigate = useNavigate();
+
   return (
     <Section className="overflow-hidden" id="pricing">
       <div className="container relative z-2">
@@ -40,12 +44,13 @@ const Pricing = () => {
         </div>
 
         <div className="flex justify-center mt-10">
-          <a
-            className="text-xs font-code font-bold tracking-wider uppercase border-b"
-            href="#"
+          <Button
+            className="w-[15rem]" // optional custom width
+            onClick={() => navigate("/dashboard")}
+            white={false} // sama seperti tombol 'Get started'
           >
-            See the full details
-          </a>
+            Go To Dashboard
+          </Button>
         </div>
       </div>
     </Section>
