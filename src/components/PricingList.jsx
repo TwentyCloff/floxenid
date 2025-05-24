@@ -5,20 +5,20 @@ const plans = [
   { 
     name: "Origin Qi", 
     price: "25.000",
-    icon: <FaBolt className="text-amber-400" />,
+    icon: <FaBolt className="text-amber-400" size={24} />,
     description: "Perfect for beginners"
   },
   { 
     name: "Half Saint", 
     price: "50.000",
-    icon: <FaStar className="text-yellow-300" />,
+    icon: <FaStar className="text-yellow-300" size={24} />,
     description: "Most popular choice",
     recommended: true 
   },
   { 
     name: "Peak Immortal", 
     price: "100.000",
-    icon: <FaCrown className="text-purple-400" />,
+    icon: <FaCrown className="text-purple-400" size={24} />,
     description: "Ultimate experience"
   }
 ];
@@ -43,18 +43,18 @@ const PricingList = () => {
   return (
     <div className="w-full max-w-6xl mx-auto bg-gradient-to-br from-n-8 to-n-9 border border-n-6 rounded-3xl p-8 text-n-1 shadow-2xl">
       <div className="mb-12 text-center">
-        <h2 className="text-3xl font-bold mb-2 bg-clip-text text-transparent bg-gradient-to-r from-color-2 to-color-4">
+        <h2 className="text-3xl md:text-4xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-color-2 to-color-4">
           Choose Your Plan
         </h2>
-        <p className="text-n-3 max-w-2xl mx-auto">
+        <p className="text-n-3 max-w-2xl mx-auto text-sm md:text-base">
           Select the perfect package for your needs. All plans come with a 30-day 
           satisfaction guarantee.
         </p>
       </div>
 
-      <div className="grid grid-cols-4 gap-0">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 md:gap-0">
         {/* Feature labels column */}
-        <div className="col-span-1">
+        <div className="hidden md:block col-span-1">
           <div className="h-48"></div> {/* Spacer for headers */}
           <div className="h-20 flex items-end pb-4 px-4 text-sm font-medium text-n-3 uppercase tracking-wider">
             Features
@@ -65,7 +65,7 @@ const PricingList = () => {
               key={`feature-${i}`}
               className="h-16 flex items-center border-t border-n-6/50 px-4 text-n-2 group"
             >
-              <span className="transition-all group-hover:text-color-2">
+              <span className="transition-all group-hover:text-color-2 text-sm">
                 {feature.label}
               </span>
             </div>
@@ -76,25 +76,25 @@ const PricingList = () => {
         {plans.map((plan, i) => (
           <div 
             key={`plan-${i}`} 
-            className={`col-span-1 relative transition-all hover:scale-[1.02] ${
+            className={`md:col-span-1 relative transition-all hover:scale-[1.02] ${
               plan.recommended 
-                ? "z-10 shadow-2xl" 
+                ? "z-10 shadow-2xl md:-mx-2" 
                 : "hover:shadow-lg"
             }`}
           >
             {/* Plan header */}
-            <div className={`h-48 rounded-t-2xl p-6 flex flex-col items-center justify-center ${
+            <div className={`h-48 rounded-t-2xl p-6 flex flex-col items-center justify-center relative ${
               plan.recommended 
-                ? "bg-gradient-to-br from-color-2/90 to-color-4/80" 
+                ? "bg-gradient-to-br from-color-2/90 to-color-4/80 pt-8" 
                 : "bg-n-7"
             }`}>
               {plan.recommended && (
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-color-2 text-n-8 text-xs font-bold px-4 py-1.5 rounded-full shadow-md z-20 uppercase tracking-wider flex items-center">
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-color-2 text-n-8 text-xs font-bold px-4 py-1.5 rounded-full shadow-md z-20 uppercase tracking-wider flex items-center whitespace-nowrap">
                   <FaStar className="mr-1" /> Recommended
                 </div>
               )}
               
-              <div className="text-3xl mb-3">
+              <div className="w-16 h-16 rounded-full bg-n-8/20 flex items-center justify-center mb-4">
                 {plan.icon}
               </div>
               <h3 className={`text-xl font-bold ${
@@ -102,7 +102,7 @@ const PricingList = () => {
               }`}>
                 {plan.name}
               </h3>
-              <p className={`text-sm mt-1 ${
+              <p className={`text-sm mt-2 text-center ${
                 plan.recommended ? "text-n-8/90" : "text-n-3"
               }`}>
                 {plan.description}
