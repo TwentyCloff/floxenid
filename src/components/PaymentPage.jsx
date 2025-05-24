@@ -6,14 +6,15 @@ import {
   FiCopy, FiExternalLink, FiChevronDown, FiCreditCard
 } from "react-icons/fi";
 import { FaQrcode, FaDiscord } from "react-icons/fa";
-import { db, auth } from "../config/firebaseConfig";
-import { doc, setDoc, serverTimestamp, onSnapshot } from "firebase/firestore";
+import { db } from "../config/firebaseConfig";
+import { doc, setDoc, serverTimestamp } from "firebase/firestore";
 import paymentVideo from "../assets/hero/payment-bg.mp4";
 import Button from "./Button";
 import gopayLogo from "../assets/selectz/gopay1.png";
 import danaLogo from "../assets/selectz/dana1.png";
 
 const PaymentPage = () => {
+  // State management
   const [step, setStep] = useState(1);
   const [paymentComplete, setPaymentComplete] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -35,18 +36,20 @@ const PaymentPage = () => {
   const [invoiceNumber, setInvoiceNumber] = useState("");
   const [showGameDropdown, setShowGameDropdown] = useState(false);
   const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
-  const [error, setError] = useState("");
   
+  // Router and query params
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
   const plan = searchParams.get('plan');
   const price = searchParams.get('price');
   const navigate = useNavigate();
 
+  // Constants
   const games = ["Roblox", "Growtopia"];
   const categories = ["Script", "Item"];
   const serviceFee = 500;
 
+  // Payment methods configuration
   const paymentMethods = {
     "qris": {
       name: "QRIS",
@@ -83,27 +86,14 @@ const PaymentPage = () => {
     }
   };
 
+  // Effects
   useEffect(() => {
     if (Object.keys(touched).length > 0) {
       validatePersonalInfo();
     }
   }, [personalInfo, touched]);
 
-  useEffect(() => {
-    if (invoiceNumber) {
-      const docRef = doc(db, "transactions", invoiceNumber);
-      const unsubscribe = onSnapshot(docRef, (doc) => {
-        if (doc.exists()) {
-          const data = doc.data();
-          if (data.transactionDetails.status === "completed") {
-            setPaymentComplete(true);
-          }
-        }
-      });
-      return () => unsubscribe();
-    }
-  }, [invoiceNumber]);
-
+  // Helper functions
   const generateInvoiceNumber = () => {
     const now = new Date();
     const datePart = now.getFullYear().toString().slice(-2) + 
@@ -146,28 +136,35 @@ const PaymentPage = () => {
     setTouched(prev => ({ ...prev, category: true }));
   };
 
+  // Validation functions
   const validatePersonalInfo = () => {
     const newErrors = {};
     const { name, email, discord, phone, game, category } = personalInfo;
     
+    // Name validation (3-50 chars, letters and spaces only)
     if (!name.trim()) newErrors.name = "Full name is required";
     else if (name.length < 3) newErrors.name = "Minimum 3 characters";
     else if (name.length > 50) newErrors.name = "Maximum 50 characters";
     else if (!/^[a-zA-Z\s.'-]+$/.test(name)) newErrors.name = "Invalid characters";
     
+    // Email validation (standard format)
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!email) newErrors.email = "Email is required";
     else if (!emailRegex.test(email)) newErrors.email = "Invalid email format";
     else if (email.length > 100) newErrors.email = "Email too long";
     
+    // Discord validation (exactly 17-19 digits)
     if (!discord.trim()) newErrors.discord = "Discord ID is required";
     else if (!/^\d{17,19}$/.test(discord)) newErrors.discord = "Must be 17-19 digits";
     
+    // Phone validation (10-15 digits)
     if (!phone) newErrors.phone = "WhatsApp number is required";
     else if (!/^\d{10,15}$/.test(phone)) newErrors.phone = "Invalid phone number";
     
+    // Game selection validation
     if (!game) newErrors.game = "Please select a game";
     
+    // Category selection validation
     if (!category) newErrors.category = "Please select a category";
     
     setErrors(newErrors);
@@ -182,6 +179,7 @@ const PaymentPage = () => {
     setTimeout(() => setCopiedIndex(null), 3000);
   };
 
+  // Navigation functions
   const handleProceedToPayment = () => {
     if (validatePersonalInfo()) {
       if (!dontShowAgain) {
@@ -204,6 +202,7 @@ const PaymentPage = () => {
     }
   };
 
+  // Payment submission
   const submitPayment = async () => {
     if (!validatePersonalInfo()) {
       scrollToFirstError();
@@ -211,15 +210,11 @@ const PaymentPage = () => {
     }
     
     setIsProcessing(true);
-    setError("");
     
     try {
       const invoiceNum = generateInvoiceNumber();
       setInvoiceNumber(invoiceNum);
       
-      const user = auth.currentUser;
-      if (!user) throw new Error("User not authenticated");
-
       const transactionData = {
         customer: {
           name: personalInfo.name,
@@ -228,7 +223,7 @@ const PaymentPage = () => {
           phone: personalInfo.phone,
           game: personalInfo.game,
           category: personalInfo.category,
-          userId: user.uid
+          userId: ""
         },
         transactionDetails: {
           plan: plan || "Unknown Plan",
@@ -260,15 +255,17 @@ const PaymentPage = () => {
       };
 
       await setDoc(doc(db, "transactions", invoiceNum), transactionData);
-      
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      setPaymentComplete(true);
     } catch (error) {
       console.error("Payment processing error:", error);
-      setError(`Payment failed: ${error.message}`);
+      alert(`Payment failed: ${error.message}`);
     } finally {
       setIsProcessing(false);
     }
   };
 
+  // Success Screen
   if (paymentComplete) {
     return (
       <div className="fixed inset-0 overflow-y-auto z-[9999] bg-black flex items-center justify-center p-4">
@@ -317,6 +314,7 @@ const PaymentPage = () => {
     );
   }
 
+  // Processing Screen
   if (isProcessing) {
     return (
       <div className="fixed inset-0 overflow-y-auto z-[9999] bg-black flex items-center justify-center p-4">
@@ -355,8 +353,10 @@ const PaymentPage = () => {
     );
   }
 
+  // Main Payment Form
   return (
     <div className="fixed inset-0 overflow-y-auto z-[9999] bg-black">
+      {/* Background video with overlay */}
       <div className="fixed inset-0 w-full h-full bg-gradient-to-br from-gray-900 via-black to-gray-900">
         <video
           autoPlay
@@ -368,6 +368,7 @@ const PaymentPage = () => {
         </video>
       </div>
 
+      {/* Copy notification */}
       {showCopyNotification && (
         <div className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none">
           <div className="bg-gray-900/90 backdrop-blur-sm rounded-lg p-4 max-w-xs w-full mx-4 border border-emerald-500/30 shadow-lg">
@@ -379,6 +380,7 @@ const PaymentPage = () => {
         </div>
       )}
 
+      {/* Rules confirmation modal */}
       {showConfirmation && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
           <div className="bg-gray-900 rounded-xl p-6 max-w-md w-full border border-purple-500/30 shadow-2xl">
@@ -444,7 +446,9 @@ const PaymentPage = () => {
         </div>
       )}
 
+      {/* Main payment container */}
       <div className="relative z-10 bg-gray-900/95 backdrop-blur-2xl p-6 rounded-xl max-w-4xl w-full mx-auto my-8 border border-gray-700/50 shadow-2xl">
+        {/* Header with progress steps */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
           <div>
             <h1 className="text-2xl md:text-3xl font-bold text-white">
@@ -485,9 +489,11 @@ const PaymentPage = () => {
           </div>
         </div>
 
+        {/* Step 1: Personal Information */}
         {step === 1 && (
           <div className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              {/* Name Field */}
               <div className="space-y-2">
                 <label className="block text-gray-400 text-sm font-medium">
                   Full Name <span className="text-red-400">*</span>
@@ -517,6 +523,7 @@ const PaymentPage = () => {
                 )}
               </div>
               
+              {/* Email Field */}
               <div className="space-y-2">
                 <label className="block text-gray-400 text-sm font-medium">
                   Email <span className="text-red-400">*</span>
@@ -546,6 +553,7 @@ const PaymentPage = () => {
                 )}
               </div>
               
+              {/* Discord Field */}
               <div className="space-y-2">
                 <label className="block text-gray-400 text-sm font-medium">
                   Discord User ID <span className="text-red-400">*</span>
@@ -582,6 +590,7 @@ const PaymentPage = () => {
                 </div>
               </div>
               
+              {/* Phone Field */}
               <div className="space-y-2">
                 <label className="block text-gray-400 text-sm font-medium">
                   WhatsApp Number <span className="text-red-400">*</span>
@@ -612,6 +621,7 @@ const PaymentPage = () => {
                 )}
               </div>
 
+              {/* Game Selection */}
               <div className="space-y-2">
                 <label className="block text-gray-400 text-sm font-medium">
                   Select Game <span className="text-red-400">*</span>
@@ -649,6 +659,7 @@ const PaymentPage = () => {
                 )}
               </div>
 
+              {/* Category Selection */}
               <div className="space-y-2">
                 <label className="block text-gray-400 text-sm font-medium">
                   Select Category <span className="text-red-400">*</span>
@@ -687,6 +698,7 @@ const PaymentPage = () => {
               </div>
             </div>
             
+            {/* Rules Section */}
             <div className="bg-gray-800/50 rounded-lg p-5 border border-gray-700/50">
               <h3 className="text-lg font-bold text-white mb-3 flex items-center">
                 <FiShield className="text-purple-400 mr-2" />
@@ -712,6 +724,7 @@ const PaymentPage = () => {
               </ul>
             </div>
             
+            {/* Navigation Buttons */}
             <div className="flex justify-between pt-5 border-t border-gray-700/50">
               <Button
                 onClick={() => navigate(-1)}
@@ -731,6 +744,7 @@ const PaymentPage = () => {
           </div>
         )}
 
+        {/* Step 2: Payment Method */}
         {step === 2 && (
           <div className="space-y-6">
             <div className="space-y-5">
@@ -763,6 +777,7 @@ const PaymentPage = () => {
               </div>
             </div>
             
+            {/* Payment Details */}
             <div className="bg-gray-800/50 rounded-xl p-5 border border-gray-700/50">
               <div className="flex flex-col items-center text-center mb-6">
                 <div className={`w-14 h-14 rounded-full flex items-center justify-center mb-3 bg-gradient-to-br ${paymentMethods[paymentMethod].color} text-white shadow-md`}>
@@ -787,6 +802,7 @@ const PaymentPage = () => {
                 </div>
               ) : (
                 <div className="space-y-5">
+                  {/* Payment Account */}
                   <div className="bg-gray-800 rounded-xl p-5 border border-gray-700/50">
                     <p className="text-gray-400 text-sm mb-1 uppercase tracking-wider">
                       {paymentMethods[paymentMethod].name} Number
@@ -814,6 +830,7 @@ const PaymentPage = () => {
                     </div>
                   </div>
 
+                  {/* Order Summary */}
                   <div className="bg-gray-800 rounded-xl p-5 border border-gray-700/50">
                     <h4 className="text-lg font-bold text-white mb-4 flex items-center">
                       <FiCreditCard className="text-blue-400 mr-2" />
@@ -849,6 +866,7 @@ const PaymentPage = () => {
                     </div>
                   </div>
 
+                  {/* Important Note */}
                   <div className="bg-yellow-500/10 rounded-lg p-4 border border-yellow-500/20 flex items-start">
                     <FiMessageSquare className="flex-shrink-0 mt-0.5 mr-3 text-yellow-400" />
                     <p className="text-yellow-300 text-sm">
@@ -859,6 +877,7 @@ const PaymentPage = () => {
               )}
             </div>
             
+            {/* Navigation Buttons */}
             <div className="flex justify-between pt-5 border-t border-gray-700/50">
               <Button
                 onClick={() => setStep(1)}
@@ -877,6 +896,7 @@ const PaymentPage = () => {
           </div>
         )}
 
+        {/* Step 3: Confirmation */}
         {step === 3 && (
           <div className="space-y-6">
             <div className="bg-gray-800/50 rounded-xl p-6 border border-gray-700/50">
@@ -890,6 +910,7 @@ const PaymentPage = () => {
               </div>
               
               <div className="space-y-6">
+                {/* Customer Information */}
                 <div className="space-y-3">
                   <h4 className="text-lg font-bold text-white flex items-center">
                     <FiUser className="text-blue-400 mr-2" />
@@ -923,6 +944,7 @@ const PaymentPage = () => {
                   </div>
                 </div>
                 
+                {/* Payment Information */}
                 <div className="space-y-3">
                   <h4 className="text-lg font-bold text-white flex items-center">
                     <FiCreditCard className="text-blue-400 mr-2" />
@@ -959,6 +981,7 @@ const PaymentPage = () => {
                   </div>
                 </div>
                 
+                {/* Security Note */}
                 <div className="bg-blue-500/10 rounded-lg p-4 border border-blue-500/20 flex items-start">
                   <div className="bg-blue-500/20 p-1.5 rounded-lg mr-3 flex-shrink-0">
                     <FiLock className="w-4 h-4 text-blue-400" />
@@ -970,6 +993,7 @@ const PaymentPage = () => {
               </div>
             </div>
             
+            {/* Navigation Buttons */}
             <div className="flex justify-between pt-5 border-t border-gray-700/50">
               <Button
                 onClick={() => setStep(2)}
