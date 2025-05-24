@@ -1,6 +1,7 @@
 @import url("https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Source+Code+Pro:wght@400;600;700&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300&display=swap");
+@import url("https://fonts.cdnfonts.com/css/circular-std"); /* Circular Std added */
 
 @tailwind base;
 @tailwind components;
@@ -10,6 +11,7 @@
   --font-sora: "Sora", sans-serif;
   --font-code: "Source Code Pro", monospace;
   --font-grotesk: "Space Grotesk", sans-serif;
+  --font-circular: "Circular Std", sans-serif; /* Circular Std variable */
   color-scheme: dark;
 }
 
@@ -24,6 +26,7 @@
   }
   body {
     @apply font-sans text-n-1 text-base;
+    font-family: var(--font-circular); /* Apply Circular Std globally */
     margin: 0;
     min-height: 100vh;
     background-color: #121212;
