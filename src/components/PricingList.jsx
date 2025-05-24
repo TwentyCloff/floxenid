@@ -3,7 +3,7 @@ import Button from "./Button";
 import { useNavigate } from "react-router-dom";
 
 const plans = ["Origin Qi", "Half Saint", "Peak Immortal"];
-const prices = ["0", "125000", "325000"];
+const prices = ["0", "125000", "325.000"];
 const recommendedIndex = 1;
 
 const features = [
@@ -32,7 +32,7 @@ const PricingList = () => {
           const isRecommended = index === recommendedIndex;
           return (
             <div
-              key={index}
+              key={`header-${index}`}
               className={`relative rounded-2xl transition-all p-4 pt-8 text-center border ${
                 isRecommended
                   ? "border-color-2 bg-n-7 scale-[1.03] shadow-lg"
@@ -56,29 +56,31 @@ const PricingList = () => {
           );
         })}
 
-        {/* Features Row */}
-        {features.map((feature, fIndex) => (
-          <React.Fragment key={fIndex}>
-            {/* Feature Name */}
-            <div className="flex items-center h-14 border-t border-n-6 pl-2 text-sm text-n-2 font-medium">
-              {feature.label}
-            </div>
-
-            {/* Feature Values */}
-            {plans.map((_, index) => (
-              <div
-                key={`${fIndex}-${index}`}
-                className="h-14 border-t border-n-6 flex items-center justify-center text-xl"
-              >
-                {feature.values[index] ? (
-                  <FaCheck className="text-color-4" />
-                ) : (
-                  <FaTimes className="text-color-3" />
-                )}
+        {/* Features Rows */}
+        {features.map((feature, fIndex) => {
+          return (
+            <React.Fragment key={`feature-${fIndex}`}>
+              {/* Feature Name */}
+              <div className="flex items-center h-14 border-t border-n-6 pl-2 text-sm text-n-2 font-medium">
+                {feature.label}
               </div>
-            ))}
-          </React.Fragment>
-        ))}
+
+              {/* Feature values for each plan */}
+              {feature.values.map((hasFeature, pIndex) => (
+                <div
+                  key={`feature-${fIndex}-plan-${pIndex}`}
+                  className="h-14 border-t border-n-6 flex items-center justify-center text-xl"
+                >
+                  {hasFeature ? (
+                    <FaCheck className="text-color-4" />
+                  ) : (
+                    <FaTimes className="text-color-3" />
+                  )}
+                </div>
+              ))}
+            </React.Fragment>
+          );
+        })}
       </div>
     </div>
   );
