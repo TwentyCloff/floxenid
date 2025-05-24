@@ -10,8 +10,8 @@ import { db } from "../config/firebaseConfig";
 import { doc, setDoc, serverTimestamp } from "firebase/firestore";
 import paymentVideo from "../assets/hero/payment-bg.mp4";
 import Button from "./Button";
-import gopayLogo from "../assets/selectz/gopay.png";
-import danaLogo from "../assets/selectz/dana.png";
+import gopayLogo from "../assets/selectz/gopay1.png";
+import danaLogo from "../assets/selectz/dana1.png";
 
 const PaymentPage = () => {
   // State management
