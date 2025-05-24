@@ -3,10 +3,8 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { disablePageScroll, enablePageScroll } from "scroll-lock";
 import { onAuthStateChanged, signOut } from "firebase/auth";
 
-import { auth } from "../config/firebaseConfig"; // pastikan path benar
-
+import { auth } from "../config/firebaseConfig";
 import MenuSvg from "../assets/svg/MenuSvg";
-import { links } from "../config";
 import { navigation } from "../constants";
 import Button from "../components/Button";
 import { HambugerMenu } from "../components/design/Header";
@@ -16,15 +14,14 @@ const Header = () => {
   const navigate = useNavigate();
 
   const [openNavigation, setOpenNavigation] = useState(false);
-  const [user, setUser] = useState(null); // user state
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
-    // Listen user state
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
     });
 
-    return () => unsubscribe(); // cleanup
+    return () => unsubscribe();
   }, []);
 
   const toggleNavigation = () => {
@@ -48,8 +45,12 @@ const Header = () => {
       await signOut(auth);
       setUser(null);
     } else {
-      navigate("/login"); // arahkan ke halaman login
+      navigate("/login");
     }
+  };
+
+  const goToDashboard = () => {
+    navigate("/dashboard");
   };
 
   return (
@@ -105,12 +106,19 @@ const Header = () => {
             <HambugerMenu />
           </nav>
 
-          {/* Login/Logout button on desktop */}
+          {/* Dashboard Button (desktop only) */}
+          {user && (
+            <Button className="hidden lg:flex mr-2" onClick={goToDashboard}>
+              Dashboard
+            </Button>
+          )}
+
+          {/* Login/Logout Button */}
           <Button className="hidden lg:flex" onClick={handleLoginLogout}>
-            {user ? "Logout" : "Login"}
+            {user ? "Logout" : "Sign In / Sign Up"}
           </Button>
 
-          {/* Mobile Menu button */}
+          {/* Mobile menu button */}
           <Button
             onClick={toggleNavigation}
             className="ml-auto lg:hidden"
