@@ -1,46 +1,16 @@
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { useLocation } from "react-router-dom";
 import { disablePageScroll, enablePageScroll } from "scroll-lock";
 
 import MenuSvg from "../assets/svg/MenuSvg";
 import { links } from "../config";
 import { navigation } from "../constants";
-import Button from "./Button";
-import { HambugerMenu } from "./design/Header";
+import Button from "../components/Button";
+import { HambugerMenu } from "../components/design/Header";
 
 const Header = () => {
   const pathname = useLocation();
   const [openNavigation, setOpenNavigation] = useState(false);
-  const [isScrolled, setIsScrolled] = useState(false);
-  const [activeSection, setActiveSection] = useState(null);
-  const sectionRefs = useRef({});
-
-  useEffect(() => {
-    const handleScroll = () => {
-      const scrollTop = window.scrollY;
-      setIsScrolled(scrollTop > 10);
-
-      let current = null;
-      Object.entries(sectionRefs.current).forEach(([id, el]) => {
-        if (el && el.offsetTop <= scrollTop + 80) {
-          current = id;
-        }
-      });
-      setActiveSection(current);
-    };
-
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
-  useEffect(() => {
-    navigation.forEach((item) => {
-      if (item.url.startsWith("#")) {
-        const id = item.url.replace("#", "");
-        sectionRefs.current[id] = document.getElementById(id);
-      }
-    });
-  }, []);
 
   const toggleNavigation = () => {
     if (openNavigation) {
@@ -65,12 +35,15 @@ const Header = () => {
       )}
 
       <div
-        className={`fixed top-0 left-0 w-full z-50 transition-colors duration-300 backdrop-blur-md ${
-          isScrolled || openNavigation ? "bg-black/90" : "bg-black/20"
+        className={`fixed top-0 left-0 w-full z-50 transition-colors duration-300 ${
+          openNavigation
+            ? "bg-black backdrop-blur-md"
+            : "bg-black/20 backdrop-blur-md"
         }`}
         style={{ height: "68px" }}
       >
         <div className="flex items-center px-5 lg:px-7.5 xl:px-10 py-3 h-full">
+          {/* Logo */}
           <a
             className="block w-auto xl:mr-8 text-3xl font-bold bg-gradient-to-r from-purple-500 to-indigo-500 text-transparent bg-clip-text"
             href="#hero"
@@ -78,6 +51,7 @@ const Header = () => {
             Qarvo
           </a>
 
+          {/* Navigation */}
           <nav
             className={`${
               openNavigation ? "flex" : "hidden"
@@ -91,11 +65,11 @@ const Header = () => {
                   target={item.external ? "_blank" : "_self"}
                   rel={item.external ? "noreferrer noopener" : undefined}
                   onClick={handleClick}
-                  className={`block relative font-code text-2xl uppercase transition-colors hover:text-color-1 ${
+                  className={`block relative font-code text-2xl uppercase text-n-1 transition-colors hover:text-color-1 ${
                     item.onlyMobile ? "lg:hidden" : ""
                   } px-6 py-6 md:py-8 lg:mr-0.25 lg:text-xs lg:font-semibold ${
-                    item.url.replace("#", "") === activeSection
-                      ? "z-2 text-color-1"
+                    item.url === pathname.hash
+                      ? "z-2 lg:text-n-1"
                       : "lg:text-n-1/50"
                   } lg:leading-5 lg:hover:text-n-1 xl:px-12`}
                 >
@@ -107,10 +81,12 @@ const Header = () => {
             <HambugerMenu />
           </nav>
 
+          {/* Source Code button on desktop */}
           <Button className="hidden lg:flex" href={links.sourceCode} external>
             Source Code
           </Button>
 
+          {/* Mobile Menu button */}
           <Button
             onClick={toggleNavigation}
             className="ml-auto lg:hidden"
