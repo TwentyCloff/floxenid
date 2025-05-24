@@ -40,7 +40,7 @@ const BentoTilt = ({ children, className = "" }) => {
 const Services = () => {
   return (
     <Section id="how-to-use">
-      <div className="bg-black pb-52">
+      <div className="bg-black pb-52 circular-font">
         <div className="container mx-auto px-3 md:px-10">
           <BentoTilt className="border-hsla relative mb-7 h-96 w-full overflow-hidden rounded-md md:h-[65vh]">
             <div className="relative w-full h-full">
@@ -53,7 +53,7 @@ const Services = () => {
               />
               <div className="relative z-10 flex flex-col justify-between w-full h-full p-5">
                 <div>
-                  <h1 className="text-[32px] leading-tight font-medium tracking-tight text-white">
+                  <h1 className="bento-title text-white">
                     radia<b className="font-semibold">n</b>t
                   </h1>
                   <p className="mt-3 text-lg text-n-3 max-w-[240px]">
@@ -76,7 +76,7 @@ const Services = () => {
                 />
                 <div className="relative z-10 flex flex-col justify-between w-full h-full p-5">
                   <div>
-                    <h1 className="text-[32px] leading-tight font-medium tracking-tight text-white">
+                    <h1 className="bento-title text-white">
                       zig<b className="font-semibold">m</b>a
                     </h1>
                     <p className="mt-3 text-lg text-n-3 max-w-[240px]">
@@ -98,7 +98,7 @@ const Services = () => {
                 />
                 <div className="relative z-10 flex flex-col justify-between w-full h-full p-5">
                   <div>
-                    <h1 className="text-[32px] leading-tight font-medium tracking-tight text-white">
+                    <h1 className="bento-title text-white">
                       n<b className="font-semibold">e</b>xus
                     </h1>
                     <p className="mt-3 text-lg text-n-3 max-w-[240px]">
@@ -120,7 +120,7 @@ const Services = () => {
                 />
                 <div className="relative z-10 flex flex-col justify-between w-full h-full p-5">
                   <div>
-                    <h1 className="text-[32px] leading-tight font-medium tracking-tight text-white">
+                    <h1 className="bento-title text-white">
                       az<b className="font-semibold">u</b>l
                     </h1>
                     <p className="mt-3 text-lg text-n-3 max-w-[240px]">
@@ -133,7 +133,7 @@ const Services = () => {
 
             <BentoTilt>
               <div className="flex w-full h-full flex-col justify-between bg-violet-300 p-5">
-                <h1 className="text-[32px] leading-tight font-medium tracking-tight text-black">
+                <h1 className="bento-title text-black">
                   M<b className="font-semibold">o</b>re co<b className="font-semibold">m</b>ing so<b className="font-semibold">o</b>n!
                 </h1>
                 <TiLocationArrow className="m-5 scale-[5] self-end text-black" />
