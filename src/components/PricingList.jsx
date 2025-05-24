@@ -7,7 +7,7 @@ const PricingList = () => {
   const navigate = useNavigate();
 
   const handleGetStarted = (planTitle, planPrice) => {
-    navigate(`/payment?plan=${encodeURIComponent(planTitle)}&price=${planPrice}`);
+    navigate(`/payment?plan=Rp{encodeURIComponent(planTitle)}&price=Rp{planPrice}`);
   };
 
   return (
@@ -29,7 +29,7 @@ const PricingList = () => {
           <div className="flex items-end h-[5.5rem] mb-6">
             {plan.price && (
               <div className="flex items-end gap-1">
-                <span className="text-[1.5rem] font-bold leading-tight">$</span>
+                <span className="text-[1.5rem] font-bold leading-tight">Rp</span>
                 <span className="text-[3.5rem] font-bold leading-tight min-w-[6ch] text-left">
                   {plan.price}
                 </span>
@@ -48,7 +48,7 @@ const PricingList = () => {
           <ul>
             {plan.features.map((feature, j) => (
               <li
-                key={`plan-${i}-feature-${j}`}
+                key={`plan-Rp{i}-feature-Rp{j}`}
                 className="flex items-start py-5 border-t border-n-6"
               >
                 <img src={check} alt="Check" width={20} height={20} />
