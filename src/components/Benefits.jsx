@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { FiCheckCircle, FiShield, FiTrendingUp, FiZap } from "react-icons/fi";
+import ClipPath from "../assets/svg/ClipPath"; // Make sure this path is correct
 
 const WhyChooseUs = () => {
   const features = [
@@ -27,16 +28,14 @@ const WhyChooseUs = () => {
 
   return (
     <section className="relative py-24 overflow-hidden">
-      {/* Add this SVG for clipPath */}
+      {/* Add the ClipPath SVG definition */}
       <svg width="0" height="0" className="absolute">
         <defs>
-          <clipPath id="benefits" clipPathUnits="objectBoundingBox">
-            <path d="M0,0.8 C0,0.8,0.2,0.9,0.5,0.9 C0.8,0.9,1,0.8,1,0.8 C1,0.8,0.8,1,0.5,1 C0.2,1,0,0.8,0,0.8" />
-          </clipPath>
+          <ClipPath />
         </defs>
       </svg>
 
-      {/* Background with clipPath */}
+      {/* Background with the same clipPath */}
       <div className="absolute inset-0 -z-10" style={{ clipPath: "url(#benefits)" }}>
         <div className="absolute inset-0 bg-gradient-to-br from-n-9 to-n-8 opacity-95" />
         <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary-500/10 rounded-full filter blur-[100px]" />
@@ -44,9 +43,8 @@ const WhyChooseUs = () => {
         <div className="absolute inset-0 opacity-5 bg-[url('https://www.transparenttextures.com/patterns/diamond-upholstery.png')]" />
       </div>
 
-      {/* Rest of your existing component */}
+      {/* Rest of your original component remains exactly the same */}
       <div className="container mx-auto px-4 relative z-10">
-        {/* Header */}
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -65,7 +63,6 @@ const WhyChooseUs = () => {
           </p>
         </motion.div>
 
-        {/* Features Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {features.map((feature, index) => (
             <motion.div
@@ -90,7 +87,6 @@ const WhyChooseUs = () => {
           ))}
         </div>
 
-        {/* Stats bar */}
         <motion.div
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
