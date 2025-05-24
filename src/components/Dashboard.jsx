@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { db } from '../config/firebaseConfig';
-import { doc, getDoc, collection, query, where, onSnapshot } from 'firebase/firestore';
+import { db, auth } from '../config/firebaseConfig';
+import { doc, collection, query, where, onSnapshot } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
 import { 
   FiUser, FiShoppingBag, FiClock, FiCheckCircle, 
   FiDownload, FiExternalLink, FiChevronRight, 
   FiCreditCard, FiHome, FiLogOut, FiX,
-  FiShield, FiMail, FiSmartphone
+  FiShield, FiMail, FiSmartphone, FiLoader,
+  FiAlertCircle, FiInfo
 } from "react-icons/fi";
 import { FaDiscord, FaQrcode } from "react-icons/fa";
+import { signOut } from 'firebase/auth';
 
 const Dashboard = () => {
   const [userData, setUserData] = useState(null);
@@ -18,68 +20,73 @@ const Dashboard = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchUserData = async () => {
+    const fetchData = async () => {
       try {
-        // Dalam implementasi nyata, gunakan ID user dari sistem auth
-        // Contoh ini menggunakan email dari localStorage sebagai referensi
-        const userEmail = localStorage.getItem('userEmail') || 'example@email.com';
-        
-        // 1. Fetch user data berdasarkan email
-        const usersRef = collection(db, 'users');
-        const q = query(usersRef, where('email', '==', userEmail));
-        
-        const unsubscribeUser = onSnapshot(q, (querySnapshot) => {
-          if (!querySnapshot.empty) {
-            const userDoc = querySnapshot.docs[0];
-            setUserData({ id: userDoc.id, ...userDoc.data() });
-            
-            // 2. Fetch transactions untuk user ini
-            const transactionsRef = collection(db, 'transactions');
-            const transactionsQuery = query(
-              transactionsRef, 
-              where('customer.email', '==', userEmail),
-              where('transactionDetails.status', 'in', ['pending', 'completed', 'failed'])
-            );
-            
-            const unsubscribeTransactions = onSnapshot(transactionsQuery, (snapshot) => {
-              const transactionsData = snapshot.docs.map(doc => ({
-                id: doc.id,
-                ...doc.data()
-              }));
-              setTransactions(transactionsData);
-              setLoading(false);
-            }, (err) => {
-              console.error("Error listening to transactions:", err);
-              setError("Failed to load transaction data");
-              setLoading(false);
-            });
-            
-            return () => unsubscribeTransactions();
+        const user = auth.currentUser;
+        if (!user) {
+          navigate('/auth');
+          return;
+        }
+
+        // User data subscription
+        const userDocRef = doc(db, 'users', user.uid);
+        const userUnsubscribe = onSnapshot(userDocRef, (doc) => {
+          if (doc.exists()) {
+            setUserData({ id: doc.id, ...doc.data() });
           } else {
             setError("User data not found");
+          }
+        });
+
+        // Transactions subscription
+        const transactionsQuery = query(
+          collection(db, 'transactions'),
+          where('customer.userId', '==', user.uid),
+          where('transactionDetails.status', 'in', ['pending', 'completed', 'failed'])
+        );
+
+        const transactionsUnsubscribe = onSnapshot(transactionsQuery, 
+          (snapshot) => {
+            const transactionsData = snapshot.docs.map(doc => ({
+              id: doc.id,
+              ...doc.data()
+            }));
+            setTransactions(transactionsData.sort((a, b) => 
+              b.transactionDetails?.timestamp?.toDate() - 
+              a.transactionDetails?.timestamp?.toDate()
+            ));
+            setLoading(false);
+          }, 
+          (err) => {
+            console.error("Transaction error:", err);
+            setError("Failed to load transactions");
             setLoading(false);
           }
-        }, (err) => {
-          console.error("Error listening to user data:", err);
-          setError("Failed to load user data");
-          setLoading(false);
-        });
-        
-        return () => unsubscribeUser();
+        );
+
+        return () => {
+          userUnsubscribe();
+          transactionsUnsubscribe();
+        };
+
       } catch (err) {
-        console.error("Error fetching data:", err);
+        console.error("Dashboard error:", err);
         setError("Failed to load data");
         setLoading(false);
       }
     };
 
-    fetchUserData();
-  }, []);
+    fetchData();
+  }, [navigate]);
 
-  const handleLogout = () => {
-    // Implement logout logic here
-    localStorage.removeItem('userEmail');
-    navigate('/');
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      navigate('/');
+    } catch (err) {
+      console.error("Logout error:", err);
+      setError("Failed to logout");
+    }
   };
 
   const formatDate = (timestamp) => {
@@ -125,7 +132,6 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
       <header className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
           <h1 className="text-2xl font-bold text-gray-900">User Dashboard</h1>
@@ -146,7 +152,6 @@ const Dashboard = () => {
         </div>
       </header>
 
-      {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {loading ? (
           <div className="flex justify-center items-center py-20">
@@ -156,9 +161,7 @@ const Dashboard = () => {
           <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-6">
             <div className="flex">
               <div className="flex-shrink-0">
-                <svg className="h-5 w-5 text-red-500" viewBox="0 0 20 20" fill="currentColor">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                </svg>
+                <FiAlertCircle className="h-5 w-5 text-red-500" />
               </div>
               <div className="ml-3">
                 <p className="text-sm text-red-700">{error}</p>
@@ -167,7 +170,6 @@ const Dashboard = () => {
           </div>
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-            {/* Sidebar */}
             <div className="lg:col-span-1">
               <div className="bg-white rounded-lg shadow-sm overflow-hidden">
                 <div className="p-6 bg-gradient-to-r from-blue-500 to-blue-600 text-white">
@@ -203,7 +205,6 @@ const Dashboard = () => {
                 </nav>
               </div>
 
-              {/* Account Info */}
               <div className="bg-white rounded-lg shadow-sm overflow-hidden mt-6">
                 <div className="p-4 border-b border-gray-200">
                   <h3 className="font-medium text-gray-900">Account Information</h3>
@@ -230,7 +231,6 @@ const Dashboard = () => {
               </div>
             </div>
 
-            {/* Main Content Area */}
             <div className="lg:col-span-3">
               <div className="bg-white rounded-lg shadow-sm overflow-hidden">
                 <div className="p-6 border-b border-gray-200">
@@ -291,7 +291,6 @@ const Dashboard = () => {
                           </div>
                         </div>
 
-                        {/* Product details */}
                         <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
                           <div className="bg-gray-50 p-4 rounded-lg">
                             <h4 className="text-sm font-medium text-gray-500 mb-2">Game Details</h4>
@@ -314,7 +313,6 @@ const Dashboard = () => {
                           </div>
                         </div>
 
-                        {/* Product Link (only shown when status is completed) */}
                         {transaction.transactionDetails?.status === 'completed' && transaction.notes?.adminNotes && (
                           <div className="mt-6 bg-green-50 rounded-lg p-4 border border-green-100">
                             <div className="flex items-start">
@@ -346,7 +344,6 @@ const Dashboard = () => {
                           </div>
                         )}
 
-                        {/* Admin message for pending/failed */}
                         {transaction.transactionDetails?.status !== 'completed' && transaction.notes?.adminNotes && (
                           <div className={`mt-6 rounded-lg p-4 border ${
                             transaction.transactionDetails?.status === 'pending' ? 
@@ -361,10 +358,10 @@ const Dashboard = () => {
                                 }
                               </div>
                               <div className="ml-3 flex-1">
-                                <h3 className="text-sm font-medium ${
+                                <h3 className={`text-sm font-medium ${
                                   transaction.transactionDetails?.status === 'pending' ? 
                                     'text-yellow-800' : 'text-red-800'
-                                }">
+                                }`}>
                                   {transaction.transactionDetails?.status === 'pending' ? 
                                     'Payment in progress' : 'Payment failed'}
                                 </h3>
@@ -390,7 +387,6 @@ const Dashboard = () => {
         )}
       </main>
 
-      {/* Footer */}
       <footer className="bg-white border-t border-gray-200 mt-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <p className="text-center text-sm text-gray-500">
