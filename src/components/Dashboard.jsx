@@ -10,7 +10,7 @@ import {
   FiAlertCircle, FiInfo
 } from "react-icons/fi";
 import { FaDiscord, FaQrcode } from "react-icons/fa";
-import { signOut } from 'firebase/auth';
+import { signOut, onAuthStateChanged } from 'firebase/auth';
 
 const Dashboard = () => {
   const [userData, setUserData] = useState(null);
@@ -18,6 +18,17 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
+
+  // Check auth state on component mount
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (!user) {
+        navigate('/login');
+      }
+    });
+
+    return () => unsubscribe();
+  }, [navigate]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -32,25 +43,30 @@ const Dashboard = () => {
         const userDocRef = doc(db, 'users', user.uid);
         const userUnsubscribe = onSnapshot(userDocRef, (doc) => {
           if (doc.exists()) {
-            setUserData({ id: doc.id, ...doc.data() });
+            const data = doc.data();
+            setUserData({ 
+              id: doc.id,
+              email: data.email || user.email,
+              name: data.name || user.displayName || '',
+              phone: data.phone || '',
+              discord: data.discord || '',
+              createdAt: data.createdAt || new Date(),
+              role: data.role || 'user'
+            });
           } else {
             // Create user document if it doesn't exist
-            setDoc(userDocRef, {
+            const newUserData = {
               email: user.email,
               name: user.displayName || '',
               phone: '',
               discord: '',
               createdAt: new Date(),
               role: 'user'
-            }).then(() => {
+            };
+            setDoc(userDocRef, newUserData).then(() => {
               setUserData({
                 id: user.uid,
-                email: user.email,
-                name: user.displayName || '',
-                phone: '',
-                discord: '',
-                createdAt: new Date(),
-                role: 'user'
+                ...newUserData
               });
             });
           }
@@ -231,12 +247,14 @@ const Dashboard = () => {
                     <p className="text-sm text-gray-500">Discord ID</p>
                     <p className="flex items-center text-gray-900">
                       <FaDiscord className="mr-2 text-blue-600" /> 
-                      {userData?.discord || 'Not connected'}
+                      {userData?.discord ? userData.discord : 'Not connected'}
                     </p>
                   </div>
                   <div className="mb-3">
                     <p className="text-sm text-gray-500">Phone Number</p>
-                    <p className="text-gray-900">{userData?.phone || 'Not provided'}</p>
+                    <p className="text-gray-900">
+                      {userData?.phone ? userData.phone : 'Not provided'}
+                    </p>
                   </div>
                   <div>
                     <p className="text-sm text-gray-500">Registered Date</p>
@@ -330,7 +348,7 @@ const Dashboard = () => {
                           </div>
                         </div>
 
-                        {transaction.transactionDetails?.status === 'completed' && transaction.notes?.adminNotes && (
+                        {transaction.transactionDetails?.status === 'completed' && (
                           <div className="mt-6 bg-green-50 rounded-lg p-4 border border-green-100">
                             <div className="flex items-start">
                               <div className="flex-shrink-0">
@@ -342,18 +360,23 @@ const Dashboard = () => {
                                 </h3>
                                 <div className="mt-2">
                                   <p className="text-sm text-green-700">
-                                    {transaction.notes.adminNotes}
+                                    {transaction.notes?.adminNotes || 'Your purchase has been processed successfully.'}
                                   </p>
-                                  {transaction.notes.link && (
-                                    <a
-                                      href={transaction.notes.link}
-                                      target="_blank"
-                                      rel="noopener noreferrer"
-                                      className="inline-flex items-center text-sm font-medium text-green-700 hover:text-green-600 mt-2"
-                                    >
-                                      Click here to access your product
-                                      <FiExternalLink className="ml-1" />
-                                    </a>
+                                  {transaction.notes?.link && (
+                                    <div className="mt-4">
+                                      <a
+                                        href={transaction.notes.link}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                                      >
+                                        <FiDownload className="mr-2" />
+                                        Download Product
+                                      </a>
+                                      <p className="mt-2 text-xs text-green-600">
+                                        Link expires in 7 days
+                                      </p>
+                                    </div>
                                   )}
                                 </div>
                               </div>
@@ -361,33 +384,39 @@ const Dashboard = () => {
                           </div>
                         )}
 
-                        {transaction.transactionDetails?.status !== 'completed' && transaction.notes?.adminNotes && (
-                          <div className={`mt-6 rounded-lg p-4 border ${
-                            transaction.transactionDetails?.status === 'pending' ? 
-                              'bg-yellow-50 border-yellow-100' : 
-                              'bg-red-50 border-red-100'
-                          }`}>
+                        {transaction.transactionDetails?.status === 'pending' && (
+                          <div className="mt-6 bg-yellow-50 rounded-lg p-4 border border-yellow-100">
                             <div className="flex items-start">
                               <div className="flex-shrink-0">
-                                {transaction.transactionDetails?.status === 'pending' ? 
-                                  <FiClock className="h-5 w-5 text-yellow-500" /> : 
-                                  <FiX className="h-5 w-5 text-red-500" />
-                                }
+                                <FiClock className="h-5 w-5 text-yellow-500" />
                               </div>
                               <div className="ml-3 flex-1">
-                                <h3 className={`text-sm font-medium ${
-                                  transaction.transactionDetails?.status === 'pending' ? 
-                                    'text-yellow-800' : 'text-red-800'
-                                }`}>
-                                  {transaction.transactionDetails?.status === 'pending' ? 
-                                    'Payment in progress' : 'Payment failed'}
+                                <h3 className="text-sm font-medium text-yellow-800">
+                                  Payment in progress
                                 </h3>
                                 <div className="mt-2">
-                                  <p className={`text-sm ${
-                                    transaction.transactionDetails?.status === 'pending' ? 
-                                      'text-yellow-700' : 'text-red-700'
-                                  }`}>
-                                    {transaction.notes.adminNotes}
+                                  <p className="text-sm text-yellow-700">
+                                    {transaction.notes?.adminNotes || 'Your payment is being processed. This usually takes 1-15 minutes.'}
+                                  </p>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+
+                        {transaction.transactionDetails?.status === 'failed' && (
+                          <div className="mt-6 bg-red-50 rounded-lg p-4 border border-red-100">
+                            <div className="flex items-start">
+                              <div className="flex-shrink-0">
+                                <FiX className="h-5 w-5 text-red-500" />
+                              </div>
+                              <div className="ml-3 flex-1">
+                                <h3 className="text-sm font-medium text-red-800">
+                                  Payment failed
+                                </h3>
+                                <div className="mt-2">
+                                  <p className="text-sm text-red-700">
+                                    {transaction.notes?.adminNotes || 'Your payment could not be processed. Please try again or contact support.'}
                                   </p>
                                 </div>
                               </div>
@@ -407,7 +436,7 @@ const Dashboard = () => {
       <footer className="bg-white border-t border-gray-200 mt-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <p className="text-center text-sm text-gray-500">
-            &copy; {new Date().getFullYear()} Your Company. All rights reserved.
+            &copy; {new Date().getFullYear()} Qarvo. All rights reserved.
           </p>
         </div>
       </footer>
