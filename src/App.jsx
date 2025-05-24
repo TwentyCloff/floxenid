@@ -13,6 +13,8 @@ import AdminDashboard from "./components/AdminDashboard";
 import LoginAdmin from "./components/LoginAdmin";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Dashboard from "./components/Dashboard";
+import Auth from "./components/Auth";
+
 
 const Home = () => (
   <>
@@ -37,6 +39,7 @@ const App = () => {
       <Route path="/" element={<Home />} />
       <Route path="/payment" element={<PaymentPage />} />
       <Route path="/dashboard" element={<Dashboard />} />
+      <Route path="/login" element={<Auth />} />
 
       {/* Login admin */}
       <Route path="/admin/login" element={<LoginAdmin />} />
