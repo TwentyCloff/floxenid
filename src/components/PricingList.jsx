@@ -7,7 +7,7 @@ const PricingList = () => {
   const navigate = useNavigate();
 
   const handleGetStarted = (planTitle, planPrice) => {
-    navigate(`/payment?plan=Rp{encodeURIComponent(planTitle)}&price=Rp{planPrice}`);
+    navigate(`/payment?plan=${encodeURIComponent(planTitle)}&price=${planPrice}`);
   };
 
   return (
@@ -40,7 +40,7 @@ const PricingList = () => {
           <Button
             className="w-full mb-6"
             onClick={() => handleGetStarted(plan.title, plan.price)}
-            white={false} // Force all to use premium-style button
+            white={false}
           >
             Get started
           </Button>
@@ -48,7 +48,7 @@ const PricingList = () => {
           <ul>
             {plan.features.map((feature, j) => (
               <li
-                key={`plan-Rp{i}-feature-Rp{j}`}
+                key={`plan-${i}-feature-${j}`}
                 className="flex items-start py-5 border-t border-n-6"
               >
                 <img src={check} alt="Check" width={20} height={20} />
