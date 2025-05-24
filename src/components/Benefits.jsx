@@ -1,103 +1,100 @@
 import { motion } from "framer-motion";
-import { benefits } from "../constants";
-import Heading from "./Heading";
-import Section from "./Section";
+import { FiCheckCircle, FiShield, FiTrendingUp, FiZap } from "react-icons/fi";
 
-const Benefits = () => {
-  const fadeIn = {
-    hidden: { opacity: 0, y: 50 },
-    visible: (i) => ({
-      opacity: 1,
-      y: 0,
-      transition: {
-        delay: i * 0.1,
-        duration: 0.8,
-        ease: "easeOut"
-      }
-    })
-  };
+const WhyChooseUs = () => {
+  const features = [
+    {
+      icon: <FiZap className="w-6 h-6" />,
+      title: "Lightning Fast Performance",
+      description: "Our solutions deliver unmatched speed and efficiency, ensuring your operations never slow down."
+    },
+    {
+      icon: <FiShield className="w-6 h-6" />,
+      title: "Enterprise-Grade Security",
+      description: "Military-grade encryption and robust protocols keep your data protected at all times."
+    },
+    {
+      icon: <FiTrendingUp className="w-6 h-6" />,
+      title: "Proven Results",
+      description: "We've helped hundreds of businesses achieve measurable growth and success."
+    },
+    {
+      icon: <FiCheckCircle className="w-6 h-6" />,
+      title: "Reliable Support",
+      description: "Our expert team is available 24/7 to ensure your systems run smoothly."
+    }
+  ];
 
   return (
-    <Section id="features" className="bg-n-8 overflow-hidden">
-      <div className="container relative z-2 py-20">
-        {/* Floating decorative elements */}
-        <div className="absolute top-0 left-1/4 w-64 h-64 bg-primary-500/10 rounded-full filter blur-3xl -z-1" />
-        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-accent-500/5 rounded-full filter blur-3xl -z-1" />
-        
-        <Heading
+    <section className="py-20 bg-gradient-to-b from-gray-50 to-white">
+      <div className="container mx-auto px-4">
+        {/* Header */}
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          viewport={{ once: true }}
           className="text-center mb-16"
-          title={
-            <motion.span 
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8 }}
-            >
-              Why Choose <span className="text-white">Qarvo</span>?
-            </motion.span>
-          }
-          text="Experience the difference with our cutting-edge solutions"
-        />
+        >
+          <h2 className="text-4xl md:text-5xl font-bold mb-4">
+            Why Choose <span className="text-white bg-blue-600 px-2 rounded-md">Qarvo</span>?
+          </h2>
+          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+            We combine cutting-edge technology with exceptional service to deliver results that matter.
+          </p>
+        </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {benefits.map((benefit, index) => (
+        {/* Features Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          {features.map((feature, index) => (
             <motion.div
-              key={benefit.id}
-              custom={index}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, margin: "-50px" }}
-              variants={fadeIn}
-              whileHover={{ y: -10 }}
-              className="group relative"
+              key={index}
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: index * 0.1 }}
+              viewport={{ once: true }}
+              whileHover={{ y: -5 }}
+              className="bg-white p-8 rounded-xl shadow-lg hover:shadow-xl transition-all"
             >
-              {/* Glow effect */}
-              <div className="absolute inset-0 bg-gradient-to-br from-primary-500/20 to-accent-500/20 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10" />
-              
-              <div className="h-full bg-n-7/50 backdrop-blur-sm border border-n-1/10 rounded-3xl overflow-hidden transition-all duration-500 group-hover:border-n-1/30 p-8">
-                {/* Icon with gradient border */}
-                <div className="relative w-14 h-14 mb-6">
-                  <div className="absolute inset-0 bg-gradient-to-br from-primary-500 to-accent-500 rounded-xl blur-sm" />
-                  <div className="relative w-full h-full bg-n-8 rounded-xl flex items-center justify-center">
-                    <img 
-                      src={benefit.iconUrl} 
-                      alt={benefit.title} 
-                      className="w-8 h-8 object-contain" 
-                      loading="lazy"
-                    />
-                  </div>
-                </div>
-                
-                <h3 className="h5 mb-4 text-white">{benefit.title}</h3>
-                <p className="body-2 text-n-3 mb-6">{benefit.text}</p>
-                
-                {/* Interactive preview image */}
-                {benefit.imageUrl && (
-                  <div className="mt-auto overflow-hidden rounded-xl">
-                    <motion.img
-                      src={benefit.imageUrl}
-                      alt={benefit.title}
-                      className="w-full h-48 object-cover opacity-80 group-hover:opacity-100 transition-opacity duration-500"
-                      initial={{ scale: 1 }}
-                      whileHover={{ scale: 1.05 }}
-                      loading="lazy"
-                    />
-                  </div>
-                )}
-                
-                {/* Shine effect on hover */}
-                <div className="absolute inset-0 pointer-events-none overflow-hidden">
-                  <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-transparent via-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 -skew-x-12 -translate-x-full group-hover:translate-x-full" />
-                </div>
+              <div className="w-14 h-14 mb-6 flex items-center justify-center rounded-lg bg-blue-100 text-blue-600">
+                {feature.icon}
               </div>
+              <h3 className="text-xl font-semibold mb-3">{feature.title}</h3>
+              <p className="text-gray-600">{feature.description}</p>
             </motion.div>
           ))}
         </div>
-        
-        {/* Decorative bottom element */}
-        <div className="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-n-8 to-transparent -z-10" />
+
+        {/* Stats Bar */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          transition={{ duration: 0.8, delay: 0.4 }}
+          viewport={{ once: true }}
+          className="mt-20 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl p-8 text-white"
+        >
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+            <div>
+              <div className="text-4xl font-bold mb-2">99.9%</div>
+              <div>Uptime</div>
+            </div>
+            <div>
+              <div className="text-4xl font-bold mb-2">500+</div>
+              <div>Happy Clients</div>
+            </div>
+            <div>
+              <div className="text-4xl font-bold mb-2">24/7</div>
+              <div>Support</div>
+            </div>
+            <div>
+              <div className="text-4xl font-bold mb-2">10x</div>
+              <div>Performance</div>
+            </div>
+          </div>
+        </motion.div>
       </div>
-    </Section>
+    </section>
   );
 };
 
-export default Benefits;
+export default WhyChooseUs;
