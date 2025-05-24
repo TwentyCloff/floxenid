@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { 
   FiUser, FiShoppingBag, FiClock, FiCheckCircle, 
   FiDownload, FiExternalLink, FiChevronRight, 
-  FiCreditCard, FiHistory, FiHome, FiLogOut
+  FiCreditCard, FiHome, FiLogOut, FiX
 } from 'react-icons/fi';
 import { FaDiscord } from 'react-icons/fa';
 
@@ -177,14 +177,6 @@ const Dashboard = () => {
                       <button className="w-full flex items-center justify-between px-4 py-2 text-left text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg">
                         <span className="flex items-center">
                           <FiCreditCard className="mr-2" /> Payment Methods
-                        </span>
-                        <FiChevronRight />
-                      </button>
-                    </li>
-                    <li>
-                      <button className="w-full flex items-center justify-between px-4 py-2 text-left text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg">
-                        <span className="flex items-center">
-                          <FiHistory className="mr-2" /> Transaction History
                         </span>
                         <FiChevronRight />
                       </button>
