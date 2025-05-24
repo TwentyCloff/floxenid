@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { FiCheckCircle, FiShield, FiTrendingUp, FiZap } from "react-icons/fi";
+import ClipPath from "../assets/svg/ClipPath"; // Pastikan path ini sesuai dengan struktur folder Anda
 
 const WhyChooseUs = () => {
   const features = [
@@ -26,13 +27,17 @@ const WhyChooseUs = () => {
   ];
 
   return (
-    <section className="relative py-24 overflow-hidden" style={{ clipPath: "url(#benefits)" }}>
-      {/* Luxury background elements */}
-      <div className="absolute inset-0 -z-10">
-        <div className="absolute inset-0 bg-gradient-to-br from-n-9 to-n-8 opacity-95" />
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary-500/10 rounded-full filter blur-[100px]" />
-        <div className="absolute bottom-0 right-1/4 w-80 h-80 bg-accent-500/10 rounded-full filter blur-[100px]" />
-        <div className="absolute inset-0 opacity-5 bg-[url('https://www.transparenttextures.com/patterns/diamond-upholstery.png')]" />
+    <section className="relative py-24 overflow-hidden">
+      {/* SVG untuk clipPath */}
+      <svg width="0" height="0" className="absolute">
+        <defs>
+          <ClipPath />
+        </defs>
+      </svg>
+
+      {/* Updated background elements */}
+      <div className="absolute inset-0 -z-10 bg-n-8" style={{ clipPath: "url(#benefits)" }}>
+        <div className="absolute inset-0 opacity-50 bg-[url('https://www.transparenttextures.com/patterns/diamond-upholstery.png')]" />
       </div>
 
       <div className="container mx-auto px-4 relative z-10">
@@ -81,7 +86,7 @@ const WhyChooseUs = () => {
           ))}
         </div>
 
-        {/* Premium stats bar - Updated with original background but card styling */}
+        {/* Premium stats bar */}
         <motion.div
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
