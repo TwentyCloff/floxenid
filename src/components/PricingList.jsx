@@ -1,10 +1,27 @@
-import React from "react";
-import { FaCheck, FaTimes } from "react-icons/fa";
+import { FaCheck, FaTimes, FaCrown, FaStar, FaBolt } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 
-const plans = ["Origin Qi", "Half Saint", "Peak Immortal"];
-const prices = ["25.000", "50.000", "100.000"];
-const recommendedIndex = 1;
+const plans = [
+  { 
+    name: "Origin Qi", 
+    price: "25.000",
+    icon: <FaBolt className="text-amber-400" />,
+    description: "Perfect for beginners"
+  },
+  { 
+    name: "Half Saint", 
+    price: "50.000",
+    icon: <FaStar className="text-yellow-300" />,
+    description: "Most popular choice",
+    recommended: true 
+  },
+  { 
+    name: "Peak Immortal", 
+    price: "100.000",
+    icon: <FaCrown className="text-purple-400" />,
+    description: "Ultimate experience"
+  }
+];
 
 const features = [
   { label: "Unlimited Script Access", values: [true, true, true] },
@@ -24,82 +41,125 @@ const PricingList = () => {
   };
 
   return (
-    <div className="w-full overflow-x-auto bg-n-8 border border-n-6 rounded-2xl p-6 text-n-1">
-      <div className="grid grid-cols-4 gap-4">
-        {/* Header Titles */}
-        <div></div>
-        {plans.map((plan, i) => (
-          <div
-            key={`header-${i}`}
-            className={`relative rounded-2xl p-4 pt-6 pb-2 text-center ${
-              i === recommendedIndex
-                ? "border-2 border-color-2 bg-n-7 scale-[1.03] shadow-lg"
-                : "border border-n-6 bg-n-7"
-            }`}
-          >
-            {i === recommendedIndex && (
-              <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-color-2 text-n-6 text-xs font-bold px-3 py-1 rounded-full shadow-md z-10">
-                RECOMMENDED
-              </div>
-            )}
-            <h4 className="text-lg font-semibold text-color-2">{plan}</h4>
-          </div>
-        ))}
+    <div className="w-full max-w-6xl mx-auto bg-gradient-to-br from-n-8 to-n-9 border border-n-6 rounded-3xl p-8 text-n-1 shadow-2xl">
+      <div className="mb-12 text-center">
+        <h2 className="text-3xl font-bold mb-2 bg-clip-text text-transparent bg-gradient-to-r from-color-2 to-color-4">
+          Choose Your Plan
+        </h2>
+        <p className="text-n-3 max-w-2xl mx-auto">
+          Select the perfect package for your needs. All plans come with a 30-day 
+          satisfaction guarantee.
+        </p>
+      </div>
 
-        {/* Price Row */}
-        <div className="font-semibold text-sm text-n-2 self-center px-4">Price</div>
-        {prices.map((price, i) => (
-          <div
-            key={`price-${i}`}
-            className={`text-center font-bold text-[1.5rem] ${
-              i === recommendedIndex ? "bg-n-7" : "bg-n-7"
-            }`}
-          >
-            Rp {price}
+      <div className="grid grid-cols-4 gap-0">
+        {/* Feature labels column */}
+        <div className="col-span-1">
+          <div className="h-48"></div> {/* Spacer for headers */}
+          <div className="h-20 flex items-end pb-4 px-4 text-sm font-medium text-n-3 uppercase tracking-wider">
+            Features
           </div>
-        ))}
+          
+          {features.map((feature, i) => (
+            <div 
+              key={`feature-${i}`}
+              className="h-16 flex items-center border-t border-n-6/50 px-4 text-n-2 group"
+            >
+              <span className="transition-all group-hover:text-color-2">
+                {feature.label}
+              </span>
+            </div>
+          ))}
+        </div>
 
-        {/* Buy Now Button Row */}
-        <div></div>
+        {/* Plan columns */}
         {plans.map((plan, i) => (
           <div 
-            key={`btn-${i}`} 
-            className={`text-center ${i === recommendedIndex ? "bg-n-7" : "bg-n-7"}`}
+            key={`plan-${i}`} 
+            className={`col-span-1 relative transition-all hover:scale-[1.02] ${
+              plan.recommended 
+                ? "z-10 shadow-2xl" 
+                : "hover:shadow-lg"
+            }`}
           >
-            <div
-              onClick={() => handleBuy(plan, prices[i])}
-              className="mt-4 w-full text-center bg-color-2 text-n-7 font-bold py-2 rounded-xl cursor-pointer hover:brightness-110 transition-all"
-            >
-              Buy Now
+            {/* Plan header */}
+            <div className={`h-48 rounded-t-2xl p-6 flex flex-col items-center justify-center ${
+              plan.recommended 
+                ? "bg-gradient-to-br from-color-2/90 to-color-4/80" 
+                : "bg-n-7"
+            }`}>
+              {plan.recommended && (
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-color-2 text-n-8 text-xs font-bold px-4 py-1.5 rounded-full shadow-md z-20 uppercase tracking-wider flex items-center">
+                  <FaStar className="mr-1" /> Recommended
+                </div>
+              )}
+              
+              <div className="text-3xl mb-3">
+                {plan.icon}
+              </div>
+              <h3 className={`text-xl font-bold ${
+                plan.recommended ? "text-n-8" : "text-color-2"
+              }`}>
+                {plan.name}
+              </h3>
+              <p className={`text-sm mt-1 ${
+                plan.recommended ? "text-n-8/90" : "text-n-3"
+              }`}>
+                {plan.description}
+              </p>
+            </div>
+
+            {/* Price section */}
+            <div className={`h-20 flex flex-col items-center justify-end pb-4 px-4 ${
+              plan.recommended ? "bg-n-8" : "bg-n-7"
+            }`}>
+              <div className="text-2xl font-bold text-color-2">
+                Rp {plan.price}
+              </div>
+              <div className="text-xs text-n-3 mt-1">
+                Lifetime Access
+              </div>
+            </div>
+
+            {/* CTA button */}
+            <div className={`p-4 ${
+              plan.recommended ? "bg-n-8" : "bg-n-7"
+            }`}>
+              <button
+                onClick={() => handleBuy(plan.name, plan.price)}
+                className={`w-full py-3 rounded-xl font-bold transition-all ${
+                  plan.recommended
+                    ? "bg-n-1 text-n-8 hover:bg-n-1/90 shadow-md"
+                    : "bg-color-2 text-n-8 hover:bg-color-2/90"
+                }`}
+              >
+                Get Started
+              </button>
+            </div>
+
+            {/* Features */}
+            <div className={`rounded-b-2xl ${
+              plan.recommended ? "bg-n-8" : "bg-n-7"
+            }`}>
+              {features.map((feature, j) => (
+                <div 
+                  key={`feature-${i}-${j}`}
+                  className="h-16 flex items-center justify-center border-t border-n-6/50"
+                >
+                  {feature.values[i] ? (
+                    <FaCheck className="text-color-4 text-lg" />
+                  ) : (
+                    <FaTimes className="text-n-5 text-lg" />
+                  )}
+                </div>
+              ))}
             </div>
           </div>
         ))}
+      </div>
 
-        {/* Divider */}
-        <div className="col-span-4 border-t border-n-6 my-2"></div>
-
-        {/* Features + Checks */}
-        {features.map((feature, i) => (
-          <React.Fragment key={`feature-${i}`}>
-            <div className="flex items-center h-14 border-t border-n-6 px-4 text-sm text-n-2">
-              {feature.label}
-            </div>
-            {feature.values.map((val, j) => (
-              <div
-                key={`val-${i}-${j}`}
-                className={`flex items-center justify-center h-14 border-t border-n-6 text-xl ${
-                  j === recommendedIndex ? "bg-n-7" : "bg-n-7"
-                }`}
-              >
-                {val ? (
-                  <FaCheck className="text-color-4" />
-                ) : (
-                  <FaTimes className="text-color-3" />
-                )}
-              </div>
-            ))}
-          </React.Fragment>
-        ))}
+      <div className="mt-12 text-center text-sm text-n-4">
+        Need help choosing? <button className="text-color-2 hover:underline">Contact us</button>
       </div>
     </div>
   );
