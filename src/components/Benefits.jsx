@@ -1,6 +1,5 @@
 import { motion } from "framer-motion";
 import { FiCheckCircle, FiShield, FiTrendingUp, FiZap } from "react-icons/fi";
-import ClipPath from "../assets/svg/ClipPath"; // Pastikan path ini sesuai dengan struktur folder Anda
 
 const WhyChooseUs = () => {
   const features = [
@@ -28,18 +27,24 @@ const WhyChooseUs = () => {
 
   return (
     <section className="relative py-24 overflow-hidden">
-      {/* SVG untuk clipPath */}
+      {/* Add this SVG for clipPath */}
       <svg width="0" height="0" className="absolute">
         <defs>
-          <ClipPath />
+          <clipPath id="benefits" clipPathUnits="objectBoundingBox">
+            <path d="M0,0.8 C0,0.8,0.2,0.9,0.5,0.9 C0.8,0.9,1,0.8,1,0.8 C1,0.8,0.8,1,0.5,1 C0.2,1,0,0.8,0,0.8" />
+          </clipPath>
         </defs>
       </svg>
 
-      {/* Updated background elements */}
-      <div className="absolute inset-0 -z-10 bg-n-8" style={{ clipPath: "url(#benefits)" }}>
-        <div className="absolute inset-0 opacity-50 bg-[url('https://www.transparenttextures.com/patterns/diamond-upholstery.png')]" />
+      {/* Background with clipPath */}
+      <div className="absolute inset-0 -z-10" style={{ clipPath: "url(#benefits)" }}>
+        <div className="absolute inset-0 bg-gradient-to-br from-n-9 to-n-8 opacity-95" />
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary-500/10 rounded-full filter blur-[100px]" />
+        <div className="absolute bottom-0 right-1/4 w-80 h-80 bg-accent-500/10 rounded-full filter blur-[100px]" />
+        <div className="absolute inset-0 opacity-5 bg-[url('https://www.transparenttextures.com/patterns/diamond-upholstery.png')]" />
       </div>
 
+      {/* Rest of your existing component */}
       <div className="container mx-auto px-4 relative z-10">
         {/* Header */}
         <motion.div 
@@ -72,7 +77,6 @@ const WhyChooseUs = () => {
               whileHover={{ y: -8 }}
               className="relative group"
             >
-              {/* Card glow effect */}
               <div className="absolute -inset-0.5 bg-gradient-to-br from-primary-500/30 to-accent-500/30 rounded-xl blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10" />
               
               <div className="h-full bg-n-7/50 backdrop-blur-sm border border-n-5/20 rounded-xl p-8 transition-all duration-300 group-hover:border-n-3/50">
@@ -86,7 +90,7 @@ const WhyChooseUs = () => {
           ))}
         </div>
 
-        {/* Premium stats bar */}
+        {/* Stats bar */}
         <motion.div
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
@@ -94,12 +98,10 @@ const WhyChooseUs = () => {
           viewport={{ once: true }}
           className="mt-20 relative group"
         >
-          {/* Original gradient background container */}
           <div className="absolute inset-0 rounded-xl p-px bg-gradient-to-r from-primary-500/30 via-accent-500/30 to-primary-500/30 -z-10">
             <div className="absolute inset-0 bg-n-8/80 rounded-xl" />
           </div>
           
-          {/* Card styling overlay */}
           <div className="bg-n-7/50 backdrop-blur-sm border border-n-5/20 rounded-xl p-8 transition-all duration-300 group-hover:border-n-3/50">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
               {[
