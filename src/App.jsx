@@ -12,6 +12,7 @@ import PaymentPage from "./components/PaymentPage";
 import AdminDashboard from "./components/AdminDashboard";
 import LoginAdmin from "./components/LoginAdmin";
 import ProtectedRoute from "./components/ProtectedRoute";
+import Dashboard from "./components/Dashboard";
 
 const Home = () => (
   <>
@@ -35,6 +36,7 @@ const App = () => {
     <Routes>
       <Route path="/" element={<Home />} />
       <Route path="/payment" element={<PaymentPage />} />
+      <Route path="/dashboard" element={<Dashboard />} />
 
       {/* Login admin */}
       <Route path="/admin/login" element={<LoginAdmin />} />
