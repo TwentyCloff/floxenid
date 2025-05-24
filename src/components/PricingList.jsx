@@ -7,7 +7,7 @@ const PricingList = () => {
   const navigate = useNavigate();
 
   const handleGetStarted = (planTitle, planPrice) => {
-    navigate(`/payment?plan=${encodeURIComponent(planTitle)}&price=${planPrice}`);
+    navigate(`/payment?plan=Rp{encodeURIComponent(planTitle)}&price=Rp{planPrice}`);
   };
 
   return (
@@ -22,33 +22,34 @@ const PricingList = () => {
             {plan.description}
           </p>
 
-          <div className="flex items-center h-[5.5rem] mb-6">
+          <div className="flex items-center h-[4rem] mb-6">
             {plan.price && (
               <>
-                <div className="h-3">$</div>
-                <div className="text-[5.5rem] leading-none font-bold">
+                <div className="h-3 text-[1rem]">Rp</div>
+                <div className="text-[3.5rem] leading-none font-bold">
                   {plan.price}
                 </div>
               </>
             )}
           </div>
 
-          <Button
-            className="w-full mb-6"
-            onClick={plan.price ? () => handleGetStarted(plan.title, plan.price) : null}
-            href={!plan.price ? "mailto:info@example.com" : null}
-            white={!plan.premium}
-          >
-            {plan.price ? "Get started" : "Contact us"}
-          </Button>
+          {plan.price && (
+            <Button
+              className="w-full mb-6"
+              onClick={() => handleGetStarted(plan.title, plan.price)}
+              white={!plan.premium}
+            >
+              Get started
+            </Button>
+          )}
 
           <ul>
             {plan.features.map((feature, j) => (
               <li
-                key={`plan-${i}-feature-${j}`}
+                key={`plan-Rp{i}-feature-Rp{j}`}
                 className="flex items-start py-5 border-t border-n-6"
               >
-                <img src={check} alt="Check" width={24} height={24} />
+                <img src={check} alt="Check" width={20} height={20} />
                 <p className="body-2 ml-4">{feature}</p>
               </li>
             ))}
