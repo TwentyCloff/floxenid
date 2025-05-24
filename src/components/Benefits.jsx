@@ -1,152 +1,100 @@
 import { motion } from "framer-motion";
-import ClipPath from "../assets/svg/ClipPath";
 import { benefits } from "../constants";
-import { GradientLight } from "./design/Benefits";
 import Heading from "./Heading";
 import Section from "./Section";
-import { curve } from "../assets";
 
 const Benefits = () => {
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
+  const fadeIn = {
+    hidden: { opacity: 0, y: 50 },
+    visible: (i) => ({
       opacity: 1,
-      transition: {
-        staggerChildren: 0.2,
-        delayChildren: 0.3
-      }
-    }
-  };
-
-  const itemVariants = {
-    hidden: { y: 20, opacity: 0 },
-    visible: {
       y: 0,
-      opacity: 1,
       transition: {
-        duration: 0.5,
+        delay: i * 0.1,
+        duration: 0.8,
         ease: "easeOut"
       }
-    }
-  };
-
-  const hoverVariants = {
-    hover: {
-      scale: 1.03,
-      transition: {
-        duration: 0.3,
-        ease: "easeOut"
-      }
-    }
+    })
   };
 
   return (
-    <Section id="features" crosses>
-      <div className="container relative z-2">
+    <Section id="features" className="bg-n-8 overflow-hidden">
+      <div className="container relative z-2 py-20">
+        {/* Floating decorative elements */}
+        <div className="absolute top-0 left-1/4 w-64 h-64 bg-primary-500/10 rounded-full filter blur-3xl -z-1" />
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-accent-500/5 rounded-full filter blur-3xl -z-1" />
+        
         <Heading
-          className="md:max-w-md lg:max-w-2xl text-center mx-auto"
+          className="text-center mb-16"
           title={
-            <>
-              Why Choose{" "}
-              <span className="inline-block relative font-semibold bg-gradient-to-r from-primary-500 to-accent-500 bg-clip-text text-transparent">
-                Qarvo?
-                <img
-                  src={curve}
-                  className="absolute top-full left-0 w-full xl:-mt-2 pointer-events-none select-none"
-                  width={624}
-                  height={28}
-                  alt="Curve"
-                  loading="lazy"
-                />
-              </span>
-            </>
+            <motion.span 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8 }}
+            >
+              Why Choose <span className="text-white">Qarvo</span>?
+            </motion.span>
           }
-          text="Discover the unparalleled advantages that set us apart in the industry"
+          text="Experience the difference with our cutting-edge solutions"
         />
 
-        <motion.div 
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16"
-          variants={containerVariants}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: "-100px" }}
-        >
-          {benefits.map((benefit) => (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {benefits.map((benefit, index) => (
             <motion.div
-              className="relative group"
               key={benefit.id}
-              variants={itemVariants}
-              whileHover="hover"
+              custom={index}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: "-50px" }}
+              variants={fadeIn}
+              whileHover={{ y: -10 }}
+              className="group relative"
             >
-              <div
-                className="absolute -inset-1 bg-gradient-to-r from-primary-500 to-accent-500 rounded-2xl opacity-75 blur-sm group-hover:opacity-100 transition-all duration-300"
-              />
+              {/* Glow effect */}
+              <div className="absolute inset-0 bg-gradient-to-br from-primary-500/20 to-accent-500/20 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10" />
               
-              <div
-                className="relative h-full p-0.5 bg-no-repeat bg-[length:100%_100%] rounded-2xl overflow-hidden"
-                style={{
-                  backgroundImage: `url(${benefit.backgroundUrl})`,
-                }}
-              >
-                <motion.div 
-                  className="relative z-2 flex flex-col min-h-[22rem] p-8 bg-n-8 rounded-xl"
-                  variants={hoverVariants}
-                >
-                  <div className="flex items-center justify-center w-16 h-16 mb-6 rounded-full bg-n-7/50 backdrop-blur-sm">
-                    <img
-                      src={benefit.iconUrl}
-                      width={32}
-                      height={32}
-                      alt={benefit.title}
+              <div className="h-full bg-n-7/50 backdrop-blur-sm border border-n-1/10 rounded-3xl overflow-hidden transition-all duration-500 group-hover:border-n-1/30 p-8">
+                {/* Icon with gradient border */}
+                <div className="relative w-14 h-14 mb-6">
+                  <div className="absolute inset-0 bg-gradient-to-br from-primary-500 to-accent-500 rounded-xl blur-sm" />
+                  <div className="relative w-full h-full bg-n-8 rounded-xl flex items-center justify-center">
+                    <img 
+                      src={benefit.iconUrl} 
+                      alt={benefit.title} 
+                      className="w-8 h-8 object-contain" 
                       loading="lazy"
-                      className="object-contain"
                     />
                   </div>
-                  
-                  <h5 className="h5 mb-4 text-gradient bg-gradient-to-r from-primary-100 to-accent-100 bg-clip-text text-transparent">
-                    {benefit.title}
-                  </h5>
-                  <p className="body-2 mb-6 text-n-3/80">{benefit.text}</p>
-                  
-                  {benefit.imageUrl && (
-                    <div className="mt-auto opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                      <img
-                        src={benefit.imageUrl}
-                        width={380}
-                        height={362}
-                        alt={benefit.title}
-                        className="w-full h-48 object-cover rounded-lg"
-                        loading="lazy"
-                      />
-                    </div>
-                  )}
-                </motion.div>
-
-                {benefit.light && <GradientLight />}
-
-                <div
-                  className="absolute inset-0.5 bg-n-8 rounded-xl"
-                  style={{ clipPath: "url(#benefits)" }}
-                >
-                  <div className="absolute inset-0 opacity-0 group-hover:opacity-20 transition-opacity duration-500">
-                    {benefit.imageUrl && (
-                      <img
-                        src={benefit.imageUrl}
-                        width={380}
-                        height={362}
-                        alt={benefit.title}
-                        className="w-full h-full object-cover"
-                        loading="lazy"
-                      />
-                    )}
-                  </div>
                 </div>
-
-                <ClipPath />
+                
+                <h3 className="h5 mb-4 text-white">{benefit.title}</h3>
+                <p className="body-2 text-n-3 mb-6">{benefit.text}</p>
+                
+                {/* Interactive preview image */}
+                {benefit.imageUrl && (
+                  <div className="mt-auto overflow-hidden rounded-xl">
+                    <motion.img
+                      src={benefit.imageUrl}
+                      alt={benefit.title}
+                      className="w-full h-48 object-cover opacity-80 group-hover:opacity-100 transition-opacity duration-500"
+                      initial={{ scale: 1 }}
+                      whileHover={{ scale: 1.05 }}
+                      loading="lazy"
+                    />
+                  </div>
+                )}
+                
+                {/* Shine effect on hover */}
+                <div className="absolute inset-0 pointer-events-none overflow-hidden">
+                  <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-transparent via-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 -skew-x-12 -translate-x-full group-hover:translate-x-full" />
+                </div>
               </div>
             </motion.div>
           ))}
-        </motion.div>
+        </div>
+        
+        {/* Decorative bottom element */}
+        <div className="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-n-8 to-transparent -z-10" />
       </div>
     </Section>
   );
