@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { db, auth } from '../config/firebaseConfig';
-import { doc, collection, query, where, onSnapshot } from 'firebase/firestore';
+import { doc, collection, query, where, onSnapshot, setDoc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
 import { 
   FiUser, FiShoppingBag, FiClock, FiCheckCircle, 
@@ -34,15 +34,32 @@ const Dashboard = () => {
           if (doc.exists()) {
             setUserData({ id: doc.id, ...doc.data() });
           } else {
-            setError("User data not found");
+            // Create user document if it doesn't exist
+            setDoc(userDocRef, {
+              email: user.email,
+              name: user.displayName || '',
+              phone: '',
+              discord: '',
+              createdAt: new Date(),
+              role: 'user'
+            }).then(() => {
+              setUserData({
+                id: user.uid,
+                email: user.email,
+                name: user.displayName || '',
+                phone: '',
+                discord: '',
+                createdAt: new Date(),
+                role: 'user'
+              });
+            });
           }
         });
 
         // Transactions subscription
         const transactionsQuery = query(
           collection(db, 'transactions'),
-          where('customer.userId', '==', user.uid),
-          where('transactionDetails.status', 'in', ['pending', 'completed', 'failed'])
+          where('customer.userId', '==', user.uid)
         );
 
         const transactionsUnsubscribe = onSnapshot(transactionsQuery, 
@@ -52,8 +69,8 @@ const Dashboard = () => {
               ...doc.data()
             }));
             setTransactions(transactionsData.sort((a, b) => 
-              b.transactionDetails?.timestamp?.toDate() - 
-              a.transactionDetails?.timestamp?.toDate()
+              (b.transactionDetails?.timestamp?.toDate() || 0) - 
+              (a.transactionDetails?.timestamp?.toDate() || 0)
             ));
             setLoading(false);
           }, 
