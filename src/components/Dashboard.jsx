@@ -24,7 +24,7 @@ const Dashboard = () => {
       try {
         const user = auth.currentUser;
         if (!user) {
-          navigate('/auth');
+          navigate('/login');
           return;
         }
 
