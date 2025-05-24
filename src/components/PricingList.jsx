@@ -72,22 +72,29 @@ const PricingList = () => {
         {/* Feature Column */}
         <div className="hidden lg:block">
           <div className="bg-gray-800 rounded-xl border border-gray-700 overflow-hidden h-full">
-            {/* Empty space to match plan headers */}
-            <div className="h-48 border-b border-gray-700 flex items-end p-6">
+            {/* Feature Header with Icon */}
+            <div className="h-[180px] border-b border-gray-700 flex flex-col items-center justify-center p-6">
+              <div className="w-14 h-14 rounded-full bg-gray-700/50 flex items-center justify-center mb-4">
+                <FaBolt className="text-purple-400" size={20} />
+              </div>
               <h3 className="text-sm font-medium text-gray-400 uppercase tracking-wider">
                 Features
               </h3>
             </div>
             
-            {/* Price section placeholder */}
-            <div className="h-20 border-b border-gray-700"></div>
+            {/* Price Label */}
+            <div className="h-20 border-b border-gray-700 flex items-center justify-center">
+              <span className="text-sm font-medium text-gray-400 uppercase tracking-wider">
+                Price
+              </span>
+            </div>
             
             {/* Feature List */}
             <div>
               {features.map((feature, index) => (
                 <div 
                   key={index}
-                  className="h-16 border-b border-gray-700 flex items-center px-6"
+                  className="h-[60px] border-b border-gray-700 flex items-center px-6"
                 >
                   <span className="text-gray-300 text-sm whitespace-nowrap">
                     {feature}
@@ -102,30 +109,31 @@ const PricingList = () => {
         {plans.map((plan, planIndex) => (
           <div 
             key={planIndex}
-            className={`relative ${plan.recommended ? "lg:-mt-4" : ""}`}
+            className="relative"
           >
+            {/* Luxury Recommended Tag */}
             {plan.recommended && (
-              <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-purple-600 text-white text-xs font-bold px-4 py-1 rounded-full uppercase tracking-wider flex items-center z-10">
-                <FaStar className="mr-1" /> Recommended
+              <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-gradient-to-r from-purple-500 to-pink-500 text-white text-xs font-bold px-4 py-2 rounded-full uppercase tracking-wider flex items-center z-10 shadow-lg">
+                <FaStar className="mr-2 animate-pulse" /> Recommended
               </div>
             )}
             
             <div className={`h-full flex flex-col rounded-xl overflow-hidden border border-gray-700 bg-gradient-to-b ${plan.color} ${plan.recommended ? "ring-2 ring-purple-500" : ""}`}>
               {/* Plan Header */}
-              <div className="h-48 flex flex-col items-center justify-center p-6 text-center">
+              <div className="h-[180px] flex flex-col items-center justify-center p-6 text-center">
                 <div className="w-14 h-14 rounded-full bg-gray-700/50 flex items-center justify-center mb-4">
                   {plan.icon}
                 </div>
                 <h3 className={`text-xl font-bold ${plan.recommended ? "text-white" : "text-purple-400"}`}>
                   {plan.name}
                 </h3>
-                <p className={`mt-2 ${plan.recommended ? "text-gray-300" : "text-gray-400"}`}>
+                <p className={`mt-2 text-sm ${plan.recommended ? "text-gray-300" : "text-gray-400"}`}>
                   {plan.description}
                 </p>
               </div>
 
               {/* Price Section */}
-              <div className="h-20 flex flex-col items-center justify-center border-t border-b border-gray-700">
+              <div className="h-20 flex flex-col items-center justify-center border-t border-b border-gray-700 bg-gray-800/30">
                 <div className="text-2xl font-bold text-purple-300">
                   Rp {plan.price}
                 </div>
@@ -139,7 +147,7 @@ const PricingList = () => {
                 {features.map((_, featureIndex) => (
                   <div 
                     key={featureIndex}
-                    className="h-16 flex items-center justify-center border-b border-gray-700"
+                    className="h-[60px] flex items-center justify-center border-b border-gray-700"
                   >
                     {featureAvailability[featureIndex][planIndex] ? (
                       <FaCheck className="text-purple-400 text-lg" />
@@ -156,7 +164,7 @@ const PricingList = () => {
                   onClick={() => handleBuy(plan.name, plan.price)}
                   className={`w-full py-3 rounded-lg font-medium transition-all ${
                     plan.recommended
-                      ? "bg-purple-600 hover:bg-purple-700 text-white"
+                      ? "bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white shadow-lg"
                       : "bg-gray-700 hover:bg-gray-600 text-purple-400"
                   }`}
                 >
