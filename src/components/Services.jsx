@@ -1,19 +1,12 @@
-import { PropsWithChildren, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { TiLocationArrow } from "react-icons/ti";
 import Section from "./Section";
 
-interface BentoTiltProps {
-  className?: string;
-}
-
-const BentoTilt = ({
-  children,
-  className = "",
-}: PropsWithChildren<BentoTiltProps>) => {
+const BentoTilt = ({ children, className = "" }) => {
   const [transformStyle, setTransformStyle] = useState("");
-  const itemRef = useRef<HTMLDivElement>(null);
+  const itemRef = useRef(null);
 
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+  const handleMouseMove = (e) => {
     if (!itemRef.current) return;
 
     const { left, top, width, height } =
@@ -47,13 +40,7 @@ const BentoTilt = ({
   );
 };
 
-interface BentoCardProps {
-  src: string;
-  title: React.ReactNode;
-  description?: string;
-}
-
-const BentoCard = ({ src, title, description }: BentoCardProps) => {
+const BentoCard = ({ src, title, description }) => {
   return (
     <article className="relative size-full">
       <video
