@@ -4,12 +4,12 @@ import { doc, collection, query, where, onSnapshot, setDoc } from 'firebase/fire
 import { useNavigate } from 'react-router-dom';
 import { 
   FiUser, FiShoppingBag, FiClock, FiCheckCircle, 
-  FiDownload, FiExternalLink, FiChevronRight, 
+  FiCopy, FiExternalLink, FiChevronRight, 
   FiCreditCard, FiHome, FiLogOut, FiX,
   FiShield, FiMail, FiSmartphone, FiLoader,
-  FiAlertCircle, FiInfo
+  FiAlertCircle
 } from "react-icons/fi";
-import { FaDiscord, FaQrcode } from "react-icons/fa";
+import { FaDiscord } from "react-icons/fa";
 import { signOut, onAuthStateChanged } from 'firebase/auth';
 
 const Dashboard = () => {
@@ -17,6 +17,7 @@ const Dashboard = () => {
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [copiedLink, setCopiedLink] = useState(null);
   const navigate = useNavigate();
 
   // Check auth state on component mount
@@ -63,12 +64,7 @@ const Dashboard = () => {
               createdAt: new Date(),
               role: 'user'
             };
-            setDoc(userDocRef, newUserData).then(() => {
-              setUserData({
-                id: user.uid,
-                ...newUserData
-              });
-            });
+            setDoc(userDocRef, newUserData);
           }
         });
 
@@ -134,29 +130,35 @@ const Dashboard = () => {
     });
   };
 
+  const copyToClipboard = (text, transactionId) => {
+    navigator.clipboard.writeText(text);
+    setCopiedLink(transactionId);
+    setTimeout(() => setCopiedLink(null), 2000);
+  };
+
   const getStatusBadge = (status) => {
     switch (status) {
       case 'completed':
         return (
-          <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
+          <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-900 text-green-200">
             <FiCheckCircle className="mr-1" /> Completed
           </span>
         );
       case 'pending':
         return (
-          <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800">
+          <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-yellow-900 text-yellow-200">
             <FiClock className="mr-1" /> Pending
           </span>
         );
       case 'failed':
         return (
-          <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-red-100 text-red-800">
+          <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-red-900 text-red-200">
             <FiX className="mr-1" /> Failed
           </span>
         );
       default:
         return (
-          <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-800">
+          <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gray-700 text-gray-300">
             Unknown
           </span>
         );
@@ -164,20 +166,20 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="bg-white shadow-sm">
+    <div className="min-h-screen bg-gray-900 text-gray-100">
+      <header className="bg-gray-800 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
-          <h1 className="text-2xl font-bold text-gray-900">User Dashboard</h1>
+          <h1 className="text-2xl font-bold">User Dashboard</h1>
           <div className="flex items-center space-x-4">
             <button 
               onClick={() => navigate('/')}
-              className="flex items-center text-gray-600 hover:text-gray-900"
+              className="flex items-center text-gray-400 hover:text-white"
             >
               <FiHome className="mr-1" /> Home
             </button>
             <button 
               onClick={handleLogout}
-              className="flex items-center text-gray-600 hover:text-gray-900"
+              className="flex items-center text-gray-400 hover:text-white"
             >
               <FiLogOut className="mr-1" /> Logout
             </button>
@@ -191,24 +193,24 @@ const Dashboard = () => {
             <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500"></div>
           </div>
         ) : error ? (
-          <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-6">
+          <div className="bg-red-900/50 border-l-4 border-red-500 p-4 mb-6">
             <div className="flex">
               <div className="flex-shrink-0">
-                <FiAlertCircle className="h-5 w-5 text-red-500" />
+                <FiAlertCircle className="h-5 w-5 text-red-400" />
               </div>
               <div className="ml-3">
-                <p className="text-sm text-red-700">{error}</p>
+                <p className="text-sm text-red-200">{error}</p>
               </div>
             </div>
           </div>
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
             <div className="lg:col-span-1">
-              <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-                <div className="p-6 bg-gradient-to-r from-blue-500 to-blue-600 text-white">
+              <div className="bg-gray-800 rounded-lg shadow-sm overflow-hidden">
+                <div className="p-6 bg-gradient-to-r from-blue-600 to-blue-700">
                   <div className="flex items-center">
-                    <div className="bg-white/20 p-2 rounded-full mr-3">
-                      <FiUser className="w-6 h-6" />
+                    <div className="bg-white/10 p-2 rounded-full mr-3">
+                      <FiUser className="w-6 h-6 text-white" />
                     </div>
                     <div>
                       <h2 className="font-bold text-lg">{userData?.name || 'User'}</h2>
@@ -216,50 +218,24 @@ const Dashboard = () => {
                     </div>
                   </div>
                 </div>
-                <nav className="p-4">
-                  <ul className="space-y-2">
-                    <li>
-                      <button className="w-full flex items-center justify-between px-4 py-2 text-left text-blue-600 bg-blue-50 rounded-lg">
-                        <span className="flex items-center">
-                          <FiShoppingBag className="mr-2" /> My Purchases
-                        </span>
-                        <FiChevronRight />
-                      </button>
-                    </li>
-                    <li>
-                      <button className="w-full flex items-center justify-between px-4 py-2 text-left text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg">
-                        <span className="flex items-center">
-                          <FiCreditCard className="mr-2" /> Payment Methods
-                        </span>
-                        <FiChevronRight />
-                      </button>
-                    </li>
-                  </ul>
-                </nav>
               </div>
 
-              <div className="bg-white rounded-lg shadow-sm overflow-hidden mt-6">
-                <div className="p-4 border-b border-gray-200">
-                  <h3 className="font-medium text-gray-900">Account Information</h3>
+              <div className="bg-gray-800 rounded-lg shadow-sm overflow-hidden mt-6">
+                <div className="p-4 border-b border-gray-700">
+                  <h3 className="font-medium">Account Information</h3>
                 </div>
                 <div className="p-4">
                   <div className="mb-3">
-                    <p className="text-sm text-gray-500">Discord ID</p>
-                    <p className="flex items-center text-gray-900">
-                      <FaDiscord className="mr-2 text-blue-600" /> 
-                      {userData?.discord ? userData.discord : 'Not connected'}
+                    <p className="text-sm text-gray-400">Discord ID</p>
+                    <p className="flex items-center">
+                      <FaDiscord className="mr-2 text-blue-400" /> 
+                      {userData?.discord || 'Not connected'}
                     </p>
                   </div>
                   <div className="mb-3">
-                    <p className="text-sm text-gray-500">Phone Number</p>
-                    <p className="text-gray-900">
-                      {userData?.phone ? userData.phone : 'Not provided'}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-500">Registered Date</p>
-                    <p className="text-gray-900">
-                      {userData?.createdAt ? formatDate(userData.createdAt) : 'N/A'}
+                    <p className="text-sm text-gray-400">Phone Number</p>
+                    <p>
+                      {userData?.phone || 'Not provided'}
                     </p>
                   </div>
                 </div>
@@ -267,19 +243,18 @@ const Dashboard = () => {
             </div>
 
             <div className="lg:col-span-3">
-              <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-                <div className="p-6 border-b border-gray-200">
-                  <h2 className="text-lg font-medium text-gray-900">My Purchases</h2>
+              <div className="bg-gray-800 rounded-lg shadow-sm overflow-hidden">
+                <div className="p-6 border-b border-gray-700">
+                  <h2 className="text-lg font-medium">My Purchases</h2>
                 </div>
 
                 {transactions.length === 0 ? (
                   <div className="p-8 text-center">
                     <svg
-                      className="mx-auto h-12 w-12 text-gray-400"
+                      className="mx-auto h-12 w-12 text-gray-600"
                       fill="none"
                       viewBox="0 0 24 24"
                       stroke="currentColor"
-                      aria-hidden="true"
                     >
                       <path
                         strokeLinecap="round"
@@ -288,138 +263,82 @@ const Dashboard = () => {
                         d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
                       />
                     </svg>
-                    <h3 className="mt-2 text-sm font-medium text-gray-900">No purchases yet</h3>
-                    <p className="mt-1 text-sm text-gray-500">
+                    <h3 className="mt-2 text-sm font-medium">No purchases yet</h3>
+                    <p className="mt-1 text-sm text-gray-400">
                       Get started by purchasing one of our products.
                     </p>
                     <div className="mt-6">
                       <button
                         onClick={() => navigate('/')}
-                        className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                        className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
                       >
                         Browse Products
                       </button>
                     </div>
                   </div>
                 ) : (
-                  <div className="divide-y divide-gray-200">
+                  <div className="divide-y divide-gray-700">
                     {transactions.map((transaction) => (
                       <div key={transaction.id} className="p-6">
                         <div className="flex flex-col md:flex-row md:items-center md:justify-between">
                           <div className="mb-4 md:mb-0">
-                            <h3 className="text-lg font-medium text-gray-900">
+                            <h3 className="text-lg font-medium">
                               {transaction.transactionDetails?.plan || 'Unknown Plan'}
                             </h3>
-                            <p className="text-sm text-gray-500">
+                            <p className="text-sm text-gray-400">
                               Invoice: {transaction.transactionDetails?.invoiceNumber || 'N/A'}
                             </p>
-                            <p className="text-sm text-gray-500 mt-1">
+                            <p className="text-sm text-gray-400 mt-1">
                               {transaction.transactionDetails?.timestamp ? 
                                 formatDate(transaction.transactionDetails.timestamp) : 'N/A'}
                             </p>
                           </div>
                           <div className="flex flex-col items-end">
-                            <div className="text-xl font-bold text-gray-900 mb-2">
+                            <div className="text-xl font-bold mb-2">
                               Rp{transaction.transactionDetails?.totalAmount?.toLocaleString('id-ID') || '0'}
                             </div>
                             {getStatusBadge(transaction.transactionDetails?.status)}
                           </div>
                         </div>
 
-                        <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-                          <div className="bg-gray-50 p-4 rounded-lg">
-                            <h4 className="text-sm font-medium text-gray-500 mb-2">Game Details</h4>
-                            <p className="text-gray-900">
-                              <span className="font-medium">Game:</span> {transaction.customer?.game || 'N/A'}
-                            </p>
-                            <p className="text-gray-900">
-                              <span className="font-medium">Category:</span> {transaction.customer?.category || 'N/A'}
-                            </p>
-                          </div>
-                          
-                          <div className="bg-gray-50 p-4 rounded-lg">
-                            <h4 className="text-sm font-medium text-gray-500 mb-2">Payment Method</h4>
-                            <p className="text-gray-900">
-                              <span className="font-medium">Method:</span> {transaction.transactionDetails?.paymentMethod || 'N/A'}
-                            </p>
-                            <p className="text-gray-900">
-                              <span className="font-medium">Status:</span> {transaction.transactionDetails?.status || 'N/A'}
-                            </p>
-                          </div>
-                        </div>
-
-                        {transaction.transactionDetails?.status === 'completed' && (
-                          <div className="mt-6 bg-green-50 rounded-lg p-4 border border-green-100">
-                            <div className="flex items-start">
-                              <div className="flex-shrink-0">
-                                <FiCheckCircle className="h-5 w-5 text-green-500" />
-                              </div>
-                              <div className="ml-3 flex-1">
-                                <h3 className="text-sm font-medium text-green-800">
-                                  Your product is ready!
+                        {transaction.transactionDetails?.status === 'completed' && transaction.notes?.link && (
+                          <div className="mt-6 bg-gray-700 rounded-lg p-4 border border-gray-600">
+                            <div className="flex flex-col space-y-3">
+                              <div className="flex items-center justify-between">
+                                <h3 className="text-sm font-medium text-green-400">
+                                  Download Link Available
                                 </h3>
-                                <div className="mt-2">
-                                  <p className="text-sm text-green-700">
-                                    {transaction.notes?.adminNotes || 'Your purchase has been processed successfully.'}
-                                  </p>
-                                  {transaction.notes?.link && (
-                                    <div className="mt-4">
-                                      <a
-                                        href={transaction.notes.link}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
-                                      >
-                                        <FiDownload className="mr-2" />
-                                        Download Product
-                                      </a>
-                                      <p className="mt-2 text-xs text-green-600">
-                                        Link expires in 7 days
-                                      </p>
-                                    </div>
+                                <button
+                                  onClick={() => copyToClipboard(transaction.notes.link, transaction.id)}
+                                  className="flex items-center text-sm text-blue-400 hover:text-blue-300"
+                                >
+                                  {copiedLink === transaction.id ? (
+                                    <>
+                                      <FiCheck className="mr-1 text-green-400" /> Copied!
+                                    </>
+                                  ) : (
+                                    <>
+                                      <FiCopy className="mr-1" /> Copy Link
+                                    </>
                                   )}
-                                </div>
+                                </button>
                               </div>
-                            </div>
-                          </div>
-                        )}
-
-                        {transaction.transactionDetails?.status === 'pending' && (
-                          <div className="mt-6 bg-yellow-50 rounded-lg p-4 border border-yellow-100">
-                            <div className="flex items-start">
-                              <div className="flex-shrink-0">
-                                <FiClock className="h-5 w-5 text-yellow-500" />
+                              <div className="bg-gray-800 p-3 rounded-md flex items-center justify-between">
+                                <p className="text-sm font-mono text-gray-300 truncate">
+                                  {transaction.notes.link}
+                                </p>
+                                <a 
+                                  href={transaction.notes.link} 
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="ml-2 text-blue-400 hover:text-blue-300"
+                                >
+                                  <FiExternalLink />
+                                </a>
                               </div>
-                              <div className="ml-3 flex-1">
-                                <h3 className="text-sm font-medium text-yellow-800">
-                                  Payment in progress
-                                </h3>
-                                <div className="mt-2">
-                                  <p className="text-sm text-yellow-700">
-                                    {transaction.notes?.adminNotes || 'Your payment is being processed. This usually takes 1-15 minutes.'}
-                                  </p>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        )}
-
-                        {transaction.transactionDetails?.status === 'failed' && (
-                          <div className="mt-6 bg-red-50 rounded-lg p-4 border border-red-100">
-                            <div className="flex items-start">
-                              <div className="flex-shrink-0">
-                                <FiX className="h-5 w-5 text-red-500" />
-                              </div>
-                              <div className="ml-3 flex-1">
-                                <h3 className="text-sm font-medium text-red-800">
-                                  Payment failed
-                                </h3>
-                                <div className="mt-2">
-                                  <p className="text-sm text-red-700">
-                                    {transaction.notes?.adminNotes || 'Your payment could not be processed. Please try again or contact support.'}
-                                  </p>
-                                </div>
-                              </div>
+                              <p className="text-xs text-gray-500">
+                                Link expires in 7 days
+                              </p>
                             </div>
                           </div>
                         )}
@@ -433,9 +352,9 @@ const Dashboard = () => {
         )}
       </main>
 
-      <footer className="bg-white border-t border-gray-200 mt-12">
+      <footer className="bg-gray-800 border-t border-gray-700 mt-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <p className="text-center text-sm text-gray-500">
+          <p className="text-center text-sm text-gray-400">
             &copy; {new Date().getFullYear()} Qarvo. All rights reserved.
           </p>
         </div>
