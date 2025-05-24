@@ -1,6 +1,9 @@
-import { useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { disablePageScroll, enablePageScroll } from "scroll-lock";
+import { onAuthStateChanged, signOut } from "firebase/auth";
+
+import { auth } from "../config/firebaseConfig"; // pastikan path benar
 
 import MenuSvg from "../assets/svg/MenuSvg";
 import { links } from "../config";
@@ -10,7 +13,19 @@ import { HambugerMenu } from "../components/design/Header";
 
 const Header = () => {
   const pathname = useLocation();
+  const navigate = useNavigate();
+
   const [openNavigation, setOpenNavigation] = useState(false);
+  const [user, setUser] = useState(null); // user state
+
+  useEffect(() => {
+    // Listen user state
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+    });
+
+    return () => unsubscribe(); // cleanup
+  }, []);
 
   const toggleNavigation = () => {
     if (openNavigation) {
@@ -26,6 +41,15 @@ const Header = () => {
     if (!openNavigation) return;
     enablePageScroll();
     setOpenNavigation(false);
+  };
+
+  const handleLoginLogout = async () => {
+    if (user) {
+      await signOut(auth);
+      setUser(null);
+    } else {
+      navigate("/login"); // arahkan ke halaman login
+    }
   };
 
   return (
@@ -81,9 +105,9 @@ const Header = () => {
             <HambugerMenu />
           </nav>
 
-          {/* Source Code button on desktop */}
-          <Button className="hidden lg:flex" href={links.sourceCode} external>
-            Source Code
+          {/* Login/Logout button on desktop */}
+          <Button className="hidden lg:flex" onClick={handleLoginLogout}>
+            {user ? "Logout" : "Login"}
           </Button>
 
           {/* Mobile Menu button */}
