@@ -1,7 +1,20 @@
-import { check } from "../assets";
-import { pricing } from "../constants";
+import { FaCheck, FaTimes } from "react-icons/fa";
 import Button from "./Button";
 import { useNavigate } from "react-router-dom";
+
+const plans = ["Origin Qi", "Half Saint", "Peak Immortal"];
+const prices = ["25.000", "50.000", "100.000"];
+const recommendedIndex = 1; // Highlight 'Half Saint'
+
+const features = [
+  { label: "Unlimited Script Access", values: [true, true, true] },
+  { label: "Priority Support", values: [false, true, true] },
+  { label: "Private Build Request", values: [false, false, true] },
+  { label: "Multi-Device Login", values: [true, true, true] },
+  { label: "Early Feature Access", values: [false, true, true] },
+  { label: "Advanced UI Customization", values: [false, false, true] },
+  { label: "Encrypted API Key", values: [true, true, true] },
+];
 
 const PricingList = () => {
   const navigate = useNavigate();
@@ -10,164 +23,65 @@ const PricingList = () => {
     navigate(`/payment?plan=${encodeURIComponent(planTitle)}&price=${planPrice}`);
   };
 
-  // Custom features for each tier
-  const features = [
-    {
-      name: "AI Chatbot Access",
-      basic: true,
-      premium: true,
-      rich: true
-    },
-    {
-      name: "Personalized Recommendations",
-      basic: true,
-      premium: true,
-      rich: true
-    },
-    {
-      name: "Basic Support",
-      basic: true,
-      premium: true,
-      rich: true
-    },
-    {
-      name: "Priority Support",
-      basic: false,
-      premium: true,
-      rich: true
-    },
-    {
-      name: "Analytics Dashboard",
-      basic: false,
-      premium: true,
-      rich: true
-    },
-    {
-      name: "Advanced Query Understanding",
-      basic: false,
-      premium: true,
-      rich: true
-    },
-    {
-      name: "Beta Feature Access",
-      basic: false,
-      premium: false,
-      rich: true
-    },
-    {
-      name: "Custom Avatar",
-      basic: false,
-      premium: false,
-      rich: true
-    },
-    {
-      name: "Early Updates",
-      basic: false,
-      premium: false,
-      rich: true
-    }
-  ];
-
   return (
-    <div className="relative">
-      <div className="flex flex-col lg:flex-row gap-8 bg-n-8 rounded-[2rem] p-8 border border-n-6">
-        {/* Features Column */}
-        <div className="lg:w-1/2">
-          <h2 className="h2 mb-8">Pricing & Features</h2>
-          <ul className="space-y-6">
-            {features.map((feature, index) => (
-              <li key={index} className="flex items-center justify-between py-4 border-b border-n-6">
-                <span className="body-1 text-n-1">{feature.name}</span>
-                <div className="flex gap-8">
-                  <span className="w-6 text-center">
-                    {feature.basic ? (
-                      <img src={check} alt="Included" width={20} height={20} />
-                    ) : (
-                      <span className="text-n-4">✗</span>
-                    )}
-                  </span>
-                  <span className="w-6 text-center">
-                    {feature.premium ? (
-                      <img src={check} alt="Included" width={20} height={20} />
-                    ) : (
-                      <span className="text-n-4">✗</span>
-                    )}
-                  </span>
-                  <span className="w-6 text-center">
-                    {feature.rich ? (
-                      <img src={check} alt="Included" width={20} height={20} />
-                    ) : (
-                      <span className="text-n-4">✗</span>
-                    )}
-                  </span>
-                </div>
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        {/* Packages Column */}
-        <div className="lg:w-1/2 flex flex-col lg:flex-row gap-4">
-          {pricing.map((plan, i) => (
-            <div
-              key={plan.id}
-              className={`
-                flex-1 px-6 py-8 bg-n-7 border rounded-[1.5rem] 
-                ${i === 1 ? "border-color-1" : "border-n-6"}
-                transition duration-300 hover:bg-n-6
-                ${i === 1 ? "hover:border-color-1" : "hover:border-n-5"}
-                flex flex-col
-              `}
-            >
-              <div className="flex flex-col h-full">
-                <h4 className={`h4 mb-2 ${i === 0 ? "text-color-2" : i === 1 ? "text-color-1" : "text-color-3"}`}>
-                  {plan.title}
-                </h4>
-                <p className="body-2 text-n-1/50 mb-6">{plan.description}</p>
-
-                <div className="flex items-end h-[4rem] mb-6">
-                  {plan.price !== "0" ? (
-                    <div className="flex items-end gap-1">
-                      <span className="text-[1.25rem] font-bold leading-tight">Rp</span>
-                      <span className="text-[2.5rem] font-bold leading-tight min-w-[6ch] text-left">
-                        {plan.price}
-                      </span>
-                    </div>
-                  ) : (
-                    <span className="text-[2.5rem] font-bold leading-tight">Free</span>
-                  )}
-                </div>
-
-                <Button
-                  className={`w-full mb-8 ${i === 1 ? "bg-color-1 text-n-8" : "bg-n-6"}`}
-                  onClick={() => handleGetStarted(plan.title, plan.price)}
-                  white={i === 1}
-                >
-                  {plan.price === "0" ? "Get Started" : "Subscribe"}
-                </Button>
-
-                <div className="mt-auto">
-                  <h5 className="body-1 mb-4">Top features:</h5>
-                  <ul className="space-y-3">
-                    {plan.features.slice(0, 3).map((feature, j) => (
-                      <li key={j} className="flex items-start">
-                        <img src={check} alt="Check" width={16} height={16} className="mt-1" />
-                        <p className="body-2 ml-2">{feature}</p>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
+    <div className="w-full overflow-x-auto bg-n-8 border border-n-6 rounded-2xl p-6 text-white">
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
+        {/* Feature Column */}
+        <div className="min-w-[12rem]">
+          <h3 className="text-xl font-bold mb-6">Pricing & Features</h3>
+          {features.map((feature, i) => (
+            <div key={i} className="h-14 flex items-center border-t border-n-6 text-sm text-white/80">
+              {feature.label}
             </div>
           ))}
         </div>
-      </div>
 
-      {/* Package labels above the columns */}
-      <div className="hidden lg:flex absolute top-0 right-[25%] w-[50%] justify-between px-8">
-        <div className="w-[30%] text-center body-2 text-n-1/50">Basic</div>
-        <div className="w-[30%] text-center body-2 text-n-1/50">Premium</div>
-        <div className="w-[30%] text-center body-2 text-n-1/50">Rich</div>
+        {/* Plan Columns */}
+        {plans.map((plan, index) => {
+          const isRecommended = index === recommendedIndex;
+          return (
+            <div
+              key={index}
+              className={`relative bg-n-7 rounded-xl shadow-md transition duration-300 ease-in-out ${
+                isRecommended
+                  ? "border-2 border-color-2 bg-opacity-100 scale-[1.03]"
+                  : "border border-n-6 hover:shadow-lg"
+              }`}
+            >
+              {isRecommended && (
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-color-2 text-white text-xs font-bold px-3 py-1 rounded-full shadow-md">
+                  RECOMMENDED
+                </div>
+              )}
+
+              <div className="text-center px-4 pt-6 pb-2">
+                <h4 className="text-lg font-semibold text-color-2">{plan}</h4>
+                <div className="text-[1.5rem] font-bold mt-2">Rp {prices[index]}</div>
+                <Button
+                  className="mt-3 w-full"
+                  onClick={() => handleGetStarted(plan, prices[index])}
+                >
+                  Get Started
+                </Button>
+              </div>
+
+              <div className="border-t border-n-6 mt-4">
+                {features.map((feature, fIndex) => (
+                  <div
+                    key={fIndex}
+                    className="h-14 flex items-center justify-center border-t border-n-6 text-xl"
+                  >
+                    {feature.values[index] ? (
+                      <FaCheck className="text-green-400" />
+                    ) : (
+                      <FaTimes className="text-red-500" />
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          );
+        })}
       </div>
     </div>
   );
