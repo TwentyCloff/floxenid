@@ -4,7 +4,8 @@ import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
 } from "firebase/auth";
-import { auth } from "../config/firebaseConfig";
+import { auth, db } from "../config/firebaseConfig";
+import { doc, setDoc } from "firebase/firestore";
 import { FiUser, FiMail, FiLock, FiArrowRight } from "react-icons/fi";
 
 const Auth = () => {
@@ -29,7 +30,16 @@ const Auth = () => {
       if (isLogin) {
         await signInWithEmailAndPassword(auth, email, password);
       } else {
-        await createUserWithEmailAndPassword(auth, email, password);
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        // Save user data to Firestore
+        await setDoc(doc(db, "users", userCredential.user.uid), {
+          email: email,
+          createdAt: new Date(),
+          name: "",
+          phone: "",
+          discord: "",
+          role: "user"
+        });
       }
       navigate("/dashboard");
     } catch (err) {
