@@ -26,7 +26,7 @@ const WhyChooseUs = () => {
   ];
 
   return (
-    <section className="relative py-24 overflow-hidden">
+    <section className="relative py-24 overflow-hidden" style={{ clipPath: "url(#benefits)" }}>
       {/* Luxury background elements */}
       <div className="absolute inset-0 -z-10">
         <div className="absolute inset-0 bg-gradient-to-br from-n-9 to-n-8 opacity-95" />
@@ -81,35 +81,35 @@ const WhyChooseUs = () => {
           ))}
         </div>
 
-        {/* Premium stats bar */}
+        {/* Premium stats bar - Updated to match feature cards */}
         <motion.div
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           transition={{ duration: 0.8, delay: 0.4 }}
           viewport={{ once: true }}
-          className="mt-20 bg-gradient-to-r from-n-7/80 to-n-8 backdrop-blur-sm border border-n-5/20 rounded-xl p-8 text-white relative overflow-hidden"
+          className="mt-20 relative group"
         >
-          {/* Animated gradient border */}
-          <div className="absolute inset-0 rounded-xl p-px bg-gradient-to-r from-primary-500/30 via-accent-500/30 to-primary-500/30 -z-10">
-            <div className="absolute inset-0 bg-n-8/80 rounded-xl" />
-          </div>
+          {/* Card glow effect */}
+          <div className="absolute -inset-0.5 bg-gradient-to-br from-primary-500/30 to-accent-500/30 rounded-xl blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10" />
           
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
-            {[
-              { value: "99.9%", label: "Uptime" },
-              { value: "500+", label: "Happy Clients" },
-              { value: "24/7", label: "Support" },
-              { value: "10x", label: "Performance" }
-            ].map((stat, i) => (
-              <div key={i} className="relative">
-                <div className="text-4xl font-bold mb-2 bg-gradient-to-r from-primary-100 to-accent-100 bg-clip-text text-transparent">
-                  {stat.value}
+          <div className="bg-n-7/50 backdrop-blur-sm border border-n-5/20 rounded-xl p-8 transition-all duration-300 group-hover:border-n-3/50">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+              {[
+                { value: "99.9%", label: "Uptime" },
+                { value: "500+", label: "Happy Clients" },
+                { value: "24/7", label: "Support" },
+                { value: "10x", label: "Performance" }
+              ].map((stat, i) => (
+                <div key={i} className="relative">
+                  <div className="text-4xl font-bold mb-2 text-white">
+                    {stat.value}
+                  </div>
+                  <div className="text-n-3/80 uppercase text-sm tracking-wider">
+                    {stat.label}
+                  </div>
                 </div>
-                <div className="text-n-3/80 uppercase text-sm tracking-wider">
-                  {stat.label}
-                </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </motion.div>
       </div>
