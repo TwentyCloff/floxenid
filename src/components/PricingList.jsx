@@ -1,9 +1,8 @@
 import { FaCheck, FaTimes } from "react-icons/fa";
-import Button from "./Button";
 import { useNavigate } from "react-router-dom";
 
 const plans = ["Origin Qi", "Half Saint", "Peak Immortal"];
-const prices = ["0", "125000", "325.000"];
+const prices = ["25.000", "50.000", "100.000"];
 const recommendedIndex = 1;
 
 const features = [
@@ -25,18 +24,30 @@ const PricingList = () => {
 
   return (
     <div className="w-full overflow-x-auto bg-n-8 border border-n-6 rounded-2xl p-6 text-n-1">
-      <div className="grid grid-cols-[16rem_repeat(3,minmax(0,1fr))] gap-4 max-lg:grid-cols-1">
-        {/* Header Row */}
-        <div />
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
+        {/* Features List */}
+        <div className="min-w-[12rem]">
+          <h3 className="text-xl font-bold mb-6">Pricing & Features</h3>
+          {features.map((feature, i) => (
+            <div
+              key={i}
+              className="h-14 flex items-center border-t border-n-6 text-sm text-n-2"
+            >
+              {feature.label}
+            </div>
+          ))}
+        </div>
+
+        {/* Plan Cards */}
         {plans.map((plan, index) => {
           const isRecommended = index === recommendedIndex;
           return (
             <div
-              key={`header-${index}`}
-              className={`relative rounded-2xl transition-all p-4 pt-8 text-center border ${
+              key={index}
+              className={`relative rounded-2xl transition-all p-4 pt-6 pb-2 ${
                 isRecommended
-                  ? "border-color-2 bg-n-7 scale-[1.03] shadow-lg"
-                  : "border-n-6 bg-n-7 hover:bg-n-6"
+                  ? "border-2 border-color-2 bg-n-7 scale-[1.03] shadow-lg"
+                  : "border border-n-6 bg-n-7 hover:bg-n-6"
               }`}
             >
               {isRecommended && (
@@ -44,41 +55,33 @@ const PricingList = () => {
                   RECOMMENDED
                 </div>
               )}
-              <h4 className="text-lg font-semibold text-color-2">{plan}</h4>
-              <p className="text-2xl font-bold mt-2 mb-4">Rp {prices[index]}</p>
-              <button
-                onClick={() => handleBuy(plan, prices[index])}
-                className="w-full rounded-xl bg-color-2 text-n-7 font-bold py-2 mt-2 hover:brightness-110 transition-all"
-              >
-                Buy Now
-              </button>
-            </div>
-          );
-        })}
 
-        {/* Features Rows */}
-        {features.map((feature, fIndex) => {
-          return (
-            <React.Fragment key={`feature-${fIndex}`}>
-              {/* Feature Name */}
-              <div className="flex items-center h-14 border-t border-n-6 pl-2 text-sm text-n-2 font-medium">
-                {feature.label}
+              <div className="text-center mb-4">
+                <h4 className="text-lg font-semibold text-color-2">{plan}</h4>
+                <p className="text-[1.5rem] font-bold mt-2">Rp {prices[index]}</p>
+                <div
+                  onClick={() => handleBuy(plan, prices[index])}
+                  className="mt-4 w-full text-center bg-color-2 text-n-7 font-bold py-2 rounded-xl cursor-pointer hover:brightness-110 transition-all"
+                >
+                  Buy Now
+                </div>
               </div>
 
-              {/* Feature values for each plan */}
-              {feature.values.map((hasFeature, pIndex) => (
-                <div
-                  key={`feature-${fIndex}-plan-${pIndex}`}
-                  className="h-14 border-t border-n-6 flex items-center justify-center text-xl"
-                >
-                  {hasFeature ? (
-                    <FaCheck className="text-color-4" />
-                  ) : (
-                    <FaTimes className="text-color-3" />
-                  )}
-                </div>
-              ))}
-            </React.Fragment>
+              <div className="border-t border-n-6">
+                {features.map((feature, fIndex) => (
+                  <div
+                    key={fIndex}
+                    className="h-14 flex items-center justify-center border-t border-n-6 text-xl"
+                  >
+                    {feature.values[index] ? (
+                      <FaCheck className="text-color-4" />
+                    ) : (
+                      <FaTimes className="text-color-3" />
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
           );
         })}
       </div>
