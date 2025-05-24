@@ -78,7 +78,7 @@ const PricingList = () => {
                   key={`feature-${i}`}
                   className={`${featureHeight} flex items-center px-6 border-b border-gray-700 text-gray-300 text-sm`}
                 >
-                  {feature.label}
+                  <span className="whitespace-nowrap">{feature.label}</span>
                 </div>
               ))}
             </div>
