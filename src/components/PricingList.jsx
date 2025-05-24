@@ -1,3 +1,4 @@
+import React from "react";
 import { FaCheck, FaTimes } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 
@@ -24,7 +25,6 @@ const PricingList = () => {
 
   return (
     <div className="w-full overflow-x-auto bg-n-8 border border-n-6 rounded-2xl p-6 text-n-1">
-      {/* Grid container with 4 columns: 1 for feature labels, 3 for plans */}
       <div className="grid grid-cols-4 gap-4">
         {/* Header Titles */}
         <div></div>
@@ -67,11 +67,9 @@ const PricingList = () => {
         {/* Features + Checks */}
         {features.map((feature, i) => (
           <React.Fragment key={`feature-${i}`}>
-            {/* Feature label */}
             <div className="flex items-center h-14 border-t border-n-6 px-4 text-sm text-n-2">
               {feature.label}
             </div>
-            {/* Feature values per plan */}
             {feature.values.map((val, j) => (
               <div
                 key={`val-${i}-${j}`}
