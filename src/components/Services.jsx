@@ -51,12 +51,12 @@ const Services = () => {
                 autoPlay
                 className="absolute left-0 top-0 w-full h-full object-cover"
               />
-              <div className="relative z-10 flex flex-col justify-between w-full h-full p-5 text-blue-50">
+              <div className="relative z-10 flex flex-col justify-between w-full h-full p-5">
                 <div>
-                  <h1 className="text-4xl font-bold mb-3">
-                    radia<b>n</b>t
+                  <h1 className="text-[32px] leading-tight font-medium tracking-tight text-white">
+                    radia<b className="font-semibold">n</b>t
                   </h1>
-                  <p className="text-xl max-w-[16rem]">
+                  <p className="mt-3 text-lg text-n-3 max-w-[240px]">
                     A cross-platform metagame app, turning your activities across Web2 and Web3 games into a rewarding adventure.
                   </p>
                 </div>
@@ -74,12 +74,12 @@ const Services = () => {
                   autoPlay
                   className="absolute left-0 top-0 w-full h-full object-cover"
                 />
-                <div className="relative z-10 flex flex-col justify-between w-full h-full p-5 text-blue-50">
+                <div className="relative z-10 flex flex-col justify-between w-full h-full p-5">
                   <div>
-                    <h1 className="text-4xl font-bold mb-3">
-                      zig<b>m</b>a
+                    <h1 className="text-[32px] leading-tight font-medium tracking-tight text-white">
+                      zig<b className="font-semibold">m</b>a
                     </h1>
-                    <p className="text-xl max-w-[16rem]">
+                    <p className="mt-3 text-lg text-n-3 max-w-[240px]">
                       An anime and gaming-inspired NFT collection - the IP primed for expansion.
                     </p>
                   </div>
@@ -96,12 +96,12 @@ const Services = () => {
                   autoPlay
                   className="absolute left-0 top-0 w-full h-full object-cover"
                 />
-                <div className="relative z-10 flex flex-col justify-between w-full h-full p-5 text-blue-50">
+                <div className="relative z-10 flex flex-col justify-between w-full h-full p-5">
                   <div>
-                    <h1 className="text-4xl font-bold mb-3">
-                      n<b>e</b>xus
+                    <h1 className="text-[32px] leading-tight font-medium tracking-tight text-white">
+                      n<b className="font-semibold">e</b>xus
                     </h1>
-                    <p className="text-xl max-w-[16rem]">
+                    <p className="mt-3 text-lg text-n-3 max-w-[240px]">
                       A gamified social hub, adding a new dimension of play to social interaction for Web3 communities.
                     </p>
                   </div>
@@ -118,12 +118,12 @@ const Services = () => {
                   autoPlay
                   className="absolute left-0 top-0 w-full h-full object-cover"
                 />
-                <div className="relative z-10 flex flex-col justify-between w-full h-full p-5 text-blue-50">
+                <div className="relative z-10 flex flex-col justify-between w-full h-full p-5">
                   <div>
-                    <h1 className="text-4xl font-bold mb-3">
-                      az<b>u</b>l
+                    <h1 className="text-[32px] leading-tight font-medium tracking-tight text-white">
+                      az<b className="font-semibold">u</b>l
                     </h1>
-                    <p className="text-xl max-w-[16rem]">
+                    <p className="mt-3 text-lg text-n-3 max-w-[240px]">
                       A cross-world AI Agent - elevating your gameplay to be more fun and productive.
                     </p>
                   </div>
@@ -133,10 +133,10 @@ const Services = () => {
 
             <BentoTilt>
               <div className="flex w-full h-full flex-col justify-between bg-violet-300 p-5">
-                <h1 className="text-4xl font-bold max-w-64 text-black">
-                  M<b>o</b>re co<b>m</b>ing so<b>o</b>n!
+                <h1 className="text-[32px] leading-tight font-medium tracking-tight text-black">
+                  M<b className="font-semibold">o</b>re co<b className="font-semibold">m</b>ing so<b className="font-semibold">o</b>n!
                 </h1>
-                <TiLocationArrow className="m-5 scale-[5] self-end" />
+                <TiLocationArrow className="m-5 scale-[5] self-end text-black" />
               </div>
             </BentoTilt>
 
