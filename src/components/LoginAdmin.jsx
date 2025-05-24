@@ -13,7 +13,7 @@ const AdminLogin = () => {
     if (username === "acai" && password === "gay123") {
       sessionStorage.setItem("admin-auth", "true");
       console.log("Login sukses:", sessionStorage.getItem("admin-auth"));
-      navigate("/admin/dashboard");
+      navigate("/admin/admin-dashboard");
     } else {
       setError("Username atau password salah.");
     }
