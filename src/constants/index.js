@@ -219,7 +219,7 @@ export const pricing = [
     id: "1",
     title: "Premium",
     description: "Advanced AI chatbot, priority support, analytics dashboard",
-    price: "125.000",
+    price: "125000",
     features: [
       "An advanced AI chatbot that can understand complex queries",
       "An analytics dashboard to track your conversations",
@@ -231,7 +231,7 @@ export const pricing = [
     id: "1",
     title: "Rich",
     description: "Beta test access",
-    price: "245.000",
+    price: "245000",
     features: [
       "Dapat mengakses fitur update lebih awal",
       "Mendapatkan Custom Avatar di tampilan GUI",
