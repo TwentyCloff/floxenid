@@ -24,57 +24,57 @@ const PricingList = () => {
   };
 
   return (
-    <div className="w-full overflow-x-auto bg-n-8 border border-n-6 rounded-2xl p-6 text-white">
+    <div className="w-full overflow-x-auto bg-n-8 border border-n-6 rounded-2xl p-6 text-n-1">
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
-        {/* Feature Column */}
+        {/* Features List */}
         <div className="min-w-[12rem]">
           <h3 className="text-xl font-bold mb-6">Pricing & Features</h3>
           {features.map((feature, i) => (
-            <div key={i} className="h-14 flex items-center border-t border-n-6 text-sm text-white/80">
+            <div key={i} className="h-14 flex items-center border-t border-n-6 text-sm text-n-2">
               {feature.label}
             </div>
           ))}
         </div>
 
-        {/* Plan Columns */}
+        {/* Plan Cards */}
         {plans.map((plan, index) => {
           const isRecommended = index === recommendedIndex;
           return (
             <div
               key={index}
-              className={`relative bg-n-7 rounded-xl shadow-md transition duration-300 ease-in-out ${
+              className={`relative rounded-2xl transition-all p-4 pt-6 pb-2 ${
                 isRecommended
-                  ? "border-2 border-color-2 bg-opacity-100 scale-[1.03]"
-                  : "border border-n-6 hover:shadow-lg"
+                  ? "border-2 border-color-2 bg-n-7 scale-[1.03] shadow-lg"
+                  : "border border-n-6 bg-n-7 hover:bg-n-6"
               }`}
             >
               {isRecommended && (
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-color-2 text-white text-xs font-bold px-3 py-1 rounded-full shadow-md">
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-color-2 text-n-6 text-xs font-bold px-3 py-1 rounded-full shadow-md z-10">
                   RECOMMENDED
                 </div>
               )}
 
-              <div className="text-center px-4 pt-6 pb-2">
+              <div className="text-center mb-4">
                 <h4 className="text-lg font-semibold text-color-2">{plan}</h4>
-                <div className="text-[1.5rem] font-bold mt-2">Rp {prices[index]}</div>
+                <p className="text-[1.5rem] font-bold mt-2">Rp {prices[index]}</p>
                 <Button
-                  className="mt-3 w-full"
+                  className="mt-4 w-full"
                   onClick={() => handleGetStarted(plan, prices[index])}
                 >
                   Get Started
                 </Button>
               </div>
 
-              <div className="border-t border-n-6 mt-4">
+              <div className="border-t border-n-6">
                 {features.map((feature, fIndex) => (
                   <div
                     key={fIndex}
                     className="h-14 flex items-center justify-center border-t border-n-6 text-xl"
                   >
                     {feature.values[index] ? (
-                      <FaCheck className="text-green-400" />
+                      <FaCheck className="text-color-4" />
                     ) : (
-                      <FaTimes className="text-red-500" />
+                      <FaTimes className="text-color-3" />
                     )}
                   </div>
                 ))}
