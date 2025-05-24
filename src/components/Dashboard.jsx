@@ -7,7 +7,7 @@ import {
   FiCopy, FiExternalLink, FiChevronRight, 
   FiCreditCard, FiHome, FiLogOut, FiX,
   FiShield, FiMail, FiSmartphone, FiLoader,
-  FiAlertCircle, FiLock, FiStar, FiAward
+  FiAlertCircle, FiLock, FiStar, FiAward, FiCheck
 } from "react-icons/fi";
 import { FaDiscord } from "react-icons/fa";
 import { signOut, onAuthStateChanged } from 'firebase/auth';
@@ -20,11 +20,13 @@ const Dashboard = () => {
   const [copiedLink, setCopiedLink] = useState(null);
   const [activeMenu, setActiveMenu] = useState(null);
   const [showPremiumAlert, setShowPremiumAlert] = useState(false);
+  const [authChecked, setAuthChecked] = useState(false);
   const navigate = useNavigate();
 
   // Check auth state on component mount
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setAuthChecked(true);
       if (!user) {
         navigate('/login');
       }
@@ -34,13 +36,12 @@ const Dashboard = () => {
   }, [navigate]);
 
   useEffect(() => {
+    if (!authChecked) return;
+
     const fetchData = async () => {
       try {
         const user = auth.currentUser;
-        if (!user) {
-          navigate('/login');
-          return;
-        }
+        if (!user) return;
 
         // User data subscription
         const userDocRef = doc(db, 'users', user.uid);
@@ -57,7 +58,6 @@ const Dashboard = () => {
               role: data.role || 'user'
             });
           } else {
-            // Create user document if it doesn't exist
             const newUserData = {
               email: user.email,
               name: user.displayName || '',
@@ -108,7 +108,7 @@ const Dashboard = () => {
     };
 
     fetchData();
-  }, [navigate]);
+  }, [navigate, authChecked]);
 
   const handleLogout = async () => {
     try {
@@ -167,7 +167,6 @@ const Dashboard = () => {
     }
   };
 
-  // Check if user has access to a specific tier
   const hasAccessToTier = (tier) => {
     if (!transactions || transactions.length === 0) return false;
     
@@ -179,15 +178,12 @@ const Dashboard = () => {
       const plan = t.transactionDetails?.plan?.toLowerCase();
       if (!plan) return false;
       
-      // For Basic tier, check if they have at least Basic
       if (tier === 'basic') {
         return plan.includes('basic') || plan.includes('premium') || plan.includes('rich');
       }
-      // For Premium tier, check if they have Premium or Rich
       else if (tier === 'premium') {
         return plan.includes('premium') || plan.includes('rich');
       }
-      // For Rich tier, check if they have exactly Rich
       else if (tier === 'rich') {
         return plan.includes('rich');
       }
@@ -197,7 +193,6 @@ const Dashboard = () => {
   };
 
   const handleMenuClick = (menu) => {
-    // Check access based on the menu clicked
     if (menu === 'basic') {
       if (hasAccessToTier('basic')) {
         setActiveMenu(menu);
@@ -221,7 +216,6 @@ const Dashboard = () => {
     }
   };
 
-  // Sample content for each tier
   const renderMenuContent = () => {
     switch (activeMenu) {
       case 'basic':
@@ -380,7 +374,6 @@ const Dashboard = () => {
                 </div>
               </div>
 
-              {/* New Tier Menu */}
               <div className="bg-gray-800 rounded-lg shadow-sm overflow-hidden mt-6">
                 <div className="p-4 border-b border-gray-700">
                   <h3 className="font-medium">Exclusive Content</h3>
@@ -446,7 +439,6 @@ const Dashboard = () => {
                 {renderMenuContent()}
               </div>
 
-              {/* My Purchases Section */}
               <div className="bg-gray-800 rounded-lg shadow-sm overflow-hidden mt-8">
                 <div className="p-6 border-b border-gray-700">
                   <h2 className="text-lg font-medium">My Purchases</h2>
@@ -518,7 +510,7 @@ const Dashboard = () => {
                                 >
                                   {copiedLink === transaction.id ? (
                                     <>
-                                      <FiCheckCircle className="mr-1 text-green-400" /> Copied!
+                                      <FiCheck className="mr-1 text-green-400" /> Copied!
                                     </>
                                   ) : (
                                     <>
@@ -556,7 +548,6 @@ const Dashboard = () => {
         )}
       </main>
 
-      {/* Premium Alert Modal */}
       {showPremiumAlert && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-gray-800 rounded-lg p-6 max-w-md w-full">
@@ -609,7 +600,6 @@ const Dashboard = () => {
   );
 };
 
-// ContentBox component for displaying links
 const ContentBox = ({ title, link, onCopy }) => {
   const [copied, setCopied] = useState(false);
 
@@ -632,7 +622,7 @@ const ContentBox = ({ title, link, onCopy }) => {
             className="text-blue-400 hover:text-blue-300 p-1"
             title="Copy link"
           >
-            {copied ? <FiCheckCircle className="text-green-400" /> : <FiCopy />}
+            {copied ? <FiCheck className="text-green-400" /> : <FiCopy />}
           </button>
           <a 
             href={link} 
