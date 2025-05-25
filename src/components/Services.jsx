@@ -1,14 +1,52 @@
 import { useRef, useState, useEffect, useCallback } from "react";
 import { TiLocationArrow } from "react-icons/ti";
 import Section from "./Section";
-import { motion } from "framer-motion";
+import { motion, useMotionValue, useTransform, AnimatePresence } from "framer-motion";
+
+// Futuristic particle component
+const Particle = ({ x, y, size, color, delay }) => {
+  return (
+    <motion.div
+      className="absolute rounded-full pointer-events-none"
+      style={{
+        left: x,
+        top: y,
+        width: size,
+        height: size,
+        background: color,
+        boxShadow: `0 0 ${size} ${color}`
+      }}
+      initial={{ opacity: 0, scale: 0 }}
+      animate={{ 
+        opacity: [0, 1, 0],
+        scale: [0, 1, 0],
+        x: [0, (Math.random() - 0.5) * 20],
+        y: [0, (Math.random() - 0.5) * 20]
+      }}
+      transition={{ 
+        duration: 1.5 + Math.random(),
+        repeat: Infinity,
+        delay: delay,
+        ease: "easeInOut"
+      }}
+    />
+  );
+};
 
 const BentoTilt = ({ children, className = "", disableTiltOnMobile = true }) => {
   const [transformStyle, setTransformStyle] = useState("");
   const [isHovered, setIsHovered] = useState(false);
   const itemRef = useRef(null);
   const [isMobile, setIsMobile] = useState(false);
-  const [cursorPosition, setCursorPosition] = useState({ x: 0, y: 0 });
+  const [cursorPosition, setCursorPosition] = useState({ x: 50, y: 50 });
+  const [particles, setParticles] = useState([]);
+  const particleCount = 15;
+
+  // Motion values for smooth cursor tracking
+  const cursorX = useMotionValue(50);
+  const cursorY = useMotionValue(50);
+  const backgroundX = useTransform(cursorX, [0, 100], [-10, 10]);
+  const backgroundY = useTransform(cursorY, [0, 100], [-10, 10]);
 
   useEffect(() => {
     const checkMobile = () => {
@@ -17,6 +55,21 @@ const BentoTilt = ({ children, className = "", disableTiltOnMobile = true }) => 
     checkMobile();
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  const generateParticles = useCallback((x, y) => {
+    const newParticles = [];
+    for (let i = 0; i < particleCount; i++) {
+      newParticles.push({
+        id: Math.random().toString(36).substr(2, 9),
+        x: `${x}%`,
+        y: `${y}%`,
+        size: `${Math.random() * 5 + 3}px`,
+        color: `hsl(${Math.random() * 60 + 200}, 100%, 70%)`,
+        delay: Math.random() * 0.5
+      });
+    }
+    setParticles(newParticles);
   }, []);
 
   const handleMouseMove = useCallback((e) => {
@@ -28,11 +81,19 @@ const BentoTilt = ({ children, className = "", disableTiltOnMobile = true }) => 
     const tiltX = (relativeY - 0.5) * 5;
     const tiltY = (relativeX - 0.5) * -5;
 
-    setCursorPosition({ x: relativeX * 100, y: relativeY * 100 });
+    const xPos = relativeX * 100;
+    const yPos = relativeY * 100;
+    
+    setCursorPosition({ x: xPos, y: yPos });
+    cursorX.set(xPos);
+    cursorY.set(yPos);
+    
+    generateParticles(xPos, yPos);
+    
     setTransformStyle(
       `perspective(700px) rotateX(${tiltX}deg) rotateY(${tiltY}deg) scale3d(0.98, 0.98, 0.98)`
     );
-  }, [isMobile, disableTiltOnMobile]);
+  }, [isMobile, disableTiltOnMobile, cursorX, cursorY, generateParticles]);
 
   const handleMouseEnter = useCallback(() => {
     setIsHovered(true);
@@ -41,12 +102,13 @@ const BentoTilt = ({ children, className = "", disableTiltOnMobile = true }) => 
   const handleMouseLeave = useCallback(() => {
     setTransformStyle("");
     setIsHovered(false);
+    setParticles([]);
   }, []);
 
   return (
     <motion.div
       ref={itemRef}
-      className={`relative transition-all duration-300 ease-out will-change-transform ${className}`}
+      className={`relative transition-all duration-300 ease-out will-change-transform overflow-hidden ${className}`}
       onMouseMove={handleMouseMove}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
@@ -57,15 +119,31 @@ const BentoTilt = ({ children, className = "", disableTiltOnMobile = true }) => 
     >
       {children}
       {isHovered && !isMobile && (
-        <motion.div 
-          className="absolute inset-0 pointer-events-none rounded-2xl md:rounded-3xl"
-          style={{
-            background: `radial-gradient(circle at ${cursorPosition.x}% ${cursorPosition.y}%, rgba(255,255,255,0.1) 0%, transparent 70%)`,
-          }}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.3 }}
-        />
+        <>
+          <motion.div 
+            className="absolute inset-0 pointer-events-none rounded-2xl md:rounded-3xl"
+            style={{
+              background: `radial-gradient(circle at ${cursorPosition.x}% ${cursorPosition.y}%, rgba(255,255,255,0.1) 0%, transparent 70%)`,
+              x: backgroundX,
+              y: backgroundY
+            }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.3 }}
+          />
+          <AnimatePresence>
+            {particles.map((particle) => (
+              <Particle
+                key={particle.id}
+                x={particle.x}
+                y={particle.y}
+                size={particle.size}
+                color={particle.color}
+                delay={particle.delay}
+              />
+            ))}
+          </AnimatePresence>
+        </>
       )}
     </motion.div>
   );
@@ -173,20 +251,14 @@ const Services = () => {
                           Anime-inspired NFT collection with expansion potential
                         </p>
                       </div>
-                      <motion.div 
-                        className="hidden md:block absolute bottom-4 right-4 bg-white/10 backdrop-blur-sm px-3 py-1 rounded-full"
-                        whileHover={{ scale: 1.05 }}
-                      >
-                        <span className="text-xs text-white">Explore →</span>
-                      </motion.div>
                     </div>
                   </div>
                 </BentoTilt>
               </motion.div>
 
-              {/* Nexus - Top Right */}
+              {/* Nexus - Top Right (1:1 Aspect Ratio) */}
               <motion.div variants={itemVariants}>
-                <BentoTilt className="h-64 md:h-auto">
+                <BentoTilt className="h-64 md:h-auto aspect-square">
                   <div className="relative w-full h-full rounded-2xl overflow-hidden md:rounded-3xl">
                     <video
                       src="/videos/feature-3.mp4"
@@ -211,9 +283,9 @@ const Services = () => {
                 </BentoTilt>
               </motion.div>
 
-              {/* Azul - Middle Right */}
+              {/* Azul - Middle Right (1:1 Aspect Ratio) */}
               <motion.div variants={itemVariants}>
-                <BentoTilt className="h-64 md:h-auto">
+                <BentoTilt className="h-64 md:h-auto aspect-square">
                   <div className="relative w-full h-full rounded-2xl overflow-hidden md:rounded-3xl">
                     <video
                       src="/videos/feature-4.mp4"
@@ -233,12 +305,6 @@ const Services = () => {
                           Cross-world AI Agent for enhanced gameplay
                         </p>
                       </div>
-                      <motion.div 
-                        className="hidden md:block absolute bottom-4 right-4 bg-white/10 backdrop-blur-sm px-3 py-1 rounded-full"
-                        whileHover={{ scale: 1.05 }}
-                      >
-                        <span className="text-xs text-white">Try Demo →</span>
-                      </motion.div>
                     </div>
                   </div>
                 </BentoTilt>
