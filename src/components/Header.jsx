@@ -118,8 +118,8 @@ const Header = () => {
       <div
         className={`fixed top-0 left-0 w-full z-50 transition-colors duration-300 ${
           openNavigation
-            ? "bg-[#0a0614] backdrop-blur-md"
-            : "bg-[#0a0614]/90 backdrop-blur-md"
+            ? "bg-[#000000] backdrop-blur-md"
+            : "bg-[#000000]/10 backdrop-blur-md"
         }`}
         style={{ height: "68px" }}
       >
