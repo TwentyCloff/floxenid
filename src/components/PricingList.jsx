@@ -172,16 +172,32 @@ const PricingList = () => {
               </div>
 
               {/* CTA Button */}
-              <div className="p-4 md:p-6">
+              <div className="relative p-4 md:p-6 overflow-hidden">
+                {/* Background shape */}
+                <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+                
                 <button
                   onClick={() => handleBuy(plan.name, plan.price)}
-                  className={`w-full py-2 md:py-3 rounded-lg font-medium transition-all ${
+                  className={`relative w-full py-2 md:py-3 rounded-lg font-medium transition-all duration-300 group ${
                     plan.recommended
-                      ? "bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white shadow-lg"
-                      : "bg-gray-700 hover:bg-gray-600 text-purple-400"
+                      ? "bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white shadow-lg hover:shadow-xl"
+                      : "bg-gray-700 hover:bg-gray-600 text-purple-400 hover:text-white"
                   }`}
                 >
-                  Get Started
+                  <span className="relative z-10 flex items-center justify-center gap-2">
+                    Get Started
+                    <svg 
+                      className={`w-4 h-4 transition-transform duration-300 group-hover:translate-x-1 ${
+                        plan.recommended ? "text-white" : "text-purple-400 group-hover:text-white"
+                      }`} 
+                      fill="none" 
+                      stroke="currentColor" 
+                      viewBox="0 0 24 24" 
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                    </svg>
+                  </span>
                 </button>
               </div>
             </div>
