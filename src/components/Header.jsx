@@ -101,22 +101,34 @@ const Header = () => {
                   {item.title}
                 </a>
               ))}
+
+              {/* Mobile buttons */}
+              <div className="flex flex-col lg:hidden items-center gap-4 mt-4">
+                {user && (
+                  <Button onClick={goToDashboard} className="w-full">
+                    Dashboard
+                  </Button>
+                )}
+                <Button onClick={handleLoginLogout} className="w-full">
+                  {user ? "Logout" : "Sign In / Sign Up"}
+                </Button>
+              </div>
             </div>
 
             <HambugerMenu />
           </nav>
 
-          {/* Dashboard Button (desktop only) */}
-          {user && (
-            <Button className="hidden lg:flex mr-2" onClick={goToDashboard}>
-              Dashboard
+          {/* Desktop buttons */}
+          <div className="hidden lg:flex items-center gap-2 ml-auto">
+            {user && (
+              <Button onClick={goToDashboard} className="mr-2">
+                Dashboard
+              </Button>
+            )}
+            <Button onClick={handleLoginLogout}>
+              {user ? "Logout" : "Sign In / Sign Up"}
             </Button>
-          )}
-
-          {/* Login/Logout Button */}
-          <Button className="hidden lg:flex" onClick={handleLoginLogout}>
-            {user ? "Logout" : "Sign In / Sign Up"}
-          </Button>
+          </div>
 
           {/* Mobile menu button */}
           <Button
