@@ -1,5 +1,4 @@
 import { useRef, useState, useEffect } from "react";
-import { TiLocationArrow } from "react-icons/ti";
 import Section from "./Section";
 
 const VideoPlayer = ({ src }) => {
@@ -9,6 +8,23 @@ const VideoPlayer = ({ src }) => {
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
+
+    // Video optimization settings
+    video.preload = "auto";
+    video.muted = true;
+    video.playsInline = true;
+    video.loop = true;
+    video.setAttribute('webkit-playsinline', 'true');
+    video.setAttribute('playsinline', 'true');
+    
+    // Remove default controls to improve performance
+    video.controls = false;
+    
+    // Use lower resolution if available
+    if (src.includes('feature-')) {
+      const baseSrc = src.replace('.mp4', '-low.mp4');
+      video.src = baseSrc;
+    }
 
     const handleCanPlay = () => {
       setIsLoaded(true);
@@ -21,15 +37,11 @@ const VideoPlayer = ({ src }) => {
 
     const handleError = () => {
       console.error("Video error:", video.error);
+      // Fallback to original source if low-res fails
+      if (!src.includes('-low.mp4')) {
+        video.src = src;
+      }
     };
-
-    // Mobile optimization
-    video.preload = "auto";
-    video.muted = true;
-    video.playsInline = true;
-    video.loop = true;
-    video.setAttribute('webkit-playsinline', 'true');
-    video.setAttribute('playsinline', 'true');
 
     video.addEventListener('canplay', handleCanPlay);
     video.addEventListener('error', handleError);
@@ -38,7 +50,7 @@ const VideoPlayer = ({ src }) => {
       video.play();
     });
 
-    // Force load on mobile
+    // Force load
     video.load();
 
     return () => {
@@ -60,7 +72,7 @@ const VideoPlayer = ({ src }) => {
       playsInline
       webkit-playsinline="true"
       className="absolute left-0 top-0 w-full h-full object-cover"
-      style={{ opacity: isLoaded ? 1 : 0, transition: 'opacity 0.5s ease' }}
+      style={{ opacity: isLoaded ? 1 : 0 }}
     />
   );
 };
@@ -73,7 +85,7 @@ const Services = () => {
           {/* Hero Section */}
           <div className="border-hsla relative mb-6 h-64 w-full overflow-hidden rounded-2xl md:h-[55vh] md:rounded-3xl md:mb-10">
             <div className="relative w-full h-full">
-              <VideoPlayer src="/videos/feature-1.mp4" />
+              <VideoPlayer src="/videos/feature-1-low.mp4" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent" />
               <div className="relative z-10 flex flex-col justify-between w-full h-full p-5 md:p-8">
                 <div>
@@ -94,7 +106,7 @@ const Services = () => {
               {/* Zigma - Left (6 columns) */}
               <div className="col-span-6 row-span-2 h-[400px]">
                 <div className="relative w-full h-full rounded-3xl overflow-hidden">
-                  <VideoPlayer src="/videos/feature-2.mp4" />
+                  <VideoPlayer src="/videos/feature-2-low.mp4" />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent" />
                   <div className="relative z-10 flex flex-col justify-between w-full h-full p-6">
                     <div>
@@ -112,7 +124,7 @@ const Services = () => {
               {/* More Features - Right (6 columns) */}
               <div className="col-span-6 row-span-2 h-[400px]">
                 <div className="relative w-full h-full rounded-3xl overflow-hidden">
-                  <VideoPlayer src="/videos/feature-5.mp4" />
+                  <VideoPlayer src="/videos/feature-5-low.mp4" />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent" />
                   <div className="relative z-10 p-6">
                     <h1 className="text-4xl font-bold text-white drop-shadow-lg">
@@ -138,7 +150,7 @@ const Services = () => {
               {/* Azul - Left Square (6 columns) */}
               <div className="col-span-6 h-[300px]">
                 <div className="relative w-full h-full rounded-3xl overflow-hidden">
-                  <VideoPlayer src="/videos/feature-4.mp4" />
+                  <VideoPlayer src="/videos/feature-4-low.mp4" />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent" />
                   <div className="relative z-10 flex flex-col justify-between w-full h-full p-6">
                     <div>
@@ -156,7 +168,7 @@ const Services = () => {
               {/* Nexus - Right Square (6 columns) */}
               <div className="col-span-6 h-[300px]">
                 <div className="relative w-full h-full rounded-3xl overflow-hidden">
-                  <VideoPlayer src="/videos/feature-3.mp4" />
+                  <VideoPlayer src="/videos/feature-3-low.mp4" />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent" />
                   <div className="relative z-10 flex flex-col justify-between w-full h-full p-6">
                     <div>
@@ -175,7 +187,7 @@ const Services = () => {
             {/* Coming Soon - Full Width */}
             <div className="h-[500px]">
               <div className="relative w-full h-full rounded-3xl overflow-hidden">
-                <VideoPlayer src="/videos/feature-6.mp4" />
+                <VideoPlayer src="/videos/feature-6-low.mp4" />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent" />
                 <div className="relative z-10 flex flex-col justify-between w-full h-full p-6">
                   <div>
@@ -198,7 +210,7 @@ const Services = () => {
               {/* Zigma */}
               <div className="h-64 w-full">
                 <div className="relative w-full h-full rounded-2xl overflow-hidden">
-                  <VideoPlayer src="/videos/feature-2.mp4" />
+                  <VideoPlayer src="/videos/feature-2-low.mp4" />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent" />
                   <div className="relative z-10 flex flex-col justify-between w-full h-full p-5">
                     <div>
@@ -216,7 +228,7 @@ const Services = () => {
               {/* Nexus */}
               <div className="h-64 w-full">
                 <div className="relative w-full h-full rounded-2xl overflow-hidden">
-                  <VideoPlayer src="/videos/feature-3.mp4" />
+                  <VideoPlayer src="/videos/feature-3-low.mp4" />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent" />
                   <div className="relative z-10 flex flex-col justify-between w-full h-full p-5">
                     <div>
@@ -234,7 +246,7 @@ const Services = () => {
               {/* Azul */}
               <div className="h-64 w-full">
                 <div className="relative w-full h-full rounded-2xl overflow-hidden">
-                  <VideoPlayer src="/videos/feature-4.mp4" />
+                  <VideoPlayer src="/videos/feature-4-low.mp4" />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent" />
                   <div className="relative z-10 flex flex-col justify-between w-full h-full p-5">
                     <div>
@@ -252,7 +264,7 @@ const Services = () => {
               {/* More Features */}
               <div className="h-64 w-full">
                 <div className="relative w-full h-full rounded-2xl overflow-hidden">
-                  <VideoPlayer src="/videos/feature-5.mp4" />
+                  <VideoPlayer src="/videos/feature-5-low.mp4" />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent" />
                   <div className="relative z-10 p-5">
                     <h1 className="text-3xl font-bold text-white drop-shadow-lg">
@@ -275,7 +287,7 @@ const Services = () => {
               {/* Coming Soon */}
               <div className="h-64 w-full">
                 <div className="relative w-full h-full rounded-2xl overflow-hidden">
-                  <VideoPlayer src="/videos/feature-6.mp4" />
+                  <VideoPlayer src="/videos/feature-6-low.mp4" />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent" />
                   <div className="relative z-10 flex flex-col justify-between w-full h-full p-5">
                     <div>
@@ -286,7 +298,6 @@ const Services = () => {
                         Exciting updates launching soon
                       </p>
                     </div>
-                    <TiLocationArrow className="scale-[1.8] text-white/90" />
                   </div>
                 </div>
               </div>
