@@ -3,7 +3,6 @@ import { TiLocationArrow } from "react-icons/ti";
 import Section from "./Section";
 import { motion, useMotionValue, useTransform, AnimatePresence } from "framer-motion";
 
-// Futuristic particle component
 const Particle = ({ x, y, size, color, delay }) => {
   return (
     <motion.div
@@ -42,7 +41,6 @@ const BentoTilt = ({ children, className = "", disableTiltOnMobile = true }) => 
   const [particles, setParticles] = useState([]);
   const particleCount = 15;
 
-  // Motion values for smooth cursor tracking
   const cursorX = useMotionValue(50);
   const cursorY = useMotionValue(50);
   const backgroundX = useTransform(cursorX, [0, 100], [-10, 10]);
@@ -149,6 +147,47 @@ const BentoTilt = ({ children, className = "", disableTiltOnMobile = true }) => 
   );
 };
 
+const VideoPlayer = ({ src }) => {
+  const videoRef = useRef(null);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    const handleEnded = () => {
+      video.currentTime = 0;
+      video.play().catch(e => console.log("Autoplay prevented:", e));
+    };
+
+    video.addEventListener('ended', handleEnded);
+    
+    // Force play and loop
+    const playPromise = video.play();
+    if (playPromise !== undefined) {
+      playPromise.catch(error => {
+        console.log("Autoplay prevented, trying muted play");
+        video.muted = true;
+        video.play();
+      });
+    }
+
+    return () => {
+      video.removeEventListener('ended', handleEnded);
+    };
+  }, [src]);
+
+  return (
+    <video
+      ref={videoRef}
+      src={src}
+      loop
+      muted
+      playsInline
+      className="absolute left-0 top-0 w-full h-full object-cover"
+    />
+  );
+};
+
 const Services = () => {
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -177,7 +216,6 @@ const Services = () => {
     <Section id="how-to-use">
       <div className="bg-black pb-20 md:pb-52 circular-font">
         <div className="container mx-auto px-4 md:px-10">
-          {/* Hero Card */}
           <motion.div
             initial="hidden"
             whileInView="visible"
@@ -187,14 +225,7 @@ const Services = () => {
             <motion.div variants={itemVariants}>
               <BentoTilt className="border-hsla relative mb-6 h-64 w-full overflow-hidden rounded-2xl md:h-[65vh] md:rounded-3xl md:mb-8">
                 <div className="relative w-full h-full">
-                  <video
-                    src="/videos/feature-1.mp4"
-                    loop
-                    muted
-                    autoPlay
-                    playsInline
-                    className="absolute left-0 top-0 w-full h-full object-cover"
-                  />
+                  <VideoPlayer src="/videos/feature-1.mp4" />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent" />
                   <div className="relative z-10 flex flex-col justify-between w-full h-full p-5 md:p-8">
                     <div>
@@ -224,23 +255,21 @@ const Services = () => {
               </BentoTilt>
             </motion.div>
 
-            {/* Bento Grid */}
             <motion.div 
-              className="grid grid-cols-1 gap-4 md:grid-cols-2 md:grid-rows-3 md:gap-6 md:h-[135vh]"
+              className="grid grid-cols-1 gap-4 md:grid-cols-3 md:grid-rows-5 md:gap-6"
               variants={containerVariants}
+              style={{
+                gridTemplateRows: 'repeat(5, minmax(0, 1fr))'
+              }}
             >
               {/* Zigma - Top Left */}
-              <motion.div variants={itemVariants} className="md:row-span-2">
+              <motion.div 
+                variants={itemVariants} 
+                className="md:row-span-2 md:col-span-1"
+              >
                 <BentoTilt className="h-64 md:h-full">
                   <div className="relative w-full h-full rounded-2xl overflow-hidden md:rounded-3xl">
-                    <video
-                      src="/videos/feature-2.mp4"
-                      loop
-                      muted
-                      autoPlay
-                      playsInline
-                      className="absolute left-0 top-0 w-full h-full object-cover"
-                    />
+                    <VideoPlayer src="/videos/feature-2.mp4" />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent" />
                     <div className="relative z-10 flex flex-col justify-between w-full h-full p-5">
                       <div>
@@ -256,18 +285,14 @@ const Services = () => {
                 </BentoTilt>
               </motion.div>
 
-              {/* Nexus - Top Right (1:1 Aspect Ratio) */}
-              <motion.div variants={itemVariants}>
-                <BentoTilt className="h-64 md:h-auto aspect-square">
+              {/* Nexus - 1:1 Aspect */}
+              <motion.div 
+                variants={itemVariants}
+                className="md:row-span-1 md:col-span-1"
+              >
+                <BentoTilt className="h-64 w-full aspect-square">
                   <div className="relative w-full h-full rounded-2xl overflow-hidden md:rounded-3xl">
-                    <video
-                      src="/videos/feature-3.mp4"
-                      loop
-                      muted
-                      autoPlay
-                      playsInline
-                      className="absolute left-0 top-0 w-full h-full object-cover"
-                    />
+                    <VideoPlayer src="/videos/feature-3.mp4" />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent" />
                     <div className="relative z-10 flex flex-col justify-between w-full h-full p-5">
                       <div>
@@ -283,18 +308,14 @@ const Services = () => {
                 </BentoTilt>
               </motion.div>
 
-              {/* Azul - Middle Right (1:1 Aspect Ratio) */}
-              <motion.div variants={itemVariants}>
-                <BentoTilt className="h-64 md:h-auto aspect-square">
+              {/* Azul - 1:1 Aspect */}
+              <motion.div 
+                variants={itemVariants}
+                className="md:row-span-1 md:col-span-1"
+              >
+                <BentoTilt className="h-64 w-full aspect-square">
                   <div className="relative w-full h-full rounded-2xl overflow-hidden md:rounded-3xl">
-                    <video
-                      src="/videos/feature-4.mp4"
-                      loop
-                      muted
-                      autoPlay
-                      playsInline
-                      className="absolute left-0 top-0 w-full h-full object-cover"
-                    />
+                    <VideoPlayer src="/videos/feature-4.mp4" />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent" />
                     <div className="relative z-10 flex flex-col justify-between w-full h-full p-5">
                       <div>
@@ -310,18 +331,14 @@ const Services = () => {
                 </BentoTilt>
               </motion.div>
 
-              {/* Feature 5 - Bottom Right */}
-              <motion.div variants={itemVariants}>
+              {/* Feature 5 */}
+              <motion.div 
+                variants={itemVariants} 
+                className="md:row-span-2 md:col-span-1"
+              >
                 <BentoTilt className="h-64 md:h-full">
                   <div className="relative w-full h-full rounded-2xl overflow-hidden md:rounded-3xl">
-                    <video
-                      src="/videos/feature-5.mp4"
-                      loop
-                      muted
-                      autoPlay
-                      playsInline
-                      className="absolute left-0 top-0 w-full h-full object-cover"
-                    />
+                    <VideoPlayer src="/videos/feature-5.mp4" />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent" />
                     <div className="relative z-10 p-5">
                       <h1 className="text-3xl font-bold text-white drop-shadow-lg">
@@ -359,7 +376,10 @@ const Services = () => {
               </motion.div>
 
               {/* Coming Soon */}
-              <motion.div variants={itemVariants} className="col-span-1 md:col-span-1 order-last">
+              <motion.div 
+                variants={itemVariants} 
+                className="md:row-span-2 md:col-span-1"
+              >
                 <BentoTilt className="h-64 md:h-full">
                   <div className="flex w-full h-full flex-col justify-between bg-gradient-to-br from-purple-500 to-indigo-600 p-5 rounded-2xl md:rounded-3xl">
                     <div>
