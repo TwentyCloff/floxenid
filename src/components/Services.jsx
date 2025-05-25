@@ -385,7 +385,7 @@ const Services = () => {
               {/* Coming Soon - Full Width */}
               <motion.div 
                 variants={itemVariants} 
-                className="h-[350px]" // Increased height from 300px to 350px
+                className="h-[450px]" // Increased height from 300px to 350px
               >
                 <BentoTilt className="h-full w-full">
                   <div className="relative w-full h-full rounded-3xl overflow-hidden">
