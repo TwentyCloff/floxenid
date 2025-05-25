@@ -24,24 +24,7 @@ import {
   FiCalendar,
   FiTrash2,
 } from "react-icons/fi";
-import { FiCreditCard } from "react-icons/fi";
-import {
-  FaDiscord,
-  FaPaypal,
-  FaCcVisa,
-  FaCcMastercard,
-  FaCcAmex,
-  FaUniversity,
-  FaWallet
-} from "react-icons/fa";
-import {
-  MdAccountBalance
-} from "react-icons/md";
-import {
-  RiBankLine,
-  RiWallet3Line,
-  RiMoneyDollarCircleLine
-} from "react-icons/ri";
+import { FaDiscord } from "react-icons/fa";
 
 const AdminDashboard = () => {
   const [payments, setPayments] = useState([]);
@@ -194,27 +177,6 @@ const AdminDashboard = () => {
           </span>
         );
     }
-  };
-
-  const getPaymentMethodIcon = (method) => {
-    if (!method) return <FiCreditCard className="text-gray-400" />;
-    
-    const lowerMethod = method.toLowerCase();
-    
-    if (lowerMethod.includes("visa")) return <FaCcMastercard className="text-blue-600" />;
-    if (lowerMethod.includes("mastercard")) return <FaCcMastercard className="text-red-500" />;
-    if (lowerMethod.includes("amex")) return <FaCcMastercard className="text-blue-400" />;
-    if (lowerMethod.includes("paypal")) return <FaCcMastercard className="text-blue-500" />;
-    if (lowerMethod.includes("bca")) return <FaCcMastercard className="text-blue-800" />;
-    if (lowerMethod.includes("bni")) return <FaCcMastercard className="text-yellow-600" />;
-    if (lowerMethod.includes("bri")) return <FaCcMastercard className="text-blue-600" />;
-    if (lowerMethod.includes("mandiri")) return <FaCcMastercard className="text-red-600" />;
-    if (lowerMethod.includes("dana")) return <FaCcMastercard className="text-blue-500" />;
-    if (lowerMethod.includes("ovo")) return <FaCcMastercard className="text-purple-600" />;
-    if (lowerMethod.includes("gopay")) return <FaCcMastercard className="text-green-600" />;
-    if (lowerMethod.includes("bank")) return <FaCcMastercard className="text-blue-700" />;
-    
-    return <FaCcMastercard className="text-gray-400" />;
   };
 
   const formatDate = (date) => {
@@ -495,12 +457,9 @@ const AdminDashboard = () => {
                         <span className="font-semibold">
                           {formatCurrency(payment.transactionDetails.amount)}
                         </span>
-                        <div className="flex items-center gap-2 mt-1">
-                          {getPaymentMethodIcon(payment.paymentMethod)}
-                          <span className="text-xs">
-                            {payment.paymentMethod || "Unknown"}
-                          </span>
-                        </div>
+                        <span className="text-xs mt-1 flex items-center gap-1">
+                          <FiCreditCard /> {payment.paymentMethod || "-"}
+                        </span>
                         <span className="text-xs mt-1 flex items-center gap-1">
                           <FiClock /> Created: {formatDate(payment.timestamp)}
                         </span>
