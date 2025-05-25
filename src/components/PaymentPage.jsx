@@ -7,7 +7,7 @@ import {
 } from "react-icons/fi";
 import { FaQrcode, FaDiscord } from "react-icons/fa";
 import { db, auth } from "../config/firebaseConfig";
-import { doc, setDoc, getDoc, serverTimestamp, collection, query, where, getDocs } from "firebase/firestore";
+import { doc, setDoc, getDoc, serverTimestamp, collection, query, where, getDocs, onSnapshot } from "firebase/firestore";
 import paymentVideo from "../assets/hero/payment-bg.mp4";
 import Button from "./Button";
 import gopayLogo from "../assets/selectz/gopay1.png";
@@ -25,6 +25,7 @@ const PaymentPage = () => {
   const [paymentComplete, setPaymentComplete] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [paymentPending, setPaymentPending] = useState(false);
+  const [paymentDeclined, setPaymentDeclined] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState("qris");
   const [personalInfo, setPersonalInfo] = useState({
     name: "",
@@ -295,6 +296,44 @@ const PaymentPage = () => {
     }
   };
 
+  const sendDiscordWebhook = async (transactionData) => {
+    try {
+      const webhookURL = "https://discord.com/api/webhooks/1375016590499909713/XvxOACsbD8RnClBMmTRCZ43lMvcH9WCW70kTm3TcXq0vF4Nfo98yIjX_G4azV1j-raYW";
+      
+      const embed = {
+        title: "New Payment Pending",
+        description: `A new payment is pending verification for ${transactionData.customer.name}`,
+        color: 0xffcc00, // Yellow for pending
+        fields: [
+          {
+            name: "Customer Info",
+            value: `**Name:** ${transactionData.customer.name}\n**Email:** ${transactionData.customer.email}\n**Discord ID:** ${transactionData.customer.discord}\n**WhatsApp:** ${transactionData.customer.phone}`,
+            inline: false
+          },
+          {
+            name: "Transaction Details",
+            value: `**Plan:** ${transactionData.transactionDetails.plan}\n**Amount:** Rp${transactionData.transactionDetails.totalAmount.toLocaleString('id-ID')}\n**Method:** ${transactionData.transactionDetails.paymentMethod}\n**Invoice:** ${transactionData.transactionDetails.invoiceNumber}`,
+            inline: false
+          }
+        ],
+        timestamp: new Date().toISOString()
+      };
+
+      await fetch(webhookURL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          content: "<@&1376170954115387392> New payment pending verification",
+          embeds: [embed]
+        })
+      });
+    } catch (error) {
+      console.error("Failed to send Discord webhook:", error);
+    }
+  };
+
   const submitPayment = async () => {
     if (!validatePersonalInfo()) {
       scrollToFirstError();
@@ -359,6 +398,9 @@ const PaymentPage = () => {
         lastUpdated: serverTimestamp()
       }, { merge: true });
 
+      // Send Discord webhook notification
+      await sendDiscordWebhook(transactionData);
+
       setPaymentPending(true);
       startPaymentStatusCheck(invoiceNum);
     } catch (error) {
@@ -369,27 +411,27 @@ const PaymentPage = () => {
   };
 
   const startPaymentStatusCheck = (invoiceNum) => {
-    const checkInterval = setInterval(async () => {
-      try {
-        const docRef = doc(db, "transactions", invoiceNum);
-        const docSnap = await getDoc(docRef);
+    const docRef = doc(db, "transactions", invoiceNum);
+    
+    const unsubscribe = onSnapshot(docRef, (docSnap) => {
+      if (docSnap.exists()) {
+        const transaction = docSnap.data();
+        const status = transaction.transactionDetails.status;
         
-        if (docSnap.exists()) {
-          const transaction = docSnap.data();
-          if (transaction.transactionDetails.status === "completed") {
-            clearInterval(checkInterval);
-            setPaymentComplete(true);
-            setPaymentPending(false);
-          }
+        if (status === "completed") {
+          setPaymentComplete(true);
+          setPaymentPending(false);
+          unsubscribe();
+        } else if (status === "failed") {
+          setPaymentDeclined(true);
+          setPaymentPending(false);
+          unsubscribe();
         }
-      } catch (error) {
-        console.error("Error checking payment status:", error);
-        clearInterval(checkInterval);
       }
-    }, 5000); // Check every 5 seconds
+    });
 
-    // Cleanup interval when component unmounts
-    return () => clearInterval(checkInterval);
+    // Cleanup subscription when component unmounts
+    return () => unsubscribe();
   };
 
   if (paymentComplete) {
@@ -499,6 +541,58 @@ const PaymentPage = () => {
             <p className="text-xs text-gray-500 font-mono tracking-wider">
               STATUS: PENDING • WAITING VERIFICATION
             </p>
+
+            <Button 
+              onClick={() => navigate("/dashboard")}
+              className="w-full bg-gradient-to-r from-gray-700 to-gray-800 hover:from-gray-800 hover:to-gray-900 shadow-lg transition-all duration-300 hover:shadow-gray-500/20"
+            >
+              Go to Dashboard
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (paymentDeclined) {
+    return (
+      <div className="fixed inset-0 overflow-y-auto z-[9999] bg-black flex items-center justify-center p-4">
+        <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-black to-gray-900 opacity-95">
+          <video autoPlay loop muted className="absolute inset-0 w-full h-full object-cover opacity-10">
+            <source src={paymentVideo} type="video/mp4" />
+          </video>
+        </div>
+
+        <div className="relative z-10 bg-gray-900/95 backdrop-blur-2xl p-8 rounded-xl max-w-md w-full border border-red-500/20 shadow-2xl shadow-red-900/10">
+          <div className="flex flex-col items-center text-center space-y-6">
+            <div className="relative">
+              <div className="absolute inset-0 bg-red-500/20 blur-xl rounded-full"></div>
+              <div className="relative w-24 h-24 bg-gradient-to-br from-red-500 to-pink-600 rounded-full flex items-center justify-center shadow-lg">
+                <FiX className="w-12 h-12 text-white" />
+              </div>
+            </div>
+            
+            <div className="space-y-2">
+              <h2 className="text-3xl font-bold text-white">
+                Payment Declined
+              </h2>
+              <p className="text-gray-400">
+                Invoice: <span className="font-mono text-red-400">{invoiceNumber}</span>
+              </p>
+            </div>
+            
+            <div className="w-full bg-gray-800/50 rounded-lg p-4 border border-gray-700/50">
+              <p className="text-red-300">
+                Pembayaran kamu ditolak, silahkan melakukan transaksi ulang
+              </p>
+            </div>
+            
+            <Button 
+              onClick={() => navigate("/dashboard")}
+              className="w-full bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-700 hover:to-pink-700 shadow-lg transition-all duration-300 hover:shadow-red-500/20"
+            >
+              Go to Dashboard
+            </Button>
           </div>
         </div>
       </div>
@@ -812,11 +906,11 @@ const PaymentPage = () => {
                   All information must be accurate. Transactions with incorrect data will be voided without refund.
                 </li>
                 <li className="flex items-start">
-                  <span className="text-purple-400 mr-2 mt-0.5">•</span>
+                  <span className="text-purple-400 mr-2 mt=0.5">•</span>
                   Your Discord User ID must match your account exactly. We cannot assist with deliveries to incorrect accounts.
                 </li>
                 <li className="flex items-start">
-                  <span className="text-purple-400 mr-2 mt-0.5">•</span>
+                  <span className="text-purple-400 mr-2 mt=0.5">•</span>
                   Payments are processed within 1-15 minutes during business hours (9AM-10PM WIB).
                 </li>
                 <li className="flex items-start">
@@ -917,7 +1011,7 @@ const PaymentPage = () => {
               {paymentMethod === "qris" ? (
                 <div className="flex flex-col items-center py-4">
                   <div className="w-52 h-52 bg-white rounded-xl flex items-center justify-center mb-4 p-4 shadow-lg">
-                    <FaQrcode className="w-full h-full text-black" />
+                    <img src={qrisByr} alt="QRIS Payment" className="w-full h-full object-contain" />
                   </div>
                   <p className="text-gray-400 text-center max-w-md text-sm">
                     Scan using your mobile banking or e-wallet app that supports QRIS
