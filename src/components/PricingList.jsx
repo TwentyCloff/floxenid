@@ -172,22 +172,19 @@ const PricingList = () => {
               </div>
 
               {/* CTA Button */}
-              <div className="relative p-4 md:p-6 overflow-hidden">
-                {/* Background shape */}
-                <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
-                
+              <div className="p-4 md:p-6">
                 <button
                   onClick={() => handleBuy(plan.name, plan.price)}
-                  className={`relative w-full py-2 md:py-3 rounded-lg font-medium transition-all duration-300 group ${
+                  className={`w-full py-2 md:py-3 rounded-lg font-medium transition-all duration-300 ${
                     plan.recommended
                       ? "bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white shadow-lg hover:shadow-xl"
                       : "bg-gray-700 hover:bg-gray-600 text-purple-400 hover:text-white"
                   }`}
                 >
-                  <span className="relative z-10 flex items-center justify-center gap-2">
+                  <span className="flex items-center justify-center gap-2">
                     Get Started
                     <svg 
-                      className={`w-4 h-4 transition-transform duration-300 group-hover:translate-x-1 ${
+                      className={`w-4 h-4 transition-transform duration-300 hover:translate-x-1 ${
                         plan.recommended ? "text-white" : "text-purple-400 group-hover:text-white"
                       }`} 
                       fill="none" 
