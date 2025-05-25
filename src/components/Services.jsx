@@ -19,11 +19,11 @@ const Particle = ({ x, y, size, color, delay }) => {
       animate={{ 
         opacity: [0, 1, 0],
         scale: [0, 1, 0],
-        x: [0, (Math.random() - 0.5) * 20],
-        y: [0, (Math.random() - 0.5) * 20]
+        x: [0, (Math.random() - 0.5) * 10], // Reduced movement
+        y: [0, (Math.random() - 0.5) * 10]  // Reduced movement
       }}
       transition={{ 
-        duration: 1.5 + Math.random(),
+        duration: 1 + Math.random(), // Shorter duration
         repeat: Infinity,
         delay: delay,
         ease: "easeInOut"
@@ -39,12 +39,13 @@ const BentoTilt = ({ children, className = "", disableTiltOnMobile = true }) => 
   const [isMobile, setIsMobile] = useState(false);
   const [cursorPosition, setCursorPosition] = useState({ x: 50, y: 50 });
   const [particles, setParticles] = useState([]);
-  const particleCount = 10; // Reduced from 15 to lighten load
+  const particleCount = 8; // Further reduced particle count
+  const rafId = useRef(null);
 
   const cursorX = useMotionValue(50);
   const cursorY = useMotionValue(50);
-  const backgroundX = useTransform(cursorX, [0, 100], [-5, 5]); // Reduced movement range
-  const backgroundY = useTransform(cursorY, [0, 100], [-5, 5]); // Reduced movement range
+  const backgroundX = useTransform(cursorX, [0, 100], [-3, 3]); // Further reduced movement
+  const backgroundY = useTransform(cursorY, [0, 100], [-3, 3]); // Further reduced movement
 
   useEffect(() => {
     const checkMobile = () => {
@@ -52,45 +53,47 @@ const BentoTilt = ({ children, className = "", disableTiltOnMobile = true }) => 
     };
     checkMobile();
     window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
+    return () => {
+      window.removeEventListener('resize', checkMobile);
+      if (rafId.current) cancelAnimationFrame(rafId.current);
+    };
   }, []);
 
   const generateParticles = useCallback((x, y) => {
-    const newParticles = [];
-    for (let i = 0; i < particleCount; i++) {
-      newParticles.push({
-        id: Math.random().toString(36).substr(2, 9),
-        x: `${x}%`,
-        y: `${y}%`,
-        size: `${Math.random() * 3 + 2}px`, // Smaller particles
-        color: `hsl(${Math.random() * 60 + 200}, 100%, 70%)`,
-        delay: Math.random() * 0.3 // Shorter delay
-      });
-    }
+    const newParticles = Array.from({ length: particleCount }, () => ({
+      id: Math.random().toString(36).substr(2, 9),
+      x: `${x}%`,
+      y: `${y}%`,
+      size: `${Math.random() * 2 + 1}px`, // Even smaller particles
+      color: `hsl(${Math.random() * 60 + 200}, 100%, 70%)`,
+      delay: Math.random() * 0.2 // Shorter delay
+    }));
     setParticles(newParticles);
-  }, []);
+  }, [particleCount]);
 
   const handleMouseMove = useCallback((e) => {
     if (!itemRef.current || (isMobile && disableTiltOnMobile)) return;
 
-    const { left, top, width, height } = itemRef.current.getBoundingClientRect();
-    const relativeX = (e.clientX - left) / width;
-    const relativeY = (e.clientY - top) / height;
-    const tiltX = (relativeY - 0.5) * 5;
-    const tiltY = (relativeX - 0.5) * -5;
+    rafId.current = requestAnimationFrame(() => {
+      const { left, top, width, height } = itemRef.current.getBoundingClientRect();
+      const relativeX = (e.clientX - left) / width;
+      const relativeY = (e.clientY - top) / height;
+      const tiltX = (relativeY - 0.5) * 3; // Reduced tilt amount
+      const tiltY = (relativeX - 0.5) * -3; // Reduced tilt amount
 
-    const xPos = relativeX * 100;
-    const yPos = relativeY * 100;
-    
-    setCursorPosition({ x: xPos, y: yPos });
-    cursorX.set(xPos);
-    cursorY.set(yPos);
-    
-    generateParticles(xPos, yPos);
-    
-    setTransformStyle(
-      `perspective(700px) rotateX(${tiltX}deg) rotateY(${tiltY}deg) scale3d(0.98, 0.98, 0.98)`
-    );
+      const xPos = relativeX * 100;
+      const yPos = relativeY * 100;
+      
+      setCursorPosition({ x: xPos, y: yPos });
+      cursorX.set(xPos);
+      cursorY.set(yPos);
+      
+      generateParticles(xPos, yPos);
+      
+      setTransformStyle(
+        `perspective(700px) rotateX(${tiltX}deg) rotateY(${tiltY}deg) scale3d(0.99, 0.99, 0.99)`
+      );
+    });
   }, [isMobile, disableTiltOnMobile, cursorX, cursorY, generateParticles]);
 
   const handleMouseEnter = useCallback(() => {
@@ -121,13 +124,13 @@ const BentoTilt = ({ children, className = "", disableTiltOnMobile = true }) => 
           <motion.div 
             className="absolute inset-0 pointer-events-none rounded-2xl md:rounded-3xl"
             style={{
-              background: `radial-gradient(circle at ${cursorPosition.x}% ${cursorPosition.y}%, rgba(255,255,255,0.1) 0%, transparent 70%)`,
+              background: `radial-gradient(circle at ${cursorPosition.x}% ${cursorPosition.y}%, rgba(255,255,255,0.05) 0%, transparent 70%)`, // Less intense gradient
               x: backgroundX,
               y: backgroundY
             }}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ duration: 0.3 }}
+            transition={{ duration: 0.2 }} // Faster transition
           />
           <AnimatePresence>
             {particles.map((particle) => (
@@ -149,29 +152,35 @@ const BentoTilt = ({ children, className = "", disableTiltOnMobile = true }) => 
 
 const VideoPlayer = ({ src }) => {
   const videoRef = useRef(null);
+  const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
+
+    const handleLoaded = () => {
+      setIsLoaded(true);
+      video.play().catch(e => {
+        console.log("Autoplay prevented, trying muted play");
+        video.muted = true;
+        video.play();
+      });
+    };
 
     const handleEnded = () => {
       video.currentTime = 0;
       video.play().catch(e => console.log("Autoplay prevented:", e));
     };
 
+    video.addEventListener('loadedmetadata', handleLoaded);
     video.addEventListener('ended', handleEnded);
     
-    // Force play and loop
-    const playPromise = video.play();
-    if (playPromise !== undefined) {
-      playPromise.catch(error => {
-        console.log("Autoplay prevented, trying muted play");
-        video.muted = true;
-        video.play();
-      });
-    }
+    // Set preload attribute
+    video.preload = "auto";
+    video.load();
 
     return () => {
+      video.removeEventListener('loadedmetadata', handleLoaded);
       video.removeEventListener('ended', handleEnded);
     };
   }, [src]);
@@ -184,6 +193,7 @@ const VideoPlayer = ({ src }) => {
       muted
       playsInline
       className="absolute left-0 top-0 w-full h-full object-cover"
+      style={{ opacity: isLoaded ? 1 : 0, transition: 'opacity 0.5s ease' }}
     />
   );
 };
@@ -206,7 +216,7 @@ const Services = () => {
       y: 0,
       opacity: 1,
       transition: {
-        duration: 0.5,
+        duration: 0.4, // Slightly faster
         ease: "easeOut"
       }
     }
@@ -246,8 +256,8 @@ const Services = () => {
                     <div className="hidden md:flex items-center gap-2 text-xs text-gray-400">
                       <motion.span 
                         className="inline-block w-2 h-2 rounded-full bg-purple-500"
-                        animate={{ scale: [1, 1.5, 1] }}
-                        transition={{ repeat: Infinity, duration: 1.5 }}
+                        animate={{ scale: [1, 1.3, 1] }} // Reduced scale
+                        transition={{ repeat: Infinity, duration: 1.2 }} // Faster
                       />
                       Hover to interact
                     </div>
@@ -306,7 +316,7 @@ const Services = () => {
                             hidden: {},
                             visible: {
                               transition: {
-                                staggerChildren: 0.1
+                                staggerChildren: 0.05 // Faster stagger
                               }
                             }
                           }}
@@ -316,7 +326,7 @@ const Services = () => {
                               key={feature}
                               className="text-sm bg-white/10 text-white px-3 py-1.5 rounded-full"
                               variants={{
-                                hidden: { opacity: 0, y: 10 },
+                                hidden: { opacity: 0, y: 5 }, // Reduced movement
                                 visible: { opacity: 1, y: 0 }
                               }}
                             >
@@ -385,12 +395,12 @@ const Services = () => {
               {/* Coming Soon - Full Width */}
               <motion.div 
                 variants={itemVariants} 
-                className="h-[500px]" // Increased height from 300px to 350px
+                className="h-[500px]"
               >
                 <BentoTilt className="h-full w-full">
                   <div className="relative w-full h-full rounded-3xl overflow-hidden">
                     <VideoPlayer src="/videos/feature-6.mp4" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent" /> {/* Changed from purple gradient */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent" />
                     <div className="relative z-10 flex flex-col justify-between w-full h-full p-6">
                       <div>
                         <h1 className="text-4xl font-bold text-white drop-shadow-lg">
@@ -404,11 +414,11 @@ const Services = () => {
                         <motion.div 
                           className="flex gap-3 text-2xl"
                           animate={{
-                            x: [0, 5, 0],
+                            x: [0, 3, 0], // Reduced movement
                           }}
                           transition={{
                             repeat: Infinity,
-                            duration: 2,
+                            duration: 1.5, // Faster
                             ease: "easeInOut"
                           }}
                         >
@@ -416,20 +426,20 @@ const Services = () => {
                             <motion.span
                               key={i}
                               animate={{
-                                y: [0, -10, 0],
+                                y: [0, -5, 0], // Reduced movement
                               }}
                               transition={{
                                 repeat: Infinity,
-                                duration: 2 + i * 0.5,
+                                duration: 1.5 + i * 0.3, // Faster
                                 ease: "easeInOut",
-                                delay: i * 0.3
+                                delay: i * 0.2 // Shorter delay
                               }}
                             >
                               {emoji}
                             </motion.span>
                           ))}
                         </motion.div>
-                        <TiLocationArrow className="scale-[3] text-white/90 animate-bounce" />
+                        <TiLocationArrow className="scale-[2.5] text-white/90 animate-bounce" />
                       </div>
                     </div>
                   </div>
@@ -437,7 +447,7 @@ const Services = () => {
               </motion.div>
             </div>
 
-            {/* Mobile Layout (unchanged) */}
+            {/* Mobile Layout */}
             <div className="md:hidden">
               <motion.div 
                 className="grid grid-cols-1 gap-4"
@@ -521,7 +531,7 @@ const Services = () => {
                             hidden: {},
                             visible: {
                               transition: {
-                                staggerChildren: 0.1
+                                staggerChildren: 0.05 // Faster stagger
                               }
                             }
                           }}
@@ -531,7 +541,7 @@ const Services = () => {
                               key={feature}
                               className="text-xs bg-white/10 text-white px-2 py-1 rounded-full"
                               variants={{
-                                hidden: { opacity: 0, y: 10 },
+                                hidden: { opacity: 0, y: 5 }, // Reduced movement
                                 visible: { opacity: 1, y: 0 }
                               }}
                             >
@@ -548,8 +558,8 @@ const Services = () => {
                 <motion.div variants={itemVariants}>
                   <BentoTilt className="h-64 w-full">
                     <div className="relative w-full h-full rounded-2xl overflow-hidden">
-                      <VideoPlayer src="/videos/feature-5.mp4" />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent" /> {/* Changed from purple gradient */}
+                      <VideoPlayer src="/videos/feature-6.mp4" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent" />
                       <div className="relative z-10 flex flex-col justify-between w-full h-full p-5">
                         <div>
                           <h1 className="text-3xl font-bold text-white drop-shadow-lg">
@@ -563,11 +573,11 @@ const Services = () => {
                           <motion.div 
                             className="flex gap-2"
                             animate={{
-                              x: [0, 5, 0],
+                              x: [0, 3, 0], // Reduced movement
                             }}
                             transition={{
                               repeat: Infinity,
-                              duration: 2,
+                              duration: 1.5, // Faster
                               ease: "easeInOut"
                             }}
                           >
@@ -575,20 +585,20 @@ const Services = () => {
                               <motion.span
                                 key={i}
                                 animate={{
-                                  y: [0, -10, 0],
+                                  y: [0, -5, 0], // Reduced movement
                                 }}
                                 transition={{
                                   repeat: Infinity,
-                                  duration: 2 + i * 0.5,
+                                  duration: 1.5 + i * 0.3, // Faster
                                   ease: "easeInOut",
-                                  delay: i * 0.3
+                                  delay: i * 0.2 // Shorter delay
                                 }}
                               >
                                 {emoji}
                               </motion.span>
                             ))}
                           </motion.div>
-                          <TiLocationArrow className="scale-[2] text-white/90 animate-bounce" />
+                          <TiLocationArrow className="scale-[1.8] text-white/90 animate-bounce" />
                         </div>
                       </div>
                     </div>
