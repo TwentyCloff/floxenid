@@ -20,6 +20,7 @@ import {
   FiMail,
   FiPhone,
   FiCreditCard,
+  FiCalendar,
 } from "react-icons/fi";
 import { FaDiscord } from "react-icons/fa";
 
@@ -28,6 +29,9 @@ const AdminDashboard = () => {
   const [filteredPayments, setFilteredPayments] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
+  const [paymentMethodFilter, setPaymentMethodFilter] = useState("all");
+  const [dateFilter, setDateFilter] = useState("");
+  const [amountRange, setAmountRange] = useState({ min: "", max: "" });
   const [isEditing, setIsEditing] = useState(null);
   const [editStatus, setEditStatus] = useState("");
   const [isUpdating, setIsUpdating] = useState(false);
@@ -54,17 +58,15 @@ const AdminDashboard = () => {
 
     // Apply search filter
     if (searchTerm) {
+      const term = searchTerm.toLowerCase();
       results = results.filter(
         (payment) =>
-          payment.customer.name
-            .toLowerCase()
-            .includes(searchTerm.toLowerCase()) ||
-          payment.customer.email
-            .toLowerCase()
-            .includes(searchTerm.toLowerCase()) ||
-          payment.transactionDetails.invoiceNumber
-            .toLowerCase()
-            .includes(searchTerm.toLowerCase())
+          payment.customer.name.toLowerCase().includes(term) ||
+          payment.customer.email.toLowerCase().includes(term) ||
+          (payment.customer.phone && payment.customer.phone.toLowerCase().includes(term)) ||
+          payment.transactionDetails.invoiceNumber.toLowerCase().includes(term) ||
+          (payment.discordId && payment.discordId.toLowerCase().includes(term)) ||
+          (payment.paymentMethod && payment.paymentMethod.toLowerCase().includes(term))
       );
     }
 
@@ -75,8 +77,40 @@ const AdminDashboard = () => {
       );
     }
 
+    // Apply payment method filter
+    if (paymentMethodFilter !== "all") {
+      results = results.filter(
+        (payment) => payment.paymentMethod === paymentMethodFilter
+      );
+    }
+
+    // Apply date filter
+    if (dateFilter) {
+      const filterDate = new Date(dateFilter);
+      results = results.filter((payment) => {
+        const paymentDate = new Date(payment.timestamp);
+        return (
+          paymentDate.getFullYear() === filterDate.getFullYear() &&
+          paymentDate.getMonth() === filterDate.getMonth() &&
+          paymentDate.getDate() === filterDate.getDate()
+        );
+      });
+    }
+
+    // Apply amount range filter
+    if (amountRange.min || amountRange.max) {
+      const minAmount = amountRange.min ? parseInt(amountRange.min) : 0;
+      const maxAmount = amountRange.max ? parseInt(amountRange.max) : Infinity;
+      
+      results = results.filter(
+        (payment) =>
+          payment.transactionDetails.amount >= minAmount &&
+          payment.transactionDetails.amount <= maxAmount
+      );
+    }
+
     setFilteredPayments(results);
-  }, [searchTerm, statusFilter, payments]);
+  }, [searchTerm, statusFilter, paymentMethodFilter, dateFilter, amountRange, payments]);
 
   const handleStatusUpdate = async (paymentId) => {
     if (!editStatus) {
@@ -148,6 +182,25 @@ const AdminDashboard = () => {
     }).format(amount);
   };
 
+  // Extract unique payment methods for filter dropdown
+  const getUniquePaymentMethods = () => {
+    const methods = new Set();
+    payments.forEach((payment) => {
+      if (payment.paymentMethod) {
+        methods.add(payment.paymentMethod);
+      }
+    });
+    return Array.from(methods);
+  };
+
+  const resetFilters = () => {
+    setSearchTerm("");
+    setStatusFilter("all");
+    setPaymentMethodFilter("all");
+    setDateFilter("");
+    setAmountRange({ min: "", max: "" });
+  };
+
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
       <div className="bg-gray-900 rounded-xl shadow-lg overflow-hidden">
@@ -169,14 +222,27 @@ const AdminDashboard = () => {
                 </div>
                 <input
                   type="text"
-                  placeholder="Search transactions..."
-                  className="pl-10 pr-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="Search by name, email, INV, phone, Discord..."
+                  className="pl-10 pr-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent w-full md:w-64"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
               </div>
+              <button
+                onClick={resetFilters}
+                className="bg-gray-700 hover:bg-gray-600 text-white px-3 py-2 rounded-lg transition"
+              >
+                Reset Filters
+              </button>
+            </div>
+          </div>
+
+          {/* Advanced Filters */}
+          <div className="mt-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3">
+            <div>
+              <label className="block text-xs text-gray-400 mb-1">Status</label>
               <select
-                className="bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent w-full"
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
               >
@@ -186,6 +252,69 @@ const AdminDashboard = () => {
                 <option value="failed">Failed</option>
               </select>
             </div>
+
+            <div>
+              <label className="block text-xs text-gray-400 mb-1">Payment Method</label>
+              <select
+                className="bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent w-full"
+                value={paymentMethodFilter}
+                onChange={(e) => setPaymentMethodFilter(e.target.value)}
+              >
+                <option value="all">All Methods</option>
+                {getUniquePaymentMethods().map((method) => (
+                  <option key={method} value={method}>
+                    {method}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-xs text-gray-400 mb-1">Date</label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <FiCalendar className="text-gray-500" />
+                </div>
+                <input
+                  type="date"
+                  className="pl-10 bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent w-full"
+                  value={dateFilter}
+                  onChange={(e) => setDateFilter(e.target.value)}
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-xs text-gray-400 mb-1">Min Amount</label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <FiDollarSign className="text-gray-500" />
+                </div>
+                <input
+                  type="number"
+                  placeholder="Min"
+                  className="pl-10 bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent w-full"
+                  value={amountRange.min}
+                  onChange={(e) => setAmountRange({...amountRange, min: e.target.value})}
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-xs text-gray-400 mb-1">Max Amount</label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <FiDollarSign className="text-gray-500" />
+                </div>
+                <input
+                  type="number"
+                  placeholder="Max"
+                  className="pl-10 bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent w-full"
+                  value={amountRange.max}
+                  onChange={(e) => setAmountRange({...amountRange, max: e.target.value})}
+                />
+              </div>
+            </div>
           </div>
         </div>
 
@@ -194,6 +323,12 @@ const AdminDashboard = () => {
           {filteredPayments.length === 0 ? (
             <div className="p-8 text-center">
               <p className="text-gray-500">No transactions found</p>
+              <button
+                onClick={resetFilters}
+                className="mt-2 text-blue-400 hover:underline"
+              >
+                Clear all filters
+              </button>
             </div>
           ) : (
             <table className="min-w-full divide-y divide-gray-800">
@@ -254,6 +389,12 @@ const AdminDashboard = () => {
                           <FiPhone />
                           {payment.customer.phone || "-"}
                         </span>
+                        {payment.discordId && (
+                          <span className="flex items-center gap-2 text-sm mt-0.5">
+                            <FaDiscord />
+                            {payment.discordId}
+                          </span>
+                        )}
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-gray-300">
@@ -261,7 +402,9 @@ const AdminDashboard = () => {
                         <span className="font-semibold">{payment.transactionDetails.plan}</span>
                         <span className="text-xs mt-1">
                           Invoice:{" "}
-                          <span className="font-mono">{payment.transactionDetails.invoiceNumber}</span>
+                          <span className="font-mono bg-gray-800 px-2 py-1 rounded">
+                            {payment.transactionDetails.invoiceNumber}
+                          </span>
                         </span>
                       </div>
                     </td>
