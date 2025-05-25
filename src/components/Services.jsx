@@ -10,22 +10,44 @@ const VideoPlayer = ({ src }) => {
     const video = videoRef.current;
     if (!video) return;
 
-    const handleLoaded = () => {
+    const handleCanPlay = () => {
       setIsLoaded(true);
-      // Set loop attribute and ensure preload
-      video.loop = true;
-      video.muted = true;
-      video.playsInline = true;
-      video.play().catch(e => console.log("Autoplay prevented:", e));
+      video.play().catch(e => {
+        console.log("Autoplay prevented, trying with muted");
+        video.muted = true;
+        video.play().catch(e => console.log("Still can't play:", e));
+      });
     };
 
-    // Preload video metadata
+    const handleError = () => {
+      console.error("Video error:", video.error);
+    };
+
+    // Mobile optimization
     video.preload = "auto";
-    video.addEventListener('loadedmetadata', handleLoaded);
-    
-    // Cleanup
+    video.muted = true;
+    video.playsInline = true;
+    video.loop = true;
+    video.setAttribute('webkit-playsinline', 'true');
+    video.setAttribute('playsinline', 'true');
+
+    video.addEventListener('canplay', handleCanPlay);
+    video.addEventListener('error', handleError);
+    video.addEventListener('ended', () => {
+      video.currentTime = 0;
+      video.play();
+    });
+
+    // Force load on mobile
+    video.load();
+
     return () => {
-      video.removeEventListener('loadedmetadata', handleLoaded);
+      video.removeEventListener('canplay', handleCanPlay);
+      video.removeEventListener('error', handleError);
+      video.removeEventListener('ended', () => {
+        video.currentTime = 0;
+        video.play();
+      });
     };
   }, [src]);
 
@@ -36,6 +58,7 @@ const VideoPlayer = ({ src }) => {
       loop
       muted
       playsInline
+      webkit-playsinline="true"
       className="absolute left-0 top-0 w-full h-full object-cover"
       style={{ opacity: isLoaded ? 1 : 0, transition: 'opacity 0.5s ease' }}
     />
@@ -163,14 +186,7 @@ const Services = () => {
                       Exciting updates and new features launching soon
                     </p>
                   </div>
-                  <div className="flex justify-between items-end">
-                    <div className="flex gap-3 text-2xl">
-                      {['🎮', '✨', '🚀'].map((emoji, i) => (
-                        <span key={i}>{emoji}</span>
-                      ))}
-                    </div>
-                    <TiLocationArrow className="scale-[2.5] text-white/90" />
-                  </div>
+                  <TiLocationArrow className="scale-[2.5] text-white/90" />
                 </div>
               </div>
             </div>
@@ -270,14 +286,7 @@ const Services = () => {
                         Exciting updates launching soon
                       </p>
                     </div>
-                    <div className="flex justify-between items-end">
-                      <div className="flex gap-2">
-                        {['🎮', '✨', '🚀'].map((emoji, i) => (
-                          <span key={i}>{emoji}</span>
-                        ))}
-                      </div>
-                      <TiLocationArrow className="scale-[1.8] text-white/90" />
-                    </div>
+                    <TiLocationArrow className="scale-[1.8] text-white/90" />
                   </div>
                 </div>
               </div>
