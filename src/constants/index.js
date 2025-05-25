@@ -59,13 +59,6 @@ export const navigation = [
     title: "Roadmap",
     url: "#roadmap",
   },
-  {
-    id: "4",
-    title: "Source Code",
-    url: links.sourceCode,
-    onlyMobile: true,
-    external: true,
-  },
 ];
 
 export const heroIcons = [homeSmile, file02, searchMd, plusSquare];
