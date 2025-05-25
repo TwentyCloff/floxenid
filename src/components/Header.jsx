@@ -138,7 +138,7 @@ const Header = () => {
               openNavigation ? "flex" : "hidden"
             } fixed top-[68px] left-0 right-0 bottom-0 bg-[#0a0614] lg:static lg:flex lg:mx-auto lg:bg-transparent`}
           >
-            <div className="relative z-2 flex flex-col items-center justify-center m-auto lg:flex-row">
+            <div className="relative z-2 flex flex-col items-center justify-center m-auto lg:flex-row lg:ml-8"> {/* Added lg:ml-8 here */}
               {navigation.map((item) => (
                 <a
                   key={item.id}
