@@ -20,7 +20,7 @@ const Dashboard = () => {
   const [error, setError] = useState(null);
   const [copiedLink, setCopiedLink] = useState(null);
   const [activeMenu, setActiveMenu] = useState(null);
-  const [showPremiumAlert, setShowPremiumAlert] = useState(false);
+  const [showHalf SaintAlert, setShowHalf SaintAlert] = useState(false);
   const [authChecked, setAuthChecked] = useState(false);
   const navigate = useNavigate();
 
@@ -161,25 +161,25 @@ const Dashboard = () => {
       const plan = t.transactionDetails?.plan?.toLowerCase();
       if (!plan) return false;
       
-      if (tier === 'basic') return plan.includes('basic') || plan.includes('premium') || plan.includes('rich');
-      if (tier === 'premium') return plan.includes('premium') || plan.includes('rich');
-      if (tier === 'rich') return plan.includes('rich');
+      if (tier === 'Origin Qi') return plan.includes('Origin Qi') || plan.includes('Half Saint') || plan.includes('Peak Immortal');
+      if (tier === 'Half Saint') return plan.includes('Half Saint') || plan.includes('Peak Immortal');
+      if (tier === 'Peak Immortal') return plan.includes('Peak Immortal');
       
       return false;
     });
   };
 
   const handleMenuClick = (menu) => {
-    if (menu === 'basic' && !hasAccessToTier('basic')) {
-      setShowPremiumAlert(true);
+    if (menu === 'Origin Qi' && !hasAccessToTier('Origin Qi')) {
+      setShowHalf SaintAlert(true);
       return;
     }
-    if (menu === 'premium' && !hasAccessToTier('premium')) {
-      setShowPremiumAlert(true);
+    if (menu === 'Half Saint' && !hasAccessToTier('Half Saint')) {
+      setShowHalf SaintAlert(true);
       return;
     }
-    if (menu === 'rich' && !hasAccessToTier('rich')) {
-      setShowPremiumAlert(true);
+    if (menu === 'Peak Immortal' && !hasAccessToTier('Peak Immortal')) {
+      setShowHalf SaintAlert(true);
       return;
     }
     setActiveMenu(menu);
@@ -187,20 +187,20 @@ const Dashboard = () => {
 
   const renderMenuContent = () => {
     const resources = {
-      basic: [
-        { title: "Basic Resource 1", link: "https://mediafire.com/basic1" },
-        { title: "Basic Resource 2", link: "https://mediafire.com/basic2" }
+      Origin Qi: [
+        { title: "Origin Qi Resource 1", link: "https://mediafire.com/Origin Qi1" },
+        { title: "Origin Qi Resource 2", link: "https://mediafire.com/Origin Qi2" }
       ],
-      premium: [
-        { title: "Premium Resource 1", link: "https://mediafire.com/premium1" },
-        { title: "Premium Resource 2", link: "https://mediafire.com/premium2" },
-        { title: "Premium Resource 3", link: "https://mediafire.com/premium3" }
+      Half Saint: [
+        { title: "Half Saint Resource 1", link: "https://mediafire.com/Half Saint1" },
+        { title: "Half Saint Resource 2", link: "https://mediafire.com/Half Saint2" },
+        { title: "Half Saint Resource 3", link: "https://mediafire.com/Half Saint3" }
       ],
-      rich: [
-        { title: "Rich Resource 1", link: "https://mediafire.com/rich1" },
-        { title: "Rich Resource 2", link: "https://mediafire.com/rich2" },
-        { title: "Rich Resource 3", link: "https://mediafire.com/rich3" },
-        { title: "Rich Resource 4", link: "https://mediafire.com/rich4" }
+      Peak Immortal: [
+        { title: "Peak Immortal Resource 1", link: "https://mediafire.com/Peak Immortal1" },
+        { title: "Peak Immortal Resource 2", link: "https://mediafire.com/Peak Immortal2" },
+        { title: "Peak Immortal Resource 3", link: "https://mediafire.com/Peak Immortal3" },
+        { title: "Peak Immortal Resource 4", link: "https://mediafire.com/Peak Immortal4" }
       ]
     };
 
@@ -323,16 +323,16 @@ const Dashboard = () => {
                 </div>
                 <div className="divide-y divide-gray-200">
                   <button 
-                    onClick={() => handleMenuClick('basic')}
-                    className={`w-full text-left px-4 py-3 flex items-center justify-between ${activeMenu === 'basic' ? 'bg-indigo-50' : 'hover:bg-gray-50'}`}
+                    onClick={() => handleMenuClick('Origin Qi')}
+                    className={`w-full text-left px-4 py-3 flex items-center justify-between ${activeMenu === 'Origin Qi' ? 'bg-indigo-50' : 'hover:bg-gray-50'}`}
                   >
                     <div className="flex items-center">
-                      <div className={`p-2 rounded-full mr-3 ${activeMenu === 'basic' ? 'bg-indigo-100 text-indigo-600' : 'bg-gray-100 text-gray-600'}`}>
+                      <div className={`p-2 rounded-full mr-3 ${activeMenu === 'Origin Qi' ? 'bg-indigo-100 text-indigo-600' : 'bg-gray-100 text-gray-600'}`}>
                         <FiStar className="h-5 w-5" />
                       </div>
-                      <span className="text-sm font-medium text-gray-900">Basic</span>
+                      <span className="text-sm font-medium text-gray-900">Origin Qi</span>
                     </div>
-                    {!hasAccessToTier('basic') ? (
+                    {!hasAccessToTier('Origin Qi') ? (
                       <FiLock className="h-5 w-5 text-gray-400" />
                     ) : (
                       <FiChevronRight className="h-5 w-5 text-gray-400" />
@@ -340,16 +340,16 @@ const Dashboard = () => {
                   </button>
                   
                   <button 
-                    onClick={() => handleMenuClick('premium')}
-                    className={`w-full text-left px-4 py-3 flex items-center justify-between ${activeMenu === 'premium' ? 'bg-purple-50' : 'hover:bg-gray-50'}`}
+                    onClick={() => handleMenuClick('Half Saint')}
+                    className={`w-full text-left px-4 py-3 flex items-center justify-between ${activeMenu === 'Half Saint' ? 'bg-purple-50' : 'hover:bg-gray-50'}`}
                   >
                     <div className="flex items-center">
-                      <div className={`p-2 rounded-full mr-3 ${activeMenu === 'premium' ? 'bg-purple-100 text-purple-600' : 'bg-gray-100 text-gray-600'}`}>
+                      <div className={`p-2 rounded-full mr-3 ${activeMenu === 'Half Saint' ? 'bg-purple-100 text-purple-600' : 'bg-gray-100 text-gray-600'}`}>
                         <FiAward className="h-5 w-5" />
                       </div>
-                      <span className="text-sm font-medium text-gray-900">Premium</span>
+                      <span className="text-sm font-medium text-gray-900">Half Saint</span>
                     </div>
-                    {!hasAccessToTier('premium') ? (
+                    {!hasAccessToTier('Half Saint') ? (
                       <FiLock className="h-5 w-5 text-gray-400" />
                     ) : (
                       <FiChevronRight className="h-5 w-5 text-gray-400" />
@@ -357,16 +357,16 @@ const Dashboard = () => {
                   </button>
                   
                   <button 
-                    onClick={() => handleMenuClick('rich')}
-                    className={`w-full text-left px-4 py-3 flex items-center justify-between ${activeMenu === 'rich' ? 'bg-amber-50' : 'hover:bg-gray-50'}`}
+                    onClick={() => handleMenuClick('Peak Immortal')}
+                    className={`w-full text-left px-4 py-3 flex items-center justify-between ${activeMenu === 'Peak Immortal' ? 'bg-amber-50' : 'hover:bg-gray-50'}`}
                   >
                     <div className="flex items-center">
-                      <div className={`p-2 rounded-full mr-3 ${activeMenu === 'rich' ? 'bg-amber-100 text-amber-600' : 'bg-gray-100 text-gray-600'}`}>
+                      <div className={`p-2 rounded-full mr-3 ${activeMenu === 'Peak Immortal' ? 'bg-amber-100 text-amber-600' : 'bg-gray-100 text-gray-600'}`}>
                         <FiAward className="h-5 w-5" />
                       </div>
-                      <span className="text-sm font-medium text-gray-900">Rich</span>
+                      <span className="text-sm font-medium text-gray-900">Peak Immortal</span>
                     </div>
-                    {!hasAccessToTier('rich') ? (
+                    {!hasAccessToTier('Peak Immortal') ? (
                       <FiLock className="h-5 w-5 text-gray-400" />
                     ) : (
                       <FiChevronRight className="h-5 w-5 text-gray-400" />
@@ -391,8 +391,8 @@ const Dashboard = () => {
                   </div>
                   {activeMenu && (
                     <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                      activeMenu === 'basic' ? 'bg-indigo-100 text-indigo-800' :
-                      activeMenu === 'premium' ? 'bg-purple-100 text-purple-800' :
+                      activeMenu === 'Origin Qi' ? 'bg-indigo-100 text-indigo-800' :
+                      activeMenu === 'Half Saint' ? 'bg-purple-100 text-purple-800' :
                       'bg-amber-100 text-amber-800'
                     }`}>
                       {activeMenu.toUpperCase()}
@@ -510,14 +510,14 @@ const Dashboard = () => {
         )}
       </main>
 
-      {/* Premium Access Modal */}
-      {showPremiumAlert && (
+      {/* Half Saint Access Modal */}
+      {showHalf SaintAlert && (
         <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg shadow-xl overflow-hidden max-w-md w-full">
             <div className="px-5 py-4 flex justify-between items-center border-b border-gray-200">
-              <h3 className="text-lg font-medium text-gray-900">Premium Access Required</h3>
+              <h3 className="text-lg font-medium text-gray-900">Half Saint Access Required</h3>
               <button 
-                onClick={() => setShowPremiumAlert(false)}
+                onClick={() => setShowHalf SaintAlert(false)}
                 className="text-gray-400 hover:text-gray-500"
               >
                 <FiX className="h-6 w-6" />
@@ -534,14 +534,14 @@ const Dashboard = () => {
               </p>
               <div className="flex justify-center space-x-3">
                 <button
-                  onClick={() => setShowPremiumAlert(false)}
+                  onClick={() => setShowHalf SaintAlert(false)}
                   className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={() => {
-                    setShowPremiumAlert(false);
+                    setShowHalf SaintAlert(false);
                     navigate('/');
                   }}
                   className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700"
