@@ -39,12 +39,12 @@ const BentoTilt = ({ children, className = "", disableTiltOnMobile = true }) => 
   const [isMobile, setIsMobile] = useState(false);
   const [cursorPosition, setCursorPosition] = useState({ x: 50, y: 50 });
   const [particles, setParticles] = useState([]);
-  const particleCount = 15;
+  const particleCount = 10; // Reduced from 15 to lighten load
 
   const cursorX = useMotionValue(50);
   const cursorY = useMotionValue(50);
-  const backgroundX = useTransform(cursorX, [0, 100], [-10, 10]);
-  const backgroundY = useTransform(cursorY, [0, 100], [-10, 10]);
+  const backgroundX = useTransform(cursorX, [0, 100], [-5, 5]); // Reduced movement range
+  const backgroundY = useTransform(cursorY, [0, 100], [-5, 5]); // Reduced movement range
 
   useEffect(() => {
     const checkMobile = () => {
@@ -62,9 +62,9 @@ const BentoTilt = ({ children, className = "", disableTiltOnMobile = true }) => 
         id: Math.random().toString(36).substr(2, 9),
         x: `${x}%`,
         y: `${y}%`,
-        size: `${Math.random() * 5 + 3}px`,
+        size: `${Math.random() * 3 + 2}px`, // Smaller particles
         color: `hsl(${Math.random() * 60 + 200}, 100%, 70%)`,
-        delay: Math.random() * 0.5
+        delay: Math.random() * 0.3 // Shorter delay
       });
     }
     setParticles(newParticles);
@@ -385,12 +385,12 @@ const Services = () => {
               {/* Coming Soon - Full Width */}
               <motion.div 
                 variants={itemVariants} 
-                className="h-[300px]"
+                className="h-[350px]" // Increased height from 300px to 350px
               >
                 <BentoTilt className="h-full w-full">
                   <div className="relative w-full h-full rounded-3xl overflow-hidden">
                     <VideoPlayer src="/videos/feature-5.mp4" />
-                    <div className="absolute inset-0 bg-gradient-to-br from-purple-500/60 to-indigo-600/60" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent" /> {/* Changed from purple gradient */}
                     <div className="relative z-10 flex flex-col justify-between w-full h-full p-6">
                       <div>
                         <h1 className="text-4xl font-bold text-white drop-shadow-lg">
@@ -549,7 +549,7 @@ const Services = () => {
                   <BentoTilt className="h-64 w-full">
                     <div className="relative w-full h-full rounded-2xl overflow-hidden">
                       <VideoPlayer src="/videos/feature-5.mp4" />
-                      <div className="absolute inset-0 bg-gradient-to-br from-purple-500/60 to-indigo-600/60" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent" /> {/* Changed from purple gradient */}
                       <div className="relative z-10 flex flex-col justify-between w-full h-full p-5">
                         <div>
                           <h1 className="text-3xl font-bold text-white drop-shadow-lg">
