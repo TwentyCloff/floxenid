@@ -40,6 +40,7 @@ const PaymentPage = () => {
   const [copiedIndex, setCopiedIndex] = useState(null);
   const [invoiceNumber, setInvoiceNumber] = useState("");
   const [userHasPlan, setUserHasPlan] = useState(false);
+  const [showPaymentDropdown, setShowPaymentDropdown] = useState(false);
   
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
@@ -848,31 +849,55 @@ const PaymentPage = () => {
           <div className="space-y-6">
             <div className="space-y-5">
               <h3 className="text-lg font-bold text-white">Select Payment Method</h3>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                {Object.entries(paymentMethods).map(([key, method]) => (
-                  <button
-                    key={key}
-                    onClick={() => setPaymentMethod(key)}
-                    className={`p-4 rounded-xl border-2 transition-all duration-200 flex flex-col items-center ${
-                      paymentMethod === key
-                        ? `border-transparent bg-gradient-to-br ${method.color} shadow-lg`
-                        : "border-gray-700 hover:border-gray-600 hover:bg-gray-800/30"
-                    }`}
-                  >
-                    <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-3 ${
-                      paymentMethod === key 
-                        ? "bg-white/10 text-white" 
-                        : "bg-gray-800 text-gray-400"
+              
+              {/* Modified Payment Method Selector - Dropdown Style */}
+              <div className="relative">
+                <button
+                  onClick={() => setShowPaymentDropdown(!showPaymentDropdown)}
+                  className={`w-full flex items-center justify-between p-4 rounded-xl border-2 transition-all duration-200 ${
+                    showPaymentDropdown 
+                      ? `border-transparent bg-gradient-to-br ${paymentMethods[paymentMethod].color} shadow-lg`
+                      : "border-gray-700 hover:border-gray-600 hover:bg-gray-800/30"
+                  }`}
+                >
+                  <div className="flex items-center">
+                    <div className={`w-10 h-10 rounded-full flex items-center justify-center mr-3 ${
+                      showPaymentDropdown ? "bg-white/10 text-white" : "bg-gray-800 text-gray-400"
                     }`}>
-                      {method.icon}
+                      {paymentMethods[paymentMethod].icon}
                     </div>
-                    <span className={`font-semibold ${
-                      paymentMethod === key ? "text-white" : "text-gray-300"
-                    }`}>
-                      {method.name}
+                    <span className="font-semibold text-white">
+                      {paymentMethods[paymentMethod].name}
                     </span>
-                  </button>
-                ))}
+                  </div>
+                  <FiChevronDown className={`w-5 h-5 transition-transform duration-200 ${
+                    showPaymentDropdown ? 'transform rotate-180 text-white' : 'text-gray-400'
+                  }`} />
+                </button>
+                
+                {showPaymentDropdown && (
+                  <div className="absolute z-10 mt-2 w-full bg-gray-800 rounded-xl border border-gray-700/50 shadow-lg overflow-hidden">
+                    <div className="max-h-60 overflow-y-auto">
+                      {Object.entries(paymentMethods).map(([key, method]) => (
+                        <button
+                          key={key}
+                          onClick={() => {
+                            setPaymentMethod(key);
+                            setShowPaymentDropdown(false);
+                          }}
+                          className={`w-full flex items-center p-3 hover:bg-gray-700/50 transition-colors ${
+                            paymentMethod === key ? 'bg-gray-700/70' : ''
+                          }`}
+                        >
+                          <div className="w-8 h-8 rounded-full flex items-center justify-center mr-3 bg-gray-800/50">
+                            {method.icon}
+                          </div>
+                          <span className="font-medium text-white">{method.name}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
             
