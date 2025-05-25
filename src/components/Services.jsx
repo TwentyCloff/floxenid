@@ -385,11 +385,11 @@ const Services = () => {
               {/* Coming Soon - Full Width */}
               <motion.div 
                 variants={itemVariants} 
-                className="h-[450px]" // Increased height from 300px to 350px
+                className="h-[500px]" // Increased height from 300px to 350px
               >
                 <BentoTilt className="h-full w-full">
                   <div className="relative w-full h-full rounded-3xl overflow-hidden">
-                    <VideoPlayer src="/videos/feature-5.mp4" />
+                    <VideoPlayer src="/videos/feature-6.mp4" />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent" /> {/* Changed from purple gradient */}
                     <div className="relative z-10 flex flex-col justify-between w-full h-full p-6">
                       <div>
