@@ -214,7 +214,7 @@ const Services = () => {
 
   return (
     <Section id="how-to-use">
-      <div className="bg-black pb-20 md:pb-52 circular-font">
+      <div className="bg-black pb-20 md:pb-32 circular-font">
         <div className="container mx-auto px-4 md:px-10">
           <motion.div
             initial="hidden"
@@ -224,7 +224,7 @@ const Services = () => {
           >
             {/* Hero Section */}
             <motion.div variants={itemVariants}>
-              <BentoTilt className="border-hsla relative mb-6 h-64 w-full overflow-hidden rounded-2xl md:h-[65vh] md:rounded-3xl md:mb-8">
+              <BentoTilt className="border-hsla relative mb-6 h-64 w-full overflow-hidden rounded-2xl md:h-[55vh] md:rounded-3xl md:mb-10">
                 <div className="relative w-full h-full">
                   <VideoPlayer src="/videos/feature-1.mp4" />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent" />
@@ -256,174 +256,342 @@ const Services = () => {
               </BentoTilt>
             </motion.div>
 
-            {/* Bento Grid */}
-            <motion.div 
-              className="grid grid-cols-1 gap-4 md:grid-cols-12 md:grid-rows-5 md:gap-6"
-              variants={containerVariants}
-            >
-              {/* Zigma - Top Left (3 columns) */}
+            {/* Desktop Bento Grid */}
+            <div className="hidden md:block">
               <motion.div 
-                variants={itemVariants} 
-                className="md:row-span-2 md:col-span-3"
+                className="grid grid-cols-12 gap-6 mb-6"
+                variants={containerVariants}
               >
-                <BentoTilt className="h-64 md:h-full">
-                  <div className="relative w-full h-full rounded-2xl overflow-hidden md:rounded-3xl">
-                    <VideoPlayer src="/videos/feature-2.mp4" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent" />
-                    <div className="relative z-10 flex flex-col justify-between w-full h-full p-5 md:p-6">
-                      <div>
-                        <h1 className="text-3xl md:text-4xl font-bold text-white drop-shadow-lg">
-                          zig<b className="font-semibold">m</b>a
-                        </h1>
-                        <p className="mt-2 text-sm md:text-base text-gray-300 max-w-[180px] md:max-w-[240px] leading-snug">
-                          Anime-inspired NFT collection with expansion potential
-                        </p>
+                {/* Zigma - Left (6 columns) */}
+                <motion.div 
+                  variants={itemVariants} 
+                  className="col-span-6 row-span-2 h-[400px]"
+                >
+                  <BentoTilt className="h-full w-full">
+                    <div className="relative w-full h-full rounded-3xl overflow-hidden">
+                      <VideoPlayer src="/videos/feature-2.mp4" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent" />
+                      <div className="relative z-10 flex flex-col justify-between w-full h-full p-6">
+                        <div>
+                          <h1 className="text-4xl font-bold text-white drop-shadow-lg">
+                            zig<b className="font-semibold">m</b>a
+                          </h1>
+                          <p className="mt-3 text-base text-gray-300 max-w-[240px] leading-snug">
+                            Anime-inspired NFT collection with expansion potential
+                          </p>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </BentoTilt>
-              </motion.div>
+                  </BentoTilt>
+                </motion.div>
 
-              {/* Nexus - Square (3 columns) */}
-              <motion.div 
-                variants={itemVariants}
-                className="md:row-span-1 md:col-span-3"
-              >
-                <BentoTilt className="h-64 w-full aspect-square">
-                  <div className="relative w-full h-full rounded-2xl overflow-hidden md:rounded-3xl">
-                    <VideoPlayer src="/videos/feature-3.mp4" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent" />
-                    <div className="relative z-10 flex flex-col justify-between w-full h-full p-5 md:p-6">
-                      <div>
-                        <h1 className="text-3xl md:text-4xl font-bold text-white drop-shadow-lg">
-                          n<b className="font-semibold">e</b>xus
+                {/* More Features - Right (6 columns) */}
+                <motion.div 
+                  variants={itemVariants} 
+                  className="col-span-6 row-span-2 h-[400px]"
+                >
+                  <BentoTilt className="h-full w-full">
+                    <div className="relative w-full h-full rounded-3xl overflow-hidden">
+                      <VideoPlayer src="/videos/feature-5.mp4" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent" />
+                      <div className="relative z-10 p-6">
+                        <h1 className="text-4xl font-bold text-white drop-shadow-lg">
+                          More Features
                         </h1>
-                        <p className="mt-2 text-sm md:text-base text-gray-300 max-w-[180px] md:max-w-[240px] leading-snug">
-                          Gamified social hub for Web3 communities
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </BentoTilt>
-              </motion.div>
-
-              {/* Azul - Square (3 columns) */}
-              <motion.div 
-                variants={itemVariants}
-                className="md:row-span-1 md:col-span-3"
-              >
-                <BentoTilt className="h-64 w-full aspect-square">
-                  <div className="relative w-full h-full rounded-2xl overflow-hidden md:rounded-3xl">
-                    <VideoPlayer src="/videos/feature-4.mp4" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent" />
-                    <div className="relative z-10 flex flex-col justify-between w-full h-full p-5 md:p-6">
-                      <div>
-                        <h1 className="text-3xl md:text-4xl font-bold text-white drop-shadow-lg">
-                          az<b className="font-semibold">u</b>l
-                        </h1>
-                        <p className="mt-2 text-sm md:text-base text-gray-300 max-w-[180px] md:max-w-[240px] leading-snug">
-                          Cross-world AI Agent for enhanced gameplay
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </BentoTilt>
-              </motion.div>
-
-              {/* Feature 5 (3 columns) */}
-              <motion.div 
-                variants={itemVariants} 
-                className="md:row-span-2 md:col-span-3"
-              >
-                <BentoTilt className="h-64 md:h-full">
-                  <div className="relative w-full h-full rounded-2xl overflow-hidden md:rounded-3xl">
-                    <VideoPlayer src="/videos/feature-5.mp4" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent" />
-                    <div className="relative z-10 p-5 md:p-6">
-                      <h1 className="text-3xl md:text-4xl font-bold text-white drop-shadow-lg">
-                        More Features
-                      </h1>
-                      <motion.div 
-                        className="mt-2 flex flex-wrap gap-2"
-                        initial="hidden"
-                        whileInView="visible"
-                        variants={{
-                          hidden: {},
-                          visible: {
-                            transition: {
-                              staggerChildren: 0.1
+                        <motion.div 
+                          className="mt-4 flex flex-wrap gap-3"
+                          initial="hidden"
+                          whileInView="visible"
+                          variants={{
+                            hidden: {},
+                            visible: {
+                              transition: {
+                                staggerChildren: 0.1
+                              }
                             }
-                          }
-                        }}
-                      >
-                        {['Leaderboards', 'Quests', 'Marketplace', 'Rewards'].map((feature) => (
-                          <motion.span
-                            key={feature}
-                            className="text-xs md:text-sm bg-white/10 text-white px-2 py-1 rounded-full"
-                            variants={{
-                              hidden: { opacity: 0, y: 10 },
-                              visible: { opacity: 1, y: 0 }
-                            }}
-                          >
-                            {feature}
-                          </motion.span>
-                        ))}
-                      </motion.div>
+                          }}
+                        >
+                          {['Leaderboards', 'Quests', 'Marketplace', 'Rewards', 'Achievements', 'Social'].map((feature) => (
+                            <motion.span
+                              key={feature}
+                              className="text-sm bg-white/10 text-white px-3 py-1.5 rounded-full"
+                              variants={{
+                                hidden: { opacity: 0, y: 10 },
+                                visible: { opacity: 1, y: 0 }
+                              }}
+                            >
+                              {feature}
+                            </motion.span>
+                          ))}
+                        </motion.div>
+                      </div>
                     </div>
-                  </div>
-                </BentoTilt>
+                  </BentoTilt>
+                </motion.div>
               </motion.div>
 
-              {/* Coming Soon (6 columns - spans full width at bottom) */}
+              {/* Second Row - Squares */}
+              <motion.div 
+                className="grid grid-cols-12 gap-6 mb-6"
+                variants={containerVariants}
+              >
+                {/* Azul - Left Square (6 columns) */}
+                <motion.div 
+                  variants={itemVariants}
+                  className="col-span-6 h-[300px]"
+                >
+                  <BentoTilt className="h-full w-full">
+                    <div className="relative w-full h-full rounded-3xl overflow-hidden">
+                      <VideoPlayer src="/videos/feature-4.mp4" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent" />
+                      <div className="relative z-10 flex flex-col justify-between w-full h-full p-6">
+                        <div>
+                          <h1 className="text-4xl font-bold text-white drop-shadow-lg">
+                            az<b className="font-semibold">u</b>l
+                          </h1>
+                          <p className="mt-2 text-base text-gray-300 max-w-[240px] leading-snug">
+                            Cross-world AI Agent for enhanced gameplay
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </BentoTilt>
+                </motion.div>
+
+                {/* Nexus - Right Square (6 columns) */}
+                <motion.div 
+                  variants={itemVariants}
+                  className="col-span-6 h-[300px]"
+                >
+                  <BentoTilt className="h-full w-full">
+                    <div className="relative w-full h-full rounded-3xl overflow-hidden">
+                      <VideoPlayer src="/videos/feature-3.mp4" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent" />
+                      <div className="relative z-10 flex flex-col justify-between w-full h-full p-6">
+                        <div>
+                          <h1 className="text-4xl font-bold text-white drop-shadow-lg">
+                            n<b className="font-semibold">e</b>xus
+                          </h1>
+                          <p className="mt-2 text-base text-gray-300 max-w-[240px] leading-snug">
+                            Gamified social hub for Web3 communities
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </BentoTilt>
+                </motion.div>
+              </motion.div>
+
+              {/* Coming Soon - Full Width */}
               <motion.div 
                 variants={itemVariants} 
-                className="md:row-span-1 md:col-span-6 md:col-start-4"
+                className="h-[300px]"
               >
-                <BentoTilt className="h-64 md:h-full">
-                  <div className="flex w-full h-full flex-col justify-between bg-gradient-to-br from-purple-500 to-indigo-600 p-5 md:p-6 rounded-2xl md:rounded-3xl">
-                    <div>
-                      <h1 className="text-3xl md:text-4xl font-bold text-white drop-shadow-lg">
-                        M<b className="font-semibold">o</b>re co<b className="font-semibold">m</b>ing!
-                      </h1>
-                      <p className="mt-2 text-sm md:text-base text-white/90 max-w-[200px] md:max-w-none">
-                        Exciting updates launching soon
-                      </p>
-                    </div>
-                    <div className="flex justify-between items-end">
-                      <motion.div 
-                        className="flex gap-2"
-                        animate={{
-                          x: [0, 5, 0],
-                        }}
-                        transition={{
-                          repeat: Infinity,
-                          duration: 2,
-                          ease: "easeInOut"
-                        }}
-                      >
-                        {['🎮', '✨', '🚀'].map((emoji, i) => (
-                          <motion.span
-                            key={i}
-                            animate={{
-                              y: [0, -10, 0],
-                            }}
-                            transition={{
-                              repeat: Infinity,
-                              duration: 2 + i * 0.5,
-                              ease: "easeInOut",
-                              delay: i * 0.3
-                            }}
-                          >
-                            {emoji}
-                          </motion.span>
-                        ))}
-                      </motion.div>
-                      <TiLocationArrow className="scale-[2] md:scale-[2.5] text-white/90 animate-bounce" />
+                <BentoTilt className="h-full w-full">
+                  <div className="relative w-full h-full rounded-3xl overflow-hidden">
+                    <VideoPlayer src="/videos/feature-5.mp4" />
+                    <div className="absolute inset-0 bg-gradient-to-br from-purple-500/60 to-indigo-600/60" />
+                    <div className="relative z-10 flex flex-col justify-between w-full h-full p-6">
+                      <div>
+                        <h1 className="text-4xl font-bold text-white drop-shadow-lg">
+                          M<b className="font-semibold">o</b>re co<b className="font-semibold">m</b>ing!
+                        </h1>
+                        <p className="mt-2 text-lg text-white/90 max-w-[400px]">
+                          Exciting updates and new features launching soon
+                        </p>
+                      </div>
+                      <div className="flex justify-between items-end">
+                        <motion.div 
+                          className="flex gap-3 text-2xl"
+                          animate={{
+                            x: [0, 5, 0],
+                          }}
+                          transition={{
+                            repeat: Infinity,
+                            duration: 2,
+                            ease: "easeInOut"
+                          }}
+                        >
+                          {['🎮', '✨', '🚀'].map((emoji, i) => (
+                            <motion.span
+                              key={i}
+                              animate={{
+                                y: [0, -10, 0],
+                              }}
+                              transition={{
+                                repeat: Infinity,
+                                duration: 2 + i * 0.5,
+                                ease: "easeInOut",
+                                delay: i * 0.3
+                              }}
+                            >
+                              {emoji}
+                            </motion.span>
+                          ))}
+                        </motion.div>
+                        <TiLocationArrow className="scale-[3] text-white/90 animate-bounce" />
+                      </div>
                     </div>
                   </div>
                 </BentoTilt>
               </motion.div>
-            </motion.div>
+            </div>
+
+            {/* Mobile Layout (unchanged) */}
+            <div className="md:hidden">
+              <motion.div 
+                className="grid grid-cols-1 gap-4"
+                variants={containerVariants}
+              >
+                {/* Zigma */}
+                <motion.div variants={itemVariants}>
+                  <BentoTilt className="h-64 w-full">
+                    <div className="relative w-full h-full rounded-2xl overflow-hidden">
+                      <VideoPlayer src="/videos/feature-2.mp4" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent" />
+                      <div className="relative z-10 flex flex-col justify-between w-full h-full p-5">
+                        <div>
+                          <h1 className="text-3xl font-bold text-white drop-shadow-lg">
+                            zig<b className="font-semibold">m</b>a
+                          </h1>
+                          <p className="mt-2 text-sm text-gray-300 max-w-[180px] leading-snug">
+                            Anime-inspired NFT collection with expansion potential
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </BentoTilt>
+                </motion.div>
+
+                {/* Nexus */}
+                <motion.div variants={itemVariants}>
+                  <BentoTilt className="h-64 w-full">
+                    <div className="relative w-full h-full rounded-2xl overflow-hidden">
+                      <VideoPlayer src="/videos/feature-3.mp4" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent" />
+                      <div className="relative z-10 flex flex-col justify-between w-full h-full p-5">
+                        <div>
+                          <h1 className="text-3xl font-bold text-white drop-shadow-lg">
+                            n<b className="font-semibold">e</b>xus
+                          </h1>
+                          <p className="mt-2 text-sm text-gray-300 max-w-[180px] leading-snug">
+                            Gamified social hub for Web3 communities
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </BentoTilt>
+                </motion.div>
+
+                {/* Azul */}
+                <motion.div variants={itemVariants}>
+                  <BentoTilt className="h-64 w-full">
+                    <div className="relative w-full h-full rounded-2xl overflow-hidden">
+                      <VideoPlayer src="/videos/feature-4.mp4" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent" />
+                      <div className="relative z-10 flex flex-col justify-between w-full h-full p-5">
+                        <div>
+                          <h1 className="text-3xl font-bold text-white drop-shadow-lg">
+                            az<b className="font-semibold">u</b>l
+                          </h1>
+                          <p className="mt-2 text-sm text-gray-300 max-w-[180px] leading-snug">
+                            Cross-world AI Agent for enhanced gameplay
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </BentoTilt>
+                </motion.div>
+
+                {/* More Features */}
+                <motion.div variants={itemVariants}>
+                  <BentoTilt className="h-64 w-full">
+                    <div className="relative w-full h-full rounded-2xl overflow-hidden">
+                      <VideoPlayer src="/videos/feature-5.mp4" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent" />
+                      <div className="relative z-10 p-5">
+                        <h1 className="text-3xl font-bold text-white drop-shadow-lg">
+                          More Features
+                        </h1>
+                        <motion.div 
+                          className="mt-2 flex flex-wrap gap-2"
+                          initial="hidden"
+                          whileInView="visible"
+                          variants={{
+                            hidden: {},
+                            visible: {
+                              transition: {
+                                staggerChildren: 0.1
+                              }
+                            }
+                          }}
+                        >
+                          {['Leaderboards', 'Quests', 'Marketplace', 'Rewards'].map((feature) => (
+                            <motion.span
+                              key={feature}
+                              className="text-xs bg-white/10 text-white px-2 py-1 rounded-full"
+                              variants={{
+                                hidden: { opacity: 0, y: 10 },
+                                visible: { opacity: 1, y: 0 }
+                              }}
+                            >
+                              {feature}
+                            </motion.span>
+                          ))}
+                        </motion.div>
+                      </div>
+                    </div>
+                  </BentoTilt>
+                </motion.div>
+
+                {/* Coming Soon */}
+                <motion.div variants={itemVariants}>
+                  <BentoTilt className="h-64 w-full">
+                    <div className="flex w-full h-full flex-col justify-between bg-gradient-to-br from-purple-500 to-indigo-600 p-5 rounded-2xl">
+                      <div>
+                        <h1 className="text-3xl font-bold text-white drop-shadow-lg">
+                          M<b className="font-semibold">o</b>re co<b className="font-semibold">m</b>ing!
+                        </h1>
+                        <p className="mt-2 text-sm text-white/90 max-w-[200px]">
+                          Exciting updates launching soon
+                        </p>
+                      </div>
+                      <div className="flex justify-between items-end">
+                        <motion.div 
+                          className="flex gap-2"
+                          animate={{
+                            x: [0, 5, 0],
+                          }}
+                          transition={{
+                            repeat: Infinity,
+                            duration: 2,
+                            ease: "easeInOut"
+                          }}
+                        >
+                          {['🎮', '✨', '🚀'].map((emoji, i) => (
+                            <motion.span
+                              key={i}
+                              animate={{
+                                y: [0, -10, 0],
+                              }}
+                              transition={{
+                                repeat: Infinity,
+                                duration: 2 + i * 0.5,
+                                ease: "easeInOut",
+                                delay: i * 0.3
+                              }}
+                            >
+                              {emoji}
+                            </motion.span>
+                          ))}
+                        </motion.div>
+                        <TiLocationArrow className="scale-[2] text-white/90 animate-bounce" />
+                      </div>
+                    </div>
+                  </BentoTilt>
+                </motion.div>
+              </motion.div>
+            </div>
           </motion.div>
         </div>
       </div>
