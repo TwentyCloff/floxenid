@@ -1,6 +1,6 @@
 <a name="readme-top"></a>
 
-![Qarvo]("https://res.cloudinary.com/dc3bfhgfd/image/upload/v1748212851/1_EzV9hwfi5ZLSfp4qTnbm9w_cqd7ey.png")
+![Qarvo](https://res.cloudinary.com/dc3bfhgfd/image/upload/v1748212851/1_EzV9hwfi5ZLSfp4qTnbm9w_cqd7ey.png)
 
 [![Ask Me Anything!](https://flat.badgen.net/static/Ask%20me/anything?icon=github&color=black&scale=1.01)](https://github.com/sanidhyy "Ask Me Anything!")
 [![GitHub license](https://flat.badgen.net/github/license/sanidhyy/brainwave?icon=github&color=black&scale=1.01)](https://github.com/sanidhyy/brainwave/blob/main/LICENSE "GitHub license")
