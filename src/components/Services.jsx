@@ -49,21 +49,88 @@ const BentoTilt = ({ children, className = "", disableTiltOnMobile = true }) => 
   );
 };
 
-const Services = () => {
+const VideoPlayer = ({ src, className = "" }) => {
+  const videoRef = useRef(null);
+  const [isLoaded, setIsLoaded] = useState(false);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    const handleLoadedData = () => setIsLoaded(true);
+    const handleError = () => console.error("Video loading error");
+
+    video.addEventListener('loadeddata', handleLoadedData);
+    video.addEventListener('error', handleError);
+
+    // Preload video metadata
+    video.preload = "metadata";
+    video.load();
+
+    return () => {
+      video.removeEventListener('loadeddata', handleLoadedData);
+      video.removeEventListener('error', handleError);
+    };
+  }, [src]);
+
   return (
-    <Section id="how-to-use">
+    <div className={`relative ${className}`}>
+      <video
+        ref={videoRef}
+        src={src}
+        loop
+        muted
+        autoPlay
+        playsInline
+        disablePictureInPicture
+        className="absolute inset-0 w-full h-full object-cover"
+      />
+      {!isLoaded && (
+        <div className="absolute inset-0 bg-gray-900 flex items-center justify-center">
+          <div className="animate-pulse flex space-x-2">
+            <div className="w-3 h-3 bg-purple-500 rounded-full"></div>
+            <div className="w-3 h-3 bg-purple-500 rounded-full"></div>
+            <div className="w-3 h-3 bg-purple-500 rounded-full"></div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+const Services = () => {
+  const [isVisible, setIsVisible] = useState(false);
+  const sectionRef = useRef(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsVisible(entry.isIntersecting);
+      },
+      { threshold: 0.1 }
+    );
+
+    if (sectionRef.current) {
+      observer.observe(sectionRef.current);
+    }
+
+    return () => {
+      if (sectionRef.current) {
+        observer.unobserve(sectionRef.current);
+      }
+    };
+  }, []);
+
+  return (
+    <Section id="how-to-use" ref={sectionRef}>
       <div className="bg-black pb-20 md:pb-52 circular-font">
         <div className="container mx-auto px-4 md:px-10">
-          {/* Hero Card */}
+          {/* Hero Card - Radiant */}
           <BentoTilt className="border-hsla relative mb-6 h-64 w-full overflow-hidden rounded-2xl md:h-[65vh] md:rounded-3xl md:mb-8">
             <div className="relative w-full h-full">
-              <video
-                src="/videos/feature-1.mp4"
-                loop
-                muted
-                autoPlay
-                playsInline
-                className="absolute left-0 top-0 w-full h-full object-cover"
+              <VideoPlayer 
+                src="/videos/feature-1.mp4" 
+                className="absolute inset-0"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent" />
               <div className="relative z-10 flex flex-col justify-between w-full h-full p-5 md:p-8">
@@ -88,14 +155,7 @@ const Services = () => {
             {/* Zigma - Top Left */}
             <BentoTilt className="h-64 md:h-full md:row-span-2">
               <div className="relative w-full h-full rounded-2xl overflow-hidden md:rounded-3xl">
-                <video
-                  src="/videos/feature-2.mp4"
-                  loop
-                  muted
-                  autoPlay
-                  playsInline
-                  className="absolute left-0 top-0 w-full h-full object-cover"
-                />
+                <VideoPlayer src="/videos/feature-2.mp4" />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent" />
                 <div className="relative z-10 flex flex-col justify-between w-full h-full p-5">
                   <div>
@@ -113,14 +173,7 @@ const Services = () => {
             {/* Nexus - Top Right */}
             <BentoTilt className="h-64 md:h-auto">
               <div className="relative w-full h-full rounded-2xl overflow-hidden md:rounded-3xl">
-                <video
-                  src="/videos/feature-3.mp4"
-                  loop
-                  muted
-                  autoPlay
-                  playsInline
-                  className="absolute left-0 top-0 w-full h-full object-cover"
-                />
+                <VideoPlayer src="/videos/feature-3.mp4" />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent" />
                 <div className="relative z-10 flex flex-col justify-between w-full h-full p-5">
                   <div>
@@ -138,14 +191,7 @@ const Services = () => {
             {/* Azul - Middle Right */}
             <BentoTilt className="h-64 md:h-auto">
               <div className="relative w-full h-full rounded-2xl overflow-hidden md:rounded-3xl">
-                <video
-                  src="/videos/feature-4.mp4"
-                  loop
-                  muted
-                  autoPlay
-                  playsInline
-                  className="absolute left-0 top-0 w-full h-full object-cover"
-                />
+                <VideoPlayer src="/videos/feature-4.mp4" />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent" />
                 <div className="relative z-10 flex flex-col justify-between w-full h-full p-5">
                   <div>
@@ -160,17 +206,10 @@ const Services = () => {
               </div>
             </BentoTilt>
 
-            {/* Feature 5 - Bottom Right (now 6th position) */}
+            {/* Feature 5 - Bottom Right */}
             <BentoTilt className="h-64 md:h-full">
               <div className="relative w-full h-full rounded-2xl overflow-hidden md:rounded-3xl">
-                <video
-                  src="/videos/feature-5.mp4"
-                  loop
-                  muted
-                  autoPlay
-                  playsInline
-                  className="absolute left-0 top-0 w-full h-full object-cover"
-                />
+                <VideoPlayer src="/videos/feature-5.mp4" />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent" />
                 <div className="relative z-10 p-5">
                   <h1 className="text-3xl font-bold text-white drop-shadow-lg">
@@ -180,7 +219,7 @@ const Services = () => {
               </div>
             </BentoTilt>
 
-            {/* Coming Soon - Now at very bottom (7th position) */}
+            {/* Coming Soon - Now at very bottom */}
             <BentoTilt className="h-64 md:h-full col-span-1 md:col-span-1 order-last">
               <div className="flex w-full h-full flex-col justify-between bg-gradient-to-br from-purple-500 to-indigo-600 p-5 rounded-2xl md:rounded-3xl">
                 <div>
