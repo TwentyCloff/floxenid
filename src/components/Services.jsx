@@ -37,11 +37,11 @@ const BentoTilt = ({ children, className = "", disableTiltOnMobile = true }) => 
   return (
     <div
       ref={itemRef}
-      className={`transition-transform duration-300 ease-out ${className}`}
+      className={`transition-all duration-300 ease-out will-change-transform ${className}`}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
       style={{ transform: transformStyle }}
-      onTouchStart={() => isMobile && setTransformStyle("scale(0.98)")}
+      onTouchStart={() => isMobile && setTransformStyle("scale(0.97)")}
       onTouchEnd={() => isMobile && setTransformStyle("")}
     >
       {children}
@@ -55,7 +55,7 @@ const Services = () => {
       <div className="bg-black pb-20 md:pb-52 circular-font">
         <div className="container mx-auto px-4 md:px-10">
           {/* Hero Card */}
-          <BentoTilt className="border-hsla relative mb-7 h-64 w-full overflow-hidden rounded-xl md:h-[65vh]">
+          <BentoTilt className="border-hsla relative mb-6 h-64 w-full overflow-hidden rounded-2xl md:h-[65vh] md:rounded-3xl md:mb-8">
             <div className="relative w-full h-full">
               <video
                 src="/videos/feature-1.mp4"
@@ -65,28 +65,29 @@ const Services = () => {
                 playsInline
                 className="absolute left-0 top-0 w-full h-full object-cover"
               />
-              <div className="absolute inset-0 bg-black/30" />
-              <div className="relative z-10 flex flex-col justify-between w-full h-full p-4 md:p-6">
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent" />
+              <div className="relative z-10 flex flex-col justify-between w-full h-full p-5 md:p-8">
                 <div>
-                  <h1 className="text-4xl md:text-6xl font-bold text-white">
+                  <h1 className="text-4xl md:text-6xl font-bold text-white drop-shadow-lg">
                     radia<b className="font-semibold">n</b>t
                   </h1>
-                  <p className="mt-2 md:mt-3 text-sm md:text-lg text-gray-300 max-w-[180px] md:max-w-[240px]">
-                    A cross-platform metagame app, turning your activities across Web2 and Web3 games into a rewarding adventure.
+                  <p className="mt-3 text-sm md:text-lg text-gray-300 max-w-[200px] md:max-w-[280px] leading-snug md:leading-normal">
+                    Cross-platform metagame app turning Web2/Web3 activities into rewards
                   </p>
                 </div>
-                <div className="hidden md:block">
-                  <p className="text-xs text-gray-400">Hover to interact</p>
+                <div className="hidden md:flex items-center gap-2 text-xs text-gray-400">
+                  <span className="inline-block w-2 h-2 rounded-full bg-purple-500 animate-pulse"></span>
+                  Hover to interact
                 </div>
               </div>
             </div>
           </BentoTilt>
 
           {/* Bento Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 md:grid-rows-3 gap-4 md:gap-6 md:h-[135vh]">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:grid-rows-3 md:gap-6 md:h-[135vh]">
             {/* Zigma - Top Left */}
-            <BentoTilt className="md:row-span-2 h-64 md:h-full">
-              <div className="relative w-full h-full rounded-xl overflow-hidden">
+            <BentoTilt className="h-64 md:h-full md:row-span-2">
+              <div className="relative w-full h-full rounded-2xl overflow-hidden md:rounded-3xl">
                 <video
                   src="/videos/feature-2.mp4"
                   loop
@@ -95,14 +96,14 @@ const Services = () => {
                   playsInline
                   className="absolute left-0 top-0 w-full h-full object-cover"
                 />
-                <div className="absolute inset-0 bg-black/30" />
-                <div className="relative z-10 flex flex-col justify-between w-full h-full p-4 md:p-6">
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent" />
+                <div className="relative z-10 flex flex-col justify-between w-full h-full p-5">
                   <div>
-                    <h1 className="text-3xl md:text-5xl font-bold text-white">
+                    <h1 className="text-3xl md:text-5xl font-bold text-white drop-shadow-lg">
                       zig<b className="font-semibold">m</b>a
                     </h1>
-                    <p className="mt-2 text-sm md:text-lg text-gray-300 max-w-[160px] md:max-w-[240px]">
-                      An anime and gaming-inspired NFT collection - the IP primed for expansion.
+                    <p className="mt-2 text-sm md:text-lg text-gray-300 max-w-[180px] md:max-w-[240px] leading-snug">
+                      Anime-inspired NFT collection with expansion potential
                     </p>
                   </div>
                 </div>
@@ -111,7 +112,7 @@ const Services = () => {
 
             {/* Nexus - Top Right */}
             <BentoTilt className="h-64 md:h-auto">
-              <div className="relative w-full h-full rounded-xl overflow-hidden">
+              <div className="relative w-full h-full rounded-2xl overflow-hidden md:rounded-3xl">
                 <video
                   src="/videos/feature-3.mp4"
                   loop
@@ -120,14 +121,14 @@ const Services = () => {
                   playsInline
                   className="absolute left-0 top-0 w-full h-full object-cover"
                 />
-                <div className="absolute inset-0 bg-black/30" />
-                <div className="relative z-10 flex flex-col justify-between w-full h-full p-4 md:p-6">
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent" />
+                <div className="relative z-10 flex flex-col justify-between w-full h-full p-5">
                   <div>
-                    <h1 className="text-3xl md:text-5xl font-bold text-white">
+                    <h1 className="text-3xl md:text-4xl font-bold text-white drop-shadow-lg">
                       n<b className="font-semibold">e</b>xus
                     </h1>
-                    <p className="mt-2 text-sm md:text-lg text-gray-300 max-w-[160px] md:max-w-[240px]">
-                      A gamified social hub for Web3 communities.
+                    <p className="mt-2 text-sm md:text-lg text-gray-300 max-w-[180px] md:max-w-[240px] leading-snug">
+                      Gamified social hub for Web3 communities
                     </p>
                   </div>
                 </div>
@@ -136,7 +137,7 @@ const Services = () => {
 
             {/* Azul - Middle Right */}
             <BentoTilt className="h-64 md:h-auto">
-              <div className="relative w-full h-full rounded-xl overflow-hidden">
+              <div className="relative w-full h-full rounded-2xl overflow-hidden md:rounded-3xl">
                 <video
                   src="/videos/feature-4.mp4"
                   loop
@@ -145,33 +146,23 @@ const Services = () => {
                   playsInline
                   className="absolute left-0 top-0 w-full h-full object-cover"
                 />
-                <div className="absolute inset-0 bg-black/30" />
-                <div className="relative z-10 flex flex-col justify-between w-full h-full p-4 md:p-6">
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent" />
+                <div className="relative z-10 flex flex-col justify-between w-full h-full p-5">
                   <div>
-                    <h1 className="text-3xl md:text-5xl font-bold text-white">
+                    <h1 className="text-3xl md:text-4xl font-bold text-white drop-shadow-lg">
                       az<b className="font-semibold">u</b>l
                     </h1>
-                    <p className="mt-2 text-sm md:text-lg text-gray-300 max-w-[160px] md:max-w-[240px]">
-                      A cross-world AI Agent for better gameplay.
+                    <p className="mt-2 text-sm md:text-lg text-gray-300 max-w-[180px] md:max-w-[240px] leading-snug">
+                      Cross-world AI Agent for enhanced gameplay
                     </p>
                   </div>
                 </div>
               </div>
             </BentoTilt>
 
-            {/* Coming Soon - Bottom Left */}
+            {/* Feature 5 - Bottom Right (now 6th position) */}
             <BentoTilt className="h-64 md:h-full">
-              <div className="flex w-full h-full flex-col justify-between bg-gradient-to-br from-violet-400 to-purple-600 p-4 md:p-6 rounded-xl">
-                <h1 className="text-3xl md:text-5xl font-bold text-black">
-                  M<b className="font-semibold">o</b>re co<b className="font-semibold">m</b>ing so<b className="font-semibold">o</b>n!
-                </h1>
-                <TiLocationArrow className="mt-4 scale-[2] md:scale-[3] self-end text-black" />
-              </div>
-            </BentoTilt>
-
-            {/* Feature 5 - Bottom Right */}
-            <BentoTilt className="h-64 md:h-full col-span-1 md:col-span-1">
-              <div className="relative w-full h-full rounded-xl overflow-hidden">
+              <div className="relative w-full h-full rounded-2xl overflow-hidden md:rounded-3xl">
                 <video
                   src="/videos/feature-5.mp4"
                   loop
@@ -180,7 +171,27 @@ const Services = () => {
                   playsInline
                   className="absolute left-0 top-0 w-full h-full object-cover"
                 />
-                <div className="absolute inset-0 bg-black/30" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent" />
+                <div className="relative z-10 p-5">
+                  <h1 className="text-3xl font-bold text-white drop-shadow-lg">
+                    More Features
+                  </h1>
+                </div>
+              </div>
+            </BentoTilt>
+
+            {/* Coming Soon - Now at very bottom (7th position) */}
+            <BentoTilt className="h-64 md:h-full col-span-1 md:col-span-1 order-last">
+              <div className="flex w-full h-full flex-col justify-between bg-gradient-to-br from-purple-500 to-indigo-600 p-5 rounded-2xl md:rounded-3xl">
+                <div>
+                  <h1 className="text-3xl md:text-5xl font-bold text-white drop-shadow-lg">
+                    M<b className="font-semibold">o</b>re co<b className="font-semibold">m</b>ing!
+                  </h1>
+                  <p className="mt-2 text-sm md:text-lg text-white/90 max-w-[200px]">
+                    Exciting updates launching soon
+                  </p>
+                </div>
+                <TiLocationArrow className="mt-4 scale-[2] md:scale-[3] self-end text-white/90 animate-bounce" />
               </div>
             </BentoTilt>
           </div>
