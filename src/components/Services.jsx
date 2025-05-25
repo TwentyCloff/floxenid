@@ -292,7 +292,7 @@ const Services = () => {
               {/* More Features */}
               <div className="h-64 w-full">
                 <div className="relative w-full h-full rounded-2xl overflow-hidden">
-                  <VideoPlayer src="/videos/feature-5.mp4" />
+                  <VideoPlayer src="/videos/feature-6.mp4" />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent" />
                   <div className="relative z-10 p-5">
                     <h1 className="text-3xl font-bold text-white drop-shadow-lg">
