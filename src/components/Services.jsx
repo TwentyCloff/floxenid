@@ -547,45 +547,49 @@ const Services = () => {
                 {/* Coming Soon */}
                 <motion.div variants={itemVariants}>
                   <BentoTilt className="h-64 w-full">
-                    <div className="flex w-full h-full flex-col justify-between bg-gradient-to-br from-purple-500 to-indigo-600 p-5 rounded-2xl">
-                      <div>
-                        <h1 className="text-3xl font-bold text-white drop-shadow-lg">
-                          M<b className="font-semibold">o</b>re co<b className="font-semibold">m</b>ing!
-                        </h1>
-                        <p className="mt-2 text-sm text-white/90 max-w-[200px]">
-                          Exciting updates launching soon
-                        </p>
-                      </div>
-                      <div className="flex justify-between items-end">
-                        <motion.div 
-                          className="flex gap-2"
-                          animate={{
-                            x: [0, 5, 0],
-                          }}
-                          transition={{
-                            repeat: Infinity,
-                            duration: 2,
-                            ease: "easeInOut"
-                          }}
-                        >
-                          {['🎮', '✨', '🚀'].map((emoji, i) => (
-                            <motion.span
-                              key={i}
-                              animate={{
-                                y: [0, -10, 0],
-                              }}
-                              transition={{
-                                repeat: Infinity,
-                                duration: 2 + i * 0.5,
-                                ease: "easeInOut",
-                                delay: i * 0.3
-                              }}
-                            >
-                              {emoji}
-                            </motion.span>
-                          ))}
-                        </motion.div>
-                        <TiLocationArrow className="scale-[2] text-white/90 animate-bounce" />
+                    <div className="relative w-full h-full rounded-2xl overflow-hidden">
+                      <VideoPlayer src="/videos/feature-5.mp4" />
+                      <div className="absolute inset-0 bg-gradient-to-br from-purple-500/60 to-indigo-600/60" />
+                      <div className="relative z-10 flex flex-col justify-between w-full h-full p-5">
+                        <div>
+                          <h1 className="text-3xl font-bold text-white drop-shadow-lg">
+                            M<b className="font-semibold">o</b>re co<b className="font-semibold">m</b>ing!
+                          </h1>
+                          <p className="mt-2 text-sm text-white/90 max-w-[200px]">
+                            Exciting updates launching soon
+                          </p>
+                        </div>
+                        <div className="flex justify-between items-end">
+                          <motion.div 
+                            className="flex gap-2"
+                            animate={{
+                              x: [0, 5, 0],
+                            }}
+                            transition={{
+                              repeat: Infinity,
+                              duration: 2,
+                              ease: "easeInOut"
+                            }}
+                          >
+                            {['🎮', '✨', '🚀'].map((emoji, i) => (
+                              <motion.span
+                                key={i}
+                                animate={{
+                                  y: [0, -10, 0],
+                                }}
+                                transition={{
+                                  repeat: Infinity,
+                                  duration: 2 + i * 0.5,
+                                  ease: "easeInOut",
+                                  delay: i * 0.3
+                                }}
+                              >
+                                {emoji}
+                              </motion.span>
+                            ))}
+                          </motion.div>
+                          <TiLocationArrow className="scale-[2] text-white/90 animate-bounce" />
+                        </div>
                       </div>
                     </div>
                   </BentoTilt>
