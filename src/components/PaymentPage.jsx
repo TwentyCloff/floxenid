@@ -17,7 +17,7 @@ import qrisByr from "../assets/selectz/qrisbayar.webp";
 import ovoLogo from "../assets/selectz/gopay1.png";
 import shopeePayLogo from "../assets/selectz/gopay1.png";
 import linkAjaLogo from "../assets/selectz/gopay1.png";
-import bcaLogo from "../assets/selectz/gopy1.png";
+import bcaLogo from "../assets/selectz/gopay1.png";
 import jagoLogo from "../assets/selectz/gopay1.png";
 
 const PaymentPage = () => {
