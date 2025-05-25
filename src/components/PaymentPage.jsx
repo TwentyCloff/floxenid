@@ -7,24 +7,30 @@ import {
 } from "react-icons/fi";
 import { FaQrcode, FaDiscord } from "react-icons/fa";
 import { db, auth } from "../config/firebaseConfig";
-import { doc, setDoc, serverTimestamp } from "firebase/firestore";
+import { doc, setDoc, getDoc, serverTimestamp, collection, query, where, getDocs } from "firebase/firestore";
 import paymentVideo from "../assets/hero/payment-bg.mp4";
 import Button from "./Button";
 import gopayLogo from "../assets/selectz/gopay1.png";
 import danaLogo from "../assets/selectz/dana1.png";
+import qrisLogo from "../assets/selectz/gopay1.png";
+import qrisByr from "../assets/selectz/qrisbayar.webp";
+import ovoLogo from "../assets/selectz/gopay1.png";
+import shopeePayLogo from "../assets/selectz/gopay1.png";
+import linkAjaLogo from "../assets/selectz/gopay1.png";
+import bcaLogo from "../assets/selectz/gopy1.png";
+import jagoLogo from "../assets/selectz/gopay1.png";
 
 const PaymentPage = () => {
   const [step, setStep] = useState(1);
   const [paymentComplete, setPaymentComplete] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [paymentPending, setPaymentPending] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState("qris");
   const [personalInfo, setPersonalInfo] = useState({
     name: "",
     email: "",
     discord: "",
     phone: "",
-    game: "",
-    category: ""
   });
   const [errors, setErrors] = useState({});
   const [touched, setTouched] = useState({});
@@ -33,8 +39,7 @@ const PaymentPage = () => {
   const [showCopyNotification, setShowCopyNotification] = useState(false);
   const [copiedIndex, setCopiedIndex] = useState(null);
   const [invoiceNumber, setInvoiceNumber] = useState("");
-  const [showGameDropdown, setShowGameDropdown] = useState(false);
-  const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
+  const [userHasPlan, setUserHasPlan] = useState(false);
   
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
@@ -42,20 +47,18 @@ const PaymentPage = () => {
   const price = searchParams.get('price');
   const navigate = useNavigate();
 
-  const games = ["Roblox", "Growtopia"];
-  const categories = ["Script", "Item"];
   const serviceFee = 500;
 
   const paymentMethods = {
     "qris": {
       name: "QRIS",
-      icon: <FaQrcode className="w-6 h-6 text-emerald-400" />,
+      icon: <img src={qrisByr} alt="QRIS" className="w-6 h-6 object-contain" />,
       instructions: "Scan QR code to complete payment",
-      account: "",
+      account: "QRIS",
       note: "Instant processing • No additional fees",
       color: "from-emerald-500 to-teal-600",
       borderColor: "border-emerald-500/30",
-      logo: null,
+      logo: qrisLogo,
       accountName: "AUTOMATIC PROCESSING"
     },
     "gopay": {
@@ -79,6 +82,61 @@ const PaymentPage = () => {
       borderColor: "border-purple-500/30",
       logo: danaLogo,
       accountName: "CUSTOMER SERVICE"
+    },
+    "ovo": {
+      name: "OVO",
+      icon: <img src={ovoLogo} alt="OVO" className="w-6 h-6 object-contain" />,
+      instructions: "Transfer to following number",
+      account: "08123456789",
+      note: "Screenshot required • Processing time 5-15 minutes",
+      color: "from-violet-500 to-purple-600",
+      borderColor: "border-violet-500/30",
+      logo: ovoLogo,
+      accountName: "CUSTOMER SERVICE"
+    },
+    "shopeepay": {
+      name: "ShopeePay",
+      icon: <img src={shopeePayLogo} alt="ShopeePay" className="w-6 h-6 object-contain" />,
+      instructions: "Transfer to following number",
+      account: "08198765432",
+      note: "Screenshot required • Processing time 5-15 minutes",
+      color: "from-orange-500 to-red-600",
+      borderColor: "border-orange-500/30",
+      logo: shopeePayLogo,
+      accountName: "CUSTOMER SERVICE"
+    },
+    "linkaja": {
+      name: "LinkAja",
+      icon: <img src={linkAjaLogo} alt="LinkAja" className="w-6 h-6 object-contain" />,
+      instructions: "Transfer to following number",
+      account: "08123456789",
+      note: "Screenshot required • Processing time 5-15 minutes",
+      color: "from-green-500 to-emerald-600",
+      borderColor: "border-green-500/30",
+      logo: linkAjaLogo,
+      accountName: "CUSTOMER SERVICE"
+    },
+    "bca": {
+      name: "BCA",
+      icon: <img src={bcaLogo} alt="BCA" className="w-6 h-6 object-contain" />,
+      instructions: "Transfer to following account",
+      account: "1234567890",
+      note: "Screenshot required • Processing time 5-15 minutes",
+      color: "from-blue-600 to-blue-700",
+      borderColor: "border-blue-600/30",
+      logo: bcaLogo,
+      accountName: "CUSTOMER SERVICE"
+    },
+    "jago": {
+      name: "Bank Jago",
+      icon: <img src={jagoLogo} alt="Bank Jago" className="w-6 h-6 object-contain" />,
+      instructions: "Transfer to following account",
+      account: "9876543210",
+      note: "Screenshot required • Processing time 5-15 minutes",
+      color: "from-teal-500 to-cyan-600",
+      borderColor: "border-teal-500/30",
+      logo: jagoLogo,
+      accountName: "CUSTOMER SERVICE"
     }
   };
 
@@ -87,6 +145,65 @@ const PaymentPage = () => {
       validatePersonalInfo();
     }
   }, [personalInfo, touched]);
+
+  useEffect(() => {
+    // Check if user already has this plan
+    const checkUserPlan = async () => {
+      const user = auth.currentUser;
+      if (user && plan) {
+        const q = query(
+          collection(db, "transactions"),
+          where("customer.userId", "==", user.uid),
+          where("transactionDetails.plan", "==", plan),
+          where("transactionDetails.status", "==", "completed")
+        );
+        
+        const querySnapshot = await getDocs(q);
+        if (!querySnapshot.empty) {
+          setUserHasPlan(true);
+        }
+      }
+    };
+
+    // Load user's previous info if available
+    const loadUserInfo = async () => {
+      const user = auth.currentUser;
+      if (user) {
+        const userDoc = await getDoc(doc(db, "users", user.uid));
+        if (userDoc.exists()) {
+          const userData = userDoc.data();
+          setPersonalInfo(prev => ({
+            ...prev,
+            name: userData.name || "",
+            email: user.email || "",
+            discord: userData.discord || "",
+            phone: userData.phone || ""
+          }));
+        } else {
+          // Check transactions for user info
+          const q = query(
+            collection(db, "transactions"),
+            where("customer.userId", "==", user.uid)
+          );
+          
+          const querySnapshot = await getDocs(q);
+          if (!querySnapshot.empty) {
+            const latestTransaction = querySnapshot.docs[0].data();
+            setPersonalInfo(prev => ({
+              ...prev,
+              name: latestTransaction.customer.name || "",
+              email: latestTransaction.customer.email || "",
+              discord: latestTransaction.customer.discord || "",
+              phone: latestTransaction.customer.phone || ""
+            }));
+          }
+        }
+      }
+    };
+
+    checkUserPlan();
+    loadUserInfo();
+  }, [plan]);
 
   const generateInvoiceNumber = () => {
     const now = new Date();
@@ -118,21 +235,9 @@ const PaymentPage = () => {
     }));
   };
 
-  const selectGame = (game) => {
-    setPersonalInfo(prev => ({ ...prev, game }));
-    setShowGameDropdown(false);
-    setTouched(prev => ({ ...prev, game: true }));
-  };
-
-  const selectCategory = (category) => {
-    setPersonalInfo(prev => ({ ...prev, category }));
-    setShowCategoryDropdown(false);
-    setTouched(prev => ({ ...prev, category: true }));
-  };
-
   const validatePersonalInfo = () => {
     const newErrors = {};
-    const { name, email, discord, phone, game, category } = personalInfo;
+    const { name, email, discord, phone } = personalInfo;
     
     if (!name.trim()) newErrors.name = "Full name is required";
     else if (name.length < 3) newErrors.name = "Minimum 3 characters";
@@ -150,10 +255,6 @@ const PaymentPage = () => {
     if (!phone) newErrors.phone = "WhatsApp number is required";
     else if (!/^\d{10,15}$/.test(phone)) newErrors.phone = "Invalid phone number";
     
-    if (!game) newErrors.game = "Please select a game";
-    
-    if (!category) newErrors.category = "Please select a category";
-    
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -167,6 +268,11 @@ const PaymentPage = () => {
   };
 
   const handleProceedToPayment = () => {
+    if (userHasPlan) {
+      alert("Anda Sudah Memiliki Paket Ini, silahkan pilih yang lain");
+      return;
+    }
+
     if (validatePersonalInfo()) {
       if (!dontShowAgain) {
         setShowConfirmation(true);
@@ -211,8 +317,6 @@ const PaymentPage = () => {
           email: personalInfo.email,
           discord: personalInfo.discord,
           phone: personalInfo.phone,
-          game: personalInfo.game,
-          category: personalInfo.category,
           userId: user.uid
         },
         transactionDetails: {
@@ -245,14 +349,46 @@ const PaymentPage = () => {
       };
 
       await setDoc(doc(db, "transactions", invoiceNum), transactionData);
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      setPaymentComplete(true);
+      
+      // Save user info for future use
+      await setDoc(doc(db, "users", user.uid), {
+        name: personalInfo.name,
+        discord: personalInfo.discord,
+        phone: personalInfo.phone,
+        lastUpdated: serverTimestamp()
+      }, { merge: true });
+
+      setPaymentPending(true);
+      startPaymentStatusCheck(invoiceNum);
     } catch (error) {
       console.error("Payment processing error:", error);
       alert(`Payment failed: ${error.message}`);
-    } finally {
       setIsProcessing(false);
     }
+  };
+
+  const startPaymentStatusCheck = (invoiceNum) => {
+    const checkInterval = setInterval(async () => {
+      try {
+        const docRef = doc(db, "transactions", invoiceNum);
+        const docSnap = await getDoc(docRef);
+        
+        if (docSnap.exists()) {
+          const transaction = docSnap.data();
+          if (transaction.transactionDetails.status === "completed") {
+            clearInterval(checkInterval);
+            setPaymentComplete(true);
+            setPaymentPending(false);
+          }
+        }
+      } catch (error) {
+        console.error("Error checking payment status:", error);
+        clearInterval(checkInterval);
+      }
+    }, 5000); // Check every 5 seconds
+
+    // Cleanup interval when component unmounts
+    return () => clearInterval(checkInterval);
   };
 
   if (paymentComplete) {
@@ -287,7 +423,7 @@ const PaymentPage = () => {
                 Thank you for purchasing <span className="text-emerald-300 font-medium">{plan}</span>.
               </p>
               <p className="text-gray-400 text-sm mt-1">
-                Our team will verify your payment within 1-15 minutes.
+                Your payment has been verified and processed.
               </p>
             </div>
             
@@ -297,6 +433,71 @@ const PaymentPage = () => {
             >
               Go to Dashboard
             </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (paymentPending) {
+    return (
+      <div className="fixed inset-0 overflow-y-auto z-[9999] bg-black flex items-center justify-center p-4">
+        <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-black to-gray-900 opacity-95">
+          <video autoPlay loop muted className="absolute inset-0 w-full h-full object-cover opacity-10">
+            <source src={paymentVideo} type="video/mp4" />
+          </video>
+        </div>
+
+        <div className="relative z-10 bg-gray-900/95 backdrop-blur-2xl p-8 rounded-xl max-w-md w-full border border-yellow-500/20 shadow-2xl shadow-yellow-900/10">
+          <div className="flex flex-col items-center text-center space-y-6">
+            <div className="relative">
+              <div className="absolute inset-0 bg-yellow-500/20 blur-xl rounded-full animate-pulse"></div>
+              <FiLoader className="relative w-20 h-20 text-yellow-400 animate-spin" />
+            </div>
+            
+            <div className="space-y-2">
+              <h2 className="text-2xl font-bold text-white">
+                Payment Pending
+              </h2>
+              <p className="text-gray-400">
+                Silahkan Bayar Nomor dibawah ini, dan tunggu sampai admin memverifikasi pembayaran kamu
+              </p>
+              <p className="text-yellow-300 text-sm mt-2">
+                Silahkan tunggu 5-15 menit
+              </p>
+            </div>
+            
+            <div className="w-full bg-gray-800/50 rounded-lg p-4 border border-gray-700/50 text-left">
+              <h3 className="text-lg font-bold text-white mb-2">Order Details</h3>
+              <div className="space-y-2">
+                <div className="flex justify-between">
+                  <span className="text-gray-400">Product:</span>
+                  <span className="text-white">{plan}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-400">Payment Method:</span>
+                  <span className="text-white">{paymentMethods[paymentMethod].name}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-400">Payment Number:</span>
+                  <span className="text-white font-mono">{paymentMethods[paymentMethod].account}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-400">Total Amount:</span>
+                  <span className="text-white font-bold">Rp{(Number(price) + serviceFee).toLocaleString('id-ID')}</span>
+                </div>
+              </div>
+            </div>
+            
+            <div className="w-full bg-yellow-500/10 rounded-lg p-3 border border-yellow-500/20">
+              <p className="text-yellow-300 text-sm">
+                Please keep your payment proof. Our admin will verify your payment shortly.
+              </p>
+            </div>
+            
+            <p className="text-xs text-gray-500 font-mono tracking-wider">
+              STATUS: PENDING • WAITING VERIFICATION
+            </p>
           </div>
         </div>
       </div>
@@ -597,80 +798,6 @@ const PaymentPage = () => {
                   </p>
                 )}
               </div>
-
-              <div className="space-y-2">
-                <label className="block text-gray-400 text-sm font-medium">
-                  Select Game <span className="text-red-400">*</span>
-                </label>
-                <div className="relative">
-                  <button
-                    onClick={() => setShowGameDropdown(!showGameDropdown)}
-                    className={`w-full bg-gray-800/70 border ${
-                      errors.game ? 'border-red-500/70' : 'border-gray-700/70'
-                    } rounded-lg py-2.5 px-4 text-white text-left flex justify-between items-center`}
-                  >
-                    <span className={personalInfo.game ? "text-white" : "text-gray-500"}>
-                      {personalInfo.game || "Select a game"}
-                    </span>
-                    <FiChevronDown className={`transition-transform ${showGameDropdown ? 'rotate-180' : ''} text-gray-400`} />
-                  </button>
-                  {showGameDropdown && (
-                    <div className="absolute z-10 mt-1 w-full bg-gray-800 border border-gray-700/70 rounded-lg shadow-lg overflow-hidden">
-                      {games.map((game) => (
-                        <div
-                          key={game}
-                          onClick={() => selectGame(game)}
-                          className="px-4 py-2.5 hover:bg-gray-700/50 cursor-pointer text-white transition-colors"
-                        >
-                          {game}
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-                {errors.game && (
-                  <p className="text-sm text-red-400 flex items-center mt-1">
-                    <FiX className="mr-1 flex-shrink-0" /> {errors.game}
-                  </p>
-                )}
-              </div>
-
-              <div className="space-y-2">
-                <label className="block text-gray-400 text-sm font-medium">
-                  Select Category <span className="text-red-400">*</span>
-                </label>
-                <div className="relative">
-                  <button
-                    onClick={() => setShowCategoryDropdown(!showCategoryDropdown)}
-                    className={`w-full bg-gray-800/70 border ${
-                      errors.category ? 'border-red-500/70' : 'border-gray-700/70'
-                    } rounded-lg py-2.5 px-4 text-white text-left flex justify-between items-center`}
-                  >
-                    <span className={personalInfo.category ? "text-white" : "text-gray-500"}>
-                      {personalInfo.category || "Select a category"}
-                    </span>
-                    <FiChevronDown className={`transition-transform ${showCategoryDropdown ? 'rotate-180' : ''} text-gray-400`} />
-                  </button>
-                  {showCategoryDropdown && (
-                    <div className="absolute z-10 mt-1 w-full bg-gray-800 border border-gray-700/70 rounded-lg shadow-lg overflow-hidden">
-                      {categories.map((category) => (
-                        <div
-                          key={category}
-                          onClick={() => selectCategory(category)}
-                          className="px-4 py-2.5 hover:bg-gray-700/50 cursor-pointer text-white transition-colors"
-                        >
-                          {category}
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-                {errors.category && (
-                  <p className="text-sm text-red-400 flex items-center mt-1">
-                    <FiX className="mr-1 flex-shrink-0" /> {errors.category}
-                  </p>
-                )}
-              </div>
             </div>
             
             <div className="bg-gray-800/50 rounded-lg p-5 border border-gray-700/50">
@@ -692,8 +819,8 @@ const PaymentPage = () => {
                   Payments are processed within 1-15 minutes during business hours (9AM-10PM WIB).
                 </li>
                 <li className="flex items-start">
-                  <span className="text-purple-400 mr-2 mt-0.5">•</span>
-                  For Gopay/DANA payments, you must send payment proof to our admin via WhatsApp.
+                  <span className="text-purple-400 mr-2 mt=0.5">•</span>
+                  For payments, you must send payment proof to our admin via WhatsApp.
                 </li>
               </ul>
             </div>
@@ -811,19 +938,6 @@ const PaymentPage = () => {
                         <span className="text-white font-medium">{plan}</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-gray-400">Game</span>
-                        <span className="text-white font-medium">{personalInfo.game}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-gray-400">Category</span>
-                        <span className="text-white font-medium">{personalInfo.category}</span>
-                      </div>
-                      <div className="border-t border-gray-700/50 my-2"></div>
-                      <div className="flex justify-between">
-                        <span className="text-gray-400">Product Price</span>
-                        <span className="text-white font-medium">Rp{Number(price).toLocaleString('id-ID')}</span>
-                      </div>
-                      <div className="flex justify-between">
                         <span className="text-gray-400">Service Fee</span>
                         <span className="text-white font-medium">Rp{serviceFee.toLocaleString('id-ID')}</span>
                       </div>
@@ -897,14 +1011,6 @@ const PaymentPage = () => {
                     <div className="bg-gray-800/70 p-4 rounded-lg border border-gray-700/50">
                       <p className="text-gray-400 text-sm mb-1">WhatsApp</p>
                       <p className="text-white font-medium">{personalInfo.phone}</p>
-                    </div>
-                    <div className="bg-gray-800/70 p-4 rounded-lg border border-gray-700/50">
-                      <p className="text-gray-400 text-sm mb-1">Game</p>
-                      <p className="text-white font-medium">{personalInfo.game}</p>
-                    </div>
-                    <div className="bg-gray-800/70 p-4 rounded-lg border border-gray-700/50">
-                      <p className="text-gray-400 text-sm mb-1">Category</p>
-                      <p className="text-white font-medium">{personalInfo.category}</p>
                     </div>
                   </div>
                 </div>
