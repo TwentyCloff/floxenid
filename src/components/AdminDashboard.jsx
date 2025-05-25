@@ -24,7 +24,8 @@ import {
   FiCalendar,
   FiTrash2,
 } from "react-icons/fi";
-import { FaDiscord } from "react-icons/fa";
+import { FaDiscord, FaPaypal, FaCcVisa, FaCcMastercard, FaCcAmex } from "react-icons/fa";
+import { SiBankofamerica, SiBca, SiBni, SiBri, SiMandiri, SiDana, SiOvo, SiGopay } from "react-icons/si";
 
 const AdminDashboard = () => {
   const [payments, setPayments] = useState([]);
@@ -177,6 +178,27 @@ const AdminDashboard = () => {
           </span>
         );
     }
+  };
+
+  const getPaymentMethodIcon = (method) => {
+    if (!method) return <FiCreditCard className="text-gray-400" />;
+    
+    const lowerMethod = method.toLowerCase();
+    
+    if (lowerMethod.includes("visa")) return <FaCcVisa className="text-blue-600" />;
+    if (lowerMethod.includes("mastercard")) return <FaCcMastercard className="text-red-500" />;
+    if (lowerMethod.includes("amex")) return <FaCcAmex className="text-blue-400" />;
+    if (lowerMethod.includes("paypal")) return <FaPaypal className="text-blue-500" />;
+    if (lowerMethod.includes("bca")) return <SiBca className="text-blue-800" />;
+    if (lowerMethod.includes("bni")) return <SiBni className="text-yellow-600" />;
+    if (lowerMethod.includes("bri")) return <SiBri className="text-blue-600" />;
+    if (lowerMethod.includes("mandiri")) return <SiMandiri className="text-red-600" />;
+    if (lowerMethod.includes("dana")) return <SiDana className="text-blue-500" />;
+    if (lowerMethod.includes("ovo")) return <SiOvo className="text-purple-600" />;
+    if (lowerMethod.includes("gopay")) return <SiGopay className="text-green-600" />;
+    if (lowerMethod.includes("bank")) return <SiBankofamerica className="text-blue-700" />;
+    
+    return <FiCreditCard className="text-gray-400" />;
   };
 
   const formatDate = (date) => {
@@ -457,9 +479,12 @@ const AdminDashboard = () => {
                         <span className="font-semibold">
                           {formatCurrency(payment.transactionDetails.amount)}
                         </span>
-                        <span className="text-xs mt-1 flex items-center gap-1">
-                          <FiCreditCard /> {payment.paymentMethod || "-"}
-                        </span>
+                        <div className="flex items-center gap-2 mt-1">
+                          {getPaymentMethodIcon(payment.paymentMethod)}
+                          <span className="text-xs">
+                            {payment.paymentMethod || "Unknown"}
+                          </span>
+                        </div>
                         <span className="text-xs mt-1 flex items-center gap-1">
                           <FiClock /> Created: {formatDate(payment.timestamp)}
                         </span>
