@@ -13,7 +13,7 @@ import Button from "./Button";
 import gopayLogo from "../assets/selectz/gopay1.png";
 import danaLogo from "../assets/selectz/dana1.png";
 import qrisLogo from "../assets/selectz/gopay1.png";
-import qrisByr from "../assets/selectz/qrisbayar.webp";
+import qrisByr from "../assets/selectz/qrisbayar.jpg";
 import ovoLogo from "../assets/selectz/gopay1.png";
 import shopeePayLogo from "../assets/selectz/gopay1.png";
 import linkAjaLogo from "../assets/selectz/gopay1.png";
