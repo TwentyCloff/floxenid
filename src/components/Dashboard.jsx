@@ -578,7 +578,7 @@ const Dashboard = () => {
       <footer className="bg-gradient-to-r from-black to-purple-900 border-t border-gray-800 mt-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <p className="text-center text-sm text-purple-300">
-            &copy; {new Date().getFullYear()} Your Company. All rights reserved.
+            &copy; {new Date().getFullYear()} Qarvo API team. All rights reserved.
           </p>
         </div>
       </footer>
