@@ -52,13 +52,13 @@ const PaymentPage = () => {
   const paymentMethods = {
     "qris": {
       name: "QRIS",
-      icon: <img src={qrisByr} alt="QRIS" className="w-6 h-6 object-contain" />,
+      icon: <img src={qrisLogo} alt="QRIS" className="w-6 h-6 object-contain" />,
       instructions: "Scan QR code to complete payment",
       account: "QRIS",
       note: "Instant processing • No additional fees",
       color: "from-emerald-500 to-teal-600",
       borderColor: "border-emerald-500/30",
-      logo: qrisLogo,
+      logo: qrisByr,
       accountName: "AUTOMATIC PROCESSING"
     },
     "gopay": {
