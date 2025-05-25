@@ -56,6 +56,43 @@ const Header = () => {
     navigate("/dashboard");
   };
 
+  // Premium Button Component
+  const FuturisticButton = ({ children, onClick, variant = "primary" }) => {
+    const variants = {
+      primary: "bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700",
+      secondary: "bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700",
+      danger: "bg-gradient-to-r from-red-500 to-orange-600 hover:from-red-600 hover:to-orange-700",
+      dashboard: "bg-gradient-to-r from-indigo-500 to-violet-600 hover:from-indigo-600 hover:to-violet-700"
+    };
+
+    return (
+      <button
+        onClick={onClick}
+        className={`
+          relative overflow-hidden
+          px-6 py-2.5 rounded-lg
+          text-sm font-medium text-white
+          ${variants[variant]}
+          shadow-lg
+          transition-all duration-200
+          hover:shadow-xl
+          hover:scale-[1.02]
+          active:scale-95
+          before:absolute before:inset-0
+          before:bg-white before:opacity-0
+          before:transition-opacity before:duration-300
+          hover:before:opacity-10
+          border border-white/10
+          backdrop-blur-sm
+        `}
+      >
+        <span className="relative z-10 flex items-center justify-center gap-2">
+          {children}
+        </span>
+      </button>
+    );
+  };
+
   return (
     <>
       {openNavigation && (
@@ -108,51 +145,23 @@ const Header = () => {
               {/* Mobile buttons */}
               <div className="flex flex-col lg:hidden items-center gap-4 mt-4">
                 {user && (
-                  <button
-                    onClick={goToDashboard}
-                    className="relative w-full max-w-xs px-6 py-3 font-medium text-white group"
-                  >
-                    <span className="absolute inset-0 w-full h-full transition-all duration-300 ease-out transform translate-x-2 translate-y-2 bg-purple-600 group-hover:translate-x-0 group-hover:translate-y-0 rounded-lg"></span>
-                    <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-indigo-600 to-purple-600 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
-                    <span className="relative flex items-center justify-center gap-2">
-                      Dashboard
-                    </span>
-                  </button>
+                  <FuturisticButton onClick={goToDashboard} variant="dashboard">
+                    Dashboard
+                  </FuturisticButton>
                 )}
                 {!user ? (
                   <>
-                    <button
-                      onClick={handleLogin}
-                      className="relative w-full max-w-xs px-6 py-3 font-medium text-white group"
-                    >
-                      <span className="absolute inset-0 w-full h-full transition-all duration-300 ease-out transform translate-x-2 translate-y-2 bg-indigo-600 group-hover:translate-x-0 group-hover:translate-y-0 rounded-lg"></span>
-                      <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
-                      <span className="relative flex items-center justify-center gap-2">
-                        Sign In
-                      </span>
-                    </button>
-                    <button
-                      onClick={handleSignUp}
-                      className="relative w-full max-w-xs px-6 py-3 font-medium text-white group"
-                    >
-                      <span className="absolute inset-0 w-full h-full transition-all duration-300 ease-out transform translate-x-2 translate-y-2 bg-pink-600 group-hover:translate-x-0 group-hover:translate-y-0 rounded-lg"></span>
-                      <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
-                      <span className="relative flex items-center justify-center gap-2">
-                        Sign Up
-                      </span>
-                    </button>
+                    <FuturisticButton onClick={handleLogin} variant="primary">
+                      Sign In
+                    </FuturisticButton>
+                    <FuturisticButton onClick={handleSignUp} variant="secondary">
+                      Sign Up
+                    </FuturisticButton>
                   </>
                 ) : (
-                  <button
-                    onClick={handleLogout}
-                    className="relative w-full max-w-xs px-6 py-3 font-medium text-white group"
-                  >
-                    <span className="absolute inset-0 w-full h-full transition-all duration-300 ease-out transform translate-x-2 translate-y-2 bg-red-600 group-hover:translate-x-0 group-hover:translate-y-0 rounded-lg"></span>
-                    <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-orange-600 to-red-600 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
-                    <span className="relative flex items-center justify-center gap-2">
-                      Logout
-                    </span>
-                  </button>
+                  <FuturisticButton onClick={handleLogout} variant="danger">
+                    Logout
+                  </FuturisticButton>
                 )}
               </div>
             </div>
@@ -163,50 +172,30 @@ const Header = () => {
           {/* Desktop buttons */}
           <div className="hidden lg:flex items-center gap-4 ml-auto">
             {user && (
-              <button
-                onClick={goToDashboard}
-                className="relative px-6 py-2.5 font-medium text-white group"
-              >
-                <span className="absolute inset-0 w-full h-full transition-all duration-300 ease-out transform translate-x-1.5 translate-y-1.5 bg-purple-600 group-hover:translate-x-0 group-hover:translate-y-0 rounded-lg"></span>
-                <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-indigo-600 to-purple-600 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
-                <span className="relative">Dashboard</span>
-              </button>
+              <FuturisticButton onClick={goToDashboard} variant="dashboard">
+                Dashboard
+              </FuturisticButton>
             )}
             {!user ? (
               <>
-                <button
-                  onClick={handleLogin}
-                  className="relative px-6 py-2.5 font-medium text-white group"
-                >
-                  <span className="absolute inset-0 w-full h-full transition-all duration-300 ease-out transform translate-x-1.5 translate-y-1.5 bg-indigo-600 group-hover:translate-x-0 group-hover:translate-y-0 rounded-lg"></span>
-                  <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
-                  <span className="relative">Sign In</span>
-                </button>
-                <button
-                  onClick={handleSignUp}
-                  className="relative px-6 py-2.5 font-medium text-white group"
-                >
-                  <span className="absolute inset-0 w-full h-full transition-all duration-300 ease-out transform translate-x-1.5 translate-y-1.5 bg-pink-600 group-hover:translate-x-0 group-hover:translate-y-0 rounded-lg"></span>
-                  <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
-                  <span className="relative">Sign Up</span>
-                </button>
+                <FuturisticButton onClick={handleLogin} variant="primary">
+                  Sign In
+                </FuturisticButton>
+                <FuturisticButton onClick={handleSignUp} variant="secondary">
+                  Sign Up
+                </FuturisticButton>
               </>
             ) : (
-              <button
-                onClick={handleLogout}
-                className="relative px-6 py-2.5 font-medium text-white group"
-              >
-                <span className="absolute inset-0 w-full h-full transition-all duration-300 ease-out transform translate-x-1.5 translate-y-1.5 bg-red-600 group-hover:translate-x-0 group-hover:translate-y-0 rounded-lg"></span>
-                <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-orange-600 to-red-600 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
-                <span className="relative">Logout</span>
-              </button>
+              <FuturisticButton onClick={handleLogout} variant="danger">
+                Logout
+              </FuturisticButton>
             )}
           </div>
 
           {/* Mobile menu button */}
           <button
             onClick={toggleNavigation}
-            className="ml-auto lg:hidden p-3 rounded-lg hover:bg-n-7 transition-colors"
+            className="ml-auto lg:hidden p-3 rounded-lg hover:bg-white/10 transition-colors"
           >
             <MenuSvg openNavigation={openNavigation} />
           </button>
