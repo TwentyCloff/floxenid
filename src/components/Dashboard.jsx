@@ -161,7 +161,7 @@ const Dashboard = () => {
       const plan = t.transactionDetails?.plan?.toLowerCase();
       if (!plan) return false;
       
-      if (tier === 'OriginQi') return plan.includes('originqi') || plan.includes('half saint') || plan.includes('peak immortal');
+      if (tier === 'Origin Qi') return plan.includes('origin qi') || plan.includes('half saint') || plan.includes('peak immortal');
       if (tier === 'Half Saint') return plan.includes('half saint') || plan.includes('peak immortal');
       if (tier === 'Peak Immortal') return plan.includes('peak immortal');
       
@@ -170,7 +170,7 @@ const Dashboard = () => {
   };
 
   const handleMenuClick = (menu) => {
-    if (menu === 'OriginQi' && !hasAccessToTier('OriginQi')) {
+    if (menu === 'Origin Qi' && !hasAccessToTier('Origin Qi')) {
       setShowPremiumAlert(true);
       return;
     }
@@ -187,9 +187,9 @@ const Dashboard = () => {
 
   const renderMenuContent = () => {
     const resources = {
-      'OriginQi': [
-        { title: "OriginQi Resource 1", link: "https://mediafire.com/OriginQi1" },
-        { title: "OriginQi Resource 2", link: "https://mediafire.com/OriginQi2" }
+      'Origin Qi': [
+        { title: "Origin Qi Resource 1", link: "https://mediafire.com/OriginQi1" },
+        { title: "Origin Qi Resource 2", link: "https://mediafire.com/OriginQi2" }
       ],
       'Half Saint': [
         { title: "Half Saint Resource 1", link: "https://mediafire.com/HalfSaint1" },
@@ -325,22 +325,22 @@ const Dashboard = () => {
                 </div>
                 <div className="divide-y divide-gray-700">
                   <button 
-                    onClick={() => handleMenuClick('OriginQi')}
+                    onClick={() => handleMenuClick('Origin Qi')}
                     className={`w-full text-left px-4 py-3 flex items-center justify-between transition-colors ${
-                      activeMenu === 'OriginQi' ? 'bg-purple-900/30' : 'hover:bg-gray-700/50'
+                      activeMenu === 'Origin Qi' ? 'bg-purple-900/30' : 'hover:bg-gray-700/50'
                     }`}
                   >
                     <div className="flex items-center">
                       <div className={`p-2 rounded-full mr-3 ${
-                        activeMenu === 'OriginQi' ? 
+                        activeMenu === 'Origin Qi' ? 
                         'bg-gradient-to-br from-purple-500 to-purple-700 text-white' : 
                         'bg-gray-700 text-purple-400'
                       }`}>
                         <FiStar className="h-5 w-5" />
                       </div>
-                      <span className="text-sm font-medium text-white">OriginQi</span>
+                      <span className="text-sm font-medium text-white">Origin Qi</span>
                     </div>
-                    {!hasAccessToTier('OriginQi') ? (
+                    {!hasAccessToTier('Origin Qi') ? (
                       <FiLock className="h-5 w-5 text-purple-400" />
                     ) : (
                       <FiChevronRight className="h-5 w-5 text-purple-400" />
@@ -411,7 +411,7 @@ const Dashboard = () => {
                   </div>
                   {activeMenu && (
                     <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                      activeMenu === 'OriginQi' ? 'bg-gradient-to-r from-purple-500 to-purple-700 text-white' :
+                      activeMenu === 'Origin Qi' ? 'bg-gradient-to-r from-purple-500 to-purple-700 text-white' :
                       activeMenu === 'Half Saint' ? 'bg-gradient-to-r from-purple-600 to-purple-800 text-white' :
                       'bg-gradient-to-r from-purple-700 to-purple-900 text-white'
                     }`}>
