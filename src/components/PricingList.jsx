@@ -56,7 +56,7 @@ const PricingList = () => {
   };
 
   return (
-    <div className="w-full max-w-6xl mx-auto bg-gray-900 border border-gray-700 rounded-3xl p-4 md:p-8">
+    <div className="w-full max-w-6xl mx-auto bg-gray-900 rounded-3xl p-4 md:p-8">
       {/* Header */}
       <div className="text-center mb-8 md:mb-12">
         <h2 className="text-3xl md:text-4xl font-bold mb-3 md:mb-4 bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-purple-600">
