@@ -6,7 +6,6 @@ import { onAuthStateChanged, signOut } from "firebase/auth";
 import { auth } from "../config/firebaseConfig";
 import MenuSvg from "../assets/svg/MenuSvg";
 import { navigation } from "../constants";
-import Button from "../components/Button";
 import { HambugerMenu } from "../components/design/Header";
 
 const Header = () => {
@@ -40,13 +39,17 @@ const Header = () => {
     setOpenNavigation(false);
   };
 
-  const handleLoginLogout = async () => {
-    if (user) {
-      await signOut(auth);
-      setUser(null);
-    } else {
-      navigate("/login");
-    }
+  const handleLogin = () => {
+    navigate("/login");
+  };
+
+  const handleSignUp = () => {
+    navigate("/signup");
+  };
+
+  const handleLogout = async () => {
+    await signOut(auth);
+    setUser(null);
   };
 
   const goToDashboard = () => {
@@ -105,13 +108,52 @@ const Header = () => {
               {/* Mobile buttons */}
               <div className="flex flex-col lg:hidden items-center gap-4 mt-4">
                 {user && (
-                  <Button onClick={goToDashboard} className="w-full">
-                    Dashboard
-                  </Button>
+                  <button
+                    onClick={goToDashboard}
+                    className="relative w-full max-w-xs px-6 py-3 font-medium text-white group"
+                  >
+                    <span className="absolute inset-0 w-full h-full transition-all duration-300 ease-out transform translate-x-2 translate-y-2 bg-purple-600 group-hover:translate-x-0 group-hover:translate-y-0 rounded-lg"></span>
+                    <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-indigo-600 to-purple-600 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
+                    <span className="relative flex items-center justify-center gap-2">
+                      Dashboard
+                    </span>
+                  </button>
                 )}
-                <Button onClick={handleLoginLogout} className="w-full">
-                  {user ? "Logout" : "Sign In / Sign Up"}
-                </Button>
+                {!user ? (
+                  <>
+                    <button
+                      onClick={handleLogin}
+                      className="relative w-full max-w-xs px-6 py-3 font-medium text-white group"
+                    >
+                      <span className="absolute inset-0 w-full h-full transition-all duration-300 ease-out transform translate-x-2 translate-y-2 bg-indigo-600 group-hover:translate-x-0 group-hover:translate-y-0 rounded-lg"></span>
+                      <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
+                      <span className="relative flex items-center justify-center gap-2">
+                        Sign In
+                      </span>
+                    </button>
+                    <button
+                      onClick={handleSignUp}
+                      className="relative w-full max-w-xs px-6 py-3 font-medium text-white group"
+                    >
+                      <span className="absolute inset-0 w-full h-full transition-all duration-300 ease-out transform translate-x-2 translate-y-2 bg-pink-600 group-hover:translate-x-0 group-hover:translate-y-0 rounded-lg"></span>
+                      <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
+                      <span className="relative flex items-center justify-center gap-2">
+                        Sign Up
+                      </span>
+                    </button>
+                  </>
+                ) : (
+                  <button
+                    onClick={handleLogout}
+                    className="relative w-full max-w-xs px-6 py-3 font-medium text-white group"
+                  >
+                    <span className="absolute inset-0 w-full h-full transition-all duration-300 ease-out transform translate-x-2 translate-y-2 bg-red-600 group-hover:translate-x-0 group-hover:translate-y-0 rounded-lg"></span>
+                    <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-orange-600 to-red-600 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
+                    <span className="relative flex items-center justify-center gap-2">
+                      Logout
+                    </span>
+                  </button>
+                )}
               </div>
             </div>
 
@@ -119,25 +161,55 @@ const Header = () => {
           </nav>
 
           {/* Desktop buttons */}
-          <div className="hidden lg:flex items-center gap-2 ml-auto">
+          <div className="hidden lg:flex items-center gap-4 ml-auto">
             {user && (
-              <Button onClick={goToDashboard} className="mr-2">
-                Dashboard
-              </Button>
+              <button
+                onClick={goToDashboard}
+                className="relative px-6 py-2.5 font-medium text-white group"
+              >
+                <span className="absolute inset-0 w-full h-full transition-all duration-300 ease-out transform translate-x-1.5 translate-y-1.5 bg-purple-600 group-hover:translate-x-0 group-hover:translate-y-0 rounded-lg"></span>
+                <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-indigo-600 to-purple-600 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
+                <span className="relative">Dashboard</span>
+              </button>
             )}
-            <Button onClick={handleLoginLogout}>
-              {user ? "Logout" : "Sign In / Sign Up"}
-            </Button>
+            {!user ? (
+              <>
+                <button
+                  onClick={handleLogin}
+                  className="relative px-6 py-2.5 font-medium text-white group"
+                >
+                  <span className="absolute inset-0 w-full h-full transition-all duration-300 ease-out transform translate-x-1.5 translate-y-1.5 bg-indigo-600 group-hover:translate-x-0 group-hover:translate-y-0 rounded-lg"></span>
+                  <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
+                  <span className="relative">Sign In</span>
+                </button>
+                <button
+                  onClick={handleSignUp}
+                  className="relative px-6 py-2.5 font-medium text-white group"
+                >
+                  <span className="absolute inset-0 w-full h-full transition-all duration-300 ease-out transform translate-x-1.5 translate-y-1.5 bg-pink-600 group-hover:translate-x-0 group-hover:translate-y-0 rounded-lg"></span>
+                  <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
+                  <span className="relative">Sign Up</span>
+                </button>
+              </>
+            ) : (
+              <button
+                onClick={handleLogout}
+                className="relative px-6 py-2.5 font-medium text-white group"
+              >
+                <span className="absolute inset-0 w-full h-full transition-all duration-300 ease-out transform translate-x-1.5 translate-y-1.5 bg-red-600 group-hover:translate-x-0 group-hover:translate-y-0 rounded-lg"></span>
+                <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-orange-600 to-red-600 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
+                <span className="relative">Logout</span>
+              </button>
+            )}
           </div>
 
           {/* Mobile menu button */}
-          <Button
+          <button
             onClick={toggleNavigation}
-            className="ml-auto lg:hidden"
-            px="px-3"
+            className="ml-auto lg:hidden p-3 rounded-lg hover:bg-n-7 transition-colors"
           >
             <MenuSvg openNavigation={openNavigation} />
-          </Button>
+          </button>
         </div>
       </div>
     </>
