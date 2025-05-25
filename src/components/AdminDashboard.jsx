@@ -6,6 +6,7 @@ import {
   orderBy,
   doc,
   updateDoc,
+  deleteDoc,
   serverTimestamp,
 } from "firebase/firestore";
 import { db } from "../config/firebaseConfig";
@@ -21,6 +22,7 @@ import {
   FiPhone,
   FiCreditCard,
   FiCalendar,
+  FiTrash2,
 } from "react-icons/fi";
 import { FaDiscord } from "react-icons/fa";
 
@@ -35,6 +37,7 @@ const AdminDashboard = () => {
   const [isEditing, setIsEditing] = useState(null);
   const [editStatus, setEditStatus] = useState("");
   const [isUpdating, setIsUpdating] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(null);
 
   useEffect(() => {
     const q = query(
@@ -134,6 +137,19 @@ const AdminDashboard = () => {
     }
   };
 
+  const handleDeletePayment = async (paymentId) => {
+    setIsUpdating(true);
+    try {
+      await deleteDoc(doc(db, "transactions", paymentId));
+      setShowDeleteConfirm(null);
+    } catch (error) {
+      console.error("Error deleting payment: ", error);
+      alert("Failed to delete payment. Please try again.");
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
   const getStatusBadge = (status) => {
     switch (status) {
       case "pending":
@@ -203,6 +219,34 @@ const AdminDashboard = () => {
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
+      {/* Delete Confirmation Modal */}
+      {showDeleteConfirm && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-gray-800 rounded-lg p-6 max-w-md w-full">
+            <h3 className="text-xl font-bold text-white mb-4">Confirm Deletion</h3>
+            <p className="text-gray-300 mb-6">
+              Are you sure you want to delete this transaction? This action cannot be undone.
+            </p>
+            <div className="flex justify-end space-x-3">
+              <button
+                onClick={() => setShowDeleteConfirm(null)}
+                className="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded text-white"
+                disabled={isUpdating}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => handleDeletePayment(showDeleteConfirm)}
+                className="px-4 py-2 bg-red-600 hover:bg-red-700 rounded text-white"
+                disabled={isUpdating}
+              >
+                {isUpdating ? "Deleting..." : "Delete"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="bg-gray-900 rounded-xl shadow-lg overflow-hidden">
         {/* Dashboard Header */}
         <div className="px-6 py-5 border-b border-gray-800 bg-gradient-to-r from-gray-800 to-gray-900">
@@ -439,40 +483,51 @@ const AdminDashboard = () => {
                       )}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      {isEditing === payment.id ? (
+                      <div className="flex flex-col space-y-2">
                         <div className="flex space-x-2">
-                          <button
-                            onClick={() => handleStatusUpdate(payment.id)}
-                            disabled={isUpdating}
-                            className={`inline-flex items-center px-3 py-1 rounded-md bg-blue-600 hover:bg-blue-700 text-white transition ${
-                              isUpdating ? "opacity-60 cursor-not-allowed" : ""
-                            }`}
-                          >
-                            Save
-                          </button>
-                          <button
-                            onClick={() => {
-                              setIsEditing(null);
-                              setEditStatus("");
-                            }}
-                            disabled={isUpdating}
-                            className="inline-flex items-center px-3 py-1 rounded-md bg-gray-700 hover:bg-gray-600 text-white transition"
-                          >
-                            Cancel
-                          </button>
+                          {isEditing === payment.id ? (
+                            <>
+                              <button
+                                onClick={() => handleStatusUpdate(payment.id)}
+                                disabled={isUpdating}
+                                className={`inline-flex items-center px-3 py-1 rounded-md bg-blue-600 hover:bg-blue-700 text-white transition ${
+                                  isUpdating ? "opacity-60 cursor-not-allowed" : ""
+                                }`}
+                              >
+                                Save
+                              </button>
+                              <button
+                                onClick={() => {
+                                  setIsEditing(null);
+                                  setEditStatus("");
+                                }}
+                                disabled={isUpdating}
+                                className="inline-flex items-center px-3 py-1 rounded-md bg-gray-700 hover:bg-gray-600 text-white transition"
+                              >
+                                Cancel
+                              </button>
+                            </>
+                          ) : (
+                            <button
+                              onClick={() => {
+                                setIsEditing(payment.id);
+                                setEditStatus(payment.transactionDetails.status || "");
+                              }}
+                              className="inline-flex items-center px-3 py-1 rounded-md bg-yellow-500 hover:bg-yellow-600 text-white transition"
+                            >
+                              <FiEdit className="mr-1" />
+                              Edit
+                            </button>
+                          )}
                         </div>
-                      ) : (
                         <button
-                          onClick={() => {
-                            setIsEditing(payment.id);
-                            setEditStatus(payment.transactionDetails.status || "");
-                          }}
-                          className="inline-flex items-center px-3 py-1 rounded-md bg-yellow-500 hover:bg-yellow-600 text-white transition"
+                          onClick={() => setShowDeleteConfirm(payment.id)}
+                          className="inline-flex items-center px-3 py-1 rounded-md bg-red-500 hover:bg-red-600 text-white transition"
                         >
-                          <FiEdit className="mr-1" />
-                          Edit
+                          <FiTrash2 className="mr-1" />
+                          Delete
                         </button>
-                      )}
+                      </div>
                     </td>
                   </tr>
                 ))}
