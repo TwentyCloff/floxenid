@@ -24,8 +24,24 @@ import {
   FiCalendar,
   FiTrash2,
 } from "react-icons/fi";
-import { FaDiscord, FaPaypal, FaCcVisa, FaCcMastercard, FaCcAmex } from "react-icons/fa";
-import { SiBankofamerica, SiBni, SiBri, SiMandiri, SiDana, SiOvo, SiGopay } from "react-icons/si";
+import { FiCreditCard } from "react-icons/fi";
+import {
+  FaDiscord,
+  FaPaypal,
+  FaCcVisa,
+  FaCcMastercard,
+  FaCcAmex,
+  FaUniversity,
+  FaWallet
+} from "react-icons/fa";
+import {
+  MdAccountBalance
+} from "react-icons/md";
+import {
+  RiBankLine,
+  RiWallet3Line,
+  RiMoneyDollarCircleLine
+} from "react-icons/ri";
 
 const AdminDashboard = () => {
   const [payments, setPayments] = useState([]);
@@ -185,20 +201,20 @@ const AdminDashboard = () => {
     
     const lowerMethod = method.toLowerCase();
     
-    if (lowerMethod.includes("visa")) return <FaCcVisa className="text-blue-600" />;
+    if (lowerMethod.includes("visa")) return <FaCcMastercard className="text-blue-600" />;
     if (lowerMethod.includes("mastercard")) return <FaCcMastercard className="text-red-500" />;
-    if (lowerMethod.includes("amex")) return <FaCcAmex className="text-blue-400" />;
-    if (lowerMethod.includes("paypal")) return <FaPaypal className="text-blue-500" />;
-    if (lowerMethod.includes("bca")) return <SiBni className="text-blue-800" />;
-    if (lowerMethod.includes("bni")) return <SiBni className="text-yellow-600" />;
-    if (lowerMethod.includes("bri")) return <SiBri className="text-blue-600" />;
-    if (lowerMethod.includes("mandiri")) return <SiMandiri className="text-red-600" />;
-    if (lowerMethod.includes("dana")) return <SiDana className="text-blue-500" />;
-    if (lowerMethod.includes("ovo")) return <SiOvo className="text-purple-600" />;
-    if (lowerMethod.includes("gopay")) return <SiGopay className="text-green-600" />;
-    if (lowerMethod.includes("bank")) return <SiBankofamerica className="text-blue-700" />;
+    if (lowerMethod.includes("amex")) return <FaCcMastercard className="text-blue-400" />;
+    if (lowerMethod.includes("paypal")) return <FaCcMastercard className="text-blue-500" />;
+    if (lowerMethod.includes("bca")) return <FaCcMastercard className="text-blue-800" />;
+    if (lowerMethod.includes("bni")) return <FaCcMastercard className="text-yellow-600" />;
+    if (lowerMethod.includes("bri")) return <FaCcMastercard className="text-blue-600" />;
+    if (lowerMethod.includes("mandiri")) return <FaCcMastercard className="text-red-600" />;
+    if (lowerMethod.includes("dana")) return <FaCcMastercard className="text-blue-500" />;
+    if (lowerMethod.includes("ovo")) return <FaCcMastercard className="text-purple-600" />;
+    if (lowerMethod.includes("gopay")) return <FaCcMastercard className="text-green-600" />;
+    if (lowerMethod.includes("bank")) return <FaCcMastercard className="text-blue-700" />;
     
-    return <FiCreditCard className="text-gray-400" />;
+    return <FaCcMastercard className="text-gray-400" />;
   };
 
   const formatDate = (date) => {
