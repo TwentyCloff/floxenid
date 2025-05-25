@@ -1,55 +1,6 @@
-import { useRef, useState, useEffect, useCallback } from "react";
+import { useRef, useState, useEffect } from "react";
 import { TiLocationArrow } from "react-icons/ti";
 import Section from "./Section";
-
-const BentoTilt = ({ children, className = "", disableTiltOnMobile = true }) => {
-  const [transformStyle, setTransformStyle] = useState("");
-  const itemRef = useRef(null);
-  const [isMobile, setIsMobile] = useState(false);
-
-  useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => {
-      window.removeEventListener('resize', checkMobile);
-    };
-  }, []);
-
-  const handleMouseMove = useCallback((e) => {
-    if (!itemRef.current || (isMobile && disableTiltOnMobile)) return;
-
-    const { left, top, width, height } = itemRef.current.getBoundingClientRect();
-    const relativeX = (e.clientX - left) / width;
-    const relativeY = (e.clientY - top) / height;
-    const tiltX = (relativeY - 0.5) * 3;
-    const tiltY = (relativeX - 0.5) * -3;
-    
-    setTransformStyle(
-      `perspective(700px) rotateX(${tiltX}deg) rotateY(${tiltY}deg) scale3d(0.99, 0.99, 0.99)`
-    );
-  }, [isMobile, disableTiltOnMobile]);
-
-  const handleMouseLeave = useCallback(() => {
-    setTransformStyle("");
-  }, []);
-
-  return (
-    <div
-      ref={itemRef}
-      className={`relative transition-all duration-300 ease-out will-change-transform overflow-hidden ${className}`}
-      onMouseMove={handleMouseMove}
-      onMouseLeave={handleMouseLeave}
-      style={{ transform: transformStyle }}
-      onTouchStart={() => isMobile && setTransformStyle("scale(0.97)")}
-      onTouchEnd={() => isMobile && setTransformStyle("")}
-    >
-      {children}
-    </div>
-  );
-};
 
 const VideoPlayer = ({ src }) => {
   const videoRef = useRef(null);
@@ -61,27 +12,20 @@ const VideoPlayer = ({ src }) => {
 
     const handleLoaded = () => {
       setIsLoaded(true);
-      video.play().catch(e => {
-        console.log("Autoplay prevented, trying muted play");
-        video.muted = true;
-        video.play();
-      });
-    };
-
-    const handleEnded = () => {
-      video.currentTime = 0;
+      // Set loop attribute and ensure preload
+      video.loop = true;
+      video.muted = true;
+      video.playsInline = true;
       video.play().catch(e => console.log("Autoplay prevented:", e));
     };
 
-    video.addEventListener('loadedmetadata', handleLoaded);
-    video.addEventListener('ended', handleEnded);
-    
+    // Preload video metadata
     video.preload = "auto";
-    video.load();
-
+    video.addEventListener('loadedmetadata', handleLoaded);
+    
+    // Cleanup
     return () => {
       video.removeEventListener('loadedmetadata', handleLoaded);
-      video.removeEventListener('ended', handleEnded);
     };
   }, [src]);
 
