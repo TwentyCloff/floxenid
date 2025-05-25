@@ -25,7 +25,7 @@ import {
   FiTrash2,
 } from "react-icons/fi";
 import { FaDiscord, FaPaypal, FaCcVisa, FaCcMastercard, FaCcAmex } from "react-icons/fa";
-import { SiBankofamerica, SiBca, SiBni, SiBri, SiMandiri, SiDana, SiOvo, SiGopay } from "react-icons/si";
+import { SiBankofamerica, SiBni, SiBri, SiMandiri, SiDana, SiOvo, SiGopay } from "react-icons/si";
 
 const AdminDashboard = () => {
   const [payments, setPayments] = useState([]);
@@ -189,7 +189,7 @@ const AdminDashboard = () => {
     if (lowerMethod.includes("mastercard")) return <FaCcMastercard className="text-red-500" />;
     if (lowerMethod.includes("amex")) return <FaCcAmex className="text-blue-400" />;
     if (lowerMethod.includes("paypal")) return <FaPaypal className="text-blue-500" />;
-    if (lowerMethod.includes("bca")) return <SiBca className="text-blue-800" />;
+    if (lowerMethod.includes("bca")) return <SiBni className="text-blue-800" />;
     if (lowerMethod.includes("bni")) return <SiBni className="text-yellow-600" />;
     if (lowerMethod.includes("bri")) return <SiBri className="text-blue-600" />;
     if (lowerMethod.includes("mandiri")) return <SiMandiri className="text-red-600" />;
