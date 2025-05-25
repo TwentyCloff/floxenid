@@ -150,7 +150,7 @@ const PricingList = () => {
                 </div>
               </div>
 
-              {/* Features - Mobile version shows feature names */}
+              {/* Features */}
               <div>
                 {features.map((feature, featureIndex) => (
                   <div 
@@ -184,8 +184,8 @@ const PricingList = () => {
                   <span className="flex items-center justify-center gap-2">
                     Get Started
                     <svg 
-                      className={`w-4 h-4 transition-transform duration-300 hover:translate-x-1 ${
-                        plan.recommended ? "text-white" : "text-purple-400 group-hover:text-white"
+                      className={`w-4 h-4 ${
+                        plan.recommended ? "text-white" : "text-purple-400"
                       }`} 
                       fill="none" 
                       stroke="currentColor" 
