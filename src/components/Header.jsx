@@ -56,38 +56,54 @@ const Header = () => {
     navigate("/dashboard");
   };
 
-  // Premium Button Component
-  const FuturisticButton = ({ children, onClick, variant = "primary" }) => {
+  // Elegant Button Component
+  const ElegantButton = ({ children, onClick, variant = "primary" }) => {
+    const baseStyle = `
+      relative overflow-hidden
+      px-6 py-2.5 rounded-md
+      text-sm font-medium
+      transition-all duration-200
+      border
+      backdrop-blur-sm
+      hover:shadow-lg
+      active:scale-[0.98]
+    `;
+
     const variants = {
-      primary: "bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700",
-      secondary: "bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700",
-      danger: "bg-gradient-to-r from-red-500 to-orange-600 hover:from-red-600 hover:to-orange-700",
-      dashboard: "bg-gradient-to-r from-indigo-500 to-violet-600 hover:from-indigo-600 hover:to-violet-700"
+      primary: `
+        bg-[#1a0d2b] hover:bg-[#231538]
+        text-purple-100 hover:text-white
+        border-purple-900/50 hover:border-purple-500/30
+        shadow-[inset_0_1px_0_0_rgba(148,102,255,0.2)]
+      `,
+      secondary: `
+        bg-[#0f0918] hover:bg-[#1a1126]
+        text-purple-200 hover:text-purple-50
+        border-purple-800/30 hover:border-purple-500/20
+        shadow-[inset_0_1px_0_0_rgba(148,102,255,0.1)]
+      `,
+      dashboard: `
+        bg-[#160e29] hover:bg-[#1f1638]
+        text-indigo-100 hover:text-indigo-50
+        border-indigo-900/50 hover:border-indigo-500/30
+        shadow-[inset_0_1px_0_0_rgba(99,102,241,0.2)]
+      `,
+      logout: `
+        bg-[#180a1a] hover:bg-[#231025]
+        text-pink-100 hover:text-pink-50
+        border-pink-900/50 hover:border-pink-500/30
+        shadow-[inset_0_1px_0_0_rgba(236,72,153,0.2)]
+      `
     };
 
     return (
       <button
         onClick={onClick}
-        className={`
-          relative overflow-hidden
-          px-6 py-2.5 rounded-lg
-          text-sm font-medium text-white
-          ${variants[variant]}
-          shadow-lg
-          transition-all duration-200
-          hover:shadow-xl
-          hover:scale-[1.02]
-          active:scale-95
-          before:absolute before:inset-0
-          before:bg-white before:opacity-0
-          before:transition-opacity before:duration-300
-          hover:before:opacity-10
-          border border-white/10
-          backdrop-blur-sm
-        `}
+        className={`${baseStyle} ${variants[variant]}`}
       >
         <span className="relative z-10 flex items-center justify-center gap-2">
           {children}
+          <span className="absolute inset-0 bg-gradient-to-b from-white/5 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300" />
         </span>
       </button>
     );
@@ -102,15 +118,15 @@ const Header = () => {
       <div
         className={`fixed top-0 left-0 w-full z-50 transition-colors duration-300 ${
           openNavigation
-            ? "bg-black backdrop-blur-md"
-            : "bg-black/20 backdrop-blur-md"
+            ? "bg-[#0a0614] backdrop-blur-md"
+            : "bg-[#0a0614]/90 backdrop-blur-md"
         }`}
         style={{ height: "68px" }}
       >
         <div className="flex items-center px-5 lg:px-7.5 xl:px-10 py-3 h-full">
           {/* Logo */}
           <a
-            className="block w-auto xl:mr-8 text-3xl font-bold bg-gradient-to-r from-purple-500 to-indigo-500 text-transparent bg-clip-text"
+            className="block w-auto xl:mr-8 text-3xl font-bold bg-gradient-to-r from-purple-300 to-purple-100 text-transparent bg-clip-text"
             href="#hero"
           >
             Qarvo
@@ -120,7 +136,7 @@ const Header = () => {
           <nav
             className={`${
               openNavigation ? "flex" : "hidden"
-            } fixed top-[68px] left-0 right-0 bottom-0 bg-black lg:static lg:flex lg:mx-auto lg:bg-transparent`}
+            } fixed top-[68px] left-0 right-0 bottom-0 bg-[#0a0614] lg:static lg:flex lg:mx-auto lg:bg-transparent`}
           >
             <div className="relative z-2 flex flex-col items-center justify-center m-auto lg:flex-row">
               {navigation.map((item) => (
@@ -130,38 +146,38 @@ const Header = () => {
                   target={item.external ? "_blank" : "_self"}
                   rel={item.external ? "noreferrer noopener" : undefined}
                   onClick={handleClick}
-                  className={`block relative font-code text-2xl uppercase text-n-1 transition-colors hover:text-color-1 ${
+                  className={`block relative font-code text-2xl uppercase text-purple-100 transition-colors hover:text-white ${
                     item.onlyMobile ? "lg:hidden" : ""
                   } px-6 py-6 md:py-8 lg:mr-0.25 lg:text-xs lg:font-semibold ${
                     item.url === pathname.hash
-                      ? "z-2 lg:text-n-1"
-                      : "lg:text-n-1/50"
-                  } lg:leading-5 lg:hover:text-n-1 xl:px-12`}
+                      ? "z-2 lg:text-white"
+                      : "lg:text-purple-100/70"
+                  } lg:leading-5 lg:hover:text-white xl:px-12`}
                 >
                   {item.title}
                 </a>
               ))}
 
               {/* Mobile buttons */}
-              <div className="flex flex-col lg:hidden items-center gap-4 mt-4">
+              <div className="flex flex-col lg:hidden items-center gap-3 mt-4">
                 {user && (
-                  <FuturisticButton onClick={goToDashboard} variant="dashboard">
+                  <ElegantButton onClick={goToDashboard} variant="dashboard">
                     Dashboard
-                  </FuturisticButton>
+                  </ElegantButton>
                 )}
                 {!user ? (
                   <>
-                    <FuturisticButton onClick={handleLogin} variant="primary">
+                    <ElegantButton onClick={handleLogin} variant="primary">
                       Sign In
-                    </FuturisticButton>
-                    <FuturisticButton onClick={handleSignUp} variant="secondary">
+                    </ElegantButton>
+                    <ElegantButton onClick={handleSignUp} variant="secondary">
                       Sign Up
-                    </FuturisticButton>
+                    </ElegantButton>
                   </>
                 ) : (
-                  <FuturisticButton onClick={handleLogout} variant="danger">
+                  <ElegantButton onClick={handleLogout} variant="logout">
                     Logout
-                  </FuturisticButton>
+                  </ElegantButton>
                 )}
               </div>
             </div>
@@ -170,32 +186,32 @@ const Header = () => {
           </nav>
 
           {/* Desktop buttons */}
-          <div className="hidden lg:flex items-center gap-4 ml-auto">
+          <div className="hidden lg:flex items-center gap-3 ml-auto">
             {user && (
-              <FuturisticButton onClick={goToDashboard} variant="dashboard">
+              <ElegantButton onClick={goToDashboard} variant="dashboard">
                 Dashboard
-              </FuturisticButton>
+              </ElegantButton>
             )}
             {!user ? (
               <>
-                <FuturisticButton onClick={handleLogin} variant="primary">
+                <ElegantButton onClick={handleLogin} variant="primary">
                   Sign In
-                </FuturisticButton>
-                <FuturisticButton onClick={handleSignUp} variant="secondary">
+                </ElegantButton>
+                <ElegantButton onClick={handleSignUp} variant="secondary">
                   Sign Up
-                </FuturisticButton>
+                </ElegantButton>
               </>
             ) : (
-              <FuturisticButton onClick={handleLogout} variant="danger">
+              <ElegantButton onClick={handleLogout} variant="logout">
                 Logout
-              </FuturisticButton>
+              </ElegantButton>
             )}
           </div>
 
           {/* Mobile menu button */}
           <button
             onClick={toggleNavigation}
-            className="ml-auto lg:hidden p-3 rounded-lg hover:bg-white/10 transition-colors"
+            className="ml-auto lg:hidden p-3 rounded-md hover:bg-purple-900/20 transition-colors"
           >
             <MenuSvg openNavigation={openNavigation} />
           </button>
