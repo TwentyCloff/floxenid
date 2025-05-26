@@ -64,7 +64,7 @@ const Footer = () => {
           <ul className="space-y-2 text-sm text-gray-300">
             <li>Email: <a href="mailto:info@qarvo.com" className="hover:text-purple-500">info@qarvo.com</a></li>
             <li>Phone: +1 234 567 890</li>
-            <li>Location: Pontianak, Indonesia</li>
+            <li>Location: Bali, Indonesia</li>
           </ul>
         </div>
       </div>
