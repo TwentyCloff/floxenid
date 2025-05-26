@@ -1,57 +1,92 @@
 import { socials } from "../constants";
+import Section from "./Section";
 
 const Footer = () => {
-  const currentYear = new Date().getFullYear();
-
   return (
-    <footer className="bg-black text-white font-sans">
-      <div className="max-w-7xl mx-auto px-6 py-12 md:py-16 flex flex-col gap-12">
-        {/* Grid Layout */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {/* Brand Info */}
-          <div className="flex flex-col gap-4">
-            <h1 className="text-3xl font-bold text-white tracking-wide">Venera</h1>
-            <p className="text-gray-400 leading-relaxed">
-              Elevate your experience with modern solutions for web, gaming, and digital automation.
-            </p>
-          </div>
-
-          {/* Navigation */}
-          <div className="flex flex-col gap-2">
-            <h2 className="text-xl font-semibold mb-2">Explore</h2>
-            <ul className="text-gray-400 space-y-1">
-              <li><a href="#home" className="hover:text-white transition-all duration-300">Home</a></li>
-              <li><a href="#about" className="hover:text-white transition-all duration-300">About</a></li>
-              <li><a href="#products" className="hover:text-white transition-all duration-300">Products</a></li>
-              <li><a href="#contact" className="hover:text-white transition-all duration-300">Contact</a></li>
-            </ul>
-          </div>
-
-          {/* Socials */}
-          <div className="flex flex-col gap-2">
-            <h2 className="text-xl font-semibold mb-2">Connect With Us</h2>
-            <div className="flex gap-4 items-center">
-              {socials.map((social, index) => (
+    <Section crosses className="!px-0 !py-0">
+      <footer className="bg-n-8 text-n-1 py-12 px-4 md:px-8">
+        <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          {/* About Section */}
+          <div className="footer-about">
+            <div className="text-2xl font-bold text-color-1 mb-4">Qarvo</div>
+            <p className="text-n-3 mb-6">Creating innovative products for you.</p>
+            <div className="flex gap-4">
+              {socials.map((social) => (
                 <a
-                  key={index}
-                  href={social.link}
+                  href={social.url}
+                  key={social.id}
                   target="_blank"
-                  rel="noopener noreferrer"
-                  className="hover:scale-110 transition-transform duration-300"
+                  rel="noreferrer noopener"
+                  aria-label={social.title}
+                  className="flex items-center justify-center w-10 h-10 bg-n-7 rounded-full transition-colors hover:bg-color-1"
                 >
-                  <img src={social.iconUrl} alt={social.name} className="w-6 h-6" />
+                  <img
+                    src={social.iconUrl}
+                    alt={social.title}
+                    width={16}
+                    height={16}
+                    className="filter brightness-0 invert"
+                  />
                 </a>
               ))}
             </div>
           </div>
+          
+          {/* Quick Links */}
+          <div className="footer-links">
+            <h3 className="text-lg font-semibold text-color-1 mb-4">Quick Links</h3>
+            <ul className="space-y-2">
+              <li><a href="#" className="text-n-3 hover:text-color-1 transition-colors">Home</a></li>
+              <li><a href="#" className="text-n-3 hover:text-color-1 transition-colors">How to use</a></li>
+              <li><a href="#" className="text-n-3 hover:text-color-1 transition-colors">Pricing</a></li>
+              <li><a href="#" className="text-n-3 hover:text-color-1 transition-colors">RoadMap</a></li>
+            </ul>
+          </div>
+          
+          {/* Resources */}
+          <div className="footer-links">
+            <h3 className="text-lg font-semibold text-color-1 mb-4">Resources</h3>
+            <ul className="space-y-2">
+              <li><a href="#" className="text-n-3 hover:text-color-1 transition-colors">Blog</a></li>
+              <li><a href="#" className="text-n-3 hover:text-color-1 transition-colors">Documentation</a></li>
+              <li><a href="#" className="text-n-3 hover:text-color-1 transition-colors">Support</a></li>
+              <li><a href="#" className="text-n-3 hover:text-color-1 transition-colors">FAQ</a></li>
+            </ul>
+          </div>
+          
+          {/* Contact */}
+          <div className="footer-links">
+            <h3 className="text-lg font-semibold text-color-1 mb-4">Contact</h3>
+            <ul className="space-y-2">
+              <li>
+                <a href="mailto:Qarvo@gmail.com" className="text-n-3 hover:text-color-1 transition-colors">
+                  Qarvo@gmail.com
+                </a>
+              </li>
+              <li>
+                <a href="tel:+62082155789956" className="text-n-3 hover:text-color-1 transition-colors">
+                  +62-0821-5578-9956
+                </a>
+              </li>
+              <li className="text-n-3">Asia</li>
+              <li className="text-n-3">Jakarta, Indonesia</li>
+            </ul>
+          </div>
         </div>
-
-        {/* Divider */}
-        <div className="border-t border-gray-800 pt-6 flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-sm text-gray-500">&copy; {currentYear} Qarvo Inc. All rights reserved.</p>
+        
+        {/* Copyright */}
+        <div className="max-w-7xl mx-auto mt-12 pt-6 border-t border-n-6 text-center text-n-4">
+          <p>
+            <span className="font-semibold">&copy; {new Date().getFullYear()} Qarvo</span>. All rights reserved.
+            <span className="block md:inline-block md:ml-4 mt-2 md:mt-0">
+              <a href="#" className="hover:text-color-1 transition-colors">Privacy Policy</a> | 
+              <a href="#" className="hover:text-color-1 transition-colors ml-2">Terms of Service</a> | 
+              <a href="#" className="hover:text-color-1 transition-colors ml-2">Cookie Policy</a>
+            </span>
+          </p>
         </div>
-      </div>
-    </footer>
+      </footer>
+    </Section>
   );
 };
 
