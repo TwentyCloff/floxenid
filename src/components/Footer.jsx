@@ -1,79 +1,57 @@
 import { socials } from "../constants";
-import Section from "./Section";
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
 
   return (
-    <Section crosses className="!px-0 !py-16 bg-[#111] text-white font-sans">
-      <div className="container grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 max-w-screen-xl mx-auto px-4">
-        {/* Logo & About */}
-        <div>
-          <div className="text-2xl font-semibold text-purple-500 mb-3">Qarvo</div>
-          <p className="text-gray-400 text-sm leading-relaxed">
-            Creating products for you.
-          </p>
-          {/* Social Icons */}
-          <div className="flex gap-4 mt-5">
-            {socials.map((social) => (
-              <a
-                key={social.id}
-                href={social.url}
-                target="_blank"
-                rel="noreferrer noopener"
-                aria-label={social.title}
-                className="w-10 h-10 flex items-center justify-center rounded-full bg-[#222] hover:bg-[#333] transition-colors"
-              >
-                <img
-                  src={social.iconUrl}
-                  alt={social.title}
-                  className="w-5 h-5"
-                />
-              </a>
-            ))}
+    <footer className="bg-black text-white font-sans">
+      <div className="max-w-7xl mx-auto px-6 py-12 md:py-16 flex flex-col gap-12">
+        {/* Grid Layout */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {/* Brand Info */}
+          <div className="flex flex-col gap-4">
+            <h1 className="text-3xl font-bold text-white tracking-wide">Venera</h1>
+            <p className="text-gray-400 leading-relaxed">
+              Elevate your experience with modern solutions for web, gaming, and digital automation.
+            </p>
+          </div>
+
+          {/* Navigation */}
+          <div className="flex flex-col gap-2">
+            <h2 className="text-xl font-semibold mb-2">Explore</h2>
+            <ul className="text-gray-400 space-y-1">
+              <li><a href="#home" className="hover:text-white transition-all duration-300">Home</a></li>
+              <li><a href="#about" className="hover:text-white transition-all duration-300">About</a></li>
+              <li><a href="#products" className="hover:text-white transition-all duration-300">Products</a></li>
+              <li><a href="#contact" className="hover:text-white transition-all duration-300">Contact</a></li>
+            </ul>
+          </div>
+
+          {/* Socials */}
+          <div className="flex flex-col gap-2">
+            <h2 className="text-xl font-semibold mb-2">Connect With Us</h2>
+            <div className="flex gap-4 items-center">
+              {socials.map((social, index) => (
+                <a
+                  key={index}
+                  href={social.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:scale-110 transition-transform duration-300"
+                >
+                  <img src={social.iconUrl} alt={social.name} className="w-6 h-6" />
+                </a>
+              ))}
+            </div>
           </div>
         </div>
 
-        {/* Links Section Example (Optional) */}
-        <div className="footer-links">
-          <h3 className="text-purple-500 text-base font-semibold mb-3">
-            Company
-          </h3>
-          <ul className="space-y-2 text-sm text-gray-300">
-            <li><a href="#" className="hover:text-purple-500 transition-colors">About Us</a></li>
-            <li><a href="#" className="hover:text-purple-500 transition-colors">Careers</a></li>
-            <li><a href="#" className="hover:text-purple-500 transition-colors">Blog</a></li>
-          </ul>
-        </div>
-
-        <div className="footer-links">
-          <h3 className="text-purple-500 text-base font-semibold mb-3">
-            Support
-          </h3>
-          <ul className="space-y-2 text-sm text-gray-300">
-            <li><a href="#" className="hover:text-purple-500 transition-colors">Help Center</a></li>
-            <li><a href="#" className="hover:text-purple-500 transition-colors">Privacy Policy</a></li>
-            <li><a href="#" className="hover:text-purple-500 transition-colors">Terms of Service</a></li>
-          </ul>
-        </div>
-
-        <div className="footer-links">
-          <h3 className="text-purple-500 text-base font-semibold mb-3">
-            Contact
-          </h3>
-          <ul className="space-y-2 text-sm text-gray-300">
-            <li>Email: <a href="mailto:info@qarvo.com" className="hover:text-purple-500">info@qarvo.com</a></li>
-            <li>Phone: +1 234 567 890</li>
-            <li>Location: Bali, Indonesia</li>
-          </ul>
+        {/* Divider */}
+        <div className="border-t border-gray-800 pt-6 flex flex-col md:flex-row justify-between items-center gap-4">
+          <p className="text-sm text-gray-500">&copy; {currentYear} Qarvo Inc. All rights reserved.</p>
         </div>
       </div>
-
-      {/* Copyright */}
-      <div className="border-t border-gray-800 mt-12 pt-6 text-center text-sm text-gray-500">
-        &copy; <span className="text-purple-500 font-medium">Qarvo</span> {currentYear}. All rights reserved.
-      </div>
-    </Section>
+    </footer>
   );
 };
 
