@@ -4,12 +4,12 @@ import Section from "./Section";
 const Footer = () => {
   return (
     <Section crosses className="!px-0 !py-0">
-      <footer className="bg-n-8 text-n-1 py-12 px-4 md:px-8">
+      <footer className="bg-black text-white py-12 px-4 md:px-8">
         <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* About Section */}
           <div className="footer-about">
             <div className="text-2xl font-bold text-color-1 mb-4">Qarvo</div>
-            <p className="text-n-3 mb-6">Creating innovative products for you.</p>
+            <p className="text-white mb-6">Creating innovative products for you.</p>
             <div className="flex gap-4">
               {socials.map((social) => (
                 <a
@@ -18,7 +18,7 @@ const Footer = () => {
                   target="_blank"
                   rel="noreferrer noopener"
                   aria-label={social.title}
-                  className="flex items-center justify-center w-10 h-10 bg-n-7 rounded-full transition-colors hover:bg-color-1"
+                  className="flex items-center justify-center w-10 h-10 bg-gray-900 rounded-full transition-colors hover:bg-color-1"
                 >
                   <img
                     src={social.iconUrl}
@@ -36,10 +36,10 @@ const Footer = () => {
           <div className="footer-links">
             <h3 className="text-lg font-semibold text-color-1 mb-4">Quick Links</h3>
             <ul className="space-y-2">
-              <li><a href="#" className="text-n-3 hover:text-color-1 transition-colors">Home</a></li>
-              <li><a href="#" className="text-n-3 hover:text-color-1 transition-colors">How to use</a></li>
-              <li><a href="#" className="text-n-3 hover:text-color-1 transition-colors">Pricing</a></li>
-              <li><a href="#" className="text-n-3 hover:text-color-1 transition-colors">RoadMap</a></li>
+              <li><a href="#" className="text-white hover:text-color-1 transition-colors">Home</a></li>
+              <li><a href="#" className="text-white hover:text-color-1 transition-colors">How to use</a></li>
+              <li><a href="#" className="text-white hover:text-color-1 transition-colors">Pricing</a></li>
+              <li><a href="#" className="text-white hover:text-color-1 transition-colors">RoadMap</a></li>
             </ul>
           </div>
           
@@ -47,10 +47,10 @@ const Footer = () => {
           <div className="footer-links">
             <h3 className="text-lg font-semibold text-color-1 mb-4">Resources</h3>
             <ul className="space-y-2">
-              <li><a href="#" className="text-n-3 hover:text-color-1 transition-colors">Blog</a></li>
-              <li><a href="#" className="text-n-3 hover:text-color-1 transition-colors">Documentation</a></li>
-              <li><a href="#" className="text-n-3 hover:text-color-1 transition-colors">Support</a></li>
-              <li><a href="#" className="text-n-3 hover:text-color-1 transition-colors">FAQ</a></li>
+              <li><a href="#" className="text-white hover:text-color-1 transition-colors">Blog</a></li>
+              <li><a href="#" className="text-white hover:text-color-1 transition-colors">Documentation</a></li>
+              <li><a href="#" className="text-white hover:text-color-1 transition-colors">Support</a></li>
+              <li><a href="#" className="text-white hover:text-color-1 transition-colors">FAQ</a></li>
             </ul>
           </div>
           
@@ -59,23 +59,23 @@ const Footer = () => {
             <h3 className="text-lg font-semibold text-color-1 mb-4">Contact</h3>
             <ul className="space-y-2">
               <li>
-                <a href="mailto:Qarvo@gmail.com" className="text-n-3 hover:text-color-1 transition-colors">
+                <a href="mailto:Qarvo@gmail.com" className="text-white hover:text-color-1 transition-colors">
                   Qarvo@gmail.com
                 </a>
               </li>
               <li>
-                <a href="tel:+62082155789956" className="text-n-3 hover:text-color-1 transition-colors">
+                <a href="tel:+62082155789956" className="text-white hover:text-color-1 transition-colors">
                   +62-0821-5578-9956
                 </a>
               </li>
-              <li className="text-n-3">Asia</li>
-              <li className="text-n-3">Jakarta, Indonesia</li>
+              <li className="text-white">Asia</li>
+              <li className="text-white">Jakarta, Indonesia</li>
             </ul>
           </div>
         </div>
         
         {/* Copyright */}
-        <div className="max-w-7xl mx-auto mt-12 pt-6 border-t border-n-6 text-center text-n-4">
+        <div className="max-w-7xl mx-auto mt-12 pt-6 border-t border-gray-800 text-center text-white">
           <p>
             <span className="font-semibold">&copy; {new Date().getFullYear()} Qarvo</span>. All rights reserved.
             <span className="block md:inline-block md:ml-4 mt-2 md:mt-0">
