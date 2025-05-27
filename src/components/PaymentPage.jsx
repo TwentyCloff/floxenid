@@ -41,6 +41,7 @@ const PaymentPage = () => {
   const [invoiceNumber, setInvoiceNumber] = useState("");
   const [userHasPlan, setUserHasPlan] = useState(false);
   const [showPaymentDropdown, setShowPaymentDropdown] = useState(false);
+  const [showPaymentDetails, setShowPaymentDetails] = useState(false);
   
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
@@ -57,8 +58,8 @@ const PaymentPage = () => {
       instructions: "Scan QR code to complete payment",
       account: "QRIS",
       note: "Instant processing • No additional fees",
-      color: "from-emerald-500 to-teal-600",
-      borderColor: "border-emerald-500/30",
+      color: "from-purple-500 to-indigo-600",
+      borderColor: "border-purple-500/30",
       logo: qrisByr,
       accountName: "AUTOMATIC PROCESSING"
     },
@@ -68,8 +69,8 @@ const PaymentPage = () => {
       instructions: "Transfer to following number",
       account: "08123456789",
       note: "Screenshot required • Processing time 5-15 minutes",
-      color: "from-blue-500 to-indigo-600",
-      borderColor: "border-blue-500/30",
+      color: "from-violet-500 to-purple-600",
+      borderColor: "border-violet-500/30",
       logo: gopayLogo,
       accountName: "CUSTOMER SERVICE"
     },
@@ -79,8 +80,8 @@ const PaymentPage = () => {
       instructions: "Transfer to following number",
       account: "08198765432",
       note: "Screenshot required • Processing time 5-15 minutes",
-      color: "from-purple-500 to-fuchsia-600",
-      borderColor: "border-purple-500/30",
+      color: "from-purple-600 to-indigo-700",
+      borderColor: "border-purple-600/30",
       logo: danaLogo,
       accountName: "CUSTOMER SERVICE"
     },
@@ -90,8 +91,8 @@ const PaymentPage = () => {
       instructions: "Transfer to following number",
       account: "08123456789",
       note: "Screenshot required • Processing time 5-15 minutes",
-      color: "from-violet-500 to-purple-600",
-      borderColor: "border-violet-500/30",
+      color: "from-indigo-500 to-purple-600",
+      borderColor: "border-indigo-500/30",
       logo: ovoLogo,
       accountName: "CUSTOMER SERVICE"
     },
@@ -101,8 +102,8 @@ const PaymentPage = () => {
       instructions: "Transfer to following number",
       account: "08198765432",
       note: "Screenshot required • Processing time 5-15 minutes",
-      color: "from-orange-500 to-red-600",
-      borderColor: "border-orange-500/30",
+      color: "from-pink-500 to-rose-600",
+      borderColor: "border-pink-500/30",
       logo: shopeePayLogo,
       accountName: "CUSTOMER SERVICE"
     },
@@ -112,8 +113,8 @@ const PaymentPage = () => {
       instructions: "Transfer to following number",
       account: "08123456789",
       note: "Screenshot required • Processing time 5-15 minutes",
-      color: "from-green-500 to-emerald-600",
-      borderColor: "border-green-500/30",
+      color: "from-blue-500 to-indigo-600",
+      borderColor: "border-blue-500/30",
       logo: linkAjaLogo,
       accountName: "CUSTOMER SERVICE"
     },
@@ -123,8 +124,8 @@ const PaymentPage = () => {
       instructions: "Transfer to following account",
       account: "1234567890",
       note: "Screenshot required • Processing time 5-15 minutes",
-      color: "from-blue-600 to-blue-700",
-      borderColor: "border-blue-600/30",
+      color: "from-indigo-600 to-blue-700",
+      borderColor: "border-indigo-600/30",
       logo: bcaLogo,
       accountName: "CUSTOMER SERVICE"
     },
@@ -134,8 +135,8 @@ const PaymentPage = () => {
       instructions: "Transfer to following account",
       account: "9876543210",
       note: "Screenshot required • Processing time 5-15 minutes",
-      color: "from-teal-500 to-cyan-600",
-      borderColor: "border-teal-500/30",
+      color: "from-purple-500 to-indigo-600",
+      borderColor: "border-purple-500/30",
       logo: jagoLogo,
       accountName: "CUSTOMER SERVICE"
     }
@@ -430,11 +431,11 @@ const PaymentPage = () => {
   if (paymentComplete) {
     return (
       <div className="fixed inset-0 bg-gray-900/90 backdrop-blur-sm flex items-center justify-center p-4 z-[9999]">
-        <div className="max-w-md w-full bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-8 border border-emerald-500/20 shadow-2xl">
+        <div className="max-w-md w-full bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-8 border border-purple-500/20 shadow-2xl">
           <div className="flex flex-col items-center text-center space-y-6">
             <div className="relative">
-              <div className="absolute inset-0 bg-emerald-500/20 blur-xl rounded-full"></div>
-              <div className="relative w-24 h-24 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-full flex items-center justify-center shadow-lg">
+              <div className="absolute inset-0 bg-purple-500/20 blur-xl rounded-full"></div>
+              <div className="relative w-24 h-24 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-full flex items-center justify-center shadow-lg">
                 <FiCheck className="w-12 h-12 text-white" />
               </div>
             </div>
@@ -444,19 +445,19 @@ const PaymentPage = () => {
                 Payment Successful
               </h2>
               <p className="text-gray-400">
-                Invoice: <span className="font-mono text-emerald-400">{invoiceNumber}</span>
+                Invoice: <span className="font-mono text-purple-400">{invoiceNumber}</span>
               </p>
             </div>
             
             <div className="w-full bg-gray-700/30 rounded-lg p-4 border border-gray-600">
               <p className="text-gray-300">
-                Thank you for purchasing <span className="text-emerald-300 font-medium">{plan}</span>.
+                Thank you for purchasing <span className="text-purple-300 font-medium">{plan}</span>.
               </p>
             </div>
             
             <Button 
               onClick={() => navigate("/dashboard")}
-              className="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700"
+              className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700"
             >
               Go to Dashboard
             </Button>
@@ -469,11 +470,11 @@ const PaymentPage = () => {
   if (paymentPending) {
     return (
       <div className="fixed inset-0 bg-gray-900/90 backdrop-blur-sm flex items-center justify-center p-4 z-[9999]">
-        <div className="max-w-md w-full bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-8 border border-yellow-500/20 shadow-2xl">
+        <div className="max-w-md w-full bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-8 border border-purple-500/20 shadow-2xl">
           <div className="flex flex-col items-center text-center space-y-6">
             <div className="relative">
-              <div className="absolute inset-0 bg-yellow-500/20 blur-xl rounded-full animate-pulse"></div>
-              <FiLoader className="relative w-20 h-20 text-yellow-400 animate-spin" />
+              <div className="absolute inset-0 bg-purple-500/20 blur-xl rounded-full animate-pulse"></div>
+              <FiLoader className="relative w-20 h-20 text-purple-400 animate-spin" />
             </div>
             
             <div className="space-y-2">
@@ -485,36 +486,12 @@ const PaymentPage = () => {
               </p>
             </div>
             
-            {paymentMethod === "qris" && (
-              <div className="w-full bg-gray-700/30 rounded-lg p-4 flex flex-col items-center">
-                <div className="w-48 h-48 bg-white rounded-lg p-3 mb-3">
-                  <img src={qrisByr} alt="QRIS Payment" className="w-full h-full object-contain" />
-                </div>
-              </div>
-            )}
-            
-            <div className="w-full bg-gray-700/30 rounded-lg p-4 border border-gray-600 text-left">
-              <div className="space-y-2">
-                <div className="flex justify-between">
-                  <span className="text-gray-400">Product:</span>
-                  <span className="text-white">{plan}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-400">Payment Method:</span>
-                  <span className="text-white">{paymentMethods[paymentMethod].name}</span>
-                </div>
-                {paymentMethod !== "qris" && (
-                  <div className="flex justify-between">
-                    <span className="text-gray-400">Payment Number:</span>
-                    <span className="text-white font-mono">{paymentMethods[paymentMethod].account}</span>
-                  </div>
-                )}
-                <div className="flex justify-between">
-                  <span className="text-gray-400">Total Amount:</span>
-                  <span className="text-white font-bold">Rp{(Number(price) + serviceFee).toLocaleString('id-ID')}</span>
-                </div>
-              </div>
-            </div>
+            <Button
+              onClick={() => setShowPaymentDetails(true)}
+              className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700"
+            >
+              Show Payment Details
+            </Button>
             
             <p className="text-xs text-gray-500 font-mono tracking-wider">
               STATUS: PENDING • WAITING VERIFICATION
@@ -528,6 +505,94 @@ const PaymentPage = () => {
             </Button>
           </div>
         </div>
+
+        {/* Payment Details Modal */}
+        {showPaymentDetails && (
+          <div className="fixed inset-0 z-[99999] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+            <div className="max-w-md w-full bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-6 border border-purple-500/30 shadow-2xl">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-xl font-bold text-white">
+                  {paymentMethods[paymentMethod].name} Payment
+                </h3>
+                <button 
+                  onClick={() => setShowPaymentDetails(false)}
+                  className="text-gray-400 hover:text-white"
+                >
+                  <FiX className="w-6 h-6" />
+                </button>
+              </div>
+              
+              <div className="space-y-4">
+                {paymentMethod === "qris" ? (
+                  <div className="flex flex-col items-center py-4">
+                    <div className="w-52 h-52 bg-white rounded-xl flex items-center justify-center mb-4 p-4 shadow-lg">
+                      <img src={qrisByr} alt="QRIS Payment" className="w-full h-full object-contain" />
+                    </div>
+                    <p className="text-gray-300 text-center">
+                      Scan this QR code using your mobile banking app
+                    </p>
+                  </div>
+                ) : (
+                  <div className="bg-gray-700/30 rounded-lg p-4 border border-gray-600">
+                    <div className="flex justify-between items-center mb-3">
+                      <div>
+                        <p className="text-gray-400 text-sm uppercase tracking-wider">
+                          {paymentMethods[paymentMethod].name} Number
+                        </p>
+                        <p className="text-lg font-bold text-white font-mono tracking-wide mt-1">
+                          {paymentMethods[paymentMethod].account}
+                        </p>
+                      </div>
+                      <button 
+                        onClick={() => copyToClipboard(paymentMethods[paymentMethod].account, paymentMethod)}
+                        className="p-2 rounded-lg bg-gray-600 hover:bg-gray-500 text-gray-300 hover:text-white transition-colors border border-gray-500"
+                        title="Copy number"
+                      >
+                        {copiedIndex === paymentMethod ? (
+                          <FiCheck className="w-5 h-5 text-purple-400" />
+                        ) : (
+                          <FiCopy className="w-5 h-5" />
+                        )}
+                      </button>
+                    </div>
+                    <p className="text-gray-400 text-sm">
+                      Atas Nama: {paymentMethods[paymentMethod].accountName}
+                    </p>
+                  </div>
+                )}
+                
+                <div className="bg-gray-700/30 rounded-lg p-4 border border-gray-600">
+                  <h4 className="text-lg font-bold text-white mb-3 flex items-center">
+                    <FiCreditCard className="text-purple-400 mr-2" />
+                    Order Summary
+                  </h4>
+                  <div className="space-y-3">
+                    <div className="flex justify-between">
+                      <span className="text-gray-400">Product</span>
+                      <span className="text-white font-medium">{plan}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-400">Service Fee</span>
+                      <span className="text-white font-medium">Rp{serviceFee.toLocaleString('id-ID')}</span>
+                    </div>
+                    <div className="border-t border-gray-600 my-2"></div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-400">Total Payment</span>
+                      <span className="text-white font-bold text-lg">Rp{(Number(price) + serviceFee).toLocaleString('id-ID')}</span>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="bg-purple-500/10 rounded-lg p-4 border border-purple-500/20 flex items-start">
+                  <FiMessageSquare className="flex-shrink-0 mt-0.5 mr-3 text-purple-400" />
+                  <p className="text-purple-300 text-sm">
+                    {paymentMethods[paymentMethod].note}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     );
   }
@@ -535,11 +600,11 @@ const PaymentPage = () => {
   if (paymentDeclined) {
     return (
       <div className="fixed inset-0 bg-gray-900/90 backdrop-blur-sm flex items-center justify-center p-4 z-[9999]">
-        <div className="max-w-md w-full bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-8 border border-red-500/20 shadow-2xl">
+        <div className="max-w-md w-full bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-8 border border-purple-500/20 shadow-2xl">
           <div className="flex flex-col items-center text-center space-y-6">
             <div className="relative">
-              <div className="absolute inset-0 bg-red-500/20 blur-xl rounded-full"></div>
-              <div className="relative w-24 h-24 bg-gradient-to-br from-red-500 to-pink-600 rounded-full flex items-center justify-center shadow-lg">
+              <div className="absolute inset-0 bg-purple-500/20 blur-xl rounded-full"></div>
+              <div className="relative w-24 h-24 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-full flex items-center justify-center shadow-lg">
                 <FiX className="w-12 h-12 text-white" />
               </div>
             </div>
@@ -549,19 +614,19 @@ const PaymentPage = () => {
                 Payment Declined
               </h2>
               <p className="text-gray-400">
-                Invoice: <span className="font-mono text-red-400">{invoiceNumber}</span>
+                Invoice: <span className="font-mono text-purple-400">{invoiceNumber}</span>
               </p>
             </div>
             
             <div className="w-full bg-gray-700/30 rounded-lg p-4 border border-gray-600">
-              <p className="text-red-300">
+              <p className="text-purple-300">
                 Your payment was declined. Please try again.
               </p>
             </div>
             
             <Button 
               onClick={() => navigate("/dashboard")}
-              className="w-full bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-700 hover:to-pink-700"
+              className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700"
             >
               Go to Dashboard
             </Button>
@@ -574,11 +639,11 @@ const PaymentPage = () => {
   if (isProcessing) {
     return (
       <div className="fixed inset-0 bg-gray-900/90 backdrop-blur-sm flex items-center justify-center p-4 z-[9999]">
-        <div className="max-w-md w-full bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-8 text-center border border-blue-500/20 shadow-2xl">
+        <div className="max-w-md w-full bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-8 text-center border border-purple-500/20 shadow-2xl">
           <div className="flex flex-col items-center space-y-6">
             <div className="relative">
-              <div className="absolute inset-0 bg-blue-500/20 blur-xl rounded-full animate-pulse"></div>
-              <FiLoader className="relative w-20 h-20 text-blue-400 animate-spin" />
+              <div className="absolute inset-0 bg-purple-500/20 blur-xl rounded-full animate-pulse"></div>
+              <FiLoader className="relative w-20 h-20 text-purple-400 animate-spin" />
             </div>
             
             <div className="space-y-2">
@@ -591,7 +656,7 @@ const PaymentPage = () => {
             </div>
             
             <div className="w-full bg-gray-700/30 rounded-full h-2 overflow-hidden">
-              <div className="bg-gradient-to-r from-blue-500 to-indigo-600 h-2 rounded-full animate-progress"></div>
+              <div className="bg-gradient-to-r from-purple-500 to-indigo-600 h-2 rounded-full animate-progress"></div>
             </div>
             
             <p className="text-xs text-gray-500 font-mono tracking-wider">
@@ -604,42 +669,49 @@ const PaymentPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-indigo-900 text-white">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-indigo-900 text-white relative overflow-hidden">
+      {/* Cyberpunk decorative elements */}
+      <div className="absolute inset-0 z-0 pointer-events-none">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_30%,rgba(138,43,226,0.15)_0%,transparent_25%),radial-gradient(circle_at_80%_70%,rgba(109,50,157,0.15)_0%,transparent_25%)]"></div>
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(138,43,226,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(138,43,226,0.05)_1px,transparent_1px)] bg-[length:40px_40px]"></div>
+        <div className="absolute inset-0 bg-[linear-gradient(to_bottom,transparent_0%,rgba(138,43,226,0.05)_50%,transparent_100%)] bg-[length:100%_8px] animate-scanline"></div>
+      </div>
+
       {/* Header */}
-      <header className="text-center pt-10 pb-6 px-4">
-        <h1 className="text-3xl md:text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-300 to-blue-400">
-          {step === 1 ? "Customer Information" : 
-           step === 2 ? "Payment Method" : 
-           "Order Confirmation"}
+      <header className="text-center pt-10 pb-6 px-4 relative z-10">
+        <h1 className="text-3xl md:text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-300 to-indigo-400 font-orbitron tracking-wider">
+          {step === 1 ? "CUSTOMER INFORMATION" : 
+           step === 2 ? "PAYMENT METHOD" : 
+           "ORDER CONFIRMATION"}
         </h1>
-        <p className="mt-2 text-gray-300">
-          Purchasing <span className="text-emerald-300 font-medium">{plan}</span> • 
+        <p className="mt-2 text-gray-300 font-rajdhani">
+          Purchasing <span className="text-purple-300 font-medium">{plan}</span> • 
           <span className="font-bold text-white ml-1">Rp{Number(price).toLocaleString('id-ID')}</span>
         </p>
       </header>
 
       {/* Progress Steps */}
-      <div className="flex justify-center mb-8 px-4">
+      <div className="flex justify-center mb-8 px-4 relative z-10">
         <div className="flex items-center space-x-2 bg-gray-800 px-3 py-2 rounded-full border border-gray-700">
           {[1, 2, 3].map((stepNumber) => (
             <React.Fragment key={stepNumber}>
               <div
                 className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium relative transition-all duration-300 ${
                   step === stepNumber
-                    ? "bg-gradient-to-br from-blue-500 to-indigo-600 text-white shadow-md transform scale-110"
+                    ? "bg-gradient-to-br from-purple-500 to-indigo-600 text-white shadow-md transform scale-110"
                     : step > stepNumber
-                    ? "bg-gradient-to-br from-emerald-500 to-teal-600 text-white"
+                    ? "bg-gradient-to-br from-purple-400 to-indigo-500 text-white"
                     : "bg-gray-700 text-gray-500"
                 }`}
               >
                 {step > stepNumber ? <FiCheck size={14} /> : stepNumber}
                 {step === stepNumber && (
-                  <span className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-4 h-0.5 bg-blue-300 rounded-full animate-pulse"></span>
+                  <span className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-4 h-0.5 bg-purple-300 rounded-full animate-pulse"></span>
                 )}
               </div>
               {stepNumber < 3 && (
                 <div className={`w-6 h-[2px] rounded-full transition-all duration-300 ${
-                  step > stepNumber ? 'bg-emerald-500' : 'bg-gray-600'
+                  step > stepNumber ? 'bg-purple-500' : 'bg-gray-600'
                 }`}></div>
               )}
             </React.Fragment>
@@ -648,21 +720,21 @@ const PaymentPage = () => {
       </div>
 
       {/* Main Content */}
-      <main className="flex-grow flex flex-col md:flex-row gap-6 w-full max-w-5xl mx-auto px-4 pb-10">
+      <main className="flex-grow flex flex-col md:flex-row gap-6 w-full max-w-5xl mx-auto px-4 pb-10 relative z-10">
         {/* Form Section */}
-        <section className={`w-full md:w-2/3 bg-gray-800/50 backdrop-blur-sm rounded-xl shadow-xl p-6 transition-all duration-300 ${
+        <section className={`w-full md:w-2/3 bg-gray-800/50 backdrop-blur-sm rounded-xl shadow-xl p-6 transition-all duration-300 border border-purple-500/20 ${
           step === 2 ? "hover:shadow-2xl hover:scale-[1.01]" : ""
         }`}>
           {step === 1 && (
             <div className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div className="space-y-2">
-                  <label className="block text-sm font-medium text-gray-300">
-                    Full Name <span className="text-red-400">*</span>
+                  <label className="block text-sm font-medium text-gray-300 font-rajdhani">
+                    Full Name <span className="text-purple-400">*</span>
                   </label>
                   <div className="relative">
                     <div className={`absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none ${
-                      errors.name ? 'text-red-400' : 'text-gray-500'
+                      errors.name ? 'text-purple-400' : 'text-gray-500'
                     }`}>
                       <FiUser className="w-5 h-5" />
                     </div>
@@ -673,25 +745,25 @@ const PaymentPage = () => {
                       onChange={handlePersonalInfoChange}
                       onBlur={() => handleBlur('name')}
                       className={`w-full bg-gray-700 border ${
-                        errors.name ? 'border-red-500/70 focus:ring-red-500/20' : 'border-gray-600 focus:ring-blue-500/20'
-                      } rounded-lg py-2.5 px-4 pl-10 text-white focus:ring-2 focus:outline-none transition-all placeholder-gray-500`}
+                        errors.name ? 'border-purple-500/70 focus:ring-purple-500/20' : 'border-gray-600 focus:ring-indigo-500/20'
+                      } rounded-lg py-2.5 px-4 pl-10 text-white focus:ring-2 focus:outline-none transition-all placeholder-gray-500 font-rajdhani`}
                       placeholder="John Doe"
                     />
                   </div>
                   {errors.name && (
-                    <p className="text-sm text-red-400 flex items-center mt-1">
+                    <p className="text-sm text-purple-400 flex items-center mt-1 font-rajdhani">
                       <FiX className="mr-1 flex-shrink-0" /> {errors.name}
                     </p>
                   )}
                 </div>
                 
                 <div className="space-y-2">
-                  <label className="block text-sm font-medium text-gray-300">
-                    Email <span className="text-red-400">*</span>
+                  <label className="block text-sm font-medium text-gray-300 font-rajdhani">
+                    Email <span className="text-purple-400">*</span>
                   </label>
                   <div className="relative">
                     <div className={`absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none ${
-                      errors.email ? 'text-red-400' : 'text-gray-500'
+                      errors.email ? 'text-purple-400' : 'text-gray-500'
                     }`}>
                       <FiMail className="w-5 h-5" />
                     </div>
@@ -702,25 +774,25 @@ const PaymentPage = () => {
                       onChange={handlePersonalInfoChange}
                       onBlur={() => handleBlur('email')}
                       className={`w-full bg-gray-700 border ${
-                        errors.email ? 'border-red-500/70 focus:ring-red-500/20' : 'border-gray-600 focus:ring-blue-500/20'
-                      } rounded-lg py-2.5 px-4 pl-10 text-white focus:ring-2 focus:outline-none transition-all placeholder-gray-500`}
+                        errors.email ? 'border-purple-500/70 focus:ring-purple-500/20' : 'border-gray-600 focus:ring-indigo-500/20'
+                      } rounded-lg py-2.5 px-4 pl-10 text-white focus:ring-2 focus:outline-none transition-all placeholder-gray-500 font-rajdhani`}
                       placeholder="your@email.com"
                     />
                   </div>
                   {errors.email && (
-                    <p className="text-sm text-red-400 flex items-center mt-1">
+                    <p className="text-sm text-purple-400 flex items-center mt-1 font-rajdhani">
                       <FiX className="mr-1 flex-shrink-0" /> {errors.email}
                     </p>
                   )}
                 </div>
                 
                 <div className="space-y-2">
-                  <label className="block text-sm font-medium text-gray-300">
-                    Discord User ID <span className="text-red-400">*</span>
+                  <label className="block text-sm font-medium text-gray-300 font-rajdhani">
+                    Discord User ID <span className="text-purple-400">*</span>
                   </label>
                   <div className="relative">
                     <div className={`absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none ${
-                      errors.discord ? 'text-red-400' : 'text-gray-500'
+                      errors.discord ? 'text-purple-400' : 'text-gray-500'
                     }`}>
                       <FaDiscord className="w-5 h-5" />
                     </div>
@@ -731,26 +803,26 @@ const PaymentPage = () => {
                       onChange={handlePersonalInfoChange}
                       onBlur={() => handleBlur('discord')}
                       className={`w-full bg-gray-700 border ${
-                        errors.discord ? 'border-red-500/70 focus:ring-red-500/20' : 'border-gray-600 focus:ring-blue-500/20'
-                      } rounded-lg py-2.5 px-4 pl-10 text-white focus:ring-2 focus:outline-none transition-all placeholder-gray-500`}
+                        errors.discord ? 'border-purple-500/70 focus:ring-purple-500/20' : 'border-gray-600 focus:ring-indigo-500/20'
+                      } rounded-lg py-2.5 px-4 pl-10 text-white focus:ring-2 focus:outline-none transition-all placeholder-gray-500 font-rajdhani`}
                       placeholder="1234567890123456789"
                       maxLength={19}
                     />
                   </div>
                   {errors.discord && (
-                    <p className="text-sm text-red-400 flex items-center mt-1">
+                    <p className="text-sm text-purple-400 flex items-center mt-1 font-rajdhani">
                       <FiX className="mr-1 flex-shrink-0" /> {errors.discord}
                     </p>
                   )}
                 </div>
                 
                 <div className="space-y-2">
-                  <label className="block text-sm font-medium text-gray-300">
-                    WhatsApp Number <span className="text-red-400">*</span>
+                  <label className="block text-sm font-medium text-gray-300 font-rajdhani">
+                    WhatsApp Number <span className="text-purple-400">*</span>
                   </label>
                   <div className="relative">
                     <div className={`absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none ${
-                      errors.phone ? 'text-red-400' : 'text-gray-500'
+                      errors.phone ? 'text-purple-400' : 'text-gray-500'
                     }`}>
                       <FiSmartphone className="w-5 h-5" />
                     </div>
@@ -761,14 +833,14 @@ const PaymentPage = () => {
                       onChange={handlePersonalInfoChange}
                       onBlur={() => handleBlur('phone')}
                       className={`w-full bg-gray-700 border ${
-                        errors.phone ? 'border-red-500/70 focus:ring-red-500/20' : 'border-gray-600 focus:ring-blue-500/20'
-                      } rounded-lg py-2.5 px-4 pl-10 text-white focus:ring-2 focus:outline-none transition-all placeholder-gray-500`}
+                        errors.phone ? 'border-purple-500/70 focus:ring-purple-500/20' : 'border-gray-600 focus:ring-indigo-500/20'
+                      } rounded-lg py-2.5 px-4 pl-10 text-white focus:ring-2 focus:outline-none transition-all placeholder-gray-500 font-rajdhani`}
                       placeholder="08123456789"
                       maxLength={15}
                     />
                   </div>
                   {errors.phone && (
-                    <p className="text-sm text-red-400 flex items-center mt-1">
+                    <p className="text-sm text-purple-400 flex items-center mt-1 font-rajdhani">
                       <FiX className="mr-1 flex-shrink-0" /> {errors.phone}
                     </p>
                   )}
@@ -776,11 +848,11 @@ const PaymentPage = () => {
               </div>
               
               <div className="bg-gray-700/30 rounded-lg p-5 border border-gray-600">
-                <h3 className="text-lg font-bold text-white mb-3 flex items-center">
+                <h3 className="text-lg font-bold text-white mb-3 flex items-center font-orbitron">
                   <FiShield className="text-purple-400 mr-2" />
                   Terms & Conditions
                 </h3>
-                <ul className="text-gray-400 text-sm space-y-3">
+                <ul className="text-gray-400 text-sm space-y-3 font-rajdhani">
                   <li className="flex items-start">
                     <span className="text-purple-400 mr-2 mt-0.5">•</span>
                     All information must be accurate. Transactions with incorrect data will be voided without refund.
@@ -800,13 +872,13 @@ const PaymentPage = () => {
                 <Button
                   onClick={() => navigate(-1)}
                   variant="outline"
-                  className="border-gray-600 hover:bg-gray-700 text-gray-300 hover:text-white"
+                  className="border-gray-600 hover:bg-gray-700 text-gray-300 hover:text-white font-rajdhani"
                 >
                   Back
                 </Button>
                 <Button
                   onClick={handleProceedToPayment}
-                  className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
+                  className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 font-rajdhani"
                   disabled={Object.keys(errors).length > 0}
                 >
                   Continue to Payment
@@ -818,55 +890,29 @@ const PaymentPage = () => {
           {step === 2 && (
             <div className="space-y-6">
               <div className="space-y-5">
-                <h3 className="text-lg font-bold text-white">Select Payment Method</h3>
+                <h3 className="text-lg font-bold text-white font-orbitron">SELECT PAYMENT METHOD</h3>
                 
-                <div className="relative">
-                  <button
-                    onClick={() => setShowPaymentDropdown(!showPaymentDropdown)}
-                    className={`w-full flex items-center justify-between p-4 rounded-xl border-2 transition-all duration-200 ${
-                      showPaymentDropdown 
-                        ? `border-transparent bg-gradient-to-br ${paymentMethods[paymentMethod].color} shadow-lg`
-                        : "border-gray-600 hover:border-gray-500 hover:bg-gray-700/30"
-                    }`}
-                  >
-                    <div className="flex items-center">
-                      <div className={`w-10 h-10 rounded-full flex items-center justify-center mr-3 ${
-                        showPaymentDropdown ? "bg-white/10 text-white" : "bg-gray-700 text-gray-400"
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                  {Object.entries(paymentMethods).map(([key, method]) => (
+                    <button
+                      key={key}
+                      onClick={() => setPaymentMethod(key)}
+                      className={`p-3 rounded-lg border-2 transition-all duration-200 flex flex-col items-center ${
+                        paymentMethod === key
+                          ? `bg-gradient-to-br ${method.color} border-transparent shadow-lg`
+                          : "border-gray-600 hover:border-gray-500 hover:bg-gray-700/30"
+                      }`}
+                    >
+                      <div className={`w-10 h-10 rounded-full flex items-center justify-center mb-2 ${
+                        paymentMethod === key ? "bg-white/10" : "bg-gray-700"
                       }`}>
-                        {paymentMethods[paymentMethod].icon}
+                        {method.icon}
                       </div>
-                      <span className="font-semibold text-white">
-                        {paymentMethods[paymentMethod].name}
+                      <span className="font-semibold text-white font-rajdhani">
+                        {method.name}
                       </span>
-                    </div>
-                    <FiChevronDown className={`w-5 h-5 transition-transform duration-200 ${
-                      showPaymentDropdown ? 'transform rotate-180 text-white' : 'text-gray-400'
-                    }`} />
-                  </button>
-                  
-                  {showPaymentDropdown && (
-                    <div className="absolute z-10 mt-2 w-full bg-gray-700 rounded-xl border border-gray-600 shadow-lg overflow-hidden">
-                      <div className="max-h-60 overflow-y-auto">
-                        {Object.entries(paymentMethods).map(([key, method]) => (
-                          <button
-                            key={key}
-                            onClick={() => {
-                              setPaymentMethod(key);
-                              setShowPaymentDropdown(false);
-                            }}
-                            className={`w-full flex items-center p-3 hover:bg-gray-600 transition-colors ${
-                              paymentMethod === key ? 'bg-gray-600/70' : ''
-                            }`}
-                          >
-                            <div className="w-8 h-8 rounded-full flex items-center justify-center mr-3 bg-gray-800/50">
-                              {method.icon}
-                            </div>
-                            <span className="font-medium text-white">{method.name}</span>
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  )}
+                    </button>
+                  ))}
                 </div>
               </div>
               
@@ -875,10 +921,10 @@ const PaymentPage = () => {
                   <div className={`w-14 h-14 rounded-full flex items-center justify-center mb-3 bg-gradient-to-br ${paymentMethods[paymentMethod].color} text-white shadow-md`}>
                     {paymentMethods[paymentMethod].icon}
                   </div>
-                  <h3 className="text-xl font-bold text-white mb-1">
+                  <h3 className="text-xl font-bold text-white mb-1 font-orbitron">
                     {paymentMethods[paymentMethod].instructions}
                   </h3>
-                  <p className="text-gray-400 text-sm">
+                  <p className="text-gray-400 text-sm font-rajdhani">
                     {paymentMethods[paymentMethod].note}
                   </p>
                 </div>
@@ -892,7 +938,7 @@ const PaymentPage = () => {
                 ) : (
                   <div className="space-y-5">
                     <div className="bg-gray-700/50 rounded-xl p-5 border border-gray-600">
-                      <p className="text-gray-400 text-sm mb-1 uppercase tracking-wider">
+                      <p className="text-gray-400 text-sm mb-1 uppercase tracking-wider font-rajdhani">
                         {paymentMethods[paymentMethod].name} Number
                       </p>
                       <div className="flex justify-between items-center">
@@ -900,7 +946,7 @@ const PaymentPage = () => {
                           <p className="text-lg font-bold text-white font-mono tracking-wide">
                             {paymentMethods[paymentMethod].account}
                           </p>
-                          <p className="text-gray-400 text-sm mt-1">
+                          <p className="text-gray-400 text-sm mt-1 font-rajdhani">
                             Atas Nama: {paymentMethods[paymentMethod].accountName}
                           </p>
                         </div>
@@ -910,7 +956,7 @@ const PaymentPage = () => {
                           title="Copy number"
                         >
                           {copiedIndex === paymentMethod ? (
-                            <FiCheck className="w-5 h-5 text-emerald-400" />
+                            <FiCheck className="w-5 h-5 text-purple-400" />
                           ) : (
                             <FiCopy className="w-5 h-5" />
                           )}
@@ -919,11 +965,11 @@ const PaymentPage = () => {
                     </div>
 
                     <div className="bg-gray-700/50 rounded-xl p-5 border border-gray-600">
-                      <h4 className="text-lg font-bold text-white mb-4 flex items-center">
-                        <FiCreditCard className="text-blue-400 mr-2" />
+                      <h4 className="text-lg font-bold text-white mb-4 flex items-center font-orbitron">
+                        <FiCreditCard className="text-purple-400 mr-2" />
                         Order Summary
                       </h4>
-                      <div className="space-y-3">
+                      <div className="space-y-3 font-rajdhani">
                         <div className="flex justify-between">
                           <span className="text-gray-400">Product</span>
                           <span className="text-white font-medium">{plan}</span>
@@ -940,9 +986,9 @@ const PaymentPage = () => {
                       </div>
                     </div>
 
-                    <div className="bg-yellow-500/10 rounded-lg p-4 border border-yellow-500/20 flex items-start">
-                      <FiMessageSquare className="flex-shrink-0 mt-0.5 mr-3 text-yellow-400" />
-                      <p className="text-yellow-300 text-sm">
+                    <div className="bg-purple-500/10 rounded-lg p-4 border border-purple-500/20 flex items-start">
+                      <FiMessageSquare className="flex-shrink-0 mt-0.5 mr-3 text-purple-400" />
+                      <p className="text-purple-300 text-sm font-rajdhani">
                         {paymentMethods[paymentMethod].note}
                       </p>
                     </div>
@@ -954,13 +1000,13 @@ const PaymentPage = () => {
                 <Button
                   onClick={() => setStep(1)}
                   variant="outline"
-                  className="border-gray-600 hover:bg-gray-700 text-gray-300 hover:text-white"
+                  className="border-gray-600 hover:bg-gray-700 text-gray-300 hover:text-white font-rajdhani"
                 >
                   Back
                 </Button>
                 <Button
                   onClick={() => setStep(3)}
-                  className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
+                  className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 font-rajdhani"
                 >
                   Confirm Payment
                 </Button>
@@ -972,43 +1018,43 @@ const PaymentPage = () => {
             <div className="space-y-6">
               <div className="bg-gray-700/30 rounded-xl p-6 border border-gray-600">
                 <div className="flex items-center mb-6">
-                  <div className="bg-gradient-to-br from-blue-500 to-indigo-600 p-2 rounded-lg mr-3">
+                  <div className="bg-gradient-to-br from-purple-500 to-indigo-600 p-2 rounded-lg mr-3">
                     <FiShield className="w-5 h-5 text-white" />
                   </div>
-                  <h3 className="text-xl font-bold text-white">
+                  <h3 className="text-xl font-bold text-white font-orbitron">
                     Confirm Your Order
                   </h3>
                 </div>
                 
                 <div className="space-y-6">
                   <div className="space-y-3">
-                    <h4 className="text-lg font-bold text-white flex items-center">
-                      <FiUser className="text-blue-400 mr-2" />
+                    <h4 className="text-lg font-bold text-white flex items-center font-orbitron">
+                      <FiUser className="text-purple-400 mr-2" />
                       Customer Information
                     </h4>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="bg-gray-700/70 p-4 rounded-lg border border-gray-600">
-                        <p className="text-gray-400 text-sm mb-1">Full Name</p>
-                        <p className="text-white font-medium">{personalInfo.name}</p>
+                        <p className="text-gray-400 text-sm mb-1 font-rajdhani">Full Name</p>
+                        <p className="text-white font-medium font-rajdhani">{personalInfo.name}</p>
                       </div>
                       <div className="bg-gray-700/70 p-4 rounded-lg border border-gray-600">
-                        <p className="text-gray-400 text-sm mb-1">Email</p>
-                        <p className="text-white font-medium">{personalInfo.email}</p>
+                        <p className="text-gray-400 text-sm mb-1 font-rajdhani">Email</p>
+                        <p className="text-white font-medium font-rajdhani">{personalInfo.email}</p>
                       </div>
                       <div className="bg-gray-700/70 p-4 rounded-lg border border-gray-600">
-                        <p className="text-gray-400 text-sm mb-1">Discord ID</p>
-                        <p className="text-white font-medium">{personalInfo.discord}</p>
+                        <p className="text-gray-400 text-sm mb-1 font-rajdhani">Discord ID</p>
+                        <p className="text-white font-medium font-rajdhani">{personalInfo.discord}</p>
                       </div>
                       <div className="bg-gray-700/70 p-4 rounded-lg border border-gray-600">
-                        <p className="text-gray-400 text-sm mb-1">WhatsApp</p>
-                        <p className="text-white font-medium">{personalInfo.phone}</p>
+                        <p className="text-gray-400 text-sm mb-1 font-rajdhani">WhatsApp</p>
+                        <p className="text-white font-medium font-rajdhani">{personalInfo.phone}</p>
                       </div>
                     </div>
                   </div>
                   
                   <div className="space-y-3">
-                    <h4 className="text-lg font-bold text-white flex items-center">
-                      <FiCreditCard className="text-blue-400 mr-2" />
+                    <h4 className="text-lg font-bold text-white flex items-center font-orbitron">
+                      <FiCreditCard className="text-purple-400 mr-2" />
                       Payment Information
                     </h4>
                     <div className="bg-gray-700/70 rounded-xl p-5 border border-gray-600">
@@ -1017,14 +1063,14 @@ const PaymentPage = () => {
                           {paymentMethods[paymentMethod].icon}
                         </div>
                         <div>
-                          <p className="text-gray-400 text-sm">Payment Method</p>
-                          <p className="text-white font-bold">
+                          <p className="text-gray-400 text-sm font-rajdhani">Payment Method</p>
+                          <p className="text-white font-bold font-rajdhani">
                             {paymentMethods[paymentMethod].name}
                           </p>
                         </div>
                       </div>
                       
-                      <div className="space-y-3">
+                      <div className="space-y-3 font-rajdhani">
                         <div className="flex justify-between">
                           <span className="text-gray-400">Product</span>
                           <span className="text-white">{plan}</span>
@@ -1042,11 +1088,11 @@ const PaymentPage = () => {
                     </div>
                   </div>
                   
-                  <div className="bg-blue-500/10 rounded-lg p-4 border border-blue-500/20 flex items-start">
-                    <div className="bg-blue-500/20 p-1.5 rounded-lg mr-3 flex-shrink-0">
-                      <FiLock className="w-4 h-4 text-blue-400" />
+                  <div className="bg-purple-500/10 rounded-lg p-4 border border-purple-500/20 flex items-start">
+                    <div className="bg-purple-500/20 p-1.5 rounded-lg mr-3 flex-shrink-0">
+                      <FiLock className="w-4 h-4 text-purple-400" />
                     </div>
-                    <p className="text-gray-300 text-sm">
+                    <p className="text-gray-300 text-sm font-rajdhani">
                       Your transaction is secured with 256-bit encryption.
                     </p>
                   </div>
@@ -1057,13 +1103,13 @@ const PaymentPage = () => {
                 <Button
                   onClick={() => setStep(2)}
                   variant="outline"
-                  className="border-gray-600 hover:bg-gray-700 text-gray-300 hover:text-white"
+                  className="border-gray-600 hover:bg-gray-700 text-gray-300 hover:text-white font-rajdhani"
                 >
                   Back
                 </Button>
                 <Button
                   onClick={submitPayment}
-                  className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700"
+                  className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 font-rajdhani"
                 >
                   Confirm & Pay Now
                 </Button>
@@ -1073,22 +1119,22 @@ const PaymentPage = () => {
         </section>
 
         {/* Order Summary Section */}
-        <section className="w-full md:w-1/3 bg-gray-800/50 backdrop-blur-sm rounded-xl shadow-xl p-6 flex flex-col">
-          <h2 className="text-xl font-semibold text-white mb-6">Order Summary</h2>
+        <section className="w-full md:w-1/3 bg-gray-800/50 backdrop-blur-sm rounded-xl shadow-xl p-6 flex flex-col border border-purple-500/20">
+          <h2 className="text-xl font-semibold text-white mb-6 font-orbitron">ORDER SUMMARY</h2>
 
           <div className="flex-grow space-y-4">
             <div className="flex items-start gap-4 p-4 bg-gray-700/30 rounded-lg border border-gray-600">
-              <div className="bg-gradient-to-br from-blue-500 to-indigo-600 w-12 h-12 rounded-lg flex items-center justify-center">
+              <div className="bg-gradient-to-br from-purple-500 to-indigo-600 w-12 h-12 rounded-lg flex items-center justify-center">
                 <FiCreditCard className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h3 className="font-medium text-white">{plan}</h3>
-                <p className="text-indigo-300 font-semibold mt-1">Rp{Number(price).toLocaleString('id-ID')}</p>
+                <h3 className="font-medium text-white font-rajdhani">{plan}</h3>
+                <p className="text-purple-300 font-semibold mt-1 font-rajdhani">Rp{Number(price).toLocaleString('id-ID')}</p>
               </div>
             </div>
           </div>
 
-          <div className="mt-8 pt-6 border-t border-gray-700">
+          <div className="mt-8 pt-6 border-t border-gray-700 font-rajdhani">
             <div className="flex justify-between">
               <span className="text-gray-300">Subtotal</span>
               <span className="font-medium text-white">Rp{Number(price).toLocaleString('id-ID')}</span>
@@ -1114,14 +1160,14 @@ const PaymentPage = () => {
                 <FiShield className="w-5 h-5 text-purple-300" />
               </div>
               <div>
-                <h3 className="text-xl font-bold text-white mb-1">Confirm Submission</h3>
-                <p className="text-gray-400">Please verify your information</p>
+                <h3 className="text-xl font-bold text-white mb-1 font-orbitron">Confirm Submission</h3>
+                <p className="text-gray-400 font-rajdhani">Please verify your information</p>
               </div>
             </div>
             
             <div className="bg-gray-700/50 rounded-lg p-4 mb-5 border border-gray-600/50">
-              <h4 className="text-sm font-semibold text-gray-300 mb-2 uppercase tracking-wider">IMPORTANT NOTICE</h4>
-              <ul className="text-gray-400 text-sm space-y-2">
+              <h4 className="text-sm font-semibold text-gray-300 mb-2 uppercase tracking-wider font-orbitron">IMPORTANT NOTICE</h4>
+              <ul className="text-gray-400 text-sm space-y-2 font-rajdhani">
                 <li className="flex items-start">
                   <span className="text-purple-400 mr-2">•</span>
                   All transactions are final and non-refundable
@@ -1134,7 +1180,7 @@ const PaymentPage = () => {
             </div>
             
             <div className="flex justify-between items-center">
-              <label className="flex items-center text-gray-400 text-sm cursor-pointer">
+              <label className="flex items-center text-gray-400 text-sm cursor-pointer font-rajdhani">
                 <input
                   type="checkbox"
                   checked={dontShowAgain}
@@ -1148,7 +1194,7 @@ const PaymentPage = () => {
                 <Button
                   onClick={() => setShowConfirmation(false)}
                   variant="outline"
-                  className="border-gray-600 hover:bg-gray-700/50 text-gray-300 hover:text-white"
+                  className="border-gray-600 hover:bg-gray-700/50 text-gray-300 hover:text-white font-rajdhani"
                 >
                   Cancel
                 </Button>
@@ -1157,7 +1203,7 @@ const PaymentPage = () => {
                     setShowConfirmation(false);
                     setStep(2);
                   }}
-                  className="bg-gradient-to-r from-purple-600 to-fuchsia-600 hover:from-purple-700 hover:to-fuchsia-700"
+                  className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 font-rajdhani"
                 >
                   Confirm
                 </Button>
@@ -1170,14 +1216,49 @@ const PaymentPage = () => {
       {/* Copy Notification */}
       {showCopyNotification && (
         <div className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none">
-          <div className="bg-gray-800/90 backdrop-blur-sm rounded-lg p-4 max-w-xs w-full mx-4 border border-emerald-500/30 shadow-lg">
+          <div className="bg-gray-800/90 backdrop-blur-sm rounded-lg p-4 max-w-xs w-full mx-4 border border-purple-500/30 shadow-lg">
             <div className="flex items-center justify-center space-x-2">
-              <FiCheck className="w-5 h-5 text-emerald-400" />
-              <p className="text-white font-medium">Copied to clipboard</p>
+              <FiCheck className="w-5 h-5 text-purple-400" />
+              <p className="text-white font-medium font-rajdhani">Copied to clipboard</p>
             </div>
           </div>
         </div>
       )}
+
+      {/* Global Styles */}
+      <style jsx global>{`
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&family=Rajdhani:wght@400;500;600&display=swap');
+        
+        .font-orbitron {
+          font-family: 'Orbitron', sans-serif;
+          letter-spacing: 1px;
+        }
+        
+        .font-rajdhani {
+          font-family: 'Rajdhani', sans-serif;
+        }
+        
+        @keyframes scanline {
+          0% { transform: translateY(-100%); }
+          100% { transform: translateY(100%); }
+        }
+        
+        .animate-scanline {
+          animation: scanline 8s linear infinite;
+        }
+        
+        .animate-progress {
+          animation: progress 2s ease-in-out infinite;
+          background-size: 200% 100%;
+          background-image: linear-gradient(to right, #8A2BE2, #6D329D, #8A2BE2);
+        }
+        
+        @keyframes progress {
+          0% { background-position: 0% 50%; }
+          50% { background-position: 100% 50%; }
+          100% { background-position: 0% 50%; }
+        }
+      `}</style>
     </div>
   );
 };
