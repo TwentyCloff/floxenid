@@ -429,8 +429,8 @@ const PaymentPage = () => {
 
   if (paymentComplete) {
     return (
-      <div className="fixed inset-0 bg-gray-900 flex items-center justify-center p-4 z-[9999]">
-        <div className="max-w-md w-full bg-gray-800 rounded-2xl p-8 border border-emerald-500/20 shadow-lg">
+      <div className="fixed inset-0 bg-gray-900/90 backdrop-blur-sm flex items-center justify-center p-4 z-[9999]">
+        <div className="max-w-md w-full bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-8 border border-emerald-500/20 shadow-2xl">
           <div className="flex flex-col items-center text-center space-y-6">
             <div className="relative">
               <div className="absolute inset-0 bg-emerald-500/20 blur-xl rounded-full"></div>
@@ -448,12 +448,9 @@ const PaymentPage = () => {
               </p>
             </div>
             
-            <div className="w-full bg-gray-700/50 rounded-lg p-4 border border-gray-600/50">
+            <div className="w-full bg-gray-700/30 rounded-lg p-4 border border-gray-600">
               <p className="text-gray-300">
                 Thank you for purchasing <span className="text-emerald-300 font-medium">{plan}</span>.
-              </p>
-              <p className="text-gray-400 text-sm mt-1">
-                Your payment has been verified and processed.
               </p>
             </div>
             
@@ -471,8 +468,8 @@ const PaymentPage = () => {
 
   if (paymentPending) {
     return (
-      <div className="fixed inset-0 bg-gray-900 flex items-center justify-center p-4 z-[9999]">
-        <div className="max-w-md w-full bg-gray-800 rounded-2xl p-8 border border-yellow-500/20 shadow-lg">
+      <div className="fixed inset-0 bg-gray-900/90 backdrop-blur-sm flex items-center justify-center p-4 z-[9999]">
+        <div className="max-w-md w-full bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-8 border border-yellow-500/20 shadow-2xl">
           <div className="flex flex-col items-center text-center space-y-6">
             <div className="relative">
               <div className="absolute inset-0 bg-yellow-500/20 blur-xl rounded-full animate-pulse"></div>
@@ -483,25 +480,20 @@ const PaymentPage = () => {
               <h2 className="text-2xl font-bold text-white">
                 Payment Pending
               </h2>
-              <p className="text-gray-400">
-                Silahkan Bayar Nomor dibawah ini, dan tunggu sampai admin memverifikasi pembayaran kamu
-              </p>
-              <p className="text-yellow-300 text-sm mt-2">
-                Silahkan tunggu 5-15 menit
+              <p className="text-gray-400 text-sm">
+                Please complete your payment and wait for verification
               </p>
             </div>
             
             {paymentMethod === "qris" && (
-              <div className="w-full bg-gray-700/50 rounded-lg p-4 flex flex-col items-center">
+              <div className="w-full bg-gray-700/30 rounded-lg p-4 flex flex-col items-center">
                 <div className="w-48 h-48 bg-white rounded-lg p-3 mb-3">
                   <img src={qrisByr} alt="QRIS Payment" className="w-full h-full object-contain" />
                 </div>
-                <p className="text-gray-300 text-sm">Scan QR code using your mobile banking or e-wallet app</p>
               </div>
             )}
             
-            <div className="w-full bg-gray-700/50 rounded-lg p-4 border border-gray-600/50 text-left">
-              <h3 className="text-lg font-bold text-white mb-2">Order Details</h3>
+            <div className="w-full bg-gray-700/30 rounded-lg p-4 border border-gray-600 text-left">
               <div className="space-y-2">
                 <div className="flex justify-between">
                   <span className="text-gray-400">Product:</span>
@@ -524,12 +516,6 @@ const PaymentPage = () => {
               </div>
             </div>
             
-            <div className="w-full bg-yellow-500/10 rounded-lg p-3 border border-yellow-500/20">
-              <p className="text-yellow-300 text-sm">
-                Please keep your payment proof. Our admin will verify your payment shortly.
-              </p>
-            </div>
-            
             <p className="text-xs text-gray-500 font-mono tracking-wider">
               STATUS: PENDING • WAITING VERIFICATION
             </p>
@@ -548,8 +534,8 @@ const PaymentPage = () => {
 
   if (paymentDeclined) {
     return (
-      <div className="fixed inset-0 bg-gray-900 flex items-center justify-center p-4 z-[9999]">
-        <div className="max-w-md w-full bg-gray-800 rounded-2xl p-8 border border-red-500/20 shadow-lg">
+      <div className="fixed inset-0 bg-gray-900/90 backdrop-blur-sm flex items-center justify-center p-4 z-[9999]">
+        <div className="max-w-md w-full bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-8 border border-red-500/20 shadow-2xl">
           <div className="flex flex-col items-center text-center space-y-6">
             <div className="relative">
               <div className="absolute inset-0 bg-red-500/20 blur-xl rounded-full"></div>
@@ -567,9 +553,9 @@ const PaymentPage = () => {
               </p>
             </div>
             
-            <div className="w-full bg-gray-700/50 rounded-lg p-4 border border-gray-600/50">
+            <div className="w-full bg-gray-700/30 rounded-lg p-4 border border-gray-600">
               <p className="text-red-300">
-                Pembayaran kamu ditolak, silahkan melakukan transaksi ulang
+                Your payment was declined. Please try again.
               </p>
             </div>
             
@@ -587,8 +573,8 @@ const PaymentPage = () => {
 
   if (isProcessing) {
     return (
-      <div className="fixed inset-0 bg-gray-900 flex items-center justify-center p-4 z-[9999]">
-        <div className="max-w-md w-full bg-gray-800 rounded-2xl p-8 text-center border border-blue-500/20 shadow-lg">
+      <div className="fixed inset-0 bg-gray-900/90 backdrop-blur-sm flex items-center justify-center p-4 z-[9999]">
+        <div className="max-w-md w-full bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-8 text-center border border-blue-500/20 shadow-2xl">
           <div className="flex flex-col items-center space-y-6">
             <div className="relative">
               <div className="absolute inset-0 bg-blue-500/20 blur-xl rounded-full animate-pulse"></div>
@@ -604,7 +590,7 @@ const PaymentPage = () => {
               </p>
             </div>
             
-            <div className="w-full bg-gray-700/50 rounded-full h-2 overflow-hidden">
+            <div className="w-full bg-gray-700/30 rounded-full h-2 overflow-hidden">
               <div className="bg-gradient-to-r from-blue-500 to-indigo-600 h-2 rounded-full animate-progress"></div>
             </div>
             
@@ -618,559 +604,580 @@ const PaymentPage = () => {
   }
 
   return (
-    <div className="fixed inset-0 bg-gray-900 overflow-y-auto z-[9999]">
-      <div className="min-h-screen flex flex-col">
-        {showCopyNotification && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none">
-            <div className="bg-gray-800/90 backdrop-blur-sm rounded-lg p-4 max-w-xs w-full mx-4 border border-emerald-500/30 shadow-lg">
-              <div className="flex items-center justify-center space-x-2">
-                <FiCheck className="w-5 h-5 text-emerald-400" />
-                <p className="text-white font-medium">Copied to clipboard</p>
-              </div>
-            </div>
-          </div>
-        )}
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-indigo-900 text-white">
+      {/* Header */}
+      <header className="text-center pt-10 pb-6 px-4">
+        <h1 className="text-3xl md:text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-300 to-blue-400">
+          {step === 1 ? "Customer Information" : 
+           step === 2 ? "Payment Method" : 
+           "Order Confirmation"}
+        </h1>
+        <p className="mt-2 text-gray-300">
+          Purchasing <span className="text-emerald-300 font-medium">{plan}</span> • 
+          <span className="font-bold text-white ml-1">Rp{Number(price).toLocaleString('id-ID')}</span>
+        </p>
+      </header>
 
-        {showConfirmation && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-            <div className="bg-gray-800 rounded-xl p-6 max-w-md w-full border border-purple-500/30 shadow-lg">
-              <div className="flex items-start space-x-3 mb-4">
-                <div className="bg-purple-500/20 p-2 rounded-lg flex-shrink-0">
-                  <FiShield className="w-5 h-5 text-purple-300" />
+      {/* Progress Steps */}
+      <div className="flex justify-center mb-8 px-4">
+        <div className="flex items-center space-x-2 bg-gray-800 px-3 py-2 rounded-full border border-gray-700">
+          {[1, 2, 3].map((stepNumber) => (
+            <React.Fragment key={stepNumber}>
+              <div
+                className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium relative transition-all duration-300 ${
+                  step === stepNumber
+                    ? "bg-gradient-to-br from-blue-500 to-indigo-600 text-white shadow-md transform scale-110"
+                    : step > stepNumber
+                    ? "bg-gradient-to-br from-emerald-500 to-teal-600 text-white"
+                    : "bg-gray-700 text-gray-500"
+                }`}
+              >
+                {step > stepNumber ? <FiCheck size={14} /> : stepNumber}
+                {step === stepNumber && (
+                  <span className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-4 h-0.5 bg-blue-300 rounded-full animate-pulse"></span>
+                )}
+              </div>
+              {stepNumber < 3 && (
+                <div className={`w-6 h-[2px] rounded-full transition-all duration-300 ${
+                  step > stepNumber ? 'bg-emerald-500' : 'bg-gray-600'
+                }`}></div>
+              )}
+            </React.Fragment>
+          ))}
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <main className="flex-grow flex flex-col md:flex-row gap-6 w-full max-w-5xl mx-auto px-4 pb-10">
+        {/* Form Section */}
+        <section className={`w-full md:w-2/3 bg-gray-800/50 backdrop-blur-sm rounded-xl shadow-xl p-6 transition-all duration-300 ${
+          step === 2 ? "hover:shadow-2xl hover:scale-[1.01]" : ""
+        }`}>
+          {step === 1 && (
+            <div className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-300">
+                    Full Name <span className="text-red-400">*</span>
+                  </label>
+                  <div className="relative">
+                    <div className={`absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none ${
+                      errors.name ? 'text-red-400' : 'text-gray-500'
+                    }`}>
+                      <FiUser className="w-5 h-5" />
+                    </div>
+                    <input
+                      type="text"
+                      name="name"
+                      value={personalInfo.name}
+                      onChange={handlePersonalInfoChange}
+                      onBlur={() => handleBlur('name')}
+                      className={`w-full bg-gray-700 border ${
+                        errors.name ? 'border-red-500/70 focus:ring-red-500/20' : 'border-gray-600 focus:ring-blue-500/20'
+                      } rounded-lg py-2.5 px-4 pl-10 text-white focus:ring-2 focus:outline-none transition-all placeholder-gray-500`}
+                      placeholder="John Doe"
+                    />
+                  </div>
+                  {errors.name && (
+                    <p className="text-sm text-red-400 flex items-center mt-1">
+                      <FiX className="mr-1 flex-shrink-0" /> {errors.name}
+                    </p>
+                  )}
                 </div>
-                <div>
-                  <h3 className="text-xl font-bold text-white mb-1">Confirm Submission</h3>
-                  <p className="text-gray-400">Please verify your information</p>
+                
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-300">
+                    Email <span className="text-red-400">*</span>
+                  </label>
+                  <div className="relative">
+                    <div className={`absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none ${
+                      errors.email ? 'text-red-400' : 'text-gray-500'
+                    }`}>
+                      <FiMail className="w-5 h-5" />
+                    </div>
+                    <input
+                      type="email"
+                      name="email"
+                      value={personalInfo.email}
+                      onChange={handlePersonalInfoChange}
+                      onBlur={() => handleBlur('email')}
+                      className={`w-full bg-gray-700 border ${
+                        errors.email ? 'border-red-500/70 focus:ring-red-500/20' : 'border-gray-600 focus:ring-blue-500/20'
+                      } rounded-lg py-2.5 px-4 pl-10 text-white focus:ring-2 focus:outline-none transition-all placeholder-gray-500`}
+                      placeholder="your@email.com"
+                    />
+                  </div>
+                  {errors.email && (
+                    <p className="text-sm text-red-400 flex items-center mt-1">
+                      <FiX className="mr-1 flex-shrink-0" /> {errors.email}
+                    </p>
+                  )}
+                </div>
+                
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-300">
+                    Discord User ID <span className="text-red-400">*</span>
+                  </label>
+                  <div className="relative">
+                    <div className={`absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none ${
+                      errors.discord ? 'text-red-400' : 'text-gray-500'
+                    }`}>
+                      <FaDiscord className="w-5 h-5" />
+                    </div>
+                    <input
+                      type="text"
+                      name="discord"
+                      value={personalInfo.discord}
+                      onChange={handlePersonalInfoChange}
+                      onBlur={() => handleBlur('discord')}
+                      className={`w-full bg-gray-700 border ${
+                        errors.discord ? 'border-red-500/70 focus:ring-red-500/20' : 'border-gray-600 focus:ring-blue-500/20'
+                      } rounded-lg py-2.5 px-4 pl-10 text-white focus:ring-2 focus:outline-none transition-all placeholder-gray-500`}
+                      placeholder="1234567890123456789"
+                      maxLength={19}
+                    />
+                  </div>
+                  {errors.discord && (
+                    <p className="text-sm text-red-400 flex items-center mt-1">
+                      <FiX className="mr-1 flex-shrink-0" /> {errors.discord}
+                    </p>
+                  )}
+                </div>
+                
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-300">
+                    WhatsApp Number <span className="text-red-400">*</span>
+                  </label>
+                  <div className="relative">
+                    <div className={`absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none ${
+                      errors.phone ? 'text-red-400' : 'text-gray-500'
+                    }`}>
+                      <FiSmartphone className="w-5 h-5" />
+                    </div>
+                    <input
+                      type="tel"
+                      name="phone"
+                      value={personalInfo.phone}
+                      onChange={handlePersonalInfoChange}
+                      onBlur={() => handleBlur('phone')}
+                      className={`w-full bg-gray-700 border ${
+                        errors.phone ? 'border-red-500/70 focus:ring-red-500/20' : 'border-gray-600 focus:ring-blue-500/20'
+                      } rounded-lg py-2.5 px-4 pl-10 text-white focus:ring-2 focus:outline-none transition-all placeholder-gray-500`}
+                      placeholder="08123456789"
+                      maxLength={15}
+                    />
+                  </div>
+                  {errors.phone && (
+                    <p className="text-sm text-red-400 flex items-center mt-1">
+                      <FiX className="mr-1 flex-shrink-0" /> {errors.phone}
+                    </p>
+                  )}
                 </div>
               </div>
               
-              <div className="bg-gray-700/50 rounded-lg p-4 mb-5 border border-gray-600/50">
-                <h4 className="text-sm font-semibold text-gray-300 mb-2 uppercase tracking-wider">IMPORTANT NOTICE</h4>
-                <ul className="text-gray-400 text-sm space-y-2">
+              <div className="bg-gray-700/30 rounded-lg p-5 border border-gray-600">
+                <h3 className="text-lg font-bold text-white mb-3 flex items-center">
+                  <FiShield className="text-purple-400 mr-2" />
+                  Terms & Conditions
+                </h3>
+                <ul className="text-gray-400 text-sm space-y-3">
                   <li className="flex items-start">
-                    <span className="text-purple-400 mr-2">•</span>
-                    All transactions are final and non-refundable
+                    <span className="text-purple-400 mr-2 mt-0.5">•</span>
+                    All information must be accurate. Transactions with incorrect data will be voided without refund.
                   </li>
                   <li className="flex items-start">
-                    <span className="text-purple-400 mr-2">•</span>
-                    Double-check your Discord ID and WhatsApp number
+                    <span className="text-purple-400 mr-2 mt=0.5">•</span>
+                    Your Discord User ID must match your account exactly.
                   </li>
                   <li className="flex items-start">
-                    <span className="text-purple-400 mr-2">•</span>
-                    Invalid information will void your transaction
+                    <span className="text-purple-400 mr-2 mt=0.5">•</span>
+                    Payments are processed within 1-15 minutes during business hours.
                   </li>
                 </ul>
               </div>
               
-              <div className="flex justify-between items-center">
-                <label className="flex items-center text-gray-400 text-sm cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={dontShowAgain}
-                    onChange={(e) => setDontShowAgain(e.target.checked)}
-                    className="mr-2 rounded bg-gray-700 border-gray-600 text-purple-500 focus:ring-purple-500"
-                  />
-                  Don't show again
-                </label>
-                
-                <div className="flex space-x-3">
-                  <Button
-                    onClick={() => setShowConfirmation(false)}
-                    variant="outline"
-                    className="border-gray-600 hover:bg-gray-700/50 text-gray-300 hover:text-white"
-                  >
-                    Cancel
-                  </Button>
-                  <Button
-                    onClick={() => {
-                      setShowConfirmation(false);
-                      setStep(2);
-                    }}
-                    className="bg-gradient-to-r from-purple-600 to-fuchsia-600 hover:from-purple-700 hover:to-fuchsia-700"
-                  >
-                    Confirm
-                  </Button>
-                </div>
+              <div className="flex justify-between pt-5 border-t border-gray-700">
+                <Button
+                  onClick={() => navigate(-1)}
+                  variant="outline"
+                  className="border-gray-600 hover:bg-gray-700 text-gray-300 hover:text-white"
+                >
+                  Back
+                </Button>
+                <Button
+                  onClick={handleProceedToPayment}
+                  className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
+                  disabled={Object.keys(errors).length > 0}
+                >
+                  Continue to Payment
+                </Button>
               </div>
             </div>
-          </div>
-        )}
+          )}
 
-        <div className="flex-1 flex flex-col max-w-4xl w-full mx-auto p-4 sm:p-6">
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
-            <div>
-              <h1 className="text-2xl md:text-3xl font-bold text-white">
-                {step === 1 ? "Customer Information" : 
-                 step === 2 ? "Payment Details" : 
-                 "Order Confirmation"}
-              </h1>
-              <p className="text-gray-400">
-                Purchasing <span className="text-emerald-300 font-medium">{plan}</span> • 
-                <span className="font-bold text-white ml-1">Rp{Number(price).toLocaleString('id-ID')}</span>
-              </p>
-            </div>
-            
-            <div className="flex items-center space-x-2 bg-gray-800 px-3 py-2 rounded-full border border-gray-700">
-              {[1, 2, 3].map((stepNumber) => (
-                <React.Fragment key={stepNumber}>
-                  <div
-                    className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium relative transition-all duration-300 ${
-                      step === stepNumber
-                        ? "bg-gradient-to-br from-blue-500 to-indigo-600 text-white shadow-md transform scale-110"
-                        : step > stepNumber
-                        ? "bg-gradient-to-br from-emerald-500 to-teal-600 text-white"
-                        : "bg-gray-700 text-gray-500"
+          {step === 2 && (
+            <div className="space-y-6">
+              <div className="space-y-5">
+                <h3 className="text-lg font-bold text-white">Select Payment Method</h3>
+                
+                <div className="relative">
+                  <button
+                    onClick={() => setShowPaymentDropdown(!showPaymentDropdown)}
+                    className={`w-full flex items-center justify-between p-4 rounded-xl border-2 transition-all duration-200 ${
+                      showPaymentDropdown 
+                        ? `border-transparent bg-gradient-to-br ${paymentMethods[paymentMethod].color} shadow-lg`
+                        : "border-gray-600 hover:border-gray-500 hover:bg-gray-700/30"
                     }`}
                   >
-                    {step > stepNumber ? <FiCheck size={14} /> : stepNumber}
-                    {step === stepNumber && (
-                      <span className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-4 h-0.5 bg-blue-300 rounded-full animate-pulse"></span>
-                    )}
-                  </div>
-                  {stepNumber < 3 && (
-                    <div className={`w-6 h-[2px] rounded-full transition-all duration-300 ${
-                      step > stepNumber ? 'bg-emerald-500' : 'bg-gray-600'
-                    }`}></div>
+                    <div className="flex items-center">
+                      <div className={`w-10 h-10 rounded-full flex items-center justify-center mr-3 ${
+                        showPaymentDropdown ? "bg-white/10 text-white" : "bg-gray-700 text-gray-400"
+                      }`}>
+                        {paymentMethods[paymentMethod].icon}
+                      </div>
+                      <span className="font-semibold text-white">
+                        {paymentMethods[paymentMethod].name}
+                      </span>
+                    </div>
+                    <FiChevronDown className={`w-5 h-5 transition-transform duration-200 ${
+                      showPaymentDropdown ? 'transform rotate-180 text-white' : 'text-gray-400'
+                    }`} />
+                  </button>
+                  
+                  {showPaymentDropdown && (
+                    <div className="absolute z-10 mt-2 w-full bg-gray-700 rounded-xl border border-gray-600 shadow-lg overflow-hidden">
+                      <div className="max-h-60 overflow-y-auto">
+                        {Object.entries(paymentMethods).map(([key, method]) => (
+                          <button
+                            key={key}
+                            onClick={() => {
+                              setPaymentMethod(key);
+                              setShowPaymentDropdown(false);
+                            }}
+                            className={`w-full flex items-center p-3 hover:bg-gray-600 transition-colors ${
+                              paymentMethod === key ? 'bg-gray-600/70' : ''
+                            }`}
+                          >
+                            <div className="w-8 h-8 rounded-full flex items-center justify-center mr-3 bg-gray-800/50">
+                              {method.icon}
+                            </div>
+                            <span className="font-medium text-white">{method.name}</span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
                   )}
-                </React.Fragment>
-              ))}
+                </div>
+              </div>
+              
+              <div className="bg-gray-700/30 rounded-xl p-5 border border-gray-600">
+                <div className="flex flex-col items-center text-center mb-6">
+                  <div className={`w-14 h-14 rounded-full flex items-center justify-center mb-3 bg-gradient-to-br ${paymentMethods[paymentMethod].color} text-white shadow-md`}>
+                    {paymentMethods[paymentMethod].icon}
+                  </div>
+                  <h3 className="text-xl font-bold text-white mb-1">
+                    {paymentMethods[paymentMethod].instructions}
+                  </h3>
+                  <p className="text-gray-400 text-sm">
+                    {paymentMethods[paymentMethod].note}
+                  </p>
+                </div>
+                
+                {paymentMethod === "qris" ? (
+                  <div className="flex flex-col items-center py-4">
+                    <div className="w-52 h-52 bg-white rounded-xl flex items-center justify-center mb-4 p-4 shadow-lg">
+                      <img src={qrisByr} alt="QRIS Payment" className="w-full h-full object-contain" />
+                    </div>
+                  </div>
+                ) : (
+                  <div className="space-y-5">
+                    <div className="bg-gray-700/50 rounded-xl p-5 border border-gray-600">
+                      <p className="text-gray-400 text-sm mb-1 uppercase tracking-wider">
+                        {paymentMethods[paymentMethod].name} Number
+                      </p>
+                      <div className="flex justify-between items-center">
+                        <div>
+                          <p className="text-lg font-bold text-white font-mono tracking-wide">
+                            {paymentMethods[paymentMethod].account}
+                          </p>
+                          <p className="text-gray-400 text-sm mt-1">
+                            Atas Nama: {paymentMethods[paymentMethod].accountName}
+                          </p>
+                        </div>
+                        <button 
+                          onClick={() => copyToClipboard(paymentMethods[paymentMethod].account, paymentMethod)}
+                          className="p-2 rounded-lg bg-gray-600 hover:bg-gray-500 text-gray-300 hover:text-white transition-colors border border-gray-500"
+                          title="Copy number"
+                        >
+                          {copiedIndex === paymentMethod ? (
+                            <FiCheck className="w-5 h-5 text-emerald-400" />
+                          ) : (
+                            <FiCopy className="w-5 h-5" />
+                          )}
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="bg-gray-700/50 rounded-xl p-5 border border-gray-600">
+                      <h4 className="text-lg font-bold text-white mb-4 flex items-center">
+                        <FiCreditCard className="text-blue-400 mr-2" />
+                        Order Summary
+                      </h4>
+                      <div className="space-y-3">
+                        <div className="flex justify-between">
+                          <span className="text-gray-400">Product</span>
+                          <span className="text-white font-medium">{plan}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-gray-400">Service Fee</span>
+                          <span className="text-white font-medium">Rp{serviceFee.toLocaleString('id-ID')}</span>
+                        </div>
+                        <div className="border-t border-gray-600 my-2"></div>
+                        <div className="flex justify-between">
+                          <span className="text-gray-400">Total Payment</span>
+                          <span className="text-white font-bold text-lg">Rp{(Number(price) + serviceFee).toLocaleString('id-ID')}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="bg-yellow-500/10 rounded-lg p-4 border border-yellow-500/20 flex items-start">
+                      <FiMessageSquare className="flex-shrink-0 mt-0.5 mr-3 text-yellow-400" />
+                      <p className="text-yellow-300 text-sm">
+                        {paymentMethods[paymentMethod].note}
+                      </p>
+                    </div>
+                  </div>
+                )}
+              </div>
+              
+              <div className="flex justify-between pt-5 border-t border-gray-700">
+                <Button
+                  onClick={() => setStep(1)}
+                  variant="outline"
+                  className="border-gray-600 hover:bg-gray-700 text-gray-300 hover:text-white"
+                >
+                  Back
+                </Button>
+                <Button
+                  onClick={() => setStep(3)}
+                  className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
+                >
+                  Confirm Payment
+                </Button>
+              </div>
+            </div>
+          )}
+
+          {step === 3 && (
+            <div className="space-y-6">
+              <div className="bg-gray-700/30 rounded-xl p-6 border border-gray-600">
+                <div className="flex items-center mb-6">
+                  <div className="bg-gradient-to-br from-blue-500 to-indigo-600 p-2 rounded-lg mr-3">
+                    <FiShield className="w-5 h-5 text-white" />
+                  </div>
+                  <h3 className="text-xl font-bold text-white">
+                    Confirm Your Order
+                  </h3>
+                </div>
+                
+                <div className="space-y-6">
+                  <div className="space-y-3">
+                    <h4 className="text-lg font-bold text-white flex items-center">
+                      <FiUser className="text-blue-400 mr-2" />
+                      Customer Information
+                    </h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="bg-gray-700/70 p-4 rounded-lg border border-gray-600">
+                        <p className="text-gray-400 text-sm mb-1">Full Name</p>
+                        <p className="text-white font-medium">{personalInfo.name}</p>
+                      </div>
+                      <div className="bg-gray-700/70 p-4 rounded-lg border border-gray-600">
+                        <p className="text-gray-400 text-sm mb-1">Email</p>
+                        <p className="text-white font-medium">{personalInfo.email}</p>
+                      </div>
+                      <div className="bg-gray-700/70 p-4 rounded-lg border border-gray-600">
+                        <p className="text-gray-400 text-sm mb-1">Discord ID</p>
+                        <p className="text-white font-medium">{personalInfo.discord}</p>
+                      </div>
+                      <div className="bg-gray-700/70 p-4 rounded-lg border border-gray-600">
+                        <p className="text-gray-400 text-sm mb-1">WhatsApp</p>
+                        <p className="text-white font-medium">{personalInfo.phone}</p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-3">
+                    <h4 className="text-lg font-bold text-white flex items-center">
+                      <FiCreditCard className="text-blue-400 mr-2" />
+                      Payment Information
+                    </h4>
+                    <div className="bg-gray-700/70 rounded-xl p-5 border border-gray-600">
+                      <div className="flex items-center mb-4">
+                        <div className={`w-10 h-10 rounded-full flex items-center justify-center mr-3 bg-gradient-to-br ${paymentMethods[paymentMethod].color} text-white`}>
+                          {paymentMethods[paymentMethod].icon}
+                        </div>
+                        <div>
+                          <p className="text-gray-400 text-sm">Payment Method</p>
+                          <p className="text-white font-bold">
+                            {paymentMethods[paymentMethod].name}
+                          </p>
+                        </div>
+                      </div>
+                      
+                      <div className="space-y-3">
+                        <div className="flex justify-between">
+                          <span className="text-gray-400">Product</span>
+                          <span className="text-white">{plan}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-gray-400">Service Fee</span>
+                          <span className="text-white">Rp{serviceFee.toLocaleString('id-ID')}</span>
+                        </div>
+                        <div className="border-t border-gray-600 my-2"></div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-gray-400">Total Amount</span>
+                          <span className="text-white font-bold text-xl">Rp{(Number(price) + serviceFee).toLocaleString('id-ID')}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="bg-blue-500/10 rounded-lg p-4 border border-blue-500/20 flex items-start">
+                    <div className="bg-blue-500/20 p-1.5 rounded-lg mr-3 flex-shrink-0">
+                      <FiLock className="w-4 h-4 text-blue-400" />
+                    </div>
+                    <p className="text-gray-300 text-sm">
+                      Your transaction is secured with 256-bit encryption.
+                    </p>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="flex justify-between pt-5 border-t border-gray-700">
+                <Button
+                  onClick={() => setStep(2)}
+                  variant="outline"
+                  className="border-gray-600 hover:bg-gray-700 text-gray-300 hover:text-white"
+                >
+                  Back
+                </Button>
+                <Button
+                  onClick={submitPayment}
+                  className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700"
+                >
+                  Confirm & Pay Now
+                </Button>
+              </div>
+            </div>
+          )}
+        </section>
+
+        {/* Order Summary Section */}
+        <section className="w-full md:w-1/3 bg-gray-800/50 backdrop-blur-sm rounded-xl shadow-xl p-6 flex flex-col">
+          <h2 className="text-xl font-semibold text-white mb-6">Order Summary</h2>
+
+          <div className="flex-grow space-y-4">
+            <div className="flex items-start gap-4 p-4 bg-gray-700/30 rounded-lg border border-gray-600">
+              <div className="bg-gradient-to-br from-blue-500 to-indigo-600 w-12 h-12 rounded-lg flex items-center justify-center">
+                <FiCreditCard className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <h3 className="font-medium text-white">{plan}</h3>
+                <p className="text-indigo-300 font-semibold mt-1">Rp{Number(price).toLocaleString('id-ID')}</p>
+              </div>
             </div>
           </div>
 
-          <div className="flex-1 bg-gray-800/50 rounded-xl p-6 border border-gray-700 shadow-lg">
-            {step === 1 && (
-              <div className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                  <div className="space-y-2">
-                    <label className="block text-gray-400 text-sm font-medium">
-                      Full Name <span className="text-red-400">*</span>
-                    </label>
-                    <div className="relative">
-                      <div className={`absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none ${
-                        errors.name ? 'text-red-400' : 'text-gray-500'
-                      }`}>
-                        <FiUser className="w-5 h-5" />
-                      </div>
-                      <input
-                        type="text"
-                        name="name"
-                        value={personalInfo.name}
-                        onChange={handlePersonalInfoChange}
-                        onBlur={() => handleBlur('name')}
-                        className={`w-full bg-gray-700 border ${
-                          errors.name ? 'border-red-500/70 focus:ring-red-500/20' : 'border-gray-600 focus:ring-blue-500/20'
-                        } rounded-lg py-2.5 px-4 pl-10 text-white focus:ring-2 focus:outline-none transition-all placeholder-gray-500`}
-                        placeholder="John Doe"
-                      />
-                    </div>
-                    {errors.name && (
-                      <p className="text-sm text-red-400 flex items-center mt-1">
-                        <FiX className="mr-1 flex-shrink-0" /> {errors.name}
-                      </p>
-                    )}
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <label className="block text-gray-400 text-sm font-medium">
-                      Email <span className="text-red-400">*</span>
-                    </label>
-                    <div className="relative">
-                      <div className={`absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none ${
-                        errors.email ? 'text-red-400' : 'text-gray-500'
-                      }`}>
-                        <FiMail className="w-5 h-5" />
-                      </div>
-                      <input
-                        type="email"
-                        name="email"
-                        value={personalInfo.email}
-                        onChange={handlePersonalInfoChange}
-                        onBlur={() => handleBlur('email')}
-                        className={`w-full bg-gray-700 border ${
-                          errors.email ? 'border-red-500/70 focus:ring-red-500/20' : 'border-gray-600 focus:ring-blue-500/20'
-                        } rounded-lg py-2.5 px-4 pl-10 text-white focus:ring-2 focus:outline-none transition-all placeholder-gray-500`}
-                        placeholder="your@email.com"
-                      />
-                    </div>
-                    {errors.email && (
-                      <p className="text-sm text-red-400 flex items-center mt-1">
-                        <FiX className="mr-1 flex-shrink-0" /> {errors.email}
-                      </p>
-                    )}
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <label className="block text-gray-400 text-sm font-medium">
-                      Discord User ID <span className="text-red-400">*</span>
-                    </label>
-                    <div className="relative">
-                      <div className={`absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none ${
-                        errors.discord ? 'text-red-400' : 'text-gray-500'
-                      }`}>
-                        <FaDiscord className="w-5 h-5" />
-                      </div>
-                      <input
-                        type="text"
-                        name="discord"
-                        value={personalInfo.discord}
-                        onChange={handlePersonalInfoChange}
-                        onBlur={() => handleBlur('discord')}
-                        className={`w-full bg-gray-700 border ${
-                          errors.discord ? 'border-red-500/70 focus:ring-red-500/20' : 'border-gray-600 focus:ring-blue-500/20'
-                        } rounded-lg py-2.5 px-4 pl-10 text-white focus:ring-2 focus:outline-none transition-all placeholder-gray-500`}
-                        placeholder="1234567890123456789"
-                        maxLength={19}
-                      />
-                    </div>
-                    {errors.discord && (
-                      <p className="text-sm text-red-400 flex items-center mt-1">
-                        <FiX className="mr-1 flex-shrink-0" /> {errors.discord}
-                      </p>
-                    )}
-                    <div className="flex items-center text-xs text-gray-500 mt-1">
-                      <span>How to find your Discord ID?</span>
-                      <a href="#" className="ml-2 text-blue-400 hover:text-blue-300 flex items-center">
-                        Guide <FiExternalLink className="ml-1 w-3 h-3" />
-                      </a>
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <label className="block text-gray-400 text-sm font-medium">
-                      WhatsApp Number <span className="text-red-400">*</span>
-                    </label>
-                    <div className="relative">
-                      <div className={`absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none ${
-                        errors.phone ? 'text-red-400' : 'text-gray-500'
-                      }`}>
-                        <FiSmartphone className="w-5 h-5" />
-                      </div>
-                      <input
-                        type="tel"
-                        name="phone"
-                        value={personalInfo.phone}
-                        onChange={handlePersonalInfoChange}
-                        onBlur={() => handleBlur('phone')}
-                        className={`w-full bg-gray-700 border ${
-                          errors.phone ? 'border-red-500/70 focus:ring-red-500/20' : 'border-gray-600 focus:ring-blue-500/20'
-                        } rounded-lg py-2.5 px-4 pl-10 text-white focus:ring-2 focus:outline-none transition-all placeholder-gray-500`}
-                        placeholder="08123456789"
-                        maxLength={15}
-                      />
-                    </div>
-                    {errors.phone && (
-                      <p className="text-sm text-red-400 flex items-center mt-1">
-                        <FiX className="mr-1 flex-shrink-0" /> {errors.phone}
-                      </p>
-                    )}
-                  </div>
-                </div>
-                
-                <div className="bg-gray-700 rounded-lg p-5 border border-gray-600">
-                  <h3 className="text-lg font-bold text-white mb-3 flex items-center">
-                    <FiShield className="text-purple-400 mr-2" />
-                    Terms & Conditions
-                  </h3>
-                  <ul className="text-gray-400 text-sm space-y-3">
-                    <li className="flex items-start">
-                      <span className="text-purple-400 mr-2 mt-0.5">•</span>
-                      All information must be accurate. Transactions with incorrect data will be voided without refund.
-                    </li>
-                    <li className="flex items-start">
-                      <span className="text-purple-400 mr-2 mt=0.5">•</span>
-                      Your Discord User ID must match your account exactly. We cannot assist with deliveries to incorrect accounts.
-                    </li>
-                    <li className="flex items-start">
-                      <span className="text-purple-400 mr-2 mt=0.5">•</span>
-                      Payments are processed within 1-15 minutes during business hours (9AM-10PM WIB).
-                    </li>
-                    <li className="flex items-start">
-                      <span className="text-purple-400 mr-2 mt=0.5">•</span>
-                      For payments, you must send payment proof to our admin via WhatsApp.
-                    </li>
-                  </ul>
-                </div>
-                
-                <div className="flex justify-between pt-5 border-t border-gray-700">
-                  <Button
-                    onClick={() => navigate(-1)}
-                    variant="outline"
-                    className="border-gray-600 hover:bg-gray-700 text-gray-300 hover:text-white"
-                  >
-                    Back
-                  </Button>
-                  <Button
-                    onClick={handleProceedToPayment}
-                    className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
-                    disabled={Object.keys(errors).length > 0}
-                  >
-                    Continue to Payment
-                  </Button>
-                </div>
+          <div className="mt-8 pt-6 border-t border-gray-700">
+            <div className="flex justify-between">
+              <span className="text-gray-300">Subtotal</span>
+              <span className="font-medium text-white">Rp{Number(price).toLocaleString('id-ID')}</span>
+            </div>
+            <div className="flex justify-between mt-2">
+              <span className="text-gray-300">Service Fee</span>
+              <span className="font-medium text-white">Rp{serviceFee.toLocaleString('id-ID')}</span>
+            </div>
+            <div className="flex justify-between mt-3 pt-3 border-t border-gray-700 font-bold text-lg">
+              <span>Total</span>
+              <span>Rp{(Number(price) + serviceFee).toLocaleString('id-ID')}</span>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      {/* Confirmation Modal */}
+      {showConfirmation && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+          <div className="bg-gray-800 rounded-xl p-6 max-w-md w-full border border-purple-500/30 shadow-lg">
+            <div className="flex items-start space-x-3 mb-4">
+              <div className="bg-purple-500/20 p-2 rounded-lg flex-shrink-0">
+                <FiShield className="w-5 h-5 text-purple-300" />
               </div>
-            )}
-
-            {step === 2 && (
-              <div className="space-y-6">
-                <div className="space-y-5">
-                  <h3 className="text-lg font-bold text-white">Select Payment Method</h3>
-                  
-                  <div className="relative">
-                    <button
-                      onClick={() => setShowPaymentDropdown(!showPaymentDropdown)}
-                      className={`w-full flex items-center justify-between p-4 rounded-xl border-2 transition-all duration-200 ${
-                        showPaymentDropdown 
-                          ? `border-transparent bg-gradient-to-br ${paymentMethods[paymentMethod].color} shadow-lg`
-                          : "border-gray-600 hover:border-gray-500 hover:bg-gray-700/30"
-                      }`}
-                    >
-                      <div className="flex items-center">
-                        <div className={`w-10 h-10 rounded-full flex items-center justify-center mr-3 ${
-                          showPaymentDropdown ? "bg-white/10 text-white" : "bg-gray-700 text-gray-400"
-                        }`}>
-                          {paymentMethods[paymentMethod].icon}
-                        </div>
-                        <span className="font-semibold text-white">
-                          {paymentMethods[paymentMethod].name}
-                        </span>
-                      </div>
-                      <FiChevronDown className={`w-5 h-5 transition-transform duration-200 ${
-                        showPaymentDropdown ? 'transform rotate-180 text-white' : 'text-gray-400'
-                      }`} />
-                    </button>
-                    
-                    {showPaymentDropdown && (
-                      <div className="absolute z-10 mt-2 w-full bg-gray-700 rounded-xl border border-gray-600 shadow-lg overflow-hidden">
-                        <div className="max-h-60 overflow-y-auto">
-                          {Object.entries(paymentMethods).map(([key, method]) => (
-                            <button
-                              key={key}
-                              onClick={() => {
-                                setPaymentMethod(key);
-                                setShowPaymentDropdown(false);
-                              }}
-                              className={`w-full flex items-center p-3 hover:bg-gray-600 transition-colors ${
-                                paymentMethod === key ? 'bg-gray-600/70' : ''
-                              }`}
-                            >
-                              <div className="w-8 h-8 rounded-full flex items-center justify-center mr-3 bg-gray-800/50">
-                                {method.icon}
-                              </div>
-                              <span className="font-medium text-white">{method.name}</span>
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-                
-                <div className="bg-gray-700 rounded-xl p-5 border border-gray-600">
-                  <div className="flex flex-col items-center text-center mb-6">
-                    <div className={`w-14 h-14 rounded-full flex items-center justify-center mb-3 bg-gradient-to-br ${paymentMethods[paymentMethod].color} text-white shadow-md`}>
-                      {paymentMethods[paymentMethod].icon}
-                    </div>
-                    <h3 className="text-xl font-bold text-white mb-1">
-                      {paymentMethods[paymentMethod].instructions}
-                    </h3>
-                    <p className="text-gray-400 text-sm">
-                      {paymentMethods[paymentMethod].note}
-                    </p>
-                  </div>
-                  
-                  {paymentMethod === "qris" ? (
-                    <div className="flex flex-col items-center py-4">
-                      <div className="w-52 h-52 bg-white rounded-xl flex items-center justify-center mb-4 p-4 shadow-lg">
-                        <img src={qrisByr} alt="QRIS Payment" className="w-full h-full object-contain" />
-                      </div>
-                      <p className="text-gray-400 text-center max-w-md text-sm">
-                        Scan using your mobile banking or e-wallet app that supports QRIS
-                      </p>
-                    </div>
-                  ) : (
-                    <div className="space-y-5">
-                      <div className="bg-gray-700 rounded-xl p-5 border border-gray-600">
-                        <p className="text-gray-400 text-sm mb-1 uppercase tracking-wider">
-                          {paymentMethods[paymentMethod].name} Number
-                        </p>
-                        <div className="flex justify-between items-center">
-                          <div>
-                            <p className="text-lg font-bold text-white font-mono tracking-wide">
-                              {paymentMethods[paymentMethod].account}
-                            </p>
-                            <p className="text-gray-400 text-sm mt-1">
-                              Atas Nama: {paymentMethods[paymentMethod].accountName}
-                            </p>
-                          </div>
-                          <button 
-                            onClick={() => copyToClipboard(paymentMethods[paymentMethod].account, paymentMethod)}
-                            className="p-2 rounded-lg bg-gray-600 hover:bg-gray-500 text-gray-300 hover:text-white transition-colors border border-gray-500"
-                            title="Copy number"
-                          >
-                            {copiedIndex === paymentMethod ? (
-                              <FiCheck className="w-5 h-5 text-emerald-400" />
-                            ) : (
-                              <FiCopy className="w-5 h-5" />
-                            )}
-                          </button>
-                        </div>
-                      </div>
-
-                      <div className="bg-gray-700 rounded-xl p-5 border border-gray-600">
-                        <h4 className="text-lg font-bold text-white mb-4 flex items-center">
-                          <FiCreditCard className="text-blue-400 mr-2" />
-                          Order Summary
-                        </h4>
-                        <div className="space-y-3">
-                          <div className="flex justify-between">
-                            <span className="text-gray-400">Product</span>
-                            <span className="text-white font-medium">{plan}</span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span className="text-gray-400">Service Fee</span>
-                            <span className="text-white font-medium">Rp{serviceFee.toLocaleString('id-ID')}</span>
-                          </div>
-                          <div className="border-t border-gray-600 my-2"></div>
-                          <div className="flex justify-between">
-                            <span className="text-gray-400">Total Payment</span>
-                            <span className="text-white font-bold text-lg">Rp{(Number(price) + serviceFee).toLocaleString('id-ID')}</span>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="bg-yellow-500/10 rounded-lg p-4 border border-yellow-500/20 flex items-start">
-                        <FiMessageSquare className="flex-shrink-0 mt-0.5 mr-3 text-yellow-400" />
-                        <p className="text-yellow-300 text-sm">
-                          {paymentMethods[paymentMethod].note} Please save your payment proof.
-                        </p>
-                      </div>
-                    </div>
-                  )}
-                </div>
-                
-                <div className="flex justify-between pt-5 border-t border-gray-700">
-                  <Button
-                    onClick={() => setStep(1)}
-                    variant="outline"
-                    className="border-gray-600 hover:bg-gray-700 text-gray-300 hover:text-white"
-                  >
-                    Back
-                  </Button>
-                  <Button
-                    onClick={() => setStep(3)}
-                    className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
-                  >
-                    Confirm Payment
-                  </Button>
-                </div>
+              <div>
+                <h3 className="text-xl font-bold text-white mb-1">Confirm Submission</h3>
+                <p className="text-gray-400">Please verify your information</p>
               </div>
-            )}
-
-            {step === 3 && (
-              <div className="space-y-6">
-                <div className="bg-gray-700 rounded-xl p-6 border border-gray-600">
-                  <div className="flex items-center mb-6">
-                    <div className="bg-gradient-to-br from-blue-500 to-indigo-600 p-2 rounded-lg mr-3">
-                      <FiShield className="w-5 h-5 text-white" />
-                    </div>
-                    <h3 className="text-xl font-bold text-white">
-                      Confirm Your Order
-                    </h3>
-                  </div>
-                  
-                  <div className="space-y-6">
-                    <div className="space-y-3">
-                      <h4 className="text-lg font-bold text-white flex items-center">
-                        <FiUser className="text-blue-400 mr-2" />
-                        Customer Information
-                      </h4>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="bg-gray-700/70 p-4 rounded-lg border border-gray-600">
-                          <p className="text-gray-400 text-sm mb-1">Full Name</p>
-                          <p className="text-white font-medium">{personalInfo.name}</p>
-                        </div>
-                        <div className="bg-gray-700/70 p-4 rounded-lg border border-gray-600">
-                          <p className="text-gray-400 text-sm mb-1">Email</p>
-                          <p className="text-white font-medium">{personalInfo.email}</p>
-                        </div>
-                        <div className="bg-gray-700/70 p-4 rounded-lg border border-gray-600">
-                          <p className="text-gray-400 text-sm mb-1">Discord ID</p>
-                          <p className="text-white font-medium">{personalInfo.discord}</p>
-                        </div>
-                        <div className="bg-gray-700/70 p-4 rounded-lg border border-gray-600">
-                          <p className="text-gray-400 text-sm mb-1">WhatsApp</p>
-                          <p className="text-white font-medium">{personalInfo.phone}</p>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <div className="space-y-3">
-                      <h4 className="text-lg font-bold text-white flex items-center">
-                        <FiCreditCard className="text-blue-400 mr-2" />
-                        Payment Information
-                      </h4>
-                      <div className="bg-gray-700/70 rounded-xl p-5 border border-gray-600">
-                        <div className="flex items-center mb-4">
-                          <div className={`w-10 h-10 rounded-full flex items-center justify-center mr-3 bg-gradient-to-br ${paymentMethods[paymentMethod].color} text-white`}>
-                            {paymentMethods[paymentMethod].icon}
-                          </div>
-                          <div>
-                            <p className="text-gray-400 text-sm">Payment Method</p>
-                            <p className="text-white font-bold">
-                              {paymentMethods[paymentMethod].name}
-                            </p>
-                          </div>
-                        </div>
-                        
-                        <div className="space-y-3">
-                          <div className="flex justify-between">
-                            <span className="text-gray-400">Product</span>
-                            <span className="text-white">{plan}</span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span className="text-gray-400">Service Fee</span>
-                            <span className="text-white">Rp{serviceFee.toLocaleString('id-ID')}</span>
-                          </div>
-                          <div className="border-t border-gray-600 my-2"></div>
-                          <div className="flex justify-between items-center">
-                            <span className="text-gray-400">Total Amount</span>
-                            <span className="text-white font-bold text-xl">Rp{(Number(price) + serviceFee).toLocaleString('id-ID')}</span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <div className="bg-blue-500/10 rounded-lg p-4 border border-blue-500/20 flex items-start">
-                      <div className="bg-blue-500/20 p-1.5 rounded-lg mr-3 flex-shrink-0">
-                        <FiLock className="w-4 h-4 text-blue-400" />
-                      </div>
-                      <p className="text-gray-300 text-sm">
-                        Your transaction is secured with 256-bit encryption. By confirming, you agree to our Terms of Service and Privacy Policy.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="flex justify-between pt-5 border-t border-gray-700">
-                  <Button
-                    onClick={() => setStep(2)}
-                    variant="outline"
-                    className="border-gray-600 hover:bg-gray-700 text-gray-300 hover:text-white"
-                  >
-                    Back
-                  </Button>
-                  <Button
-                    onClick={submitPayment}
-                    className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700"
-                  >
-                    Confirm & Pay Now
-                  </Button>
-                </div>
+            </div>
+            
+            <div className="bg-gray-700/50 rounded-lg p-4 mb-5 border border-gray-600/50">
+              <h4 className="text-sm font-semibold text-gray-300 mb-2 uppercase tracking-wider">IMPORTANT NOTICE</h4>
+              <ul className="text-gray-400 text-sm space-y-2">
+                <li className="flex items-start">
+                  <span className="text-purple-400 mr-2">•</span>
+                  All transactions are final and non-refundable
+                </li>
+                <li className="flex items-start">
+                  <span className="text-purple-400 mr-2">•</span>
+                  Double-check your Discord ID and WhatsApp number
+                </li>
+              </ul>
+            </div>
+            
+            <div className="flex justify-between items-center">
+              <label className="flex items-center text-gray-400 text-sm cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={dontShowAgain}
+                  onChange={(e) => setDontShowAgain(e.target.checked)}
+                  className="mr-2 rounded bg-gray-700 border-gray-600 text-purple-500 focus:ring-purple-500"
+                />
+                Don't show again
+              </label>
+              
+              <div className="flex space-x-3">
+                <Button
+                  onClick={() => setShowConfirmation(false)}
+                  variant="outline"
+                  className="border-gray-600 hover:bg-gray-700/50 text-gray-300 hover:text-white"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  onClick={() => {
+                    setShowConfirmation(false);
+                    setStep(2);
+                  }}
+                  className="bg-gradient-to-r from-purple-600 to-fuchsia-600 hover:from-purple-700 hover:to-fuchsia-700"
+                >
+                  Confirm
+                </Button>
               </div>
-            )}
+            </div>
           </div>
         </div>
-      </div>
+      )}
+
+      {/* Copy Notification */}
+      {showCopyNotification && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none">
+          <div className="bg-gray-800/90 backdrop-blur-sm rounded-lg p-4 max-w-xs w-full mx-4 border border-emerald-500/30 shadow-lg">
+            <div className="flex items-center justify-center space-x-2">
+              <FiCheck className="w-5 h-5 text-emerald-400" />
+              <p className="text-white font-medium">Copied to clipboard</p>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
