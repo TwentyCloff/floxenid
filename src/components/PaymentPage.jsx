@@ -798,7 +798,7 @@ const PaymentPage = () => {
               
               <div className="flex justify-between pt-5 border-t border-gray-700">
                 <Button
-                  onClick={() => navigate(-1)}
+                  onClick={() => navigate(#pricing)}
                   variant="outline"
                   className="border-gray-600 hover:bg-gray-700 text-gray-300 hover:text-white"
                 >
