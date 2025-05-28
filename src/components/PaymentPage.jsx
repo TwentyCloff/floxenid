@@ -3,21 +3,14 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { 
   FiCheck, FiLock, FiX, FiShield, FiUser, 
   FiMail, FiSmartphone, FiLoader, FiMessageSquare,
-  FiCopy, FiExternalLink, FiChevronDown, FiCreditCard
+  FiCopy, FiExternalLink, FiChevronDown, FiCreditCard,
+  FiWallet
 } from "react-icons/fi";
-import { FaQrcode, FaDiscord } from "react-icons/fa";
+import { FaDiscord, FaBitcoin, FaPaypal, FaUniversity } from "react-icons/fa";
+import { SiBankofamerica } from "react-icons/si";
 import { db, auth } from "../config/firebaseConfig";
 import { doc, setDoc, getDoc, serverTimestamp, collection, query, where, getDocs, onSnapshot } from "firebase/firestore";
 import Button from "./Button";
-import gopayLogo from "../assets/selectz/gopay1.png";
-import danaLogo from "../assets/selectz/dana1.png";
-import qrisLogo from "../assets/selectz/gopay1.png";
-import qrisByr from "../assets/selectz/qrisbayar.jpg";
-import ovoLogo from "../assets/selectz/gopay1.png";
-import shopeePayLogo from "../assets/selectz/gopay1.png";
-import linkAjaLogo from "../assets/selectz/gopay1.png";
-import bcaLogo from "../assets/selectz/gopay1.png";
-import jagoLogo from "../assets/selectz/gopay1.png";
 
 const PaymentPage = () => {
   const [step, setStep] = useState(1);
@@ -25,7 +18,7 @@ const PaymentPage = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [paymentPending, setPaymentPending] = useState(false);
   const [paymentDeclined, setPaymentDeclined] = useState(false);
-  const [paymentMethod, setPaymentMethod] = useState("qris");
+  const [paymentMethod, setPaymentMethod] = useState("crypto");
   const [personalInfo, setPersonalInfo] = useState({
     name: "",
     email: "",
@@ -40,8 +33,8 @@ const PaymentPage = () => {
   const [copiedIndex, setCopiedIndex] = useState(null);
   const [invoiceNumber, setInvoiceNumber] = useState("");
   const [userHasPlan, setUserHasPlan] = useState(false);
-  const [showPaymentDropdown, setShowPaymentDropdown] = useState(false);
   const [showPaymentDetails, setShowPaymentDetails] = useState(false);
+  const [currency, setCurrency] = useState("usd");
   
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
@@ -52,93 +45,68 @@ const PaymentPage = () => {
   const serviceFee = 500;
 
   const paymentMethods = {
-    "qris": {
-      name: "QRIS",
-      icon: <img src={qrisLogo} alt="QRIS" className="w-6 h-6 object-contain" />,
-      instructions: "Scan QR code to complete payment",
-      account: "QRIS",
+    "crypto": {
+      name: "Crypto",
+      icon: <FaBitcoin className="text-yellow-500" size={24} />,
+      instructions: "Send crypto to the following address",
+      account: "0x71C7656EC7ab88b098defB751B7401B5f6d8976F",
       note: "Instant processing • No additional fees",
-      color: "from-purple-500 to-indigo-600",
-      borderColor: "border-purple-500/30",
-      logo: qrisByr,
-      accountName: "AUTOMATIC PROCESSING"
+      color: "from-yellow-500 to-yellow-600",
+      borderColor: "border-yellow-500/30",
+      accountName: "CRYPTO WALLET"
     },
-    "gopay": {
-      name: "GOPAY",
-      icon: <img src={gopayLogo} alt="Gopay" className="w-6 h-6 object-contain" />,
-      instructions: "Transfer to following number",
-      account: "08123456789",
-      note: "Screenshot required • Processing time 5-15 minutes",
-      color: "from-violet-500 to-purple-600",
-      borderColor: "border-violet-500/30",
-      logo: gopayLogo,
-      accountName: "CUSTOMER SERVICE"
-    },
-    "dana": {
-      name: "DANA",
-      icon: <img src={danaLogo} alt="DANA" className="w-6 h-6 object-contain" />,
-      instructions: "Transfer to following number",
-      account: "08198765432",
-      note: "Screenshot required • Processing time 5-15 minutes",
-      color: "from-purple-600 to-indigo-700",
-      borderColor: "border-purple-600/30",
-      logo: danaLogo,
-      accountName: "CUSTOMER SERVICE"
-    },
-    "ovo": {
-      name: "OVO",
-      icon: <img src={ovoLogo} alt="OVO" className="w-6 h-6 object-contain" />,
-      instructions: "Transfer to following number",
-      account: "08123456789",
-      note: "Screenshot required • Processing time 5-15 minutes",
-      color: "from-indigo-500 to-purple-600",
-      borderColor: "border-indigo-500/30",
-      logo: ovoLogo,
-      accountName: "CUSTOMER SERVICE"
-    },
-    "shopeepay": {
-      name: "ShopeePay",
-      icon: <img src={shopeePayLogo} alt="ShopeePay" className="w-6 h-6 object-contain" />,
-      instructions: "Transfer to following number",
-      account: "08198765432",
-      note: "Screenshot required • Processing time 5-15 minutes",
-      color: "from-pink-500 to-rose-600",
-      borderColor: "border-pink-500/30",
-      logo: shopeePayLogo,
-      accountName: "CUSTOMER SERVICE"
-    },
-    "linkaja": {
-      name: "LinkAja",
-      icon: <img src={linkAjaLogo} alt="LinkAja" className="w-6 h-6 object-contain" />,
-      instructions: "Transfer to following number",
-      account: "08123456789",
-      note: "Screenshot required • Processing time 5-15 minutes",
-      color: "from-blue-500 to-indigo-600",
+    "paypal": {
+      name: "PayPal",
+      icon: <FaPaypal className="text-blue-500" size={24} />,
+      instructions: "You will be redirected to PayPal",
+      account: "paypal@example.com",
+      note: "Processing time 5-15 minutes",
+      color: "from-blue-500 to-blue-600",
       borderColor: "border-blue-500/30",
-      logo: linkAjaLogo,
-      accountName: "CUSTOMER SERVICE"
+      accountName: "PAYPAL ACCOUNT"
     },
-    "bca": {
-      name: "BCA",
-      icon: <img src={bcaLogo} alt="BCA" className="w-6 h-6 object-contain" />,
+    "credit": {
+      name: "Credit Card",
+      icon: <FiCreditCard className="text-purple-500" size={24} />,
+      instructions: "Enter your card details",
+      account: "VISA/MASTERCARD",
+      note: "Secure payment processing",
+      color: "from-purple-500 to-purple-600",
+      borderColor: "border-purple-500/30",
+      accountName: "CREDIT CARD"
+    },
+    "bank": {
+      name: "Bank Transfer",
+      icon: <FaUniversity className="text-green-500" size={24} />,
       instructions: "Transfer to following account",
       account: "1234567890",
-      note: "Screenshot required • Processing time 5-15 minutes",
-      color: "from-indigo-600 to-blue-700",
-      borderColor: "border-indigo-600/30",
-      logo: bcaLogo,
-      accountName: "CUSTOMER SERVICE"
+      note: "Processing time 1-3 business days",
+      color: "from-green-500 to-green-600",
+      borderColor: "border-green-500/30",
+      accountName: "BANK ACCOUNT"
+    }
+  };
+
+  const currencies = {
+    "usd": {
+      symbol: "$",
+      name: "USD"
     },
-    "jago": {
-      name: "Bank Jago",
-      icon: <img src={jagoLogo} alt="Bank Jago" className="w-6 h-6 object-contain" />,
-      instructions: "Transfer to following account",
-      account: "9876543210",
-      note: "Screenshot required • Processing time 5-15 minutes",
-      color: "from-purple-500 to-indigo-600",
-      borderColor: "border-purple-500/30",
-      logo: jagoLogo,
-      accountName: "CUSTOMER SERVICE"
+    "idr": {
+      symbol: "Rp",
+      name: "IDR"
+    },
+    "sgd": {
+      symbol: "S$",
+      name: "SGD"
+    },
+    "btc": {
+      symbol: "₿",
+      name: "BTC"
+    },
+    "eth": {
+      symbol: "Ξ",
+      name: "ETH"
     }
   };
 
@@ -268,7 +236,7 @@ const PaymentPage = () => {
 
   const handleProceedToPayment = () => {
     if (userHasPlan) {
-      alert("Anda Sudah Memiliki Paket Ini, silahkan pilih yang lain");
+      alert("You already have this plan, please choose another one");
       return;
     }
 
@@ -309,7 +277,7 @@ const PaymentPage = () => {
           },
           {
             name: "Transaction Details",
-            value: `**Plan:** ${transactionData.transactionDetails.plan}\n**Amount:** Rp${transactionData.transactionDetails.totalAmount.toLocaleString('id-ID')}\n**Method:** ${transactionData.transactionDetails.paymentMethod}\n**Invoice:** ${transactionData.transactionDetails.invoiceNumber}`,
+            value: `**Plan:** ${transactionData.transactionDetails.plan}\n**Amount:** ${currency === 'usd' ? '$' : currency === 'idr' ? 'Rp' : currency === 'sgd' ? 'S$' : currency === 'btc' ? '₿' : 'Ξ'}${transactionData.transactionDetails.totalAmount.toLocaleString('id-ID')}\n**Method:** ${transactionData.transactionDetails.paymentMethod}\n**Invoice:** ${transactionData.transactionDetails.invoiceNumber}`,
             inline: false
           }
         ],
@@ -363,7 +331,7 @@ const PaymentPage = () => {
           status: "pending",
           invoiceNumber: invoiceNum,
           adminFee: serviceFee,
-          currency: "IDR",
+          currency: currency.toUpperCase(),
           totalAmount: Number(price) + serviceFee,
           timestamp: serverTimestamp()
         },
@@ -431,7 +399,7 @@ const PaymentPage = () => {
   if (paymentComplete) {
     return (
       <div className="fixed inset-0 bg-gray-900/90 backdrop-blur-sm flex items-center justify-center p-4 z-[9999]">
-        <div className="max-w-md w-full bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-8 border border-purple-500/20 shadow-2xl">
+        <div className="max-w-md w-full bg-gray-800 rounded-xl p-8 border border-purple-500/30 shadow-2xl">
           <div className="flex flex-col items-center text-center space-y-6">
             <div className="relative">
               <div className="absolute inset-0 bg-purple-500/20 blur-xl rounded-full"></div>
@@ -470,7 +438,7 @@ const PaymentPage = () => {
   if (paymentPending) {
     return (
       <div className="fixed inset-0 bg-gray-900/90 backdrop-blur-sm flex items-center justify-center p-4 z-[9999]">
-        <div className="max-w-md w-full bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-8 border border-purple-500/20 shadow-2xl">
+        <div className="max-w-md w-full bg-gray-800 rounded-xl p-8 border border-purple-500/30 shadow-2xl">
           <div className="flex flex-col items-center text-center space-y-6">
             <div className="relative">
               <div className="absolute inset-0 bg-purple-500/20 blur-xl rounded-full animate-pulse"></div>
@@ -509,7 +477,7 @@ const PaymentPage = () => {
         {/* Payment Details Modal */}
         {showPaymentDetails && (
           <div className="fixed inset-0 z-[99999] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-            <div className="max-w-md w-full bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-6 border border-purple-500/30 shadow-2xl">
+            <div className="max-w-md w-full bg-gray-800 rounded-xl p-6 border border-purple-500/30 shadow-2xl">
               <div className="flex justify-between items-center mb-4">
                 <h3 className="text-xl font-bold text-white">
                   {paymentMethods[paymentMethod].name} Payment
@@ -523,43 +491,32 @@ const PaymentPage = () => {
               </div>
               
               <div className="space-y-4">
-                {paymentMethod === "qris" ? (
-                  <div className="flex flex-col items-center py-4">
-                    <div className="w-52 h-52 bg-white rounded-xl flex items-center justify-center mb-4 p-4 shadow-lg">
-                      <img src={qrisByr} alt="QRIS Payment" className="w-full h-full object-contain" />
+                <div className="bg-gray-700/30 rounded-lg p-4 border border-gray-600">
+                  <div className="flex justify-between items-center mb-3">
+                    <div>
+                      <p className="text-gray-400 text-sm uppercase tracking-wider">
+                        {paymentMethods[paymentMethod].name} {paymentMethod === 'crypto' ? 'Address' : paymentMethod === 'bank' ? 'Account' : paymentMethod === 'credit' ? 'Card' : 'Email'}
+                      </p>
+                      <p className="text-lg font-bold text-white font-mono tracking-wide mt-1">
+                        {paymentMethods[paymentMethod].account}
+                      </p>
                     </div>
-                    <p className="text-gray-300 text-center">
-                      Scan this QR code using your mobile banking app
-                    </p>
+                    <button 
+                      onClick={() => copyToClipboard(paymentMethods[paymentMethod].account, paymentMethod)}
+                      className="p-2 rounded-lg bg-gray-600 hover:bg-gray-500 text-gray-300 hover:text-white transition-colors border border-gray-500"
+                      title="Copy"
+                    >
+                      {copiedIndex === paymentMethod ? (
+                        <FiCheck className="w-5 h-5 text-purple-400" />
+                      ) : (
+                        <FiCopy className="w-5 h-5" />
+                      )}
+                    </button>
                   </div>
-                ) : (
-                  <div className="bg-gray-700/30 rounded-lg p-4 border border-gray-600">
-                    <div className="flex justify-between items-center mb-3">
-                      <div>
-                        <p className="text-gray-400 text-sm uppercase tracking-wider">
-                          {paymentMethods[paymentMethod].name} Number
-                        </p>
-                        <p className="text-lg font-bold text-white font-mono tracking-wide mt-1">
-                          {paymentMethods[paymentMethod].account}
-                        </p>
-                      </div>
-                      <button 
-                        onClick={() => copyToClipboard(paymentMethods[paymentMethod].account, paymentMethod)}
-                        className="p-2 rounded-lg bg-gray-600 hover:bg-gray-500 text-gray-300 hover:text-white transition-colors border border-gray-500"
-                        title="Copy number"
-                      >
-                        {copiedIndex === paymentMethod ? (
-                          <FiCheck className="w-5 h-5 text-purple-400" />
-                        ) : (
-                          <FiCopy className="w-5 h-5" />
-                        )}
-                      </button>
-                    </div>
-                    <p className="text-gray-400 text-sm">
-                      Atas Nama: {paymentMethods[paymentMethod].accountName}
-                    </p>
-                  </div>
-                )}
+                  <p className="text-gray-400 text-sm">
+                    Account Name: {paymentMethods[paymentMethod].accountName}
+                  </p>
+                </div>
                 
                 <div className="bg-gray-700/30 rounded-lg p-4 border border-gray-600">
                   <h4 className="text-lg font-bold text-white mb-3 flex items-center">
@@ -573,12 +530,12 @@ const PaymentPage = () => {
                     </div>
                     <div className="flex justify-between">
                       <span className="text-gray-400">Service Fee</span>
-                      <span className="text-white font-medium">Rp{serviceFee.toLocaleString('id-ID')}</span>
+                      <span className="text-white font-medium">{currencies[currency].symbol}{serviceFee.toLocaleString('id-ID')}</span>
                     </div>
                     <div className="border-t border-gray-600 my-2"></div>
                     <div className="flex justify-between">
                       <span className="text-gray-400">Total Payment</span>
-                      <span className="text-white font-bold text-lg">Rp{(Number(price) + serviceFee).toLocaleString('id-ID')}</span>
+                      <span className="text-white font-bold text-lg">{currencies[currency].symbol}{(Number(price) + serviceFee).toLocaleString('id-ID')}</span>
                     </div>
                   </div>
                 </div>
@@ -600,7 +557,7 @@ const PaymentPage = () => {
   if (paymentDeclined) {
     return (
       <div className="fixed inset-0 bg-gray-900/90 backdrop-blur-sm flex items-center justify-center p-4 z-[9999]">
-        <div className="max-w-md w-full bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-8 border border-purple-500/20 shadow-2xl">
+        <div className="max-w-md w-full bg-gray-800 rounded-xl p-8 border border-purple-500/30 shadow-2xl">
           <div className="flex flex-col items-center text-center space-y-6">
             <div className="relative">
               <div className="absolute inset-0 bg-purple-500/20 blur-xl rounded-full"></div>
@@ -639,7 +596,7 @@ const PaymentPage = () => {
   if (isProcessing) {
     return (
       <div className="fixed inset-0 bg-gray-900/90 backdrop-blur-sm flex items-center justify-center p-4 z-[9999]">
-        <div className="max-w-md w-full bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-8 text-center border border-purple-500/20 shadow-2xl">
+        <div className="max-w-md w-full bg-gray-800 rounded-xl p-8 text-center border border-purple-500/30 shadow-2xl">
           <div className="flex flex-col items-center space-y-6">
             <div className="relative">
               <div className="absolute inset-0 bg-purple-500/20 blur-xl rounded-full animate-pulse"></div>
@@ -669,216 +626,177 @@ const PaymentPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-indigo-900 text-white relative overflow-hidden">
+    <div className="min-h-screen bg-gray-900 text-white relative overflow-hidden">
       {/* Cyberpunk decorative elements */}
       <div className="absolute inset-0 z-0 pointer-events-none">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_30%,rgba(138,43,226,0.15)_0%,transparent_25%),radial-gradient(circle_at_80%_70%,rgba(109,50,157,0.15)_0%,transparent_25%)]"></div>
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(138,43,226,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(138,43,226,0.05)_1px,transparent_1px)] bg-[length:40px_40px]"></div>
-        <div className="absolute inset-0 bg-[linear-gradient(to_bottom,transparent_0%,rgba(138,43,226,0.05)_50%,transparent_100%)] bg-[length:100%_8px] animate-scanline"></div>
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_30%,rgba(188,19,254,0.15)_0%,transparent_25%),radial-gradient(circle_at_80%_70%,rgba(15,240,252,0.15)_0%,transparent_25%)]"></div>
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(188,19,254,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(188,19,254,0.05)_1px,transparent_1px)] bg-[length:40px_40px]"></div>
+        <div className="absolute inset-0 bg-[linear-gradient(to_bottom,transparent_0%,rgba(188,19,254,0.05)_50%,transparent_100%)] bg-[length:100%_8px] animate-scanline"></div>
       </div>
 
-      {/* Header */}
-      <header className="text-center pt-10 pb-6 px-4 relative z-10">
-        <h1 className="text-3xl md:text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-300 to-indigo-400 font-orbitron tracking-wider">
-          {step === 1 ? "CUSTOMER INFORMATION" : 
-           step === 2 ? "PAYMENT METHOD" : 
-           "ORDER CONFIRMATION"}
-        </h1>
-        <p className="mt-2 text-gray-300 font-rajdhani">
-          Purchasing <span className="text-purple-300 font-medium">{plan}</span> • 
-          <span className="font-bold text-white ml-1">Rp{Number(price).toLocaleString('id-ID')}</span>
-        </p>
-      </header>
+      <div className="container mx-auto px-4 py-10 relative z-10">
+        <header className="text-center mb-10">
+          <h1 className="text-3xl md:text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-blue-400 font-orbitron tracking-wider mb-2">
+            PAYMENT GATEWAY
+          </h1>
+          <p className="text-gray-400">
+            Complete your subscription to unlock premium features
+          </p>
+        </header>
 
-      {/* Progress Steps */}
-      <div className="flex justify-center mb-8 px-4 relative z-10">
-        <div className="flex items-center space-x-2 bg-gray-800 px-3 py-2 rounded-full border border-gray-700">
-          {[1, 2, 3].map((stepNumber) => (
-            <React.Fragment key={stepNumber}>
-              <div
-                className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium relative transition-all duration-300 ${
-                  step === stepNumber
-                    ? "bg-gradient-to-br from-purple-500 to-indigo-600 text-white shadow-md transform scale-110"
-                    : step > stepNumber
-                    ? "bg-gradient-to-br from-purple-400 to-indigo-500 text-white"
-                    : "bg-gray-700 text-gray-500"
-                }`}
-              >
-                {step > stepNumber ? <FiCheck size={14} /> : stepNumber}
-                {step === stepNumber && (
-                  <span className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-4 h-0.5 bg-purple-300 rounded-full animate-pulse"></span>
-                )}
-              </div>
-              {stepNumber < 3 && (
-                <div className={`w-6 h-[2px] rounded-full transition-all duration-300 ${
-                  step > stepNumber ? 'bg-purple-500' : 'bg-gray-600'
-                }`}></div>
-              )}
-            </React.Fragment>
-          ))}
-        </div>
-      </div>
+        <div className="bg-gray-800/80 backdrop-blur-md rounded-xl border border-purple-500/30 shadow-xl p-8 mb-8">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
+            <div>
+              <div className="text-2xl font-bold text-blue-400 font-orbitron">{plan}</div>
+              <div className="text-gray-500">Premium Membership</div>
+            </div>
+            <div className="text-3xl font-bold bg-gradient-to-r from-purple-400 to-pink-500 bg-clip-text text-transparent mt-4 md:mt-0">
+              {currencies[currency].symbol}{Number(price).toLocaleString('id-ID')}
+              <span className="text-lg text-gray-400 ml-1">/month</span>
+            </div>
+          </div>
 
-      {/* Main Content */}
-      <main className="flex-grow flex flex-col md:flex-row gap-6 w-full max-w-5xl mx-auto px-4 pb-10 relative z-10">
-        {/* Form Section */}
-        <section className={`w-full md:w-2/3 bg-gray-800/50 backdrop-blur-sm rounded-xl shadow-xl p-6 transition-all duration-300 border border-purple-500/20 ${
-          step === 2 ? "hover:shadow-2xl hover:scale-[1.01]" : ""
-        }`}>
           {step === 1 && (
-            <div className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                <div className="space-y-2">
-                  <label className="block text-sm font-medium text-gray-300 font-rajdhani">
-                    Full Name <span className="text-purple-400">*</span>
-                  </label>
-                  <div className="relative">
-                    <div className={`absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none ${
-                      errors.name ? 'text-purple-400' : 'text-gray-500'
-                    }`}>
-                      <FiUser className="w-5 h-5" />
-                    </div>
-                    <input
-                      type="text"
-                      name="name"
-                      value={personalInfo.name}
-                      onChange={handlePersonalInfoChange}
-                      onBlur={() => handleBlur('name')}
-                      className={`w-full bg-gray-700 border ${
-                        errors.name ? 'border-purple-500/70 focus:ring-purple-500/20' : 'border-gray-600 focus:ring-indigo-500/20'
-                      } rounded-lg py-2.5 px-4 pl-10 text-white focus:ring-2 focus:outline-none transition-all placeholder-gray-500 font-rajdhani`}
-                      placeholder="John Doe"
-                    />
-                  </div>
-                  {errors.name && (
-                    <p className="text-sm text-purple-400 flex items-center mt-1 font-rajdhani">
-                      <FiX className="mr-1 flex-shrink-0" /> {errors.name}
-                    </p>
-                  )}
-                </div>
+            <div className="space-y-8">
+              <div>
+                <h3 className="text-xl font-bold text-blue-400 mb-4 flex items-center font-orbitron">
+                  <FiUser className="mr-2" />
+                  CUSTOMER INFORMATION
+                </h3>
                 
-                <div className="space-y-2">
-                  <label className="block text-sm font-medium text-gray-300 font-rajdhani">
-                    Email <span className="text-purple-400">*</span>
-                  </label>
-                  <div className="relative">
-                    <div className={`absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none ${
-                      errors.email ? 'text-purple-400' : 'text-gray-500'
-                    }`}>
-                      <FiMail className="w-5 h-5" />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <label className="block text-sm font-medium text-gray-400">
+                      Full Name <span className="text-purple-400">*</span>
+                    </label>
+                    <div className="relative">
+                      <input
+                        type="text"
+                        name="name"
+                        value={personalInfo.name}
+                        onChange={handlePersonalInfoChange}
+                        onBlur={() => handleBlur('name')}
+                        className={`w-full bg-gray-700 border ${
+                          errors.name ? 'border-purple-500 focus:ring-purple-500/20' : 'border-gray-600 focus:ring-blue-500/20'
+                        } rounded-lg py-3 px-4 text-white focus:ring-2 focus:outline-none transition-all placeholder-gray-500`}
+                        placeholder="John Doe"
+                      />
                     </div>
-                    <input
-                      type="email"
-                      name="email"
-                      value={personalInfo.email}
-                      onChange={handlePersonalInfoChange}
-                      onBlur={() => handleBlur('email')}
-                      className={`w-full bg-gray-700 border ${
-                        errors.email ? 'border-purple-500/70 focus:ring-purple-500/20' : 'border-gray-600 focus:ring-indigo-500/20'
-                      } rounded-lg py-2.5 px-4 pl-10 text-white focus:ring-2 focus:outline-none transition-all placeholder-gray-500 font-rajdhani`}
-                      placeholder="your@email.com"
-                    />
+                    {errors.name && (
+                      <p className="text-sm text-purple-400 flex items-center mt-1">
+                        <FiX className="mr-1 flex-shrink-0" /> {errors.name}
+                      </p>
+                    )}
                   </div>
-                  {errors.email && (
-                    <p className="text-sm text-purple-400 flex items-center mt-1 font-rajdhani">
-                      <FiX className="mr-1 flex-shrink-0" /> {errors.email}
-                    </p>
-                  )}
-                </div>
-                
-                <div className="space-y-2">
-                  <label className="block text-sm font-medium text-gray-300 font-rajdhani">
-                    Discord User ID <span className="text-purple-400">*</span>
-                  </label>
-                  <div className="relative">
-                    <div className={`absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none ${
-                      errors.discord ? 'text-purple-400' : 'text-gray-500'
-                    }`}>
-                      <FaDiscord className="w-5 h-5" />
+                  
+                  <div className="space-y-2">
+                    <label className="block text-sm font-medium text-gray-400">
+                      Email <span className="text-purple-400">*</span>
+                    </label>
+                    <div className="relative">
+                      <input
+                        type="email"
+                        name="email"
+                        value={personalInfo.email}
+                        onChange={handlePersonalInfoChange}
+                        onBlur={() => handleBlur('email')}
+                        className={`w-full bg-gray-700 border ${
+                          errors.email ? 'border-purple-500 focus:ring-purple-500/20' : 'border-gray-600 focus:ring-blue-500/20'
+                        } rounded-lg py-3 px-4 text-white focus:ring-2 focus:outline-none transition-all placeholder-gray-500`}
+                        placeholder="your@email.com"
+                      />
                     </div>
-                    <input
-                      type="text"
-                      name="discord"
-                      value={personalInfo.discord}
-                      onChange={handlePersonalInfoChange}
-                      onBlur={() => handleBlur('discord')}
-                      className={`w-full bg-gray-700 border ${
-                        errors.discord ? 'border-purple-500/70 focus:ring-purple-500/20' : 'border-gray-600 focus:ring-indigo-500/20'
-                      } rounded-lg py-2.5 px-4 pl-10 text-white focus:ring-2 focus:outline-none transition-all placeholder-gray-500 font-rajdhani`}
-                      placeholder="1234567890123456789"
-                      maxLength={19}
-                    />
+                    {errors.email && (
+                      <p className="text-sm text-purple-400 flex items-center mt-1">
+                        <FiX className="mr-1 flex-shrink-0" /> {errors.email}
+                      </p>
+                    )}
                   </div>
-                  {errors.discord && (
-                    <p className="text-sm text-purple-400 flex items-center mt-1 font-rajdhani">
-                      <FiX className="mr-1 flex-shrink-0" /> {errors.discord}
-                    </p>
-                  )}
-                </div>
-                
-                <div className="space-y-2">
-                  <label className="block text-sm font-medium text-gray-300 font-rajdhani">
-                    WhatsApp Number <span className="text-purple-400">*</span>
-                  </label>
-                  <div className="relative">
-                    <div className={`absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none ${
-                      errors.phone ? 'text-purple-400' : 'text-gray-500'
-                    }`}>
-                      <FiSmartphone className="w-5 h-5" />
+                  
+                  <div className="space-y-2">
+                    <label className="block text-sm font-medium text-gray-400">
+                      Discord User ID <span className="text-purple-400">*</span>
+                    </label>
+                    <div className="relative">
+                      <input
+                        type="text"
+                        name="discord"
+                        value={personalInfo.discord}
+                        onChange={handlePersonalInfoChange}
+                        onBlur={() => handleBlur('discord')}
+                        className={`w-full bg-gray-700 border ${
+                          errors.discord ? 'border-purple-500 focus:ring-purple-500/20' : 'border-gray-600 focus:ring-blue-500/20'
+                        } rounded-lg py-3 px-4 text-white focus:ring-2 focus:outline-none transition-all placeholder-gray-500`}
+                        placeholder="1234567890123456789"
+                        maxLength={19}
+                      />
                     </div>
-                    <input
-                      type="tel"
-                      name="phone"
-                      value={personalInfo.phone}
-                      onChange={handlePersonalInfoChange}
-                      onBlur={() => handleBlur('phone')}
-                      className={`w-full bg-gray-700 border ${
-                        errors.phone ? 'border-purple-500/70 focus:ring-purple-500/20' : 'border-gray-600 focus:ring-indigo-500/20'
-                      } rounded-lg py-2.5 px-4 pl-10 text-white focus:ring-2 focus:outline-none transition-all placeholder-gray-500 font-rajdhani`}
-                      placeholder="08123456789"
-                      maxLength={15}
-                    />
+                    {errors.discord && (
+                      <p className="text-sm text-purple-400 flex items-center mt-1">
+                        <FiX className="mr-1 flex-shrink-0" /> {errors.discord}
+                      </p>
+                    )}
                   </div>
-                  {errors.phone && (
-                    <p className="text-sm text-purple-400 flex items-center mt-1 font-rajdhani">
-                      <FiX className="mr-1 flex-shrink-0" /> {errors.phone}
-                    </p>
-                  )}
+                  
+                  <div className="space-y-2">
+                    <label className="block text-sm font-medium text-gray-400">
+                      WhatsApp Number <span className="text-purple-400">*</span>
+                    </label>
+                    <div className="relative">
+                      <input
+                        type="tel"
+                        name="phone"
+                        value={personalInfo.phone}
+                        onChange={handlePersonalInfoChange}
+                        onBlur={() => handleBlur('phone')}
+                        className={`w-full bg-gray-700 border ${
+                          errors.phone ? 'border-purple-500 focus:ring-purple-500/20' : 'border-gray-600 focus:ring-blue-500/20'
+                        } rounded-lg py-3 px-4 text-white focus:ring-2 focus:outline-none transition-all placeholder-gray-500`}
+                        placeholder="08123456789"
+                        maxLength={15}
+                      />
+                    </div>
+                    {errors.phone && (
+                      <p className="text-sm text-purple-400 flex items-center mt-1">
+                        <FiX className="mr-1 flex-shrink-0" /> {errors.phone}
+                      </p>
+                    )}
+                  </div>
                 </div>
               </div>
               
-              <div className="bg-gray-700/30 rounded-lg p-5 border border-gray-600">
-                <h3 className="text-lg font-bold text-white mb-3 flex items-center font-orbitron">
+              <div className="bg-gray-700/50 rounded-lg p-6 border border-gray-600">
+                <h3 className="text-lg font-bold text-white mb-4 flex items-center">
                   <FiShield className="text-purple-400 mr-2" />
                   Terms & Conditions
                 </h3>
-                <ul className="text-gray-400 text-sm space-y-3 font-rajdhani">
+                <ul className="text-gray-400 space-y-3">
                   <li className="flex items-start">
                     <span className="text-purple-400 mr-2 mt-0.5">•</span>
                     All information must be accurate. Transactions with incorrect data will be voided without refund.
                   </li>
                   <li className="flex items-start">
-                    <span className="text-purple-400 mr-2 mt=0.5">•</span>
+                    <span className="text-purple-400 mr-2 mt-0.5">•</span>
                     Your Discord User ID must match your account exactly.
                   </li>
                   <li className="flex items-start">
-                    <span className="text-purple-400 mr-2 mt=0.5">•</span>
+                    <span className="text-purple-400 mr-2 mt-0.5">•</span>
                     Payments are processed within 1-15 minutes during business hours.
                   </li>
                 </ul>
               </div>
               
-              <div className="flex justify-between pt-5 border-t border-gray-700">
+              <div className="flex justify-between pt-6 border-t border-gray-700">
                 <Button
                   onClick={() => navigate(-1)}
                   variant="outline"
-                  className="border-gray-600 hover:bg-gray-700 text-gray-300 hover:text-white font-rajdhani"
+                  className="border-gray-600 hover:bg-gray-700 text-gray-300 hover:text-white"
                 >
                   Back
                 </Button>
                 <Button
                   onClick={handleProceedToPayment}
-                  className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 font-rajdhani"
+                  className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
                   disabled={Object.keys(errors).length > 0}
                 >
                   Continue to Payment
@@ -888,27 +806,28 @@ const PaymentPage = () => {
           )}
 
           {step === 2 && (
-            <div className="space-y-6">
-              <div className="space-y-5">
-                <h3 className="text-lg font-bold text-white font-orbitron">SELECT PAYMENT METHOD</h3>
+            <div className="space-y-8">
+              <div>
+                <h3 className="text-xl font-bold text-blue-400 mb-4 flex items-center font-orbitron">
+                  <FiWallet className="mr-2" />
+                  PAYMENT METHOD
+                </h3>
                 
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   {Object.entries(paymentMethods).map(([key, method]) => (
                     <button
                       key={key}
                       onClick={() => setPaymentMethod(key)}
-                      className={`p-3 rounded-lg border-2 transition-all duration-200 flex flex-col items-center ${
+                      className={`p-4 rounded-lg border transition-all duration-200 flex flex-col items-center ${
                         paymentMethod === key
                           ? `bg-gradient-to-br ${method.color} border-transparent shadow-lg`
-                          : "border-gray-600 hover:border-gray-500 hover:bg-gray-700/30"
+                          : "border-gray-600 hover:border-purple-500 hover:bg-gray-700/30"
                       }`}
                     >
-                      <div className={`w-10 h-10 rounded-full flex items-center justify-center mb-2 ${
-                        paymentMethod === key ? "bg-white/10" : "bg-gray-700"
-                      }`}>
+                      <div className="mb-2">
                         {method.icon}
                       </div>
-                      <span className="font-semibold text-white font-rajdhani">
+                      <span className="font-semibold text-white">
                         {method.name}
                       </span>
                     </button>
@@ -916,44 +835,104 @@ const PaymentPage = () => {
                 </div>
               </div>
               
-              <div className="bg-gray-700/30 rounded-xl p-5 border border-gray-600">
+              <div>
+                <h3 className="text-xl font-bold text-blue-400 mb-4 flex items-center font-orbitron">
+                  <FiCreditCard className="mr-2" />
+                  CURRENCY
+                </h3>
+                
+                <div className="flex flex-wrap gap-2">
+                  {Object.entries(currencies).map(([key, curr]) => (
+                    <button
+                      key={key}
+                      onClick={() => setCurrency(key)}
+                      className={`px-4 py-2 rounded-md transition-all ${
+                        currency === key
+                          ? 'bg-purple-500 text-white'
+                          : 'bg-gray-700 border border-gray-600 hover:border-purple-500'
+                      }`}
+                    >
+                      {curr.name}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              
+              <div className="bg-gray-700/50 rounded-xl p-6 border border-gray-600">
                 <div className="flex flex-col items-center text-center mb-6">
-                  <div className={`w-14 h-14 rounded-full flex items-center justify-center mb-3 bg-gradient-to-br ${paymentMethods[paymentMethod].color} text-white shadow-md`}>
+                  <div className={`w-14 h-14 rounded-full flex items-center justify-center mb-4 bg-gradient-to-br ${paymentMethods[paymentMethod].color} text-white shadow-md`}>
                     {paymentMethods[paymentMethod].icon}
                   </div>
-                  <h3 className="text-xl font-bold text-white mb-1 font-orbitron">
+                  <h3 className="text-xl font-bold text-white mb-2 font-orbitron">
                     {paymentMethods[paymentMethod].instructions}
                   </h3>
-                  <p className="text-gray-400 text-sm font-rajdhani">
+                  <p className="text-gray-400">
                     {paymentMethods[paymentMethod].note}
                   </p>
                 </div>
                 
-                {paymentMethod === "qris" ? (
-                  <div className="flex flex-col items-center py-4">
-                    <div className="w-52 h-52 bg-white rounded-xl flex items-center justify-center mb-4 p-4 shadow-lg">
-                      <img src={qrisByr} alt="QRIS Payment" className="w-full h-full object-contain" />
+                <div className="space-y-6">
+                  {paymentMethod === 'credit' ? (
+                    <div className="space-y-4">
+                      <div className="space-y-2">
+                        <label className="block text-sm font-medium text-gray-400">
+                          Card Number <span className="text-purple-400">*</span>
+                        </label>
+                        <input
+                          type="text"
+                          className="w-full bg-gray-700 border border-gray-600 focus:ring-blue-500/20 rounded-lg py-3 px-4 text-white focus:ring-2 focus:outline-none transition-all placeholder-gray-500"
+                          placeholder="1234 5678 9012 3456"
+                        />
+                      </div>
+                      
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <label className="block text-sm font-medium text-gray-400">
+                            Expiry Date <span className="text-purple-400">*</span>
+                          </label>
+                          <input
+                            type="text"
+                            className="w-full bg-gray-700 border border-gray-600 focus:ring-blue-500/20 rounded-lg py-3 px-4 text-white focus:ring-2 focus:outline-none transition-all placeholder-gray-500"
+                            placeholder="MM/YY"
+                          />
+                        </div>
+                        
+                        <div className="space-y-2">
+                          <label className="block text-sm font-medium text-gray-400">
+                            CVV <span className="text-purple-400">*</span>
+                          </label>
+                          <input
+                            type="text"
+                            className="w-full bg-gray-700 border border-gray-600 focus:ring-blue-500/20 rounded-lg py-3 px-4 text-white focus:ring-2 focus:outline-none transition-all placeholder-gray-500"
+                            placeholder="123"
+                          />
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                ) : (
-                  <div className="space-y-5">
-                    <div className="bg-gray-700/50 rounded-xl p-5 border border-gray-600">
-                      <p className="text-gray-400 text-sm mb-1 uppercase tracking-wider font-rajdhani">
-                        {paymentMethods[paymentMethod].name} Number
-                      </p>
-                      <div className="flex justify-between items-center">
+                  ) : paymentMethod === 'paypal' ? (
+                    <div className="bg-gray-700/70 rounded-lg p-5 border border-gray-600">
+                      <p className="text-gray-400 mb-2">You will be redirected to PayPal to complete your payment</p>
+                      <input
+                        type="email"
+                        className="w-full bg-gray-700 border border-gray-600 focus:ring-blue-500/20 rounded-lg py-3 px-4 text-white focus:ring-2 focus:outline-none transition-all placeholder-gray-500"
+                        placeholder="PayPal email"
+                      />
+                    </div>
+                  ) : (
+                    <div className="bg-gray-700/70 rounded-lg p-5 border border-gray-600">
+                      <div className="flex justify-between items-center mb-3">
                         <div>
-                          <p className="text-lg font-bold text-white font-mono tracking-wide">
-                            {paymentMethods[paymentMethod].account}
+                          <p className="text-gray-400 text-sm uppercase tracking-wider">
+                            {paymentMethods[paymentMethod].name} {paymentMethod === 'crypto' ? 'Address' : 'Account'}
                           </p>
-                          <p className="text-gray-400 text-sm mt-1 font-rajdhani">
-                            Atas Nama: {paymentMethods[paymentMethod].accountName}
+                          <p className="text-lg font-bold text-white font-mono tracking-wide mt-1">
+                            {paymentMethods[paymentMethod].account}
                           </p>
                         </div>
                         <button 
                           onClick={() => copyToClipboard(paymentMethods[paymentMethod].account, paymentMethod)}
                           className="p-2 rounded-lg bg-gray-600 hover:bg-gray-500 text-gray-300 hover:text-white transition-colors border border-gray-500"
-                          title="Copy number"
+                          title="Copy"
                         >
                           {copiedIndex === paymentMethod ? (
                             <FiCheck className="w-5 h-5 text-purple-400" />
@@ -962,194 +941,67 @@ const PaymentPage = () => {
                           )}
                         </button>
                       </div>
-                    </div>
-
-                    <div className="bg-gray-700/50 rounded-xl p-5 border border-gray-600">
-                      <h4 className="text-lg font-bold text-white mb-4 flex items-center font-orbitron">
-                        <FiCreditCard className="text-purple-400 mr-2" />
-                        Order Summary
-                      </h4>
-                      <div className="space-y-3 font-rajdhani">
-                        <div className="flex justify-between">
-                          <span className="text-gray-400">Product</span>
-                          <span className="text-white font-medium">{plan}</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-gray-400">Service Fee</span>
-                          <span className="text-white font-medium">Rp{serviceFee.toLocaleString('id-ID')}</span>
-                        </div>
-                        <div className="border-t border-gray-600 my-2"></div>
-                        <div className="flex justify-between">
-                          <span className="text-gray-400">Total Payment</span>
-                          <span className="text-white font-bold text-lg">Rp{(Number(price) + serviceFee).toLocaleString('id-ID')}</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="bg-purple-500/10 rounded-lg p-4 border border-purple-500/20 flex items-start">
-                      <FiMessageSquare className="flex-shrink-0 mt-0.5 mr-3 text-purple-400" />
-                      <p className="text-purple-300 text-sm font-rajdhani">
-                        {paymentMethods[paymentMethod].note}
+                      <p className="text-gray-400 text-sm">
+                        Account Name: {paymentMethods[paymentMethod].accountName}
                       </p>
                     </div>
-                  </div>
-                )}
-              </div>
-              
-              <div className="flex justify-between pt-5 border-t border-gray-700">
-                <Button
-                  onClick={() => setStep(1)}
-                  variant="outline"
-                  className="border-gray-600 hover:bg-gray-700 text-gray-300 hover:text-white font-rajdhani"
-                >
-                  Back
-                </Button>
-                <Button
-                  onClick={() => setStep(3)}
-                  className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 font-rajdhani"
-                >
-                  Confirm Payment
-                </Button>
-              </div>
-            </div>
-          )}
+                  )}
 
-          {step === 3 && (
-            <div className="space-y-6">
-              <div className="bg-gray-700/30 rounded-xl p-6 border border-gray-600">
-                <div className="flex items-center mb-6">
-                  <div className="bg-gradient-to-br from-purple-500 to-indigo-600 p-2 rounded-lg mr-3">
-                    <FiShield className="w-5 h-5 text-white" />
-                  </div>
-                  <h3 className="text-xl font-bold text-white font-orbitron">
-                    Confirm Your Order
-                  </h3>
-                </div>
-                
-                <div className="space-y-6">
-                  <div className="space-y-3">
-                    <h4 className="text-lg font-bold text-white flex items-center font-orbitron">
-                      <FiUser className="text-purple-400 mr-2" />
-                      Customer Information
-                    </h4>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="bg-gray-700/70 p-4 rounded-lg border border-gray-600">
-                        <p className="text-gray-400 text-sm mb-1 font-rajdhani">Full Name</p>
-                        <p className="text-white font-medium font-rajdhani">{personalInfo.name}</p>
-                      </div>
-                      <div className="bg-gray-700/70 p-4 rounded-lg border border-gray-600">
-                        <p className="text-gray-400 text-sm mb-1 font-rajdhani">Email</p>
-                        <p className="text-white font-medium font-rajdhani">{personalInfo.email}</p>
-                      </div>
-                      <div className="bg-gray-700/70 p-4 rounded-lg border border-gray-600">
-                        <p className="text-gray-400 text-sm mb-1 font-rajdhani">Discord ID</p>
-                        <p className="text-white font-medium font-rajdhani">{personalInfo.discord}</p>
-                      </div>
-                      <div className="bg-gray-700/70 p-4 rounded-lg border border-gray-600">
-                        <p className="text-gray-400 text-sm mb-1 font-rajdhani">WhatsApp</p>
-                        <p className="text-white font-medium font-rajdhani">{personalInfo.phone}</p>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-3">
-                    <h4 className="text-lg font-bold text-white flex items-center font-orbitron">
+                  <div className="bg-gray-700/70 rounded-lg p-5 border border-gray-600">
+                    <h4 className="text-lg font-bold text-white mb-4 flex items-center">
                       <FiCreditCard className="text-purple-400 mr-2" />
-                      Payment Information
+                      Order Summary
                     </h4>
-                    <div className="bg-gray-700/70 rounded-xl p-5 border border-gray-600">
-                      <div className="flex items-center mb-4">
-                        <div className={`w-10 h-10 rounded-full flex items-center justify-center mr-3 bg-gradient-to-br ${paymentMethods[paymentMethod].color} text-white`}>
-                          {paymentMethods[paymentMethod].icon}
-                        </div>
-                        <div>
-                          <p className="text-gray-400 text-sm font-rajdhani">Payment Method</p>
-                          <p className="text-white font-bold font-rajdhani">
-                            {paymentMethods[paymentMethod].name}
-                          </p>
-                        </div>
+                    <div className="space-y-3">
+                      <div className="flex justify-between">
+                        <span className="text-gray-400">Product</span>
+                        <span className="text-white">{plan}</span>
                       </div>
-                      
-                      <div className="space-y-3 font-rajdhani">
-                        <div className="flex justify-between">
-                          <span className="text-gray-400">Product</span>
-                          <span className="text-white">{plan}</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-gray-400">Service Fee</span>
-                          <span className="text-white">Rp{serviceFee.toLocaleString('id-ID')}</span>
-                        </div>
-                        <div className="border-t border-gray-600 my-2"></div>
-                        <div className="flex justify-between items-center">
-                          <span className="text-gray-400">Total Amount</span>
-                          <span className="text-white font-bold text-xl">Rp{(Number(price) + serviceFee).toLocaleString('id-ID')}</span>
-                        </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-400">Service Fee</span>
+                        <span className="text-white">{currencies[currency].symbol}{serviceFee.toLocaleString('id-ID')}</span>
+                      </div>
+                      <div className="border-t border-gray-600 my-2"></div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-400">Total Payment</span>
+                        <span className="text-white font-bold text-lg">{currencies[currency].symbol}{(Number(price) + serviceFee).toLocaleString('id-ID')}</span>
                       </div>
                     </div>
                   </div>
-                  
+
                   <div className="bg-purple-500/10 rounded-lg p-4 border border-purple-500/20 flex items-start">
-                    <div className="bg-purple-500/20 p-1.5 rounded-lg mr-3 flex-shrink-0">
-                      <FiLock className="w-4 h-4 text-purple-400" />
-                    </div>
-                    <p className="text-gray-300 text-sm font-rajdhani">
-                      Your transaction is secured with 256-bit encryption.
+                    <FiMessageSquare className="flex-shrink-0 mt-0.5 mr-3 text-purple-400" />
+                    <p className="text-purple-300 text-sm">
+                      {paymentMethods[paymentMethod].note}
                     </p>
                   </div>
                 </div>
               </div>
               
-              <div className="flex justify-between pt-5 border-t border-gray-700">
+              <div className="flex justify-between pt-6 border-t border-gray-700">
                 <Button
-                  onClick={() => setStep(2)}
+                  onClick={() => setStep(1)}
                   variant="outline"
-                  className="border-gray-600 hover:bg-gray-700 text-gray-300 hover:text-white font-rajdhani"
+                  className="border-gray-600 hover:bg-gray-700 text-gray-300 hover:text-white"
                 >
                   Back
                 </Button>
                 <Button
                   onClick={submitPayment}
-                  className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 font-rajdhani"
+                  className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
                 >
                   Confirm & Pay Now
                 </Button>
               </div>
             </div>
           )}
-        </section>
+        </div>
 
-        {/* Order Summary Section */}
-        <section className="w-full md:w-1/3 bg-gray-800/50 backdrop-blur-sm rounded-xl shadow-xl p-6 flex flex-col border border-purple-500/20">
-          <h2 className="text-xl font-semibold text-white mb-6 font-orbitron">ORDER SUMMARY</h2>
-
-          <div className="flex-grow space-y-4">
-            <div className="flex items-start gap-4 p-4 bg-gray-700/30 rounded-lg border border-gray-600">
-              <div className="bg-gradient-to-br from-purple-500 to-indigo-600 w-12 h-12 rounded-lg flex items-center justify-center">
-                <FiCreditCard className="w-6 h-6 text-white" />
-              </div>
-              <div>
-                <h3 className="font-medium text-white font-rajdhani">{plan}</h3>
-                <p className="text-purple-300 font-semibold mt-1 font-rajdhani">Rp{Number(price).toLocaleString('id-ID')}</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="mt-8 pt-6 border-t border-gray-700 font-rajdhani">
-            <div className="flex justify-between">
-              <span className="text-gray-300">Subtotal</span>
-              <span className="font-medium text-white">Rp{Number(price).toLocaleString('id-ID')}</span>
-            </div>
-            <div className="flex justify-between mt-2">
-              <span className="text-gray-300">Service Fee</span>
-              <span className="font-medium text-white">Rp{serviceFee.toLocaleString('id-ID')}</span>
-            </div>
-            <div className="flex justify-between mt-3 pt-3 border-t border-gray-700 font-bold text-lg">
-              <span>Total</span>
-              <span>Rp{(Number(price) + serviceFee).toLocaleString('id-ID')}</span>
-            </div>
-          </div>
-        </section>
-      </main>
+        <footer className="text-center text-gray-500 text-sm">
+          <p className="mb-1">Secured with <FiLock className="inline" /> SSL Encryption | <a href="#" className="text-blue-400 hover:underline">Terms of Service</a></p>
+          <p>Need help? <a href="#" className="text-blue-400 hover:underline">Contact Support</a></p>
+        </footer>
+      </div>
 
       {/* Confirmation Modal */}
       {showConfirmation && (
@@ -1160,14 +1012,14 @@ const PaymentPage = () => {
                 <FiShield className="w-5 h-5 text-purple-300" />
               </div>
               <div>
-                <h3 className="text-xl font-bold text-white mb-1 font-orbitron">Confirm Submission</h3>
-                <p className="text-gray-400 font-rajdhani">Please verify your information</p>
+                <h3 className="text-xl font-bold text-white mb-1">Confirm Submission</h3>
+                <p className="text-gray-400">Please verify your information</p>
               </div>
             </div>
             
             <div className="bg-gray-700/50 rounded-lg p-4 mb-5 border border-gray-600/50">
-              <h4 className="text-sm font-semibold text-gray-300 mb-2 uppercase tracking-wider font-orbitron">IMPORTANT NOTICE</h4>
-              <ul className="text-gray-400 text-sm space-y-2 font-rajdhani">
+              <h4 className="text-sm font-semibold text-gray-300 mb-2 uppercase tracking-wider">IMPORTANT NOTICE</h4>
+              <ul className="text-gray-400 text-sm space-y-2">
                 <li className="flex items-start">
                   <span className="text-purple-400 mr-2">•</span>
                   All transactions are final and non-refundable
@@ -1180,7 +1032,7 @@ const PaymentPage = () => {
             </div>
             
             <div className="flex justify-between items-center">
-              <label className="flex items-center text-gray-400 text-sm cursor-pointer font-rajdhani">
+              <label className="flex items-center text-gray-400 text-sm cursor-pointer">
                 <input
                   type="checkbox"
                   checked={dontShowAgain}
@@ -1194,7 +1046,7 @@ const PaymentPage = () => {
                 <Button
                   onClick={() => setShowConfirmation(false)}
                   variant="outline"
-                  className="border-gray-600 hover:bg-gray-700/50 text-gray-300 hover:text-white font-rajdhani"
+                  className="border-gray-600 hover:bg-gray-700/50 text-gray-300 hover:text-white"
                 >
                   Cancel
                 </Button>
@@ -1203,7 +1055,7 @@ const PaymentPage = () => {
                     setShowConfirmation(false);
                     setStep(2);
                   }}
-                  className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 font-rajdhani"
+                  className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
                 >
                   Confirm
                 </Button>
@@ -1219,7 +1071,7 @@ const PaymentPage = () => {
           <div className="bg-gray-800/90 backdrop-blur-sm rounded-lg p-4 max-w-xs w-full mx-4 border border-purple-500/30 shadow-lg">
             <div className="flex items-center justify-center space-x-2">
               <FiCheck className="w-5 h-5 text-purple-400" />
-              <p className="text-white font-medium font-rajdhani">Copied to clipboard</p>
+              <p className="text-white font-medium">Copied to clipboard</p>
             </div>
           </div>
         </div>
@@ -1232,10 +1084,6 @@ const PaymentPage = () => {
         .font-orbitron {
           font-family: 'Orbitron', sans-serif;
           letter-spacing: 1px;
-        }
-        
-        .font-rajdhani {
-          font-family: 'Rajdhani', sans-serif;
         }
         
         @keyframes scanline {
