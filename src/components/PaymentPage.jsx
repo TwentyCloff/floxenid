@@ -52,7 +52,7 @@ const PaymentPage = () => {
       note: "Instant processing • No additional fees",
       color: "from-yellow-500 to-yellow-600",
       borderColor: "border-yellow-500/30",
-      accountName: "CRYPTO WALLET"
+      accountName: "AcaiLoveNier"
     },
     "paypal": {
       name: "PayPal",
