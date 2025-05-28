@@ -3,8 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { 
   FiCheck, FiLock, FiX, FiShield, FiUser, 
   FiMail, FiSmartphone, FiLoader, FiMessageSquare,
-  FiCopy, FiExternalLink, FiChevronDown, FiCreditCard,
-  FiWallet
+  FiCopy, FiExternalLink, FiChevronDown, FiCreditCard
 } from "react-icons/fi";
 import { FaDiscord, FaBitcoin, FaPaypal, FaUniversity } from "react-icons/fa";
 import { SiBankofamerica } from "react-icons/si";
@@ -809,7 +808,7 @@ const PaymentPage = () => {
             <div className="space-y-8">
               <div>
                 <h3 className="text-xl font-bold text-blue-400 mb-4 flex items-center font-orbitron">
-                  <FiWallet className="mr-2" />
+                  <FiCreditCard className="mr-2" />
                   PAYMENT METHOD
                 </h3>
                 
