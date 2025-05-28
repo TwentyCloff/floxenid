@@ -48,7 +48,7 @@ const PaymentPage = () => {
       name: "Crypto",
       icon: <FaBitcoin className="text-yellow-500" size={24} />,
       instructions: "Send crypto to the following address",
-      account: "0x71C7656EC7ab88b098defB751B7401B5f6d8976F",
+      account: "acai and nier is husband and husband",
       note: "Instant processing • No additional fees",
       color: "from-yellow-500 to-yellow-600",
       borderColor: "border-yellow-500/30",
