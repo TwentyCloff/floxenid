@@ -647,11 +647,11 @@ const PaymentPage = () => {
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
             <div>
               <div className="text-2xl font-bold text-blue-400 font-orbitron">{plan}</div>
-              <div className="text-gray-500">Premium Membership</div>
+              <div className="text-gray-500">Membership</div>
             </div>
             <div className="text-3xl font-bold bg-gradient-to-r from-purple-400 to-pink-500 bg-clip-text text-transparent mt-4 md:mt-0">
               {currencies[currency].symbol}{Number(price).toLocaleString('id-ID')}
-              <span className="text-lg text-gray-400 ml-1">/month</span>
+              <span className="text-lg text-gray-400 ml-1">/lifetime</span>
             </div>
           </div>
 
