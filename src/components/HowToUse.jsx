@@ -1,4 +1,4 @@
-import { useRef, useEffect, useState } from "react";
+fix bug, dan bagian atas atau bagian awalnya itu jangan tampilkan video youtube, ubah jadi text tengah How To Use, jangan lupa fix bug bagian get started, first quest dan yang lainnya, disini hilangkan icon centang dan hilangkan scroll bar di kanannya, karena 3 icon ini bisa di scroll, dan bug, dan ketika klik misalnya first quest, tampilkan yang lain, jangan yang sama, dan hilangkan beginner persen,dll, gak penting, fokus dengan how to use, cara menggunakan script exploitasi saya, beri full kode dengan improvement 200x ya ! : import { useRef, useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { TiLocationArrow } from "react-icons/ti";
 import { FiUser, FiCompass, FiAward, FiLink, FiYoutube } from "react-icons/fi";
