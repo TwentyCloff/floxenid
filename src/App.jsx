@@ -7,7 +7,7 @@ import Header from "./components/Header";
 import Hero from "./components/Hero";
 import Pricing from "./components/Pricing";
 import Roadmap from "./components/Roadmap";
-import Services from "./components/Services";
+import Services from "./components/HowToUse";
 import PaymentPage from "./components/PaymentPage";
 import AdminDashboard from "./components/AdminDashboard";
 import LoginAdmin from "./components/LoginAdmin";
