@@ -74,14 +74,14 @@ const Features = () => {
     <Section 
       id="features"
       crosses
-      className="pt-[6rem] -mt-[5.25rem] relative overflow-hidden"
+      className="pt-[4rem] -mt-[2rem] relative overflow-hidden"
     >
-      {/* Background gradient similar to hero */}
-      <div
-        className="absolute inset-0 z-[-20] pointer-events-none"
-        style={{
-          background: "linear-gradient(180deg, #121212 0%, #000000 90%)",
-        }}
+      {/* Full black background */}
+      <div className="absolute inset-0 bg-black z-[-30]" />
+
+      {/* Transparent top shape to blend with hero section */}
+      <div 
+        className="absolute top-0 left-0 w-full h-32 bg-gradient-to-b from-black/80 to-transparent z-[-20]"
       />
 
       {/* Container for content */}
@@ -120,7 +120,7 @@ const Features = () => {
                 const IconComponent = featureIcons[feature.icon];
                 return (
                   <div 
-                    className="bg-n-7/50 p-4 rounded-xl border border-n-6 hover:bg-n-7 transition-colors backdrop-blur-sm"
+                    className="bg-n-7/80 p-4 rounded-xl border border-n-6 hover:bg-n-7 transition-colors backdrop-blur-sm"
                     key={feature.id}
                   >
                     <div className="flex items-start">
@@ -168,7 +168,7 @@ const Features = () => {
                       top: `calc(50% - ${y}rem)`,
                     }}
                   >
-                    <div className="relative w-full h-full bg-n-7 border-2 border-n-6 rounded-xl flex items-center justify-center p-2 hover:scale-110 transition-transform duration-300 hover:shadow-lg hover:shadow-primary/20 backdrop-blur-sm">
+                    <div className="relative w-full h-full bg-n-7/80 border-2 border-n-6 rounded-xl flex items-center justify-center p-2 hover:scale-110 transition-transform duration-300 hover:shadow-lg hover:shadow-primary/20 backdrop-blur-sm">
                       <IconComponent className="text-3xl text-primary" />
                       <div className="absolute -z-10 inset-0 rounded-xl bg-primary/10 blur-md"></div>
                     </div>
@@ -185,11 +185,11 @@ const Features = () => {
         </div>
       </div>
 
-      {/* Gradient transisi ke hitam pekat */}
+      {/* Bottom gradient to blend with next section */}
       <div
-        className="absolute bottom-0 left-0 w-full h-[12rem] z-[-5]"
+        className="absolute bottom-0 left-0 w-full h-32 z-[-5]"
         style={{
-          background: "linear-gradient(to bottom, transparent, #000)",
+          background: "linear-gradient(to top, #000, transparent)",
         }}
       />
     </Section>
