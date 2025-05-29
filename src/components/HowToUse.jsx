@@ -137,80 +137,23 @@ const StepCard = ({
   );
 };
 
-const TutorialPage = ({ title, steps, subtitle }) => {
+const HowToUse = ({ pageType = "basic" }) => {
+  const [activeSection, setActiveSection] = useState("getting-started");
   const [activeStep, setActiveStep] = useState(null);
   const [completedSteps, setCompletedSteps] = useState([]);
-
-  const handleStepComplete = (stepId) => {
-    if (!completedSteps.includes(stepId)) {
-      setCompletedSteps([...completedSteps, stepId]);
-    }
-  };
-
-  return (
-    <div className="mb-16">
-      <div className="text-center py-12">
-        <motion.h2 
-          className="text-3xl md:text-4xl font-bold text-white mb-4"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-        >
-          {title}
-        </motion.h2>
-        {subtitle && (
-          <motion.p 
-            className="text-lg text-gray-300 max-w-2xl mx-auto"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-          >
-            {subtitle}
-          </motion.p>
-        )}
-      </div>
-
-      <div className="space-y-6">
-        {steps.map((step) => (
-          <StepCard
-            key={step.id}
-            number={step.id}
-            title={step.title}
-            description={step.description}
-            videoId={step.videoId}
-            poster={step.poster}
-            icon={step.icon}
-            duration={step.duration}
-            tips={step.tips}
-            expanded={activeStep === step.id}
-            onExpand={(expanded) => {
-              if (expanded) {
-                setActiveStep(step.id);
-                handleStepComplete(step.id);
-              } else if (activeStep === step.id) {
-                setActiveStep(null);
-              }
-            }}
-          />
-        ))}
-      </div>
-    </div>
-  );
-};
-
-const HowToUse = ({ pageType = "basic" }) => {
+  
   const pageConfigs = {
     basic: {
       title: "How To Use",
       subtitle: "Step-by-step guide to using the exploit script",
-      pages: [
-        {
+      sections: {
+        "getting-started": {
           title: "Getting Started",
-          subtitle: "Learn how to set up and run the exploit script properly",
+          description: "Learn how to set up and run the exploit script properly.",
           steps: [
             {
               id: 1,
-              title: "Installation Guide",
+              title: "Installation",
               description: "Step-by-step instructions to install all required components.",
               videoId: "dQw4w9WgXcQ",
               poster: "/images/step-1-poster.jpg",
@@ -224,7 +167,7 @@ const HowToUse = ({ pageType = "basic" }) => {
             },
             {
               id: 2,
-              title: "Configuration Setup",
+              title: "Configuration",
               description: "How to properly configure the script for your environment.",
               videoId: "dQw4w9WgXcQ",
               poster: "/images/step-2-poster.jpg",
@@ -266,9 +209,9 @@ const HowToUse = ({ pageType = "basic" }) => {
             }
           ]
         },
-        {
+        "first-execution": {
           title: "First Execution",
-          subtitle: "Running the script for the first time and verifying results",
+          description: "How to execute the script for the first time and verify it works.",
           steps: [
             {
               id: 1,
@@ -328,9 +271,9 @@ const HowToUse = ({ pageType = "basic" }) => {
             }
           ]
         },
-        {
+        "advanced-features": {
           title: "Advanced Features",
-          subtitle: "Learn about advanced options and customization",
+          description: "Learn about advanced options and customization.",
           steps: [
             {
               id: 1,
@@ -390,7 +333,7 @@ const HowToUse = ({ pageType = "basic" }) => {
             }
           ]
         }
-      ],
+      },
       advancedTutorials: [
         {
           title: "Script Optimization",
@@ -415,12 +358,19 @@ const HowToUse = ({ pageType = "basic" }) => {
   };
 
   const config = pageConfigs[pageType] || pageConfigs.basic;
+  const activeSectionData = config.sections[activeSection];
   
+  const handleStepComplete = (stepId) => {
+    if (!completedSteps.includes(stepId)) {
+      setCompletedSteps([...completedSteps, stepId]);
+    }
+  };
+
   return (
     <Section id="how-to-use">
       <div className="bg-black pb-20 md:pb-32">
         <div className="container mx-auto px-4 md:px-10">
-          {/* Main Title */}
+          {/* Hero Section */}
           <div className="text-center py-12 md:py-20">
             <motion.h1 
               className="text-4xl md:text-6xl font-bold text-white mb-4"
@@ -440,14 +390,71 @@ const HowToUse = ({ pageType = "basic" }) => {
             </motion.p>
           </div>
 
-          {/* Tutorial Pages */}
-          <div className="space-y-20">
-            {config.pages.map((page, index) => (
-              <TutorialPage 
-                key={index}
-                title={page.title}
-                subtitle={page.subtitle}
-                steps={page.steps}
+          {/* Section Navigation */}
+          <div className="mb-8">
+            <div className="flex flex-wrap justify-center gap-2">
+              {Object.entries(config.sections).map(([key, section]) => (
+                <Tooltip key={key} content={section.description} responsive>
+                  <button
+                    onClick={() => setActiveSection(key)}
+                    className={`px-4 py-2 rounded-full text-sm font-medium transition-colors flex items-center gap-2 ${
+                      activeSection === key 
+                        ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg' 
+                        : 'bg-gray-900 text-gray-300 hover:bg-gray-800'
+                    }`}
+                  >
+                    {key === 'getting-started' && <FiUser className="text-sm" />}
+                    {key === 'first-execution' && <FiCompass className="text-sm" />}
+                    {key === 'advanced-features' && <FiLink className="text-sm" />}
+                    <span>{section.title}</span>
+                  </button>
+                </Tooltip>
+              ))}
+            </div>
+          </div>
+
+          {/* Current Section Title */}
+          <div className="text-center mb-8">
+            <motion.h2 
+              className="text-2xl md:text-3xl font-bold text-white mb-2"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              {activeSectionData.title}
+            </motion.h2>
+            <motion.p 
+              className="text-gray-300 max-w-2xl mx-auto"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3, delay: 0.1 }}
+            >
+              {activeSectionData.description}
+            </motion.p>
+          </div>
+
+          {/* Step-by-Step Guide - 2x2 Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {activeSectionData.steps.map((step) => (
+              <StepCard
+                key={step.id}
+                number={step.id}
+                title={step.title}
+                description={step.description}
+                videoId={step.videoId}
+                poster={step.poster}
+                icon={step.icon}
+                duration={step.duration}
+                tips={step.tips}
+                expanded={activeStep === step.id}
+                onExpand={(expanded) => {
+                  if (expanded) {
+                    setActiveStep(step.id);
+                    handleStepComplete(step.id);
+                  } else if (activeStep === step.id) {
+                    setActiveStep(null);
+                  }
+                }}
               />
             ))}
           </div>
