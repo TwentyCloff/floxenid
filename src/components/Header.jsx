@@ -1,7 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { disablePageScroll, enablePageScroll } from "scroll-lock";
 import { onAuthStateChanged, signOut } from "firebase/auth";
+import { gsap } from "gsap";
 
 import { auth } from "../config/firebaseConfig";
 import MenuSvg from "../assets/svg/MenuSvg";
@@ -11,9 +12,11 @@ import { HambugerMenu } from "../components/design/Header";
 const Header = () => {
   const pathname = useLocation();
   const navigate = useNavigate();
+  const navRefs = useRef([]);
 
   const [openNavigation, setOpenNavigation] = useState(false);
   const [user, setUser] = useState(null);
+  const [activeNav, setActiveNav] = useState(null);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
@@ -21,6 +24,22 @@ const Header = () => {
     });
 
     return () => unsubscribe();
+  }, []);
+
+  useEffect(() => {
+    // Initialize GSAP animations for nav items
+    navRefs.current.forEach((ref, index) => {
+      if (ref) {
+        const blueRects = gsap.utils.toArray(ref.querySelectorAll(".blue rect"));
+        const pinkRects = gsap.utils.toArray(ref.querySelectorAll(".pink rect"));
+        
+        // Set initial position
+        gsap.set([...blueRects, ...pinkRects], { xPercent: -100 });
+
+        // Store animation targets in ref for later use
+        ref._animationTargets = { blueRects, pinkRects };
+      }
+    });
   }, []);
 
   const toggleNavigation = () => {
@@ -33,10 +52,58 @@ const Header = () => {
     }
   };
 
-  const handleClick = () => {
+  const handleClick = (id) => {
     if (!openNavigation) return;
     enablePageScroll();
     setOpenNavigation(false);
+    setActiveNav(id);
+  };
+
+  const handleNavClick = (id, event) => {
+    setActiveNav(id);
+    
+    const currentRef = navRefs.current.find(ref => ref?.id === `nav-${id}`);
+    if (!currentRef) return;
+
+    const { blueRects, pinkRects } = currentRef._animationTargets;
+    
+    // Animate the clicked item
+    gsap.to(blueRects, {
+      duration: 0.8,
+      ease: "elastic.out(1, 0.3)",
+      xPercent: "100",
+      stagger: 0.01,
+      overwrite: true,
+      delay: 0.13
+    });
+
+    gsap.to(pinkRects, {
+      duration: 0.8,
+      ease: "elastic.out(1, 0.3)",
+      xPercent: "100",
+      stagger: 0.01,
+      overwrite: true
+    });
+
+    // Reset other nav items
+    navRefs.current.forEach(ref => {
+      if (ref && ref.id !== `nav-${id}`) {
+        const { blueRects, pinkRects } = ref._animationTargets || {};
+        if (blueRects && pinkRects) {
+          gsap.to([...blueRects, ...pinkRects], {
+            xPercent: -100,
+            duration: 0.3,
+            ease: "power2.out"
+          });
+        }
+      }
+    });
+
+    // Handle navigation if it's a link
+    const navItem = navigation.find(item => item.id === id);
+    if (navItem && !event.currentTarget.hasAttribute('data-no-navigate')) {
+      navigate(navItem.url);
+    }
   };
 
   const handleLogin = () => {
@@ -109,6 +176,62 @@ const Header = () => {
     );
   };
 
+  // Navigation Item Component
+  const NavItem = ({ item }) => {
+    const isActive = activeNav === item.id || pathname.hash === item.url;
+    
+    return (
+      <div className="radio-btn-group">
+        <input
+          type="radio"
+          name="stagger-radio-group"
+          id={`input-${item.id}`}
+          checked={isActive}
+          readOnly
+        />
+        <label
+          htmlFor={`input-${item.id}`}
+          onClick={(e) => handleNavClick(item.id, e)}
+          ref={el => navRefs.current[item.id] = el}
+          id={`nav-${item.id}`}
+          className={`block relative font-code uppercase text-purple-100 transition-colors hover:text-white ${
+            item.onlyMobile ? "lg:hidden" : ""
+          } px-6 py-6 md:py-8 lg:mr-0.25 lg:text-xs lg:font-semibold ${
+            isActive ? "z-2 lg:text-white" : "lg:text-purple-100/70"
+          } lg:leading-5 lg:hover:text-white xl:px-12`}
+        >
+          <span>{item.title}</span>
+          <svg height="100%" width="100%" xmlns="http://www.w3.org/2000/svg">
+            <g className="pink">
+              <rect x="-100%" y="0" width="100%" height="5" />
+              <rect x="-100%" y="5" width="100%" height="5" />
+              <rect x="-100%" y="10" width="100%" height="5" />
+              <rect x="-100%" y="15" width="100%" height="5" />
+              <rect x="-100%" y="20" width="100%" height="5" />
+              <rect x="-100%" y="25" width="100%" height="5" />
+              <rect x="-100%" y="30" width="100%" height="5" />
+              <rect x="-100%" y="35" width="100%" height="5" />
+              <rect x="-100%" y="40" width="100%" height="5" />
+              <rect x="-100%" y="45" width="100%" height="5" />
+            </g>
+            <g className="blue">
+              <rect x="-100%" y="0" width="100%" height="5" />
+              <rect x="-100%" y="5" width="100%" height="5" />
+              <rect x="-100%" y="10" width="100%" height="5" />
+              <rect x="-100%" y="15" width="100%" height="5" />
+              <rect x="-100%" y="20" width="100%" height="5" />
+              <rect x="-100%" y="25" width="100%" height="5" />
+              <rect x="-100%" y="30" width="100%" height="5" />
+              <rect x="-100%" y="35" width="100%" height="5" />
+              <rect x="-100%" y="40" width="100%" height="5" />
+              <rect x="-100%" y="45" width="100%" height="5" />
+            </g>
+          </svg>
+        </label>
+      </div>
+    );
+  };
+
   return (
     <>
       {openNavigation && (
@@ -128,6 +251,8 @@ const Header = () => {
           <a
             className="block w-auto xl:mr-8 text-3xl font-bold bg-gradient-to-r from-purple-300 to-purple-100 text-transparent bg-clip-text"
             href="#hero"
+            onClick={() => handleNavClick("0", { currentTarget: { hasAttribute: () => false } })}
+            data-no-navigate
           >
             Qarvo
           </a>
@@ -138,24 +263,9 @@ const Header = () => {
               openNavigation ? "flex" : "hidden"
             } fixed top-[68px] left-0 right-0 bottom-0 bg-[#0a0614] lg:static lg:flex lg:mx-auto lg:bg-transparent`}
           >
-            <div className="relative z-2 flex flex-col items-center justify-center m-auto lg:flex-row lg:ml-20"> {/* Added lg:ml-8 here */}
+            <div className="relative z-2 flex flex-col items-center justify-center m-auto lg:flex-row lg:ml-20">
               {navigation.map((item) => (
-                <a
-                  key={item.id}
-                  href={item.url}
-                  target={item.external ? "_blank" : "_self"}
-                  rel={item.external ? "noreferrer noopener" : undefined}
-                  onClick={handleClick}
-                  className={`block relative font-code text-2xl uppercase text-purple-100 transition-colors hover:text-white ${
-                    item.onlyMobile ? "lg:hidden" : ""
-                  } px-6 py-6 md:py-8 lg:mr-0.25 lg:text-xs lg:font-semibold ${
-                    item.url === pathname.hash
-                      ? "z-2 lg:text-white"
-                      : "lg:text-purple-100/70"
-                  } lg:leading-5 lg:hover:text-white xl:px-12`}
-                >
-                  {item.title}
-                </a>
+                <NavItem key={item.id} item={item} />
               ))}
 
               {/* Mobile buttons */}
