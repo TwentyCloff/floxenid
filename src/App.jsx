@@ -14,7 +14,7 @@ import LoginAdmin from "./components/LoginAdmin";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Dashboard from "./components/Dashboard";
 import Auth from "./components/Auth";
-import Tutorial from "./components/tutorial"; // pastikan huruf T besar dan file-nya ada
+import Tutorial from "./components/Tutorial"; // pastikan huruf T besar dan file-nya ada
 
 const Home = () => (
   <>
