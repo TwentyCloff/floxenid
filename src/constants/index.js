@@ -9,19 +9,13 @@ import {
   discord,
   discordBlack,
   facebook,
-  figma,
   file02,
-  framer,
   homeSmile,
   instagram,
   notification2,
   notification3,
   notification4,
-  notion,
-  photoshop,
   plusSquare,
-  protopie,
-  raindrop,
   recording01,
   recording03,
   roadmap1,
@@ -29,7 +23,6 @@ import {
   roadmap3,
   roadmap4,
   searchMd,
-  slack,
   sliders04,
   telegram,
   twitter,
@@ -37,6 +30,16 @@ import {
   verificon,
 } from "../assets";
 import { links } from "../config";
+
+// External game icons URLs
+const gameIcons = {
+  roblox: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Roblox_2021_Logo.svg/1200px-Roblox_2021_Logo.svg.png",
+  minecraft: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/32/Minecraft_logo.svg/1200px-Minecraft_logo.svg.png",
+  fortnite: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7c/Fortnite_F_lettermark_logo.png/640px-Fortnite_F_lettermark_logo.png",
+  unity: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/19/Unity_Technologies_logo.svg/1200px-Unity_Technologies_logo.svg.png",
+  unreal: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/20/Unreal_Engine_Logo.svg/1200px-Unreal_Engine_Logo.svg.png",
+  gdevelop: "https://wiki.gdevelop.io/wp-content/uploads/2021/04/gdevelop-logo.png"
+};
 
 export const navigation = [
   {
@@ -46,8 +49,8 @@ export const navigation = [
   },
   {
     id: "2",
-    title: "How to use",
-    url: "#how-to-use",
+    title: "Features",
+    url: "#features",
   },
   {
     id: "1",
@@ -68,8 +71,8 @@ export const notificationImages = [notification4, notification3, notification2];
 export const companyLogos = [yourlogo, yourlogo, yourlogo, yourlogo, yourlogo];
 
 export const brainwaveServices = [
-  "Photo generating",
-  "Photo enhance",
+  "Auto Farming",
+  "Anti-Ban Protection",
   "Seamless Integration",
 ];
 
@@ -84,8 +87,8 @@ export const brainwaveServicesIcons = [
 export const roadmap = [
   {
     id: "0",
-    title: "Voice recognition",
-    text: "Enable the chatbot to understand and respond to voice commands, making it easier for users to interact with the app hands-free.",
+    title: "Game Detection",
+    text: "Automatically detect the game you're playing and suggest optimal scripts for your session.",
     date: "May 2023",
     status: "done",
     imageUrl: roadmap1,
@@ -93,105 +96,91 @@ export const roadmap = [
   },
   {
     id: "1",
-    title: "Gamification",
-    text: "Add game-like elements, such as badges or leaderboards, to incentivize users to engage with the chatbot more frequently.",
-    date: "May 2023",
+    title: "Performance Mode",
+    text: "New optimization system to reduce resource usage while running scripts in the background.",
+    date: "June 2023",
     status: "progress",
     imageUrl: roadmap2,
   },
   {
     id: "2",
-    title: "Chatbot customization",
-    text: "Allow users to customize the chatbot's appearance and behavior, making it more engaging and fun to interact with.",
-    date: "May 2023",
+    title: "Script Marketplace",
+    text: "Community-driven marketplace where users can share and sell their custom scripts.",
+    date: "July 2023",
     status: "done",
     imageUrl: roadmap3,
   },
   {
     id: "3",
-    title: "Integration with APIs",
-    text: "Allow the chatbot to access external data sources, such as weather APIs or news APIs, to provide more relevant recommendations.",
-    date: "May 2023",
+    title: "Cross-Game Support",
+    text: "Expand script compatibility to support more popular games and platforms.",
+    date: "August 2023",
     status: "progress",
     imageUrl: roadmap4,
   },
 ];
 
 export const collabText =
-  "With smart automation and top-notch security, it's the perfect solution for teams looking to work smarter.";
+  "With smart automation and undetectable scripts, our solutions give you the competitive edge in your favorite games.";
 
 export const collabContent = [
   {
     id: "0",
-    title: "Seamless Integration",
+    title: "Undetectable",
     text: collabText,
   },
   {
     id: "1",
-    title: "Smart Automation",
+    title: "Auto-Updating",
   },
   {
     id: "2",
-    title: "Top-notch Security",
+    title: "24/7 Support",
   },
 ];
 
 export const collabApps = [
   {
     id: "0",
-    title: "Figma",
-    icon: figma,
+    title: "Roblox",
+    icon: gameIcons.roblox,
     width: 26,
-    height: 36,
+    height: 26,
   },
   {
     id: "1",
-    title: "Notion",
-    icon: notion,
-    width: 34,
-    height: 36,
+    title: "Minecraft",
+    icon: gameIcons.minecraft,
+    width: 26,
+    height: 26,
   },
   {
     id: "2",
-    title: "Discord",
-    icon: discord,
-    width: 36,
-    height: 28,
+    title: "Fortnite",
+    icon: gameIcons.fortnite,
+    width: 26,
+    height: 26,
   },
   {
     id: "3",
-    title: "Slack",
-    icon: slack,
-    width: 34,
-    height: 35,
+    title: "Unity",
+    icon: gameIcons.unity,
+    width: 26,
+    height: 26,
   },
   {
     id: "4",
-    title: "Photoshop",
-    icon: photoshop,
-    width: 34,
-    height: 34,
+    title: "Unreal",
+    icon: gameIcons.unreal,
+    width: 26,
+    height: 26,
   },
   {
     id: "5",
-    title: "Protopie",
-    icon: protopie,
-    width: 34,
-    height: 34,
-  },
-  {
-    id: "6",
-    title: "Framer",
-    icon: framer,
+    title: "GDevelop",
+    icon: gameIcons.gdevelop,
     width: 26,
-    height: 34,
-  },
-  {
-    id: "7",
-    title: "Raindrop",
-    icon: raindrop,
-    width: 38,
-    height: 32,
+    height: 26,
   },
 ];
 
@@ -199,36 +188,38 @@ export const pricing = [
   {
     id: "0",
     title: "Basic",
-    description: "AI chatbot, personalized recommendations",
+    description: "Essential scripts for beginners",
     price: "0",
     features: [
-      "An AI chatbot that can understand your queries",
-      "Personalized recommendations based on your preferences",
-      "Ability to explore the app and its features without any cost",
+      "Access to basic scripts",
+      "Community support",
+      "Limited script execution time",
     ],
     premium: false,
   },
   {
     id: "1",
     title: "Premium",
-    description: "Advanced AI chatbot, priority support, analytics dashboard",
+    description: "Advanced scripts with auto-update",
     price: "125000",
     features: [
-      "An advanced AI chatbot that can understand complex queries",
-      "An analytics dashboard to track your conversations",
-      "Priority support to solve issues quickly",
+      "All basic features",
+      "Premium scripts access",
+      "Auto-update functionality",
+      "Priority support",
     ],
     premium: true,
   },
   {
-    id: "1",
-    title: "Rich",
-    description: "Beta test access",
+    id: "2",
+    title: "Developer",
+    description: "For script creators and power users",
     price: "245000",
     features: [
-      "Dapat mengakses fitur update lebih awal",
-      "Mendapatkan Custom Avatar di tampilan GUI",
-      "Priority support to solve issues quickly",
+      "All premium features",
+      "Early access to new scripts",
+      "Script development tools",
+      "Custom script requests",
     ],
     premium: true,
   },
@@ -237,16 +228,16 @@ export const pricing = [
 export const benefits = [
   {
     id: "0",
-    title: "Advanced Capabilities",
-    text: "Qarvo delivers cutting-edge tools engineered for peak performance. Each solution is built to enhance your efficiency, automate tasks, and give you a tactical advantage—no matter the environment.",
+    title: "Powerful Scripts",
+    text: "Our scripts are engineered for maximum performance and minimal detection. Each script is optimized to give you the edge in your favorite games.",
     backgroundUrl: "/src/assets/benefits/card-1.svg",
     iconUrl: verificon,
     imageUrl: benefitImage2,
   },
   {
     id: "1",
-    title: "Seamless Accessibility",
-    text: "Access all Qarvo products instantly through our official website or Discord server. With support across multiple platforms, your toolkit is always within reach—anytime, anywhere.",
+    title: "Easy Access",
+    text: "Get instant access to all scripts through our website or Discord server. Compatible with multiple platforms and always up-to-date.",
     backgroundUrl: "/src/assets/benefits/card-2.svg",
     iconUrl: verificon,
     imageUrl: benefitImage2,
@@ -254,16 +245,16 @@ export const benefits = [
   },
   {
     id: "2",
-    title: "Continuous Innovation",
-    text: "While others rely on outdated or patched methods, Qarvo continuously evolves. Our tools receive frequent updates to adapt to the latest game versions, bypass systems, and user needs.",
+    title: "Regular Updates",
+    text: "We continuously update our scripts to bypass the latest game patches and anti-cheat systems, ensuring uninterrupted performance.",
     backgroundUrl: "/src/assets/benefits/card-3.svg",
     iconUrl: verificon,
     imageUrl: benefitImage2,
   },
   {
     id: "3",
-    title: "Effortless Configuration",
-    text: "Designed for mobility and speed, Qarvo products include guided setup processes, modular features, and customization options to fit your workflow across all devices.",
+    title: "Simple Setup",
+    text: "Our scripts feature one-click installation and intuitive interfaces, making them accessible even for beginners.",
     backgroundUrl: "/src/assets/benefits/card-4.svg",
     iconUrl: verificon,
     imageUrl: benefitImage2,
@@ -271,16 +262,16 @@ export const benefits = [
   },
   {
     id: "4",
-    title: "Connected Community",
-    text: "Join a thriving network of developers, power users, and automation experts. Share configurations, collaborate on builds, and trade earned assets through our secure, community-driven platform.",
+    title: "Active Community",
+    text: "Join thousands of users in our community to share configurations, get help, and stay updated on the latest developments.",
     backgroundUrl: "/src/assets/benefits/card-5.svg",
     iconUrl: verificon,
     imageUrl: benefitImage2,
   },
   {
     id: "5",
-    title: "24/7 Expert Support",
-    text: "Our dedicated support team is available around the clock to assist with technical issues, script optimization, and advanced module configurations—ensuring you're always at peak performance.",
+    title: "24/7 Support",
+    text: "Our support team is available around the clock to help with any issues or questions you might have.",
     backgroundUrl: "/src/assets/benefits/card-6.svg",
     iconUrl: verificon,
     imageUrl: benefitImage2,
