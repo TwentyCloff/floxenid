@@ -1,125 +1,124 @@
-import { useState, useRef, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useState, useRef, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 
 const Tooltip = ({ 
   content, 
   children, 
-  position = 'top',
+  position = "top", 
   delay = 200,
-  className = ''
+  disabled = false
 }) => {
   const [isVisible, setIsVisible] = useState(false);
   const [coords, setCoords] = useState({});
+  const tooltipRef = useRef(null);
   const triggerRef = useRef(null);
+  
   let timeout;
-
+  
   const updatePosition = () => {
-    if (triggerRef.current) {
-      const rect = triggerRef.current.getBoundingClientRect();
-      setCoords({
-        top: rect.top + window.scrollY,
-        left: rect.left + window.scrollX,
-        width: rect.width,
-        height: rect.height
-      });
+    if (triggerRef.current && tooltipRef.current) {
+      const triggerRect = triggerRef.current.getBoundingClientRect();
+      const tooltipRect = tooltipRef.current.getBoundingClientRect();
+      
+      const positions = {
+        top: {
+          top: triggerRect.top - tooltipRect.height - 10,
+          left: triggerRect.left + triggerRect.width / 2 - tooltipRect.width / 2
+        },
+        bottom: {
+          top: triggerRect.bottom + 10,
+          left: triggerRect.left + triggerRect.width / 2 - tooltipRect.width / 2
+        },
+        left: {
+          top: triggerRect.top + triggerRect.height / 2 - tooltipRect.height / 2,
+          left: triggerRect.left - tooltipRect.width - 10
+        },
+        right: {
+          top: triggerRect.top + triggerRect.height / 2 - tooltipRect.height / 2,
+          left: triggerRect.right + 10
+        }
+      };
+      
+      setCoords(positions[position]);
     }
   };
-
-  const handleMouseEnter = () => {
-    updatePosition();
+  
+  const showTooltip = () => {
+    if (disabled) return;
     timeout = setTimeout(() => {
       setIsVisible(true);
+      updatePosition();
     }, delay);
   };
-
-  const handleMouseLeave = () => {
+  
+  const hideTooltip = () => {
     clearTimeout(timeout);
     setIsVisible(false);
   };
-
+  
   useEffect(() => {
     return () => clearTimeout(timeout);
   }, []);
-
-  const getTooltipPosition = () => {
-    const offset = 8;
-    const tooltipWidth = 200; // Approximate width, can be dynamic if needed
-
-    switch (position) {
-      case 'top':
-        return {
-          top: coords.top - offset,
-          left: coords.left + coords.width / 2,
-          transform: 'translateX(-50%) translateY(-100%)'
-        };
-      case 'bottom':
-        return {
-          top: coords.top + coords.height + offset,
-          left: coords.left + coords.width / 2,
-          transform: 'translateX(-50%)'
-        };
-      case 'left':
-        return {
-          top: coords.top + coords.height / 2,
-          left: coords.left - offset,
-          transform: 'translateX(-100%) translateY(-50%)'
-        };
-      case 'right':
-        return {
-          top: coords.top + coords.height / 2,
-          left: coords.left + coords.width + offset,
-          transform: 'translateY(-50%)'
-        };
-      default:
-        return {
-          top: coords.top - offset,
-          left: coords.left + coords.width / 2,
-          transform: 'translateX(-50%) translateY(-100%)'
-        };
-    }
-  };
-
-  const positionClasses = {
-    top: 'bottom-[calc(100%+8px)] left-1/2 -translate-x-1/2',
-    bottom: 'top-[calc(100%+8px)] left-1/2 -translate-x-1/2',
-    left: 'right-[calc(100%+8px)] top-1/2 -translate-y-1/2',
-    right: 'left-[calc(100%+8px)] top-1/2 -translate-y-1/2'
-  };
-
+  
   return (
     <div 
+      className="relative inline-block"
       ref={triggerRef}
-      className={`relative inline-block ${className}`}
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
-      onFocus={handleMouseEnter}
-      onBlur={handleMouseLeave}
+      onMouseEnter={showTooltip}
+      onMouseLeave={hideTooltip}
+      onFocus={showTooltip}
+      onBlur={hideTooltip}
     >
       {children}
       
       <AnimatePresence>
         {isVisible && (
           <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.9 }}
-            transition={{ duration: 0.15 }}
-            className={`absolute z-50 w-max max-w-xs ${positionClasses[position]}`}
+            ref={tooltipRef}
+            className={`absolute z-50 px-3 py-2 text-sm font-medium rounded-md shadow-lg max-w-xs whitespace-normal ${
+              position === 'top' ? 'origin-bottom' : 
+              position === 'bottom' ? 'origin-top' : 
+              position === 'left' ? 'origin-right' : 'origin-left'
+            }`}
             style={{
-              pointerEvents: 'none'
+              ...coords,
+              backgroundColor: 'rgba(17, 24, 39, 0.9)',
+              backdropFilter: 'blur(4px)',
+              color: '#fff'
+            }}
+            initial={{ 
+              opacity: 0, 
+              scale: 0.8,
+              y: position === 'top' ? 5 : position === 'bottom' ? -5 : 0,
+              x: position === 'left' ? 5 : position === 'right' ? -5 : 0
+            }}
+            animate={{ 
+              opacity: 1, 
+              scale: 1,
+              y: 0,
+              x: 0
+            }}
+            exit={{ 
+              opacity: 0, 
+              scale: 0.8,
+              y: position === 'top' ? 5 : position === 'bottom' ? -5 : 0,
+              x: position === 'left' ? 5 : position === 'right' ? -5 : 0
+            }}
+            transition={{
+              type: "spring",
+              damping: 20,
+              stiffness: 300
             }}
           >
-            <div className="bg-gray-800 text-white text-xs rounded-md py-2 px-3 shadow-lg">
-              <div className="relative">
-                {content}
-                <div className={`absolute w-2 h-2 bg-gray-800 transform rotate-45 ${{
-                  top: 'bottom-[-4px] left-1/2 -translate-x-1/2',
-                  bottom: 'top-[-4px] left-1/2 -translate-x-1/2',
-                  left: 'right-[-4px] top-1/2 -translate-y-1/2',
-                  right: 'left-[-4px] top-1/2 -translate-y-1/2'
-                }[position]}`} />
-              </div>
-            </div>
+            {content}
+            <div 
+              className={`absolute w-2 h-2 bg-gray-900/90 transform rotate-45 ${
+                position === 'top' ? 'bottom-[-2px] left-1/2 -translate-x-1/2' :
+                position === 'bottom' ? 'top-[-2px] left-1/2 -translate-x-1/2' :
+                position === 'left' ? 'right-[-2px] top-1/2 -translate-y-1/2' :
+                'left-[-2px] top-1/2 -translate-y-1/2'
+              }`}
+            />
           </motion.div>
         )}
       </AnimatePresence>
