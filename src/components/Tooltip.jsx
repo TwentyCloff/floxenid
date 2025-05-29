@@ -1,75 +1,99 @@
-import { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 const Tooltip = ({ 
   content, 
   children, 
-  position = "top",
+  position = "top", 
+  responsive = true,
   delay = 0.3,
-  className = ""
+  disabled = false
 }) => {
   const [isVisible, setIsVisible] = useState(false);
-  const [coords, setCoords] = useState({});
+  const [calculatedPosition, setCalculatedPosition] = useState(position);
   const tooltipRef = useRef(null);
   const parentRef = useRef(null);
+  let timeoutId;
 
-  const positions = {
-    top: "bottom-full mb-2 left-1/2 -translate-x-1/2",
-    bottom: "top-full mt-2 left-1/2 -translate-x-1/2",
-    left: "right-full mr-2 top-1/2 -translate-y-1/2",
-    right: "left-full ml-2 top-1/2 -translate-y-1/2"
-  };
-
-  const updatePosition = () => {
-    if (parentRef.current && tooltipRef.current) {
-      const parentRect = parentRef.current.getBoundingClientRect();
-      const tooltipRect = tooltipRef.current.getBoundingClientRect();
-      
-      let newPosition = position;
-      
-      // Adjust position if tooltip would go off screen
-      if (position === "top" && parentRect.top - tooltipRect.height < 0) {
-        newPosition = "bottom";
-      } else if (position === "bottom" && parentRect.bottom + tooltipRect.height > window.innerHeight) {
-        newPosition = "top";
-      } else if (position === "left" && parentRect.left - tooltipRect.width < 0) {
-        newPosition = "right";
-      } else if (position === "right" && parentRect.right + tooltipRect.width > window.innerWidth) {
-        newPosition = "left";
-      }
-      
-      setCoords({ position: newPosition });
-    }
-  };
-
+  // Handle responsive positioning
   useEffect(() => {
-    if (isVisible) {
-      updatePosition();
-      window.addEventListener('resize', updatePosition);
-      return () => window.removeEventListener('resize', updatePosition);
-    }
-  }, [isVisible]);
+    if (!isVisible || !responsive) return;
 
-  let timeout;
-  const showTooltip = () => {
-    timeout = setTimeout(() => {
-      setIsVisible(true);
-    }, delay * 1000);
+    const checkPosition = () => {
+      if (!tooltipRef.current || !parentRef.current) return;
+
+      const tooltipRect = tooltipRef.current.getBoundingClientRect();
+      const parentRect = parentRef.current.getBoundingClientRect();
+      
+      // Check viewport boundaries
+      const positions = {
+        top: parentRect.top - tooltipRect.height > 0,
+        bottom: parentRect.bottom + tooltipRect.height < window.innerHeight,
+        left: parentRect.left - tooltipRect.width > 0,
+        right: parentRect.right + tooltipRect.width < window.innerWidth
+      };
+
+      // Fallback positions if preferred position doesn't fit
+      let newPosition = position;
+      if (position === "top" && !positions.top) newPosition = "bottom";
+      if (position === "bottom" && !positions.bottom) newPosition = "top";
+      if (position === "left" && !positions.left) newPosition = "right";
+      if (position === "right" && !positions.right) newPosition = "left";
+
+      setCalculatedPosition(newPosition);
+    };
+
+    checkPosition();
+    window.addEventListener("resize", checkPosition);
+    return () => window.removeEventListener("resize", checkPosition);
+  }, [isVisible, position, responsive]);
+
+  const handleMouseEnter = () => {
+    if (disabled) return;
+    timeoutId = setTimeout(() => setIsVisible(true), delay * 1000);
   };
 
-  const hideTooltip = () => {
-    clearTimeout(timeout);
+  const handleMouseLeave = () => {
+    clearTimeout(timeoutId);
     setIsVisible(false);
+  };
+
+  // Position styles
+  const positionStyles = {
+    top: {
+      bottom: "100%",
+      left: "50%",
+      transform: "translateX(-50%)",
+      marginBottom: "8px"
+    },
+    bottom: {
+      top: "100%",
+      left: "50%",
+      transform: "translateX(-50%)",
+      marginTop: "8px"
+    },
+    left: {
+      right: "100%",
+      top: "50%",
+      transform: "translateY(-50%)",
+      marginRight: "8px"
+    },
+    right: {
+      left: "100%",
+      top: "50%",
+      transform: "translateY(-50%)",
+      marginLeft: "8px"
+    }
   };
 
   return (
     <div 
-      className={`relative inline-block ${className}`}
+      className="relative inline-block"
       ref={parentRef}
-      onMouseEnter={showTooltip}
-      onMouseLeave={hideTooltip}
-      onFocus={showTooltip}
-      onBlur={hideTooltip}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+      onFocus={handleMouseEnter}
+      onBlur={handleMouseLeave}
     >
       {children}
       
@@ -77,21 +101,27 @@ const Tooltip = ({
         {isVisible && (
           <motion.div
             ref={tooltipRef}
-            className={`absolute z-50 ${positions[coords.position || position]}`}
-            initial={{ opacity: 0, y: position === 'top' ? 5 : -5, x: position === 'left' ? 5 : position === 'right' ? -5 : 0 }}
-            animate={{ opacity: 1, y: 0, x: 0 }}
-            exit={{ opacity: 0, y: position === 'top' ? 5 : -5, x: position === 'left' ? 5 : position === 'right' ? -5 : 0 }}
-            transition={{ duration: 0.2, ease: "easeOut" }}
+            className={`absolute z-50 px-3 py-2 text-sm font-medium rounded-md shadow-lg max-w-xs ${
+              calculatedPosition === "top" || calculatedPosition === "bottom" 
+                ? "w-max" 
+                : "w-48"
+            } bg-gray-800 text-white`}
+            style={positionStyles[calculatedPosition]}
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.9 }}
+            transition={{ type: "spring", damping: 20, stiffness: 300 }}
           >
-            <div className="bg-gray-800 text-white text-xs font-medium px-3 py-2 rounded-lg shadow-lg border border-gray-700 max-w-xs">
-              {content}
-              <div className={`absolute w-2 h-2 bg-gray-800 transform rotate-45 border border-gray-700 ${
-                coords.position === 'top' || position === 'top' ? 'bottom-[-4px] left-1/2 -translate-x-1/2 border-t-0 border-l-0' :
-                coords.position === 'bottom' || position === 'bottom' ? 'top-[-4px] left-1/2 -translate-x-1/2 border-b-0 border-r-0' :
-                coords.position === 'left' || position === 'left' ? 'right-[-4px] top-1/2 -translate-y-1/2 border-l-0 border-b-0' :
-                'left-[-4px] top-1/2 -translate-y-1/2 border-r-0 border-t-0'
-              }`} />
-            </div>
+            {content}
+            {/* Tooltip arrow */}
+            <div 
+              className={`absolute w-2 h-2 bg-gray-800 transform rotate-45 ${
+                calculatedPosition === "top" ? "bottom-[-4px] left-1/2 -translate-x-1/2" :
+                calculatedPosition === "bottom" ? "top-[-4px] left-1/2 -translate-x-1/2" :
+                calculatedPosition === "left" ? "right-[-4px] top-1/2 -translate-y-1/2" :
+                "left-[-4px] top-1/2 -translate-y-1/2"
+              }`}
+            />
           </motion.div>
         )}
       </AnimatePresence>
