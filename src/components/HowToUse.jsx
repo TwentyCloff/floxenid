@@ -102,20 +102,26 @@ const StepCard = ({
                     </ul>
                     
                     <div className="mt-4 grid grid-cols-2 gap-3">
-                      <button className="bg-gray-800 hover:bg-gray-700 text-white py-2 px-4 rounded-lg text-sm transition-colors flex items-center justify-center gap-2">
+                      <button 
+                        className="bg-gray-800 hover:bg-gray-700 text-white py-2 px-4 rounded-lg text-sm transition-colors flex items-center justify-center gap-2"
+                        onClick={() => window.location.href = `https://youtube.com/watch?v=${videoId}`}
+                        >
                         <FiYoutube />
-                        Tutorial
+                        Video Tutorial
                       </button>
-                      <button className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white py-2 px-4 rounded-lg text-sm transition-colors flex items-center justify-center gap-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-8.707l-3-3a1 1 0 00-1.414 1.414L10.586 9H7a1 1 0 100 2h3.586l-1.293 1.293a1 1 0 101.414 1.414l3-3a1 1 0 000-1.414z" clipRule="evenodd" />
-                        </svg>
-                        Try Now
-                      </button>
-                    </div>
+                      button 
+                      className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white py-2 px-4 rounded-lg text-sm transition-colors flex items-center justify-center gap-2"
+                      onClick={() => window.location.href = '/tutorial'}
+                      >
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 14c1.669 0 3.218.51 4.5 1.385A7.962 7.962 0 0114.5 14c1.255 0 2.443.29 3.5.804v-10A7.968 7.968 0 0014.5 4c-1.255 0-2.443.29-3.5.804V12a1 1 0 11-2 0V4.804z" />
+                      </svg>
+                      Full Tutorial
+                    </button>
                   </div>
-                </motion.div>
-              )}
+                </div>
+      </motion.div>
+      )}
             </AnimatePresence>
           </div>
         </div>
