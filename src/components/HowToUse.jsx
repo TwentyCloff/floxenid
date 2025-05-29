@@ -3,7 +3,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import { TiLocationArrow } from "react-icons/ti";
 import { FiUser, FiCompass, FiLink, FiYoutube } from "react-icons/fi";
 import Section from "./Section";
-import Tooltip from "./Tooltip";
 
 const StepCard = ({ 
   number, 
@@ -35,50 +34,44 @@ const StepCard = ({
     >
       <div className="p-6">
         <div className="flex items-start gap-4">
-          <Tooltip content={`Step ${number}`} responsive>
-            <div className="bg-gradient-to-br from-blue-500 to-purple-600 rounded-full w-10 h-10 flex items-center justify-center flex-shrink-0 shadow-md">
-              {Icon ? <Icon className="text-white text-lg" /> : (
-                <span className="text-white font-bold">{number}</span>
-              )}
-            </div>
-          </Tooltip>
+          <div className="bg-gradient-to-br from-blue-500 to-purple-600 rounded-full w-10 h-10 flex items-center justify-center flex-shrink-0 shadow-md">
+            {Icon ? <Icon className="text-white text-lg" /> : (
+              <span className="text-white font-bold">{number}</span>
+            )}
+          </div>
           <div className="flex-1">
             <div className="flex justify-between items-start">
               <h3 className="text-xl font-bold text-white mb-2">{title}</h3>
-              <Tooltip content={isExpanded ? 'Collapse details' : 'Expand for more'} responsive>
-                <button 
-                  onClick={toggleExpand}
-                  className="text-gray-400 hover:text-white transition-colors flex items-center gap-1"
-                >
-                  {isExpanded ? (
-                    <>
-                      <span>Less</span>
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                        <path fillRule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clipRule="evenodd" />
-                      </svg>
-                    </>
-                  ) : (
-                    <>
-                      <span>More</span>
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                        <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
-                      </svg>
-                    </>
-                  )}
-                </button>
-              </Tooltip>
+              <button 
+                onClick={toggleExpand}
+                className="text-gray-400 hover:text-white transition-colors flex items-center gap-1"
+              >
+                {isExpanded ? (
+                  <>
+                    <span>Less</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clipRule="evenodd" />
+                    </svg>
+                  </>
+                ) : (
+                  <>
+                    <span>More</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+                    </svg>
+                  </>
+                )}
+              </button>
             </div>
             <p className="text-gray-300 mb-4">{description}</p>
             
             <div className="flex items-center justify-between mb-4">
-              <Tooltip content="Estimated time to complete" responsive>
-                <span className="text-sm text-gray-400 flex items-center gap-1">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
-                  </svg>
-                  {duration}
-                </span>
-              </Tooltip>
+              <span className="text-sm text-gray-400 flex items-center gap-1">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
+                </svg>
+                {duration}
+              </span>
             </div>
             
             <AnimatePresence>
@@ -100,31 +93,25 @@ const StepCard = ({
                     <ul className="space-y-3">
                       {tips.map((tip, index) => (
                         <li key={index} className="flex items-start gap-3">
-                          <Tooltip content="Pro tip" responsive>
-                            <div className="bg-blue-500/20 rounded-full p-1 mt-0.5">
-                              <TiLocationArrow className="text-blue-400 text-xs" />
-                            </div>
-                          </Tooltip>
+                          <div className="bg-blue-500/20 rounded-full p-1 mt-0.5">
+                            <TiLocationArrow className="text-blue-400 text-xs" />
+                          </div>
                           <span className="text-gray-300 text-sm">{tip}</span>
                         </li>
                       ))}
                     </ul>
                     
                     <div className="mt-4 grid grid-cols-2 gap-3">
-                      <Tooltip content="Watch full tutorial video" responsive>
-                        <button className="bg-gray-800 hover:bg-gray-700 text-white py-2 px-4 rounded-lg text-sm transition-colors flex items-center justify-center gap-2">
-                          <FiYoutube />
-                          Tutorial
-                        </button>
-                      </Tooltip>
-                      <Tooltip content="Try this feature now" responsive>
-                        <button className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white py-2 px-4 rounded-lg text-sm transition-colors flex items-center justify-center gap-2">
-                          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-8.707l-3-3a1 1 0 00-1.414 1.414L10.586 9H7a1 1 0 100 2h3.586l-1.293 1.293a1 1 0 101.414 1.414l3-3a1 1 0 000-1.414z" clipRule="evenodd" />
-                          </svg>
-                          Try Now
-                        </button>
-                      </Tooltip>
+                      <button className="bg-gray-800 hover:bg-gray-700 text-white py-2 px-4 rounded-lg text-sm transition-colors flex items-center justify-center gap-2">
+                        <FiYoutube />
+                        Tutorial
+                      </button>
+                      <button className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white py-2 px-4 rounded-lg text-sm transition-colors flex items-center justify-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-8.707l-3-3a1 1 0 00-1.414 1.414L10.586 9H7a1 1 0 100 2h3.586l-1.293 1.293a1 1 0 101.414 1.414l3-3a1 1 0 000-1.414z" clipRule="evenodd" />
+                        </svg>
+                        Try Now
+                      </button>
                     </div>
                   </div>
                 </motion.div>
@@ -394,21 +381,20 @@ const HowToUse = ({ pageType = "basic" }) => {
           <div className="mb-8">
             <div className="flex flex-wrap justify-center gap-2">
               {Object.entries(config.sections).map(([key, section]) => (
-                <Tooltip key={key} content={section.description} responsive>
-                  <button
-                    onClick={() => setActiveSection(key)}
-                    className={`px-4 py-2 rounded-full text-sm font-medium transition-colors flex items-center gap-2 ${
-                      activeSection === key 
-                        ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg' 
-                        : 'bg-gray-900 text-gray-300 hover:bg-gray-800'
-                    }`}
-                  >
-                    {key === 'getting-started' && <FiUser className="text-sm" />}
-                    {key === 'first-execution' && <FiCompass className="text-sm" />}
-                    {key === 'advanced-features' && <FiLink className="text-sm" />}
-                    <span>{section.title}</span>
-                  </button>
-                </Tooltip>
+                <button
+                  key={key}
+                  onClick={() => setActiveSection(key)}
+                  className={`px-4 py-2 rounded-full text-sm font-medium transition-colors flex items-center gap-2 ${
+                    activeSection === key 
+                      ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg' 
+                      : 'bg-gray-900 text-gray-300 hover:bg-gray-800'
+                  }`}
+                >
+                  {key === 'getting-started' && <FiUser className="text-sm" />}
+                  {key === 'first-execution' && <FiCompass className="text-sm" />}
+                  {key === 'advanced-features' && <FiLink className="text-sm" />}
+                  <span>{section.title}</span>
+                </button>
               ))}
             </div>
           </div>
@@ -485,12 +471,10 @@ const HowToUse = ({ pageType = "basic" }) => {
                         </svg>
                         {tutorial.duration}
                       </span>
-                      <Tooltip content="Watch full tutorial" responsive>
-                        <button className="text-blue-400 hover:text-blue-300 text-sm font-medium flex items-center gap-1">
-                          <FiYoutube />
-                          Watch
-                        </button>
-                      </Tooltip>
+                      <button className="text-blue-400 hover:text-blue-300 text-sm font-medium flex items-center gap-1">
+                        <FiYoutube />
+                        Watch
+                      </button>
                     </div>
                   </div>
                 </motion.div>
@@ -513,30 +497,26 @@ const HowToUse = ({ pageType = "basic" }) => {
               Follow the steps above to properly use the exploit script. For best results, read all instructions carefully.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Tooltip content="Download the script" responsive>
-                <motion.button 
-                  className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-bold py-3 px-8 rounded-full text-lg transition-colors flex items-center justify-center gap-2 shadow-lg"
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd" />
-                  </svg>
-                  Download Script
-                </motion.button>
-              </Tooltip>
-              <Tooltip content="View documentation" responsive>
-                <motion.button 
-                  className="bg-transparent hover:bg-gray-800 text-white font-bold py-3 px-8 rounded-full text-lg transition-colors border border-gray-600 flex items-center justify-center gap-2"
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                    <path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 14c1.669 0 3.218.51 4.5 1.385A7.962 7.962 0 0114.5 14c1.255 0 2.443.29 3.5.804v-10A7.968 7.968 0 0014.5 4c-1.255 0-2.443.29-3.5.804V12a1 1 0 11-2 0V4.804z" />
-                  </svg>
-                  Documentation
-                </motion.button>
-              </Tooltip>
+              <motion.button 
+                className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-bold py-3 px-8 rounded-full text-lg transition-colors flex items-center justify-center gap-2 shadow-lg"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd" />
+                </svg>
+                Download Script
+              </motion.button>
+              <motion.button 
+                className="bg-transparent hover:bg-gray-800 text-white font-bold py-3 px-8 rounded-full text-lg transition-colors border border-gray-600 flex items-center justify-center gap-2"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                  <path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 14c1.669 0 3.218.51 4.5 1.385A7.962 7.962 0 0114.5 14c1.255 0 2.443.29 3.5.804v-10A7.968 7.968 0 0014.5 4c-1.255 0-2.443.29-3.5.804V12a1 1 0 11-2 0V4.804z" />
+                </svg>
+                Documentation
+              </motion.button>
             </div>
           </motion.div>
         </div>
