@@ -14,15 +14,13 @@ import LoginAdmin from "./components/LoginAdmin";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Dashboard from "./components/Dashboard";
 import Auth from "./components/Auth";
-import Tutorial from "./components/tutorial";
-
+import Tutorial from "./components/tutorial"; // pastikan huruf T besar dan file-nya ada
 
 const Home = () => (
   <>
     <div className="pt-[4.75rem] lg:pt-[5.25rem] overflow-hidden">
       <Header />
       <Hero />
-      {/* Changed order here - Collaboration first, then Benefits */}
       <Collaboration />
       <Benefits />
       <Services />
@@ -41,7 +39,7 @@ const App = () => {
       <Route path="/payment" element={<PaymentPage />} />
       <Route path="/dashboard" element={<Dashboard />} />
       <Route path="/login" element={<Auth />} />
-      <Route path="/tutorial" element={Tutorial />} />
+      <Route path="/tutorial" element={<Tutorial />} />
 
       {/* Login admin */}
       <Route path="/admin/login" element={<LoginAdmin />} />
