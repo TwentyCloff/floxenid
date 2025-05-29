@@ -17,94 +17,107 @@ const gameIcons = {
 const Collaboration = () => {
   return (
     <Section crosses>
-      <div className="container lg:flex">
-        <div className="max-w-[25rem]">
-          <h2 className="h2 mb-4 md:mb-8">
-            Premium Scripts for Your
-            <span className="inline-block relative font-semibold">
-              Game Development
-              <img
-                src={curve}
-                className="absolute top-full left-0 w-full xl:-mt-2 pointer-events-none select-none"
-                width={624}
-                height={28}
-                alt="Curve"
-              />
+      <div className="container lg:flex flex-col lg:flex-row gap-12 items-center">
+        {/* Left Content - Text and Features */}
+        <div className="lg:max-w-[30rem] text-center lg:text-left">
+          <h2 className="h2 mb-6 md:mb-8 relative inline-block">
+            <span className="relative z-10">
+              Premium Scripts for Your{' '}
+              <span className="text-gradient font-bold">Game Development</span>
             </span>
+            <img
+              src={curve}
+              className="absolute -bottom-2 left-0 w-full xl:-mt-2 pointer-events-none select-none"
+              width={624}
+              height={28}
+              alt="Curve"
+            />
           </h2>
 
-          <ul className="max-w-[22rem] mb-10 md:mb-14">
-            {collabContent.map((item) => (
-              <li className="mb-3 py-3" key={item.id}>
-                <div className="flex items-center">
-                  <img
-                    src={check}
-                    width={24}
-                    alt="check"
-                    height={24}
-                    className="pointer-events-none select-none"
-                  />
-                  <h6 className="body-2 ml-5">{item.title}</h6>
-                </div>
-
-                {item.text && (
-                  <p className="body-2 mt-3 text-n-4">{item.text}</p>
-                )}
-              </li>
-            ))}
-          </ul>
-
-          <Button>Get Scripts Now</Button>
-        </div>
-
-        <div className="lg:ml-auto xl:w-[38rem] mt-4">
-          <p className="body-2 mb-4 text-n-4 md:mb-16 lg:mb-32 lg:w-[32rem] lg:mx-auto">
+          <p className="body-2 mb-8 text-n-4 lg:pr-8">
             {collabText}
           </p>
 
-          <div className="relative left-1/2 flex w-[22rem] aspect-square border border-n-6 rounded-full -translate-x-1/2 scale-75 md:scale-100">
-            <div className="flex w-60 aspect-square m-auto border border-n-6 rounded-full">
-              <div className="w-[6rem] aspect-square m-auto p-[0.2rem] bg-conic-gradient rounded-full">
-                <div className="flex items-center justify-center w-full h-full bg-n-8 rounded-full">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-10">
+            {collabContent.map((item) => (
+              <div 
+                className="bg-n-7/50 p-4 rounded-xl border border-n-6 hover:bg-n-7 transition-colors"
+                key={item.id}
+              >
+                <div className="flex items-start">
                   <img
-                    src={gameIcons.roblox}
-                    width={48}
-                    height={48}
-                    alt="Roblox"
-                    className="rounded-full"
+                    src={check}
+                    width={20}
+                    alt="check"
+                    height={20}
+                    className="mt-1 flex-shrink-0 pointer-events-none select-none"
                   />
+                  <div className="ml-3">
+                    <h6 className="body-2 font-medium">{item.title}</h6>
+                    {item.text && (
+                      <p className="body-2 mt-1 text-n-3">{item.text}</p>
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
+            ))}
+          </div>
 
-            <ul>
-              {collabApps.map((app, i) => (
-                <li
+          <Button className="mx-auto lg:mx-0">Get Scripts Now</Button>
+        </div>
+
+        {/* Right Content - Game Icons Visualization */}
+        <div className="relative w-full max-w-[32rem] lg:w-[40rem] aspect-square">
+          {/* Central Roblox Icon with Glow */}
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="relative w-40 h-40 rounded-full bg-n-8 border-2 border-primary/30 flex items-center justify-center">
+              <img
+                src={gameIcons.roblox}
+                width={80}
+                height={80}
+                alt="Roblox"
+                className="rounded-full z-10"
+              />
+              <div className="absolute inset-0 rounded-full bg-primary/10 blur-xl animate-pulse"></div>
+            </div>
+          </div>
+
+          {/* Rotating Orbit with Game Icons */}
+          <div className="absolute inset-0 animate-spin-slow">
+            {collabApps.map((app, i) => {
+              const angle = (i * 360) / collabApps.length;
+              const radius = 10; // rem units
+              const x = Math.sin((angle * Math.PI) / 180) * radius;
+              const y = Math.cos((angle * Math.PI) / 180) * radius;
+              
+              return (
+                <div
                   key={app.id}
-                  className={`absolute top-0 left-1/2 h-1/2 -ml-[1.6rem] origin-bottom rotate-${
-                    i * 45
-                  }`}
+                  className="absolute w-16 h-16 -mt-8 -ml-8"
+                  style={{
+                    left: `calc(50% + ${x}rem)`,
+                    top: `calc(50% - ${y}rem)`,
+                  }}
                 >
-                  <div
-                    className={`relative -top-[1.6rem] flex w-[3.2rem] h-[3.2rem] bg-n-7 border border-n-1/15 rounded-xl -rotate-${
-                      i * 45
-                    } animate-pulse`}
-                  >
+                  <div className="relative w-full h-full bg-n-7 border-2 border-n-6 rounded-xl flex items-center justify-center p-2 hover:scale-110 transition-transform duration-300 hover:shadow-lg hover:shadow-primary/20">
                     <img
                       src={gameIcons[app.icon]}
                       alt={app.title}
-                      width={app.height}
+                      width={app.width}
                       height={app.height}
-                      className="m-auto object-contain p-1"
+                      className="object-contain"
                     />
+                    <div className="absolute -z-10 inset-0 rounded-xl bg-primary/10 blur-md"></div>
                   </div>
-                </li>
-              ))}
-            </ul>
-
-            <LeftCurve />
-            <RightCurve />
+                </div>
+              );
+            })}
           </div>
+
+          {/* Decorative Elements */}
+          <div className="absolute inset-0 rounded-full border-2 border-n-6/50 opacity-30"></div>
+          <div className="absolute inset-4 rounded-full border-2 border-n-6/30 opacity-20"></div>
+          <div className="absolute inset-8 rounded-full border-2 border-n-6/10 opacity-10"></div>
         </div>
       </div>
     </Section>
