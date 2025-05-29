@@ -1,6 +1,6 @@
 import { FaRobot, FaChartLine, FaShieldAlt, FaSync, FaCogs, FaMagic, FaLightbulb, FaCode, FaDatabase, FaClock } from 'react-icons/fa';
 import Section from "./Section";
-import { Button } from "./Button";
+import Button from "./Button";
 import { LeftCurve, RightCurve } from "./design/Collaboration";
 
 // Define your features list
