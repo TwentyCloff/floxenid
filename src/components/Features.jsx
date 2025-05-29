@@ -79,9 +79,20 @@ const Features = () => {
       {/* Full black background */}
       <div className="absolute inset-0 bg-black z-[-30]" />
 
-      {/* Transparent top shape to blend with hero section */}
+      {/* Transparent shape that flows from bottom (darker) to top (more transparent) */}
       <div 
-        className="absolute top-0 left-0 w-full h-32 bg-gradient-to-b from-black/80 to-transparent z-[-20]"
+        className="absolute inset-0 w-full h-full z-[-20]"
+        style={{
+          background: 'linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.5) 50%, rgba(0,0,0,0) 100%)'
+        }}
+      />
+
+      {/* Mobile version of the transparent shape (appears only on mobile) */}
+      <div 
+        className="absolute inset-0 w-full h-full z-[-20] md:hidden"
+        style={{
+          background: 'linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.5) 50%, rgba(0,0,0,0) 100%)'
+        }}
       />
 
       {/* Container for content */}
