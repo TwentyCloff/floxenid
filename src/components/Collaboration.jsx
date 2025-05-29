@@ -1,8 +1,18 @@
-import { brainwaveSymbol, check, curve } from "../assets";
+import { check, curve } from "../assets";
 import { collabApps, collabContent, collabText } from "../constants";
 import Button from "./Button";
 import { LeftCurve, RightCurve } from "./design/Collaboration";
 import Section from "./Section";
+
+// Game icons (using external URLs)
+const gameIcons = {
+  roblox: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Roblox_2021_Logo.svg/1200px-Roblox_2021_Logo.svg.png",
+  minecraft: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/32/Minecraft_logo.svg/1200px-Minecraft_logo.svg.png",
+  fortnite: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7c/Fortnite_F_lettermark_logo.png/640px-Fortnite_F_lettermark_logo.png",
+  unity: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/19/Unity_Technologies_logo.svg/1200px-Unity_Technologies_logo.svg.png",
+  unreal: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/20/Unreal_Engine_Logo.svg/1200px-Unreal_Engine_Logo.svg.png",
+  gdevelop: "https://wiki.gdevelop.io/wp-content/uploads/2021/04/gdevelop-logo.png"
+};
 
 const Collaboration = () => {
   return (
@@ -10,9 +20,9 @@ const Collaboration = () => {
       <div className="container lg:flex">
         <div className="max-w-[25rem]">
           <h2 className="h2 mb-4 md:mb-8">
-            AI Chat App for seemless
+            Premium Scripts for Your
             <span className="inline-block relative font-semibold">
-              collaboration
+              Game Development
               <img
                 src={curve}
                 className="absolute top-full left-0 w-full xl:-mt-2 pointer-events-none select-none"
@@ -44,7 +54,7 @@ const Collaboration = () => {
             ))}
           </ul>
 
-          <Button>Try it now</Button>
+          <Button>Get Scripts Now</Button>
         </div>
 
         <div className="lg:ml-auto xl:w-[38rem] mt-4">
@@ -57,10 +67,11 @@ const Collaboration = () => {
               <div className="w-[6rem] aspect-square m-auto p-[0.2rem] bg-conic-gradient rounded-full">
                 <div className="flex items-center justify-center w-full h-full bg-n-8 rounded-full">
                   <img
-                    src={brainwaveSymbol}
+                    src={gameIcons.roblox}
                     width={48}
                     height={48}
-                    alt="brainwave"
+                    alt="Roblox"
+                    className="rounded-full"
                   />
                 </div>
               </div>
@@ -80,11 +91,11 @@ const Collaboration = () => {
                     } animate-pulse`}
                   >
                     <img
-                      src={app.icon}
+                      src={gameIcons[app.icon]}
                       alt={app.title}
                       width={app.height}
                       height={app.height}
-                      className="m-auto"
+                      className="m-auto object-contain p-1"
                     />
                   </div>
                 </li>
