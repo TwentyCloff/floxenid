@@ -119,14 +119,14 @@ const Header = () => {
         className={`fixed top-0 left-0 w-full z-50 transition-colors duration-300 ${
           openNavigation
             ? "bg-[#000000] backdrop-blur-md"
-            : "bg-[#000000]/3 backdrop-blur-md"
+            : "bg-[#000000]/30 backdrop-blur-md"
         }`}
         style={{ height: "68px" }}
       >
         <div className="flex items-center px-5 lg:px-7.5 xl:px-10 py-3 h-full">
           {/* Logo */}
           <a
-            className="block w-auto xl:mr-8 text-3xl font-bold bg-gradient-to-r from-purple-300 to-purple-100 text-transparent bg-clip-text"
+            className="block w-auto xl:mr-8 text-3xl font-bold bg-gradient-to-r from-purple-900 to-purple-600 text-transparent bg-clip-text"
             href="#hero"
           >
             Qarvo
@@ -138,7 +138,7 @@ const Header = () => {
               openNavigation ? "flex" : "hidden"
             } fixed top-[68px] left-0 right-0 bottom-0 bg-[#0a0614] lg:static lg:flex lg:mx-auto lg:bg-transparent`}
           >
-            <div className="relative z-2 flex flex-col items-center justify-center m-auto lg:flex-row lg:ml-20"> {/* Added lg:ml-8 here */}
+            <div className="relative z-2 flex flex-col items-center justify-center m-auto lg:flex-row lg:ml-20">
               {navigation.map((item) => (
                 <a
                   key={item.id}
