@@ -343,25 +343,16 @@ const Tutorial = () => {
       <div className="container mx-auto px-4 py-12">
         {/* Header */}
         <div className="flex flex-col items-center mb-8">
-          {/* Combined Back and Tutorial indicator */}
+          {/* Simplified navigation indicator */}
           <div className="w-full flex justify-between items-center mb-6">
-            <div className="flex items-center gap-4">
-              <motion.button 
-                onClick={() => window.history.back()}
-                className="flex items-center gap-1 text-blue-400 hover:text-blue-300 font-medium transition-colors group"
-                whileHover={{ x: -2 }}
-              >
-                <FiArrowLeft className="text-lg group-hover:-translate-x-0.5 transition-transform" />
-                <span>Back</span>
-              </motion.button>
-              
-              <div className="text-gray-400">-</div>
-              
-              <div className="text-gray-300 flex items-center gap-1">
-                <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                <span>Tutorial</span>
-              </div>
-            </div>
+            <motion.button 
+              onClick={() => window.history.back()}
+              className="flex items-center gap-2 text-gray-300 hover:text-white font-medium transition-colors group"
+              whileHover={{ x: -2 }}
+            >
+              <FiArrowLeft className="text-lg group-hover:-translate-x-0.5 transition-transform" />
+              <span>Tutorial Guide</span>
+            </motion.button>
           </div>
           
           <h1 className="text-3xl font-bold text-center">{tutorialData.title}</h1>
@@ -378,10 +369,10 @@ const Tutorial = () => {
               <button
                 key={key}
                 onClick={() => setActiveSection(key)}
-                className={`px-4 py-2 rounded-full text-sm font-medium transition-colors flex items-center gap-2 ${
+                className={`px-4 py-2 rounded-full text-sm font-medium transition-colors flex items-center gap-2 border ${
                   activeSection === key 
-                    ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg' 
-                    : 'bg-gray-900 text-gray-300 hover:bg-gray-800'
+                    ? 'bg-gray-800 border-gray-600 text-white shadow-lg' 
+                    : 'bg-gray-900 border-gray-700 text-gray-300 hover:bg-gray-800'
                 }`}
               >
                 {key === 'getting-started' && <FiUser className="text-sm" />}
@@ -398,7 +389,7 @@ const Tutorial = () => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.3 }}
-          className="bg-gray-900 rounded-xl p-6 mb-12"
+          className="bg-gray-900 rounded-xl p-6 mb-12 border border-gray-800"
         >
           <h2 className="text-2xl font-bold mb-4">{activeSectionData.title}</h2>
           <p className="text-gray-300 mb-6">{activeSectionData.description}</p>
@@ -407,11 +398,11 @@ const Tutorial = () => {
             {activeSectionData.steps.map((step) => (
               <motion.div 
                 key={step.id}
-                className="bg-gray-800 rounded-lg p-6"
+                className="bg-gray-800 rounded-lg p-6 border border-gray-700"
                 whileHover={{ scale: 1.01 }}
               >
                 <div className="flex items-start gap-4 mb-4">
-                  <div className="bg-gradient-to-br from-blue-500 to-purple-600 rounded-full w-10 h-10 flex items-center justify-center flex-shrink-0 shadow-md">
+                  <div className="bg-gray-700 rounded-full w-10 h-10 flex items-center justify-center flex-shrink-0 border border-gray-600">
                     <span className="text-white font-bold">{step.id}</span>
                   </div>
                   <div>
@@ -426,7 +417,7 @@ const Tutorial = () => {
                       {step.content.map((item, index) => (
                         <li key={index} className="text-gray-300">
                           {item.includes('```') ? (
-                            <pre className="bg-gray-900 p-3 rounded-md overflow-x-auto">
+                            <pre className="bg-gray-900 p-3 rounded-md overflow-x-auto border border-gray-700">
                               <code>{item.replace('```', '').trim()}</code>
                             </pre>
                           ) : (
@@ -448,8 +439,8 @@ const Tutorial = () => {
                       <ul className="space-y-3">
                         {step.tips.map((tip, index) => (
                           <li key={index} className="flex items-start gap-3">
-                            <div className="bg-blue-500/20 rounded-full p-1 mt-0.5">
-                              <TiLocationArrow className="text-blue-400 text-xs" />
+                            <div className="bg-gray-700 rounded-full p-1 mt-0.5 border border-gray-600">
+                              <TiLocationArrow className="text-gray-300 text-xs" />
                             </div>
                             <span className="text-gray-300 text-sm">{tip}</span>
                           </li>
@@ -466,7 +457,7 @@ const Tutorial = () => {
                       {step.duration}
                     </span>
                     <button 
-                      className="text-blue-400 hover:text-blue-300 text-sm font-medium flex items-center gap-1"
+                      className="text-gray-300 hover:text-white text-sm font-medium flex items-center gap-1 border border-gray-600 rounded-full px-3 py-1 hover:bg-gray-700 transition-colors"
                       onClick={() => window.open(`https://youtube.com/watch?v=${step.videoId}`, '_blank')}
                     >
                       <FiYoutube />
@@ -486,10 +477,10 @@ const Tutorial = () => {
             Join our community forum or contact support for additional assistance with the script.
           </p>
           <div className="flex flex-wrap justify-center gap-4">
-            <button className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-medium py-2 px-6 rounded-full transition-colors">
+            <button className="bg-gray-800 hover:bg-gray-700 text-white font-medium py-2 px-6 rounded-full border border-gray-700 transition-colors">
               Community Forum
             </button>
-            <button className="bg-gray-800 hover:bg-gray-700 text-white font-medium py-2 px-6 rounded-full transition-colors">
+            <button className="bg-gray-800 hover:bg-gray-700 text-white font-medium py-2 px-6 rounded-full border border-gray-700 transition-colors">
               Contact Support
             </button>
           </div>
