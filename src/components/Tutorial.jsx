@@ -351,7 +351,7 @@ const Tutorial = () => {
               whileHover={{ x: -2 }}
             >
               <FiArrowLeft className="text-lg group-hover:-translate-x-0.5 transition-transform" />
-              <span>Tutorial Guide</span>
+              <span>Back</span>
             </motion.button>
           </div>
           
