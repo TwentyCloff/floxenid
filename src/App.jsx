@@ -6,7 +6,7 @@ import Footer from "./components/Footer";
 import Header from "./components/Header";
 import Hero from "./components/Hero";
 import Pricing from "./components/Pricing";
-import UpdateLog from "./components/UpdateLog";
+import Roadmap from "./components/Roadmap";
 import Services from "./components/HowToUse";
 import PaymentPage from "./components/PaymentPage";
 import AdminDashboard from "./components/AdminDashboard";
@@ -25,7 +25,7 @@ const Home = () => (
       <Benefits />
       <Services />
       <Pricing />
-      <UpdateLog />
+      <Roadmap />
       <Footer />
     </div>
     <ButtonGradient />
