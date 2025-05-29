@@ -33,12 +33,12 @@ import { links } from "../config";
 
 // External game icons URLs
 const gameIcons = {
-  roblox: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Roblox_2021_Logo.svg/1200px-Roblox_2021_Logo.svg.png",
-  minecraft: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/32/Minecraft_logo.svg/1200px-Minecraft_logo.svg.png",
-  fortnite: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7c/Fortnite_F_lettermark_logo.png/640px-Fortnite_F_lettermark_logo.png",
-  unity: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/19/Unity_Technologies_logo.svg/1200px-Unity_Technologies_logo.svg.png",
-  unreal: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/20/Unreal_Engine_Logo.svg/1200px-Unreal_Engine_Logo.svg.png",
-  gdevelop: "https://wiki.gdevelop.io/wp-content/uploads/2021/04/gdevelop-logo.png"
+  roblox: "https://upload.wikimedia.org/wikipedia/commons/f/f2/Roblox_%282025%29_%28App_Icon%29.svg",
+  minecraft: "https://upload.wikimedia.org/wikipedia/commons/6/64/Minecraft-creeper-face.svg",
+  fortnite: "https://upload.wikimedia.org/wikipedia/commons/7/7c/Fortnite_F_lettermark_logo.png",
+  unity: "https://upload.wikimedia.org/wikipedia/commons/e/e7/Unity_5_logo.svg",
+  unreal: "https://upload.wikimedia.org/wikipedia/commons/0/0c/Unreal_Engine_4_logo_and_wordmark.svg",
+  gdevelop: "https://upload.wikimedia.org/wikipedia/commons/f/fd/Godot_logo_reimagined_vertical.svg"
 };
 
 export const navigation = [
