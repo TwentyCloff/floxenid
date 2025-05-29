@@ -14,6 +14,7 @@ import LoginAdmin from "./components/LoginAdmin";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Dashboard from "./components/Dashboard";
 import Auth from "./components/Auth";
+import tutorial from "./components/tutorial";
 
 
 const Home = () => (
@@ -40,6 +41,7 @@ const App = () => {
       <Route path="/payment" element={<PaymentPage />} />
       <Route path="/dashboard" element={<Dashboard />} />
       <Route path="/login" element={<Auth />} />
+      <Route path="/tutorial" element={tutorial />} />
 
       {/* Login admin */}
       <Route path="/admin/login" element={<LoginAdmin />} />
