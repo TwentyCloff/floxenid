@@ -342,15 +342,28 @@ const Tutorial = () => {
     <div className="bg-black min-h-screen text-white">
       <div className="container mx-auto px-4 py-12">
         {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <button 
+        <div className="flex items-center justify-between mb-8 relative">
+          {/* Enhanced Back Button with Shape and Hover */}
+          <motion.button 
             onClick={() => window.history.back()}
-            className="flex items-center gap-2 text-blue-400 hover:text-blue-300"
+            className="flex items-center gap-2 bg-gray-800 hover:bg-gray-700 text-blue-400 hover:text-blue-300 font-medium py-2 px-4 rounded-lg transition-all duration-200 shadow-md"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
           >
-            <FiArrowLeft /> Back
-          </button>
+            <FiArrowLeft className="text-lg" />
+            <span>Back</span>
+          </motion.button>
+          
           <h1 className="text-3xl font-bold text-center">{tutorialData.title}</h1>
-          <div className="w-24"></div> {/* Spacer for alignment */}
+          
+          {/* Tutorial Indicator with Shape and Hover */}
+          <motion.div 
+            className="bg-gray-800 hover:bg-gray-700 text-gray-300 font-medium py-2 px-4 rounded-lg transition-all duration-200 shadow-md flex items-center gap-2"
+            whileHover={{ scale: 1.05 }}
+          >
+            <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+            <span>Tutorial</span>
+          </motion.div>
         </div>
 
         <p className="text-gray-300 text-center mb-12 max-w-2xl mx-auto">
