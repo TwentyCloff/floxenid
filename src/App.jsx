@@ -6,10 +6,9 @@ import Nav1 from "./components/Nav1";
 
 const Home = () => (
   <div className="pt-[4.75rem] lg:pt-[5.25rem] overflow-hidden">
-    <Header />
+    <Nav1 />
     <Hero />
     <Footer />
-    <Nav1 />
   </div>
 );
 
