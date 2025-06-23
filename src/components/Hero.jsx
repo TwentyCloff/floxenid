@@ -1,5 +1,4 @@
 import Typewriter from "typewriter-effect";
-import { curve } from "../assets";
 import blackholeVideo from "../assets/hero/blackhole.webm";
 import Section from "./Section";
 
@@ -86,18 +85,11 @@ const Hero = () => {
             Unlock the next level of game scripting with{" "}
             <span className="inline-block relative font-semibold text-white">
               Qarvo
-              <img
-                src={curve}
-                className="absolute top-full left-0 w-full xl:-mt-2 pointer-events-none select-none"
-                width={624}
-                height={28}
-                alt="Curve"
-              />
             </span>
             .network
           </p>
 
-          {/* ✅ Tombol Glassmorph tanpa komponen eksternal */}
+          {/* Tombol Glassmorphism */}
           <a
             href="#pricing"
             className="inline-block px-7 py-3 rounded-full border border-white/30 text-white font-semibold
