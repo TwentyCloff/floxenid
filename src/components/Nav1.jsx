@@ -26,7 +26,7 @@ const Navbar = () => {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
-    };
+    });
 
     const handleScroll = () => {
       setScrolled(window.scrollY > 10);
