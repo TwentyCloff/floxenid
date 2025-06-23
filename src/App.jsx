@@ -13,16 +13,27 @@ const Home = () => (
 
 const NotFound = () => (
   <div
-    className="min-h-screen flex flex-col items-center justify-center text-center px-6 relative overflow-hidden"
+    className="min-h-screen flex flex-col items-center justify-center text-center px-6 relative overflow-hidden pb-[8rem]"
     style={{
       background: "linear-gradient(135deg, #FFECEC, #F6C1C1, #B08888)",
     }}
   >
     {/* Wave Background Atas */}
     <svg
-      className="absolute top-0 left-0 w-full h-40"
+      className="absolute top-0 left-0 w-full h-40 text-white/10"
       viewBox="0 0 1440 320"
-      fill="#F6C1C1"
+      fill="currentColor"
+      xmlns="http://www.w3.org/2000/svg"
+      preserveAspectRatio="none"
+    >
+      <path d="M0,96L40,117.3C80,139,160,181,240,176C320,171,400,117,480,101.3C560,85,640,107,720,122.7C800,139,880,149,960,154.7C1040,160,1120,160,1200,160C1280,160,1360,160,1400,160L1440,160L1440,0L1400,0C1360,0,1280,0,1200,0C1120,0,1040,0,960,0C880,0,800,0,720,0C640,0,560,0,480,0C400,0,320,0,240,0C160,0,80,0,40,0L0,0Z" />
+    </svg>
+
+    {/* Wave Background Bawah */}
+    <svg
+      className="absolute bottom-0 left-0 w-full h-40 text-white/10 rotate-180"
+      viewBox="0 0 1440 320"
+      fill="currentColor"
       xmlns="http://www.w3.org/2000/svg"
       preserveAspectRatio="none"
     >
@@ -34,31 +45,20 @@ const NotFound = () => (
       404
     </h1>
 
-    <p className="text-2xl lg:text-3xl text-white font-semibold mt-10 drop-shadow z-10">
+    <p className="text-2xl lg:text-3xl text-white font-semibold mt-2 mb-4 drop-shadow-md z-10">
       Halaman Tidak Ditemukan
     </p>
 
-    <p className="text-white/80 max-w-md mt-8 z-10">
+    <p className="text-white/80 max-w-md mb-8 drop-shadow-sm z-10">
       Maaf, halaman yang kamu cari tidak tersedia atau sudah dipindahkan.
     </p>
 
     <Link
       to="/"
-      className="mt-10 px-6 py-3 bg-white/30 hover:bg-white/40 border border-white/50 rounded-full text-white font-medium transition duration-300 shadow z-10 backdrop-blur-sm"
+      className="px-6 py-3 bg-white/30 hover:bg-white/40 border border-white/50 rounded-full text-white font-medium transition duration-300 shadow z-10 backdrop-blur-sm"
     >
       Kembali ke Beranda
     </Link>
-
-    {/* Wave Bawah */}
-    <svg
-      className="absolute bottom-0 left-0 w-full h-40 rotate-180"
-      viewBox="0 0 1440 320"
-      fill="#F6C1C1"
-      xmlns="http://www.w3.org/2000/svg"
-      preserveAspectRatio="none"
-    >
-      <path d="M0,96L40,117.3C80,139,160,181,240,176C320,171,400,117,480,101.3C560,85,640,107,720,122.7C800,139,880,149,960,154.7C1040,160,1120,160,1200,160C1280,160,1360,160,1400,160L1440,160L1440,320L1400,320C1360,320,1280,320,1200,320C1120,320,1040,320,960,320C880,320,800,320,720,320C640,320,560,320,480,320C400,320,320,320,240,320C160,320,80,320,40,320L0,320Z" />
-    </svg>
   </div>
 );
 
