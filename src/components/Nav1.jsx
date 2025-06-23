@@ -11,10 +11,11 @@ const Navbar = () => {
   const [openNavigation, setOpenNavigation] = useState(false);
   const [activeMenu, setActiveMenu] = useState(null);
   const [scrolled, setScrolled] = useState(false);
-  const [isHoveringMenu, setIsHoveringMenu] = useState(false);
-  const menuTimeoutRef = useRef(null);
-  
-  // Refs for all menu elements
+  const [isHovering, setIsHovering] = useState(false);
+  const timeoutRef = useRef(null);
+
+  // Refs for all interactive elements
+  const navRef = useRef(null);
   const productsButtonRef = useRef(null);
   const productsMenuRef = useRef(null);
   const docsButtonRef = useRef(null);
@@ -25,7 +26,7 @@ const Navbar = () => {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
-    });
+    };
 
     const handleScroll = () => {
       setScrolled(window.scrollY > 10);
@@ -35,9 +36,65 @@ const Navbar = () => {
     return () => {
       unsubscribe();
       window.removeEventListener('scroll', handleScroll);
-      clearTimeout(menuTimeoutRef.current);
+      clearTimeout(timeoutRef.current);
     };
   }, []);
+
+  // Enhanced hover detection with shape-based closing
+  useEffect(() => {
+    const handleMouseMove = (e) => {
+      if (!activeMenu) return;
+
+      // Get all relevant elements
+      const button = 
+        activeMenu === 'products' ? productsButtonRef.current :
+        activeMenu === 'docs' ? docsButtonRef.current :
+        resourcesButtonRef.current;
+
+      const menu = 
+        activeMenu === 'products' ? productsMenuRef.current :
+        activeMenu === 'docs' ? docsMenuRef.current :
+        resourcesMenuRef.current;
+
+      if (!button || !menu) return;
+
+      // Get bounding rectangles
+      const buttonRect = button.getBoundingClientRect();
+      const menuRect = menu.getBoundingClientRect();
+
+      // Create an expanded hover area that connects button and menu
+      const hoverArea = {
+        left: Math.min(buttonRect.left, menuRect.left) - 20,
+        right: Math.max(buttonRect.right, menuRect.right) + 20,
+        top: Math.min(buttonRect.top, menuRect.top) - 10,
+        bottom: Math.max(buttonRect.bottom, menuRect.bottom) + 10
+      };
+
+      // Check if cursor is outside the combined hover area
+      if (
+        e.clientX < hoverArea.left ||
+        e.clientX > hoverArea.right ||
+        e.clientY < hoverArea.top ||
+        e.clientY > hoverArea.bottom
+      ) {
+        if (!timeoutRef.current) {
+          timeoutRef.current = setTimeout(() => {
+            if (!isHovering) {
+              setActiveMenu(null);
+            }
+          }, 150); // 150ms delay before closing
+        }
+      } else {
+        clearTimeout(timeoutRef.current);
+        timeoutRef.current = null;
+      }
+    };
+
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+    };
+  }, [activeMenu, isHovering]);
 
   const toggleNavigation = () => {
     if (openNavigation) {
@@ -64,33 +121,16 @@ const Navbar = () => {
   const goToPricing = () => navigate("/pricing");
   const goToSignUp = () => navigate("/signup");
 
-  // Enhanced hover handlers with delay
   const handleMenuEnter = (menuType) => {
-    clearTimeout(menuTimeoutRef.current);
+    clearTimeout(timeoutRef.current);
+    timeoutRef.current = null;
     setActiveMenu(menuType);
-    setIsHoveringMenu(true);
+    setIsHovering(true);
   };
 
-  const handleMenuLeave = (menuType) => {
-    clearTimeout(menuTimeoutRef.current);
-    menuTimeoutRef.current = setTimeout(() => {
-      if (!isHoveringMenu) {
-        setActiveMenu(null);
-      }
-    }, 300); // 300ms delay before closing
-  };
-
-  const handleMenuContentEnter = () => {
-    clearTimeout(menuTimeoutRef.current);
-    setIsHoveringMenu(true);
-  };
-
-  const handleMenuContentLeave = () => {
-    setIsHoveringMenu(false);
-    clearTimeout(menuTimeoutRef.current);
-    menuTimeoutRef.current = setTimeout(() => {
-      setActiveMenu(null);
-    }, 200); // 200ms delay after leaving menu content
+  const handleMenuLeave = () => {
+    setIsHovering(false);
+    // The shape-based detection will handle closing now
   };
 
   // Menu data
@@ -180,7 +220,10 @@ const Navbar = () => {
         />
       )}
 
-      <header className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${scrolled ? 'bg-[#0E0E10]/90 backdrop-blur-sm' : 'bg-transparent'}`}>
+      <header 
+        ref={navRef}
+        className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${scrolled ? 'bg-[#0E0E10]/90 backdrop-blur-sm' : 'bg-transparent'}`}
+      >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           {/* Left section */}
           <div className="flex items-center space-x-8">
@@ -198,11 +241,11 @@ const Navbar = () => {
                 className="relative"
                 ref={productsButtonRef}
                 onMouseEnter={() => handleMenuEnter('products')}
-                onMouseLeave={() => handleMenuLeave('products')}
+                onMouseLeave={handleMenuLeave}
               >
                 <button 
                   className={`px-4 py-2 rounded-md text-sm font-medium transition-colors duration-200 flex items-center ${
-                    activeMenu === 'products' ? 'text-white' : 'text-gray-400 hover:text-white'
+                    activeMenu === 'products' ? 'text-white' : 'text-gray-300 hover:text-white'
                   }`}
                 >
                   Products
@@ -211,16 +254,16 @@ const Navbar = () => {
 
                 <div 
                   ref={productsMenuRef}
-                  className={`absolute left-0 mt-2 w-[600px] rounded-lg shadow-lg bg-[#161618]/90 backdrop-blur-md border border-gray-700/50 overflow-hidden transition-all duration-300 origin-top ${
+                  className={`absolute left-0 mt-2 w-[600px] rounded-lg bg-[#161618]/70 backdrop-blur-lg border border-gray-600/30 overflow-hidden transition-all duration-300 origin-top ${
                     activeMenu === 'products' ? 'opacity-100 scale-y-100' : 'opacity-0 scale-y-95 pointer-events-none'
                   }`}
-                  onMouseEnter={handleMenuContentEnter}
-                  onMouseLeave={handleMenuContentLeave}
+                  onMouseEnter={() => setIsHovering(true)}
+                  onMouseLeave={handleMenuLeave}
                 >
                   <div className="p-6">
                     <div className="grid grid-cols-2 gap-8">
                       <div>
-                        <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-4">
+                        <h3 className="text-sm font-semibold text-gray-300 uppercase tracking-wider mb-4">
                           Open-source
                         </h3>
                         <ul className="space-y-4">
@@ -230,7 +273,7 @@ const Navbar = () => {
                         </ul>
                       </div>
                       <div>
-                        <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-4">
+                        <h3 className="text-sm font-semibold text-gray-300 uppercase tracking-wider mb-4">
                           Pro
                         </h3>
                         <ul className="space-y-4">
@@ -249,11 +292,11 @@ const Navbar = () => {
                 className="relative"
                 ref={docsButtonRef}
                 onMouseEnter={() => handleMenuEnter('docs')}
-                onMouseLeave={() => handleMenuLeave('docs')}
+                onMouseLeave={handleMenuLeave}
               >
                 <button 
                   className={`px-4 py-2 rounded-md text-sm font-medium transition-colors duration-200 flex items-center ${
-                    activeMenu === 'docs' ? 'text-white' : 'text-gray-400 hover:text-white'
+                    activeMenu === 'docs' ? 'text-white' : 'text-gray-300 hover:text-white'
                   }`}
                 >
                   Docs
@@ -262,16 +305,16 @@ const Navbar = () => {
 
                 <div 
                   ref={docsMenuRef}
-                  className={`absolute left-0 mt-2 w-[500px] rounded-lg shadow-lg bg-[#161618]/90 backdrop-blur-md border border-gray-700/50 overflow-hidden transition-all duration-300 origin-top ${
+                  className={`absolute left-0 mt-2 w-[500px] rounded-lg bg-[#161618]/70 backdrop-blur-lg border border-gray-600/30 overflow-hidden transition-all duration-300 origin-top ${
                     activeMenu === 'docs' ? 'opacity-100 scale-y-100' : 'opacity-0 scale-y-95 pointer-events-none'
                   }`}
-                  onMouseEnter={handleMenuContentEnter}
-                  onMouseLeave={handleMenuContentLeave}
+                  onMouseEnter={() => setIsHovering(true)}
+                  onMouseLeave={handleMenuLeave}
                 >
                   <div className="p-6">
                     <div className="grid grid-cols-2 gap-8">
                       <div>
-                        <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-4">
+                        <h3 className="text-sm font-semibold text-gray-300 uppercase tracking-wider mb-4">
                           Guides
                         </h3>
                         <ul className="space-y-4">
@@ -281,7 +324,7 @@ const Navbar = () => {
                         </ul>
                       </div>
                       <div>
-                        <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-4">
+                        <h3 className="text-sm font-semibold text-gray-300 uppercase tracking-wider mb-4">
                           Reference
                         </h3>
                         <ul className="space-y-4">
@@ -300,11 +343,11 @@ const Navbar = () => {
                 className="relative"
                 ref={resourcesButtonRef}
                 onMouseEnter={() => handleMenuEnter('resources')}
-                onMouseLeave={() => handleMenuLeave('resources')}
+                onMouseLeave={handleMenuLeave}
               >
                 <button 
                   className={`px-4 py-2 rounded-md text-sm font-medium transition-colors duration-200 flex items-center ${
-                    activeMenu === 'resources' ? 'text-white' : 'text-gray-400 hover:text-white'
+                    activeMenu === 'resources' ? 'text-white' : 'text-gray-300 hover:text-white'
                   }`}
                 >
                   Resources
@@ -313,16 +356,16 @@ const Navbar = () => {
 
                 <div 
                   ref={resourcesMenuRef}
-                  className={`absolute left-0 mt-2 w-[500px] rounded-lg shadow-lg bg-[#161618]/90 backdrop-blur-md border border-gray-700/50 overflow-hidden transition-all duration-300 origin-top ${
+                  className={`absolute left-0 mt-2 w-[500px] rounded-lg bg-[#161618]/70 backdrop-blur-lg border border-gray-600/30 overflow-hidden transition-all duration-300 origin-top ${
                     activeMenu === 'resources' ? 'opacity-100 scale-y-100' : 'opacity-0 scale-y-95 pointer-events-none'
                   }`}
-                  onMouseEnter={handleMenuContentEnter}
-                  onMouseLeave={handleMenuContentLeave}
+                  onMouseEnter={() => setIsHovering(true)}
+                  onMouseLeave={handleMenuLeave}
                 >
                   <div className="p-6">
                     <div className="grid grid-cols-2 gap-8">
                       <div>
-                        <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-4">
+                        <h3 className="text-sm font-semibold text-gray-300 uppercase tracking-wider mb-4">
                           Company
                         </h3>
                         <ul className="space-y-4">
@@ -332,7 +375,7 @@ const Navbar = () => {
                         </ul>
                       </div>
                       <div>
-                        <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-4">
+                        <h3 className="text-sm font-semibold text-gray-300 uppercase tracking-wider mb-4">
                           Updates
                         </h3>
                         <ul className="space-y-4">
@@ -350,7 +393,7 @@ const Navbar = () => {
               <button
                 onClick={goToPricing}
                 className={`px-4 py-2 rounded-md text-sm font-medium transition-colors duration-200 ${
-                  location.pathname === '/pricing' ? 'text-white' : 'text-gray-400 hover:text-white'
+                  location.pathname === '/pricing' ? 'text-white' : 'text-gray-300 hover:text-white'
                 }`}
               >
                 Pricing
@@ -364,7 +407,7 @@ const Navbar = () => {
               href="https://discord.gg"
               target="_blank"
               rel="noreferrer"
-              className="text-gray-400 hover:text-white transition-colors duration-200 hidden md:block"
+              className="text-gray-300 hover:text-white transition-colors duration-200 hidden md:block"
             >
               <span className="sr-only">Discord</span>
               <DiscordIcon />
@@ -401,7 +444,7 @@ const Navbar = () => {
         <nav
           className={`${
             openNavigation ? 'block' : 'hidden'
-          } fixed top-16 left-0 right-0 bg-[#161618]/95 backdrop-blur-md border-t border-gray-700/50 md:hidden transition-all duration-300 ease-in-out`}
+          } fixed top-16 left-0 right-0 bg-[#161618]/95 backdrop-blur-lg border-t border-gray-700/30 md:hidden transition-all duration-300 ease-in-out`}
           style={{
             maxHeight: openNavigation ? 'calc(100vh - 64px)' : '0',
             overflow: 'hidden'
@@ -410,7 +453,7 @@ const Navbar = () => {
           <div className="px-4 py-3 space-y-1">
             <a
               href="/products"
-              className="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:bg-gray-800 hover:text-white"
+              className="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:bg-gray-800/50 hover:text-white"
               onClick={handleClick}
             >
               Products
@@ -418,7 +461,7 @@ const Navbar = () => {
 
             <a
               href="/docs"
-              className="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:bg-gray-800 hover:text-white"
+              className="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:bg-gray-800/50 hover:text-white"
               onClick={handleClick}
             >
               Docs
@@ -426,7 +469,7 @@ const Navbar = () => {
 
             <a
               href="/resources"
-              className="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:bg-gray-800 hover:text-white"
+              className="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:bg-gray-800/50 hover:text-white"
               onClick={handleClick}
             >
               Resources
@@ -438,13 +481,13 @@ const Navbar = () => {
                 handleClick();
               }}
               className={`w-full text-left px-3 py-2 rounded-md text-base font-medium ${
-                location.pathname === '/pricing' ? 'bg-gray-800 text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white'
+                location.pathname === '/pricing' ? 'bg-gray-800/50 text-white' : 'text-gray-300 hover:bg-gray-800/50 hover:text-white'
               }`}
             >
               Pricing
             </button>
 
-            <div className="pt-4 pb-2 border-t border-gray-700/50 flex flex-col space-y-3">
+            <div className="pt-4 pb-2 border-t border-gray-700/30 flex flex-col space-y-3">
               {user ? (
                 <>
                   <ElegantButton 
@@ -550,12 +593,12 @@ const MenuItem = ({ title, description, url }) => {
     <li>
       <a
         href={url}
-        className="group block rounded-md p-2 transition-colors duration-200 hover:bg-gray-800"
+        className="group block rounded-md p-2 transition-colors duration-200 hover:bg-gray-800/50"
       >
         <p className="text-base font-medium text-white group-hover:text-white">
           {title}
         </p>
-        <p className="mt-1 text-sm text-gray-400">{description}</p>
+        <p className="mt-1 text-sm text-gray-300">{description}</p>
       </a>
     </li>
   );
