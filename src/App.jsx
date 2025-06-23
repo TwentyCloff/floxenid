@@ -14,7 +14,7 @@ const Home = () => (
 const App = () => {
   const NotFound = () => (
     <div
-      className="min-h-screen flex flex-col items-center justify-center text-center px-6 relative overflow-hidden pb-[12rem] pt-28 space-y-6"
+      className="min-h-screen flex flex-col items-center justify-center text-center px-6 relative overflow-hidden pb-[12rem] pt-36 space-y-6"
       style={{
         background: "linear-gradient(135deg, #FFECEC, #F6C1C1, #B08888)",
       }}
