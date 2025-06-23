@@ -4,13 +4,11 @@ import Hero from "./components/Hero";
 import Footer from "./components/Footer";
 
 const Home = () => (
-  <>
-    <div className="pt-[4.75rem] lg:pt-[5.25rem] overflow-hidden">
-      <Header />
-      <Hero />
-      <Footer />
-    </div>
-  </>
+  <div className="pt-[4.75rem] lg:pt-[5.25rem] overflow-hidden">
+    <Header />
+    <Hero />
+    <Footer />
+  </div>
 );
 
 const NotFound = () => (
@@ -32,13 +30,13 @@ const NotFound = () => (
     </svg>
 
     {/* Konten 404 */}
-    <h1 className="text-[6rem] lg:text-[8rem] font-extrabold text-white drop-shadow-lg animate-pulse z-10">
+    <h1 className="text-[6rem] lg:text-[8rem] font-extrabold text-white drop-shadow-[0_2px_6px_rgba(0,0,0,0.7)] z-10 animate-pulse">
       404
     </h1>
-    <p className="text-2xl lg:text-3xl text-white font-semibold mb-4 drop-shadow z-10">
+    <p className="text-2xl lg:text-3xl font-semibold mb-4 z-10 text-white drop-shadow-[0_1px_4px_rgba(0,0,0,0.6)]">
       Halaman Tidak Ditemukan
     </p>
-    <p className="text-white/80 max-w-md mb-6 z-10">
+    <p className="text-white/90 max-w-md mb-6 z-10 drop-shadow-[0_1px_3px_rgba(0,0,0,0.5)]">
       Maaf, halaman yang kamu cari tidak tersedia atau sudah dipindahkan.
     </p>
     <Link
@@ -48,7 +46,7 @@ const NotFound = () => (
       Kembali ke Beranda
     </Link>
 
-    {/* Hiasan Lingkaran di Kanan Bawah */}
+    {/* Hiasan Lingkaran */}
     <div className="absolute bottom-[-50px] right-[-50px] w-40 h-40 bg-white/10 rounded-full border-2 border-white/30"></div>
   </div>
 );
