@@ -1,8 +1,6 @@
 import Typewriter from "typewriter-effect";
-
 import { curve } from "../assets";
 import blackholeVideo from "../assets/hero/blackhole.webm";
-import Button from "./Button";
 import Section from "./Section";
 
 const Hero = () => {
@@ -99,9 +97,14 @@ const Hero = () => {
             .network
           </p>
 
-          <Button href="#pricing" white>
+          {/* ✅ Tombol Glassmorph tanpa komponen eksternal */}
+          <a
+            href="#pricing"
+            className="inline-block px-7 py-3 rounded-full border border-white/30 text-white font-semibold
+                       bg-white/10 backdrop-blur-md hover:bg-white/20 transition-all duration-300 shadow-lg"
+          >
             Get started
-          </Button>
+          </a>
         </div>
       </div>
 
