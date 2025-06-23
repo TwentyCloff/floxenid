@@ -45,7 +45,7 @@ const NotFound = () => (
       404
     </h1>
 
-    <p className="text-2xl lg:text-3xl text-white font-semibold mt-6 mb-4 drop-shadow-md z-10">
+    <p className="text-2xl lg:text-3xl text-white font-semibold mt-12 mb-4 drop-shadow-md z-10">
       Halaman Tidak Ditemukan
     </p>
 
