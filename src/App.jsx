@@ -20,9 +20,9 @@ const NotFound = () => (
   >
     {/* Wave Background Atas */}
     <svg
-      className="absolute top-0 left-0 w-full h-40 text-white/10"
+      className="absolute top-0 left-0 w-full h-40"
       viewBox="0 0 1440 320"
-      fill="currentColor"
+      fill="#F6C1C1"
       xmlns="http://www.w3.org/2000/svg"
       preserveAspectRatio="none"
     >
@@ -34,26 +34,26 @@ const NotFound = () => (
       404
     </h1>
 
-    <p className="text-2xl lg:text-3xl text-white font-semibold mt-6 drop-shadow z-10">
+    <p className="text-2xl lg:text-3xl text-white font-semibold mt-10 drop-shadow z-10">
       Halaman Tidak Ditemukan
     </p>
 
-    <p className="text-white/80 max-w-md mt-4 z-10">
+    <p className="text-white/80 max-w-md mt-8 z-10">
       Maaf, halaman yang kamu cari tidak tersedia atau sudah dipindahkan.
     </p>
 
     <Link
       to="/"
-      className="mt-6 px-6 py-3 bg-white/30 hover:bg-white/40 border border-white/50 rounded-full text-white font-medium transition duration-300 shadow z-10 backdrop-blur-sm"
+      className="mt-10 px-6 py-3 bg-white/30 hover:bg-white/40 border border-white/50 rounded-full text-white font-medium transition duration-300 shadow z-10 backdrop-blur-sm"
     >
       Kembali ke Beranda
     </Link>
 
-    {/* Wave Bawah sebagai penghias */}
+    {/* Wave Bawah */}
     <svg
-      className="absolute bottom-0 left-0 w-full h-40 text-white/10 rotate-180"
+      className="absolute bottom-0 left-0 w-full h-40 rotate-180"
       viewBox="0 0 1440 320"
-      fill="currentColor"
+      fill="#F6C1C1"
       xmlns="http://www.w3.org/2000/svg"
       preserveAspectRatio="none"
     >
