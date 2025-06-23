@@ -1,4 +1,3 @@
-import { socials } from "../constants";
 import Section from "./Section";
 
 const Footer = () => {
@@ -10,28 +9,9 @@ const Footer = () => {
           <div className="footer-about">
             <div className="text-2xl font-bold text-color-1 mb-4">Qarvo</div>
             <p className="text-white mb-6">Creating innovative products for you.</p>
-            <div className="flex gap-4">
-              {socials.map((social) => (
-                <a
-                  href={social.url}
-                  key={social.id}
-                  target="_blank"
-                  rel="noreferrer noopener"
-                  aria-label={social.title}
-                  className="flex items-center justify-center w-10 h-10 bg-gray-900 rounded-full transition-colors hover:bg-color-1"
-                >
-                  <img
-                    src={social.iconUrl}
-                    alt={social.title}
-                    width={16}
-                    height={16}
-                    className="filter brightness-0 invert"
-                  />
-                </a>
-              ))}
-            </div>
+            {/* Social icons removed */}
           </div>
-          
+
           {/* Quick Links */}
           <div className="footer-links">
             <h3 className="text-lg font-semibold text-color-1 mb-4">Quick Links</h3>
@@ -42,7 +22,7 @@ const Footer = () => {
               <li><a href="#roadmap" className="text-white hover:text-color-1 transition-colors">RoadMap</a></li>
             </ul>
           </div>
-          
+
           {/* Resources */}
           <div className="footer-links">
             <h3 className="text-lg font-semibold text-color-1 mb-4">Resources</h3>
@@ -53,7 +33,7 @@ const Footer = () => {
               <li><a href="#" className="text-white hover:text-color-1 transition-colors">FAQ</a></li>
             </ul>
           </div>
-          
+
           {/* Contact */}
           <div className="footer-links">
             <h3 className="text-lg font-semibold text-color-1 mb-4">Contact</h3>
@@ -73,7 +53,7 @@ const Footer = () => {
             </ul>
           </div>
         </div>
-        
+
         {/* Copyright */}
         <div className="max-w-7xl mx-auto mt-12 pt-6 border-t border-gray-800 text-center text-white">
           <p>
