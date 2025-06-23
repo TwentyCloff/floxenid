@@ -11,8 +11,8 @@ const Navbar = () => {
   const [openNavigation, setOpenNavigation] = useState(false);
   const [activeMenu, setActiveMenu] = useState(null);
   const [scrolled, setScrolled] = useState(false);
-  const [isHovering, setIsHovering] = useState(false);
   const timeoutRef = useRef(null);
+  const isHoveringRef = useRef(false);
 
   // Refs for all interactive elements
   const navRef = useRef(null);
@@ -40,12 +40,11 @@ const Navbar = () => {
     };
   }, []);
 
-  // Enhanced hover detection with shape-based closing
+  // Enhanced hover detection with precise boundaries
   useEffect(() => {
     const handleMouseMove = (e) => {
       if (!activeMenu) return;
 
-      // Get all relevant elements
       const button = 
         activeMenu === 'products' ? productsButtonRef.current :
         activeMenu === 'docs' ? docsButtonRef.current :
@@ -58,31 +57,30 @@ const Navbar = () => {
 
       if (!button || !menu) return;
 
-      // Get bounding rectangles
+      // Get precise boundaries with 10px buffer
       const buttonRect = button.getBoundingClientRect();
       const menuRect = menu.getBoundingClientRect();
 
-      // Create an expanded hover area that connects button and menu
-      const hoverArea = {
-        left: Math.min(buttonRect.left, menuRect.left) - 20,
-        right: Math.max(buttonRect.right, menuRect.right) + 20,
-        top: Math.min(buttonRect.top, menuRect.top) - 10,
-        bottom: Math.max(buttonRect.bottom, menuRect.bottom) + 10
+      // Create a connecting bridge between button and menu
+      const bridgeArea = {
+        left: Math.min(buttonRect.left, menuRect.left) - 10,
+        right: Math.max(buttonRect.right, menuRect.right) + 10,
+        top: Math.min(buttonRect.top, menuRect.top) - 5,
+        bottom: Math.max(buttonRect.bottom, menuRect.bottom) + 5
       };
 
-      // Check if cursor is outside the combined hover area
-      if (
-        e.clientX < hoverArea.left ||
-        e.clientX > hoverArea.right ||
-        e.clientY < hoverArea.top ||
-        e.clientY > hoverArea.bottom
-      ) {
+      // Check if cursor is within the interactive zone
+      const isInZone = 
+        e.clientX >= bridgeArea.left &&
+        e.clientX <= bridgeArea.right &&
+        e.clientY >= bridgeArea.top && 
+        e.clientY <= bridgeArea.bottom;
+
+      if (!isInZone && !isHoveringRef.current) {
         if (!timeoutRef.current) {
           timeoutRef.current = setTimeout(() => {
-            if (!isHovering) {
-              setActiveMenu(null);
-            }
-          }, 150); // 150ms delay before closing
+            setActiveMenu(null);
+          }, 100); // Reduced delay to 100ms
         }
       } else {
         clearTimeout(timeoutRef.current);
@@ -94,7 +92,7 @@ const Navbar = () => {
     return () => {
       window.removeEventListener('mousemove', handleMouseMove);
     };
-  }, [activeMenu, isHovering]);
+  }, [activeMenu]);
 
   const toggleNavigation = () => {
     if (openNavigation) {
@@ -117,6 +115,7 @@ const Navbar = () => {
     await signOut(auth);
     setUser(null);
   };
+
   const goToDashboard = () => navigate("/dashboard");
   const goToPricing = () => navigate("/pricing");
   const goToSignUp = () => navigate("/signup");
@@ -125,12 +124,11 @@ const Navbar = () => {
     clearTimeout(timeoutRef.current);
     timeoutRef.current = null;
     setActiveMenu(menuType);
-    setIsHovering(true);
+    isHoveringRef.current = true;
   };
 
   const handleMenuLeave = () => {
-    setIsHovering(false);
-    // The shape-based detection will handle closing now
+    isHoveringRef.current = false;
   };
 
   // Menu data
@@ -254,10 +252,10 @@ const Navbar = () => {
 
                 <div 
                   ref={productsMenuRef}
-                  className={`absolute left-0 mt-2 w-[600px] rounded-lg bg-[#161618]/70 backdrop-blur-lg border border-gray-600/30 overflow-hidden transition-all duration-300 origin-top ${
+                  className={`absolute left-0 mt-2 w-[600px] rounded-lg bg-[#161618]/80 backdrop-blur-lg border border-gray-600/30 overflow-hidden transition-all duration-200 origin-top ${
                     activeMenu === 'products' ? 'opacity-100 scale-y-100' : 'opacity-0 scale-y-95 pointer-events-none'
                   }`}
-                  onMouseEnter={() => setIsHovering(true)}
+                  onMouseEnter={() => isHoveringRef.current = true}
                   onMouseLeave={handleMenuLeave}
                 >
                   <div className="p-6">
@@ -266,7 +264,7 @@ const Navbar = () => {
                         <h3 className="text-sm font-semibold text-gray-300 uppercase tracking-wider mb-4">
                           Open-source
                         </h3>
-                        <ul className="space-y-4">
+                        <ul className="space-y-3">
                           {productsMenu.openSource.map((item, index) => (
                             <MenuItem key={`opensource-${index}`} {...item} />
                           ))}
@@ -276,7 +274,7 @@ const Navbar = () => {
                         <h3 className="text-sm font-semibold text-gray-300 uppercase tracking-wider mb-4">
                           Pro
                         </h3>
-                        <ul className="space-y-4">
+                        <ul className="space-y-3">
                           {productsMenu.pro.map((item, index) => (
                             <MenuItem key={`pro-${index}`} {...item} />
                           ))}
@@ -305,10 +303,10 @@ const Navbar = () => {
 
                 <div 
                   ref={docsMenuRef}
-                  className={`absolute left-0 mt-2 w-[500px] rounded-lg bg-[#161618]/70 backdrop-blur-lg border border-gray-600/30 overflow-hidden transition-all duration-300 origin-top ${
+                  className={`absolute left-0 mt-2 w-[500px] rounded-lg bg-[#161618]/80 backdrop-blur-lg border border-gray-600/30 overflow-hidden transition-all duration-200 origin-top ${
                     activeMenu === 'docs' ? 'opacity-100 scale-y-100' : 'opacity-0 scale-y-95 pointer-events-none'
                   }`}
-                  onMouseEnter={() => setIsHovering(true)}
+                  onMouseEnter={() => isHoveringRef.current = true}
                   onMouseLeave={handleMenuLeave}
                 >
                   <div className="p-6">
@@ -317,7 +315,7 @@ const Navbar = () => {
                         <h3 className="text-sm font-semibold text-gray-300 uppercase tracking-wider mb-4">
                           Guides
                         </h3>
-                        <ul className="space-y-4">
+                        <ul className="space-y-3">
                           {docsMenu.guides.map((item, index) => (
                             <MenuItem key={`guide-${index}`} {...item} />
                           ))}
@@ -327,7 +325,7 @@ const Navbar = () => {
                         <h3 className="text-sm font-semibold text-gray-300 uppercase tracking-wider mb-4">
                           Reference
                         </h3>
-                        <ul className="space-y-4">
+                        <ul className="space-y-3">
                           {docsMenu.reference.map((item, index) => (
                             <MenuItem key={`reference-${index}`} {...item} />
                           ))}
@@ -356,10 +354,10 @@ const Navbar = () => {
 
                 <div 
                   ref={resourcesMenuRef}
-                  className={`absolute left-0 mt-2 w-[500px] rounded-lg bg-[#161618]/70 backdrop-blur-lg border border-gray-600/30 overflow-hidden transition-all duration-300 origin-top ${
+                  className={`absolute left-0 mt-2 w-[500px] rounded-lg bg-[#161618]/80 backdrop-blur-lg border border-gray-600/30 overflow-hidden transition-all duration-200 origin-top ${
                     activeMenu === 'resources' ? 'opacity-100 scale-y-100' : 'opacity-0 scale-y-95 pointer-events-none'
                   }`}
-                  onMouseEnter={() => setIsHovering(true)}
+                  onMouseEnter={() => isHoveringRef.current = true}
                   onMouseLeave={handleMenuLeave}
                 >
                   <div className="p-6">
@@ -368,7 +366,7 @@ const Navbar = () => {
                         <h3 className="text-sm font-semibold text-gray-300 uppercase tracking-wider mb-4">
                           Company
                         </h3>
-                        <ul className="space-y-4">
+                        <ul className="space-y-3">
                           {resourcesMenu.company.map((item, index) => (
                             <MenuItem key={`company-${index}`} {...item} />
                           ))}
@@ -378,7 +376,7 @@ const Navbar = () => {
                         <h3 className="text-sm font-semibold text-gray-300 uppercase tracking-wider mb-4">
                           Updates
                         </h3>
-                        <ul className="space-y-4">
+                        <ul className="space-y-3">
                           {resourcesMenu.updates.map((item, index) => (
                             <MenuItem key={`update-${index}`} {...item} />
                           ))}
@@ -433,18 +431,18 @@ const Navbar = () => {
             {/* Mobile menu button */}
             <button
               onClick={toggleNavigation}
-              className="ml-auto md:hidden p-2 rounded-md hover:bg-gray-800 transition-colors"
+              className="ml-auto md:hidden p-2 rounded-md hover:bg-gray-800/50 transition-colors"
             >
               {openNavigation ? <CloseIcon /> : <MenuIcon />}
             </button>
           </div>
         </div>
 
-        {/* Mobile Navigation - Simplified version */}
+        {/* Mobile Navigation */}
         <nav
           className={`${
             openNavigation ? 'block' : 'hidden'
-          } fixed top-16 left-0 right-0 bg-[#161618]/95 backdrop-blur-lg border-t border-gray-700/30 md:hidden transition-all duration-300 ease-in-out`}
+          } fixed top-16 left-0 right-0 bg-[#161618]/95 backdrop-blur-lg border-t border-gray-700/30 md:hidden transition-all duration-200 ease-in-out`}
           style={{
             maxHeight: openNavigation ? 'calc(100vh - 64px)' : '0',
             overflow: 'hidden'
