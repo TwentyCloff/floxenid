@@ -11,11 +11,16 @@ const Navbar = () => {
   const [openNavigation, setOpenNavigation] = useState(false);
   const [activeMenu, setActiveMenu] = useState(null);
   const [scrolled, setScrolled] = useState(false);
-  const menuRefs = {
-    products: useRef(null),
-    docs: useRef(null),
-    resources: useRef(null)
-  };
+  const [isHoveringMenu, setIsHoveringMenu] = useState(false);
+  const menuTimeoutRef = useRef(null);
+  
+  // Refs for all menu elements
+  const productsButtonRef = useRef(null);
+  const productsMenuRef = useRef(null);
+  const docsButtonRef = useRef(null);
+  const docsMenuRef = useRef(null);
+  const resourcesButtonRef = useRef(null);
+  const resourcesMenuRef = useRef(null);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
@@ -30,22 +35,9 @@ const Navbar = () => {
     return () => {
       unsubscribe();
       window.removeEventListener('scroll', handleScroll);
+      clearTimeout(menuTimeoutRef.current);
     };
   }, []);
-
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (activeMenu && menuRefs[activeMenu].current && 
-          !menuRefs[activeMenu].current.contains(event.target)) {
-        setActiveMenu(null);
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [activeMenu]);
 
   const toggleNavigation = () => {
     if (openNavigation) {
@@ -71,6 +63,35 @@ const Navbar = () => {
   const goToDashboard = () => navigate("/dashboard");
   const goToPricing = () => navigate("/pricing");
   const goToSignUp = () => navigate("/signup");
+
+  // Enhanced hover handlers with delay
+  const handleMenuEnter = (menuType) => {
+    clearTimeout(menuTimeoutRef.current);
+    setActiveMenu(menuType);
+    setIsHoveringMenu(true);
+  };
+
+  const handleMenuLeave = (menuType) => {
+    clearTimeout(menuTimeoutRef.current);
+    menuTimeoutRef.current = setTimeout(() => {
+      if (!isHoveringMenu) {
+        setActiveMenu(null);
+      }
+    }, 300); // 300ms delay before closing
+  };
+
+  const handleMenuContentEnter = () => {
+    clearTimeout(menuTimeoutRef.current);
+    setIsHoveringMenu(true);
+  };
+
+  const handleMenuContentLeave = () => {
+    setIsHoveringMenu(false);
+    clearTimeout(menuTimeoutRef.current);
+    menuTimeoutRef.current = setTimeout(() => {
+      setActiveMenu(null);
+    }, 200); // 200ms delay after leaving menu content
+  };
 
   // Menu data
   const productsMenu = {
@@ -175,16 +196,11 @@ const Navbar = () => {
               {/* Products Menu */}
               <div 
                 className="relative"
-                ref={menuRefs.products}
-                onMouseEnter={() => setActiveMenu('products')}
-                onMouseLeave={() => {
-                  if (!menuRefs.products.current?.matches(':hover')) {
-                    setActiveMenu(null);
-                  }
-                }}
+                ref={productsButtonRef}
+                onMouseEnter={() => handleMenuEnter('products')}
+                onMouseLeave={() => handleMenuLeave('products')}
               >
                 <button 
-                  onClick={() => setActiveMenu(activeMenu === 'products' ? null : 'products')}
                   className={`px-4 py-2 rounded-md text-sm font-medium transition-colors duration-200 flex items-center ${
                     activeMenu === 'products' ? 'text-white' : 'text-gray-400 hover:text-white'
                   }`}
@@ -194,11 +210,12 @@ const Navbar = () => {
                 </button>
 
                 <div 
+                  ref={productsMenuRef}
                   className={`absolute left-0 mt-2 w-[600px] rounded-lg shadow-lg bg-[#161618]/90 backdrop-blur-md border border-gray-700/50 overflow-hidden transition-all duration-300 origin-top ${
                     activeMenu === 'products' ? 'opacity-100 scale-y-100' : 'opacity-0 scale-y-95 pointer-events-none'
                   }`}
-                  onMouseEnter={() => setActiveMenu('products')}
-                  onMouseLeave={() => setActiveMenu(null)}
+                  onMouseEnter={handleMenuContentEnter}
+                  onMouseLeave={handleMenuContentLeave}
                 >
                   <div className="p-6">
                     <div className="grid grid-cols-2 gap-8">
@@ -230,16 +247,11 @@ const Navbar = () => {
               {/* Docs Menu */}
               <div 
                 className="relative"
-                ref={menuRefs.docs}
-                onMouseEnter={() => setActiveMenu('docs')}
-                onMouseLeave={() => {
-                  if (!menuRefs.docs.current?.matches(':hover')) {
-                    setActiveMenu(null);
-                  }
-                }}
+                ref={docsButtonRef}
+                onMouseEnter={() => handleMenuEnter('docs')}
+                onMouseLeave={() => handleMenuLeave('docs')}
               >
                 <button 
-                  onClick={() => setActiveMenu(activeMenu === 'docs' ? null : 'docs')}
                   className={`px-4 py-2 rounded-md text-sm font-medium transition-colors duration-200 flex items-center ${
                     activeMenu === 'docs' ? 'text-white' : 'text-gray-400 hover:text-white'
                   }`}
@@ -249,11 +261,12 @@ const Navbar = () => {
                 </button>
 
                 <div 
+                  ref={docsMenuRef}
                   className={`absolute left-0 mt-2 w-[500px] rounded-lg shadow-lg bg-[#161618]/90 backdrop-blur-md border border-gray-700/50 overflow-hidden transition-all duration-300 origin-top ${
                     activeMenu === 'docs' ? 'opacity-100 scale-y-100' : 'opacity-0 scale-y-95 pointer-events-none'
                   }`}
-                  onMouseEnter={() => setActiveMenu('docs')}
-                  onMouseLeave={() => setActiveMenu(null)}
+                  onMouseEnter={handleMenuContentEnter}
+                  onMouseLeave={handleMenuContentLeave}
                 >
                   <div className="p-6">
                     <div className="grid grid-cols-2 gap-8">
@@ -285,16 +298,11 @@ const Navbar = () => {
               {/* Resources Menu */}
               <div 
                 className="relative"
-                ref={menuRefs.resources}
-                onMouseEnter={() => setActiveMenu('resources')}
-                onMouseLeave={() => {
-                  if (!menuRefs.resources.current?.matches(':hover')) {
-                    setActiveMenu(null);
-                  }
-                }}
+                ref={resourcesButtonRef}
+                onMouseEnter={() => handleMenuEnter('resources')}
+                onMouseLeave={() => handleMenuLeave('resources')}
               >
                 <button 
-                  onClick={() => setActiveMenu(activeMenu === 'resources' ? null : 'resources')}
                   className={`px-4 py-2 rounded-md text-sm font-medium transition-colors duration-200 flex items-center ${
                     activeMenu === 'resources' ? 'text-white' : 'text-gray-400 hover:text-white'
                   }`}
@@ -304,11 +312,12 @@ const Navbar = () => {
                 </button>
 
                 <div 
+                  ref={resourcesMenuRef}
                   className={`absolute left-0 mt-2 w-[500px] rounded-lg shadow-lg bg-[#161618]/90 backdrop-blur-md border border-gray-700/50 overflow-hidden transition-all duration-300 origin-top ${
                     activeMenu === 'resources' ? 'opacity-100 scale-y-100' : 'opacity-0 scale-y-95 pointer-events-none'
                   }`}
-                  onMouseEnter={() => setActiveMenu('resources')}
-                  onMouseLeave={() => setActiveMenu(null)}
+                  onMouseEnter={handleMenuContentEnter}
+                  onMouseLeave={handleMenuContentLeave}
                 >
                   <div className="p-6">
                     <div className="grid grid-cols-2 gap-8">
