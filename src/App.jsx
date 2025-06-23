@@ -15,7 +15,7 @@ const Home = () => (
 
 const NotFound = () => (
   <div
-    className="min-h-screen flex flex-col items-center justify-center text-center px-6 relative overflow-hidden pb-40"
+    className="min-h-screen flex flex-col items-center justify-center text-center px-6 relative overflow-hidden pb-[8rem]"
     style={{
       background: "linear-gradient(135deg, #FFECEC, #F6C1C1, #B08888)",
     }}
@@ -46,10 +46,10 @@ const NotFound = () => (
     <h1 className="text-[6rem] lg:text-[8rem] font-extrabold text-white drop-shadow-lg animate-pulse z-10">
       404
     </h1>
-    <p className="text-2xl lg:text-3xl text-white font-semibold mb-4 drop-shadow z-10">
+    <p className="text-2xl lg:text-3xl text-white font-semibold mt-2 mb-4 drop-shadow-md z-10">
       Halaman Tidak Ditemukan
     </p>
-    <p className="text-white/80 max-w-md mb-6 z-10 drop-shadow-sm">
+    <p className="text-white/80 max-w-md mb-8 drop-shadow-sm z-10">
       Maaf, halaman yang kamu cari tidak tersedia atau sudah dipindahkan.
     </p>
     <Link
