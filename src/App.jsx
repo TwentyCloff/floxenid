@@ -13,7 +13,7 @@ const Home = () => (
 
 const NotFound = () => (
   <div
-    className="min-h-screen flex flex-col items-center justify-center text-center px-6 relative overflow-hidden pb-[8rem]"
+    className="min-h-screen flex flex-col items-center justify-center text-center px-6 relative overflow-hidden pb-[10rem] pt-[6rem]"
     style={{
       background: "linear-gradient(135deg, #FFECEC, #F6C1C1, #B08888)",
     }}
@@ -41,21 +41,21 @@ const NotFound = () => (
     </svg>
 
     {/* Konten */}
-    <h1 className="text-[6rem] lg:text-[8rem] font-extrabold text-white drop-shadow-lg animate-pulse z-10">
+    <h1 className="text-[6rem] lg:text-[8rem] font-extrabold text-white drop-shadow-[0_2px_3px_rgba(0,0,0,0.25)] animate-pulse z-10">
       404
     </h1>
 
-    <p className="text-2xl lg:text-3xl text-white font-semibold mt-12 mb-4 drop-shadow-md z-10">
+    <p className="text-2xl lg:text-3xl text-white font-semibold mt-12 mb-4 drop-shadow-[0_1px_2px_rgba(0,0,0,0.25)] z-10">
       Halaman Tidak Ditemukan
     </p>
 
-    <p className="text-white/80 max-w-md mt-3 mb-6 drop-shadow-sm z-10">
+    <p className="text-white/80 max-w-md mb-8 drop-shadow-[0_1px_1px_rgba(0,0,0,0.2)] z-10">
       Maaf, halaman yang kamu cari tidak tersedia atau sudah dipindahkan.
     </p>
 
     <Link
       to="/"
-      className="mt-6 px-6 py-3 bg-white/30 hover:bg-white/40 border border-white/50 rounded-full text-white font-medium transition duration-300 shadow z-10 backdrop-blur-sm"
+      className="px-6 py-3 bg-white/30 hover:bg-white/40 border border-white/50 rounded-full text-white font-medium transition duration-300 shadow z-10 backdrop-blur-sm"
     >
       Kembali ke Beranda
     </Link>
