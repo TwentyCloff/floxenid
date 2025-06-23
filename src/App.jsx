@@ -4,21 +4,23 @@ import Hero from "./components/Hero";
 import Footer from "./components/Footer";
 
 const Home = () => (
-  <div className="pt-[4.75rem] lg:pt-[5.25rem] overflow-hidden">
-    <Header />
-    <Hero />
-    <Footer />
-  </div>
+  <>
+    <div className="pt-[4.75rem] lg:pt-[5.25rem] overflow-hidden">
+      <Header />
+      <Hero />
+      <Footer />
+    </div>
+  </>
 );
 
 const NotFound = () => (
   <div
-    className="min-h-screen flex flex-col items-center justify-center text-center px-6 relative overflow-hidden"
+    className="min-h-screen flex flex-col items-center justify-center text-center px-6 relative overflow-hidden pb-40"
     style={{
       background: "linear-gradient(135deg, #FFECEC, #F6C1C1, #B08888)",
     }}
   >
-    {/* Gelombang Atas */}
+    {/* Wave Atas */}
     <svg
       className="absolute top-0 left-0 w-full h-40 text-white/10"
       viewBox="0 0 1440 320"
@@ -29,14 +31,25 @@ const NotFound = () => (
       <path d="M0,96L40,117.3C80,139,160,181,240,176C320,171,400,117,480,101.3C560,85,640,107,720,122.7C800,139,880,149,960,154.7C1040,160,1120,160,1200,160C1280,160,1360,160,1400,160L1440,160L1440,0L1400,0C1360,0,1280,0,1200,0C1120,0,1040,0,960,0C880,0,800,0,720,0C640,0,560,0,480,0C400,0,320,0,240,0C160,0,80,0,40,0L0,0Z" />
     </svg>
 
-    {/* Konten 404 */}
-    <h1 className="text-[6rem] lg:text-[8rem] font-extrabold text-white drop-shadow-[0_2px_6px_rgba(0,0,0,0.7)] z-10 animate-pulse">
+    {/* Wave Bawah */}
+    <svg
+      className="absolute bottom-0 left-0 w-full h-40 text-white/10 rotate-180"
+      viewBox="0 0 1440 320"
+      fill="currentColor"
+      xmlns="http://www.w3.org/2000/svg"
+      preserveAspectRatio="none"
+    >
+      <path d="M0,96L40,117.3C80,139,160,181,240,176C320,171,400,117,480,101.3C560,85,640,107,720,122.7C800,139,880,149,960,154.7C1040,160,1120,160,1200,160C1280,160,1360,160,1400,160L1440,160L1440,0L1400,0C1360,0,1280,0,1200,0C1120,0,1040,0,960,0C880,0,800,0,720,0C640,0,560,0,480,0C400,0,320,0,240,0C160,0,80,0,40,0L0,0Z" />
+    </svg>
+
+    {/* Konten */}
+    <h1 className="text-[6rem] lg:text-[8rem] font-extrabold text-white drop-shadow-lg animate-pulse z-10">
       404
     </h1>
-    <p className="text-2xl lg:text-3xl font-semibold mb-4 z-10 text-white drop-shadow-[0_1px_4px_rgba(0,0,0,0.6)]">
+    <p className="text-2xl lg:text-3xl text-white font-semibold mb-4 drop-shadow z-10">
       Halaman Tidak Ditemukan
     </p>
-    <p className="text-white/90 max-w-md mb-6 z-10 drop-shadow-[0_1px_3px_rgba(0,0,0,0.5)]">
+    <p className="text-white/80 max-w-md mb-6 z-10 drop-shadow-sm">
       Maaf, halaman yang kamu cari tidak tersedia atau sudah dipindahkan.
     </p>
     <Link
@@ -45,9 +58,6 @@ const NotFound = () => (
     >
       Kembali ke Beranda
     </Link>
-
-    {/* Hiasan Lingkaran */}
-    <div className="absolute bottom-[-50px] right-[-50px] w-40 h-40 bg-white/10 rounded-full border-2 border-white/30"></div>
   </div>
 );
 
