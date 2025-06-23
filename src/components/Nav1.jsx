@@ -9,13 +9,23 @@ const Navbar = () => {
   const location = useLocation();
   const [user, setUser] = useState(null);
   const [openNavigation, setOpenNavigation] = useState(false);
-  const [isProductsOpen, setIsProductsOpen] = useState(false);
+  const [activeMenu, setActiveMenu] = useState(null);
+  const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
     });
-    return () => unsubscribe();
+
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 10);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => {
+      unsubscribe();
+      window.removeEventListener('scroll', handleScroll);
+    };
   }, []);
 
   const toggleNavigation = () => {
@@ -32,25 +42,18 @@ const Navbar = () => {
     if (!openNavigation) return;
     enablePageScroll();
     setOpenNavigation(false);
+    setActiveMenu(null);
   };
 
-  const handleLogin = () => navigate("/login");
-  const handleSignUp = () => navigate("/signup");
   const handleLogout = async () => {
     await signOut(auth);
     setUser(null);
   };
   const goToDashboard = () => navigate("/dashboard");
+  const goToPricing = () => navigate("/pricing");
+  const goToSignUp = () => navigate("/signup");
 
-  // Navigation items
-  const navigation = [
-    { id: "home", title: "Home", url: "/" },
-    { id: "features", title: "Features", url: "/features" },
-    { id: "pricing", title: "Pricing", url: "/pricing" },
-    { id: "docs", title: "Documentation", url: "/docs", external: true },
-  ];
-
-  // Products menu items
+  // Menu data
   const productsMenu = {
     openSource: [
       { title: "Once UI Core", description: "Open-source NPM package", url: "/core" },
@@ -63,6 +66,29 @@ const Navbar = () => {
       { title: "Magic Bio", description: "Link-in-bio site", url: "/bio" },
       { title: "Once UI Blocks", description: "Copy-paste sections", url: "/blocks" },
       { title: "Once UI for Figma", description: "Figma design system", url: "/figma" },
+    ]
+  };
+
+  const docsMenu = {
+    guides: [
+      { title: "Getting Started", description: "Begin your Once UI journey", url: "/docs/getting-started" },
+      { title: "Customization", description: "Tailor Once UI to your needs", url: "/docs/customization" },
+    ],
+    reference: [
+      { title: "Components API", description: "Complete component reference", url: "/docs/components" },
+      { title: "Theme Config", description: "Customize colors and styles", url: "/docs/theme" },
+    ]
+  };
+
+  const resourcesMenu = {
+    company: [
+      { title: "About Us", description: "Learn about our mission", url: "/about" },
+      { title: "Our Team", description: "Meet the creators", url: "/team" },
+    ],
+    updates: [
+      { title: "Changelog", description: "Latest updates and changes", url: "/changelog" },
+      { title: "Roadmap", description: "Future plans and features", url: "/roadmap" },
+      { title: "Blog", description: "News and articles", url: "/blog" },
     ]
   };
 
@@ -80,28 +106,19 @@ const Navbar = () => {
 
     const variants = {
       primary: `
-        bg-[#1a0d2b] hover:bg-[#231538]
-        text-purple-100 hover:text-white
-        border-purple-900/50 hover:border-purple-500/30
-        shadow-[inset_0_1px_0_0_rgba(148,102,255,0.2)]
-      `,
-      secondary: `
-        bg-[#0f0918] hover:bg-[#1a1126]
-        text-purple-200 hover:text-purple-50
-        border-purple-800/30 hover:border-purple-500/20
-        shadow-[inset_0_1px_0_0_rgba(148,102,255,0.1)]
+        bg-white hover:bg-gray-100
+        text-black
+        border-gray-200
       `,
       dashboard: `
         bg-[#160e29] hover:bg-[#1f1638]
         text-indigo-100 hover:text-indigo-50
         border-indigo-900/50 hover:border-indigo-500/30
-        shadow-[inset_0_1px_0_0_rgba(99,102,241,0.2)]
       `,
       logout: `
         bg-[#180a1a] hover:bg-[#231025]
         text-pink-100 hover:text-pink-50
         border-pink-900/50 hover:border-pink-500/30
-        shadow-[inset_0_1px_0_0_rgba(236,72,153,0.2)]
       `
     };
 
@@ -109,7 +126,6 @@ const Navbar = () => {
       <button onClick={onClick} className={`${baseStyle} ${variants[variant]}`}>
         <span className="relative z-10 flex items-center justify-center gap-2">
           {children}
-          <span className="absolute inset-0 bg-gradient-to-b from-white/5 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300" />
         </span>
       </button>
     );
@@ -124,94 +140,169 @@ const Navbar = () => {
         />
       )}
 
-      <header className="fixed top-0 left-0 w-full z-50 bg-[#0E0E10] border-b border-gray-800">
+      <header className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${scrolled ? 'bg-[#0E0E10]/80 backdrop-blur-sm' : 'bg-transparent'}`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           {/* Left section */}
           <div className="flex items-center space-x-8">
             <a 
               href="/" 
-              className="text-xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-600"
+              className="text-xl font-bold tracking-tight text-white"
             >
               once ui
             </a>
 
             {/* Desktop Navigation */}
-            <nav className="hidden md:flex items-center space-x-6">
-              {navigation.map((item) => (
-                <a
-                  key={item.id}
-                  href={item.url}
-                  target={item.external ? "_blank" : "_self"}
-                  rel={item.external ? "noreferrer noopener" : undefined}
-                  className={`text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 ${
-                    location.pathname === item.url ? "text-white font-semibold" : ""
+            <nav className="hidden md:flex items-center space-x-1">
+              {/* Products Menu */}
+              <div 
+                className="relative group"
+                onMouseEnter={() => setActiveMenu('products')}
+                onMouseLeave={() => setActiveMenu(null)}
+              >
+                <button 
+                  className={`px-4 py-2 rounded-md text-sm font-medium transition-colors duration-200 flex items-center ${
+                    activeMenu === 'products' ? 'text-white' : 'text-gray-400 hover:text-white'
                   }`}
                 >
-                  {item.title}
-                </a>
-              ))}
-
-              {/* Products Dropdown */}
-              <div 
-                className="relative"
-                onMouseEnter={() => setIsProductsOpen(true)}
-                onMouseLeave={() => setIsProductsOpen(false)}
-              >
-                <button className="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 flex items-center">
                   Products
-                  <svg
-                    className={`ml-1 h-4 w-4 transition-transform duration-200 ${
-                      isProductsOpen ? "rotate-180" : ""
-                    }`}
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M19 9l-7 7-7-7"
-                    />
-                  </svg>
+                  <ChevronIcon isOpen={activeMenu === 'products'} />
                 </button>
 
-                {/* Mega Menu Dropdown */}
-                {isProductsOpen && (
-                  <div 
-                    className="absolute left-0 mt-2 w-[600px] rounded-lg shadow-lg bg-[#161618] border border-gray-800 overflow-hidden transition-all duration-300 origin-top"
-                    style={{
-                      animation: "fadeIn 0.3s ease-out forwards",
-                      transformOrigin: "top center"
-                    }}
-                  >
-                    <div className="p-6">
-                      <div className="grid grid-cols-2 gap-8">
-                        <div>
-                          <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-4">
-                            Open-source
-                          </h3>
-                          <ul className="space-y-4">
-                            {productsMenu.openSource.map((item, index) => (
-                              <MenuItem key={`opensource-${index}`} {...item} />
-                            ))}
-                          </ul>
-                        </div>
-                        <div>
-                          <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-4">
-                            Pro
-                          </h3>
-                          <ul className="space-y-4">
-                            {productsMenu.pro.map((item, index) => (
-                              <MenuItem key={`pro-${index}`} {...item} />
-                            ))}
-                          </ul>
-                        </div>
+                <div 
+                  className={`absolute left-0 mt-2 w-[600px] rounded-lg shadow-lg bg-[#161618] border border-gray-800 overflow-hidden transition-all duration-300 origin-top ${
+                    activeMenu === 'products' ? 'opacity-100 scale-y-100' : 'opacity-0 scale-y-95 pointer-events-none'
+                  }`}
+                >
+                  <div className="p-6">
+                    <div className="grid grid-cols-2 gap-8">
+                      <div>
+                        <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-4">
+                          Open-source
+                        </h3>
+                        <ul className="space-y-4">
+                          {productsMenu.openSource.map((item, index) => (
+                            <MenuItem key={`opensource-${index}`} {...item} />
+                          ))}
+                        </ul>
+                      </div>
+                      <div>
+                        <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-4">
+                          Pro
+                        </h3>
+                        <ul className="space-y-4">
+                          {productsMenu.pro.map((item, index) => (
+                            <MenuItem key={`pro-${index}`} {...item} />
+                          ))}
+                        </ul>
                       </div>
                     </div>
                   </div>
-                )}
+                </div>
               </div>
+
+              {/* Docs Menu */}
+              <div 
+                className="relative group"
+                onMouseEnter={() => setActiveMenu('docs')}
+                onMouseLeave={() => setActiveMenu(null)}
+              >
+                <button 
+                  className={`px-4 py-2 rounded-md text-sm font-medium transition-colors duration-200 flex items-center ${
+                    activeMenu === 'docs' ? 'text-white' : 'text-gray-400 hover:text-white'
+                  }`}
+                >
+                  Docs
+                  <ChevronIcon isOpen={activeMenu === 'docs'} />
+                </button>
+
+                <div 
+                  className={`absolute left-0 mt-2 w-[500px] rounded-lg shadow-lg bg-[#161618] border border-gray-800 overflow-hidden transition-all duration-300 origin-top ${
+                    activeMenu === 'docs' ? 'opacity-100 scale-y-100' : 'opacity-0 scale-y-95 pointer-events-none'
+                  }`}
+                >
+                  <div className="p-6">
+                    <div className="grid grid-cols-2 gap-8">
+                      <div>
+                        <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-4">
+                          Guides
+                        </h3>
+                        <ul className="space-y-4">
+                          {docsMenu.guides.map((item, index) => (
+                            <MenuItem key={`guide-${index}`} {...item} />
+                          ))}
+                        </ul>
+                      </div>
+                      <div>
+                        <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-4">
+                          Reference
+                        </h3>
+                        <ul className="space-y-4">
+                          {docsMenu.reference.map((item, index) => (
+                            <MenuItem key={`reference-${index}`} {...item} />
+                          ))}
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Resources Menu */}
+              <div 
+                className="relative group"
+                onMouseEnter={() => setActiveMenu('resources')}
+                onMouseLeave={() => setActiveMenu(null)}
+              >
+                <button 
+                  className={`px-4 py-2 rounded-md text-sm font-medium transition-colors duration-200 flex items-center ${
+                    activeMenu === 'resources' ? 'text-white' : 'text-gray-400 hover:text-white'
+                  }`}
+                >
+                  Resources
+                  <ChevronIcon isOpen={activeMenu === 'resources'} />
+                </button>
+
+                <div 
+                  className={`absolute left-0 mt-2 w-[500px] rounded-lg shadow-lg bg-[#161618] border border-gray-800 overflow-hidden transition-all duration-300 origin-top ${
+                    activeMenu === 'resources' ? 'opacity-100 scale-y-100' : 'opacity-0 scale-y-95 pointer-events-none'
+                  }`}
+                >
+                  <div className="p-6">
+                    <div className="grid grid-cols-2 gap-8">
+                      <div>
+                        <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-4">
+                          Company
+                        </h3>
+                        <ul className="space-y-4">
+                          {resourcesMenu.company.map((item, index) => (
+                            <MenuItem key={`company-${index}`} {...item} />
+                          ))}
+                        </ul>
+                      </div>
+                      <div>
+                        <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-4">
+                          Updates
+                        </h3>
+                        <ul className="space-y-4">
+                          {resourcesMenu.updates.map((item, index) => (
+                            <MenuItem key={`update-${index}`} {...item} />
+                          ))}
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Pricing Link */}
+              <button
+                onClick={goToPricing}
+                className={`px-4 py-2 rounded-md text-sm font-medium transition-colors duration-200 ${
+                  location.pathname === '/pricing' ? 'text-white' : 'text-gray-400 hover:text-white'
+                }`}
+              >
+                Pricing
+              </button>
             </nav>
           </div>
 
@@ -230,23 +321,18 @@ const Navbar = () => {
             </a>
 
             <div className="hidden lg:flex items-center gap-3">
-              {user && (
-                <ElegantButton onClick={goToDashboard} variant="dashboard">
-                  Dashboard
-                </ElegantButton>
-              )}
-              {!user ? (
+              {user ? (
                 <>
-                  <ElegantButton onClick={handleLogin} variant="primary">
-                    Sign In
+                  <ElegantButton onClick={goToDashboard} variant="dashboard">
+                    Dashboard
                   </ElegantButton>
-                  <ElegantButton onClick={handleSignUp} variant="secondary">
-                    Sign Up
+                  <ElegantButton onClick={handleLogout} variant="logout">
+                    Logout
                   </ElegantButton>
                 </>
               ) : (
-                <ElegantButton onClick={handleLogout} variant="logout">
-                  Logout
+                <ElegantButton onClick={goToSignUp} variant="primary">
+                  Sign Up
                 </ElegantButton>
               )}
             </div>
@@ -285,57 +371,26 @@ const Navbar = () => {
         {/* Mobile Navigation */}
         <nav
           className={`${
-            openNavigation ? "block" : "hidden"
+            openNavigation ? 'block' : 'hidden'
           } fixed top-16 left-0 right-0 bg-[#161618] border-t border-gray-800 md:hidden transition-all duration-300 ease-in-out`}
           style={{
-            maxHeight: openNavigation ? "calc(100vh - 64px)" : "0",
-            overflow: "hidden"
+            maxHeight: openNavigation ? 'calc(100vh - 64px)' : '0',
+            overflow: 'hidden'
           }}
         >
-          <div className="px-4 py-3 space-y-2">
-            {navigation.map((item) => (
-              <a
-                key={item.id}
-                href={item.url}
-                target={item.external ? "_blank" : "_self"}
-                rel={item.external ? "noreferrer noopener" : undefined}
-                onClick={handleClick}
-                className={`block px-3 py-2 rounded-md text-base font-medium ${
-                  location.pathname === item.url
-                    ? "bg-gray-800 text-white"
-                    : "text-gray-300 hover:bg-gray-800 hover:text-white"
-                }`}
-              >
-                {item.title}
-              </a>
-            ))}
-
+          <div className="px-4 py-3 space-y-1">
             {/* Products in mobile */}
             <div className="px-3 py-2">
               <button
-                onClick={() => setIsProductsOpen(!isProductsOpen)}
+                onClick={() => setActiveMenu(activeMenu === 'products' ? null : 'products')}
                 className="flex items-center justify-between w-full text-gray-300 hover:text-white"
               >
                 <span className="text-base font-medium">Products</span>
-                <svg
-                  className={`ml-1 h-5 w-5 transition-transform duration-200 ${
-                    isProductsOpen ? "rotate-180" : ""
-                  }`}
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M19 9l-7 7-7-7"
-                  />
-                </svg>
+                <ChevronIcon isOpen={activeMenu === 'products'} />
               </button>
 
-              {isProductsOpen && (
-                <div className="mt-2 pl-4 space-y-2 border-l border-gray-700">
+              {activeMenu === 'products' && (
+                <div className="mt-2 pl-4 space-y-3 border-l border-gray-700">
                   <h4 className="text-sm font-semibold text-gray-400 mt-3">Open-source</h4>
                   {productsMenu.openSource.map((item, index) => (
                     <a
@@ -363,76 +418,159 @@ const Navbar = () => {
               )}
             </div>
 
+            {/* Docs in mobile */}
+            <div className="px-3 py-2">
+              <button
+                onClick={() => setActiveMenu(activeMenu === 'docs' ? null : 'docs')}
+                className="flex items-center justify-between w-full text-gray-300 hover:text-white"
+              >
+                <span className="text-base font-medium">Docs</span>
+                <ChevronIcon isOpen={activeMenu === 'docs'} />
+              </button>
+
+              {activeMenu === 'docs' && (
+                <div className="mt-2 pl-4 space-y-3 border-l border-gray-700">
+                  <h4 className="text-sm font-semibold text-gray-400 mt-3">Guides</h4>
+                  {docsMenu.guides.map((item, index) => (
+                    <a
+                      key={`mobile-guide-${index}`}
+                      href={item.url}
+                      className="block px-3 py-2 rounded-md text-sm text-gray-300 hover:bg-gray-800 hover:text-white"
+                      onClick={handleClick}
+                    >
+                      {item.title}
+                    </a>
+                  ))}
+
+                  <h4 className="text-sm font-semibold text-gray-400 mt-3">Reference</h4>
+                  {docsMenu.reference.map((item, index) => (
+                    <a
+                      key={`mobile-reference-${index}`}
+                      href={item.url}
+                      className="block px-3 py-2 rounded-md text-sm text-gray-300 hover:bg-gray-800 hover:text-white"
+                      onClick={handleClick}
+                    >
+                      {item.title}
+                    </a>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Resources in mobile */}
+            <div className="px-3 py-2">
+              <button
+                onClick={() => setActiveMenu(activeMenu === 'resources' ? null : 'resources')}
+                className="flex items-center justify-between w-full text-gray-300 hover:text-white"
+              >
+                <span className="text-base font-medium">Resources</span>
+                <ChevronIcon isOpen={activeMenu === 'resources'} />
+              </button>
+
+              {activeMenu === 'resources' && (
+                <div className="mt-2 pl-4 space-y-3 border-l border-gray-700">
+                  <h4 className="text-sm font-semibold text-gray-400 mt-3">Company</h4>
+                  {resourcesMenu.company.map((item, index) => (
+                    <a
+                      key={`mobile-company-${index}`}
+                      href={item.url}
+                      className="block px-3 py-2 rounded-md text-sm text-gray-300 hover:bg-gray-800 hover:text-white"
+                      onClick={handleClick}
+                    >
+                      {item.title}
+                    </a>
+                  ))}
+
+                  <h4 className="text-sm font-semibold text-gray-400 mt-3">Updates</h4>
+                  {resourcesMenu.updates.map((item, index) => (
+                    <a
+                      key={`mobile-update-${index}`}
+                      href={item.url}
+                      className="block px-3 py-2 rounded-md text-sm text-gray-300 hover:bg-gray-800 hover:text-white"
+                      onClick={handleClick}
+                    >
+                      {item.title}
+                    </a>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Pricing in mobile */}
+            <button
+              onClick={() => {
+                goToPricing();
+                handleClick();
+              }}
+              className={`w-full text-left px-3 py-2 rounded-md text-base font-medium ${
+                location.pathname === '/pricing' ? 'bg-gray-800 text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white'
+              }`}
+            >
+              Pricing
+            </button>
+
             {/* Mobile buttons */}
             <div className="pt-4 pb-2 border-t border-gray-800 flex flex-col space-y-3">
-              {user && (
-                <ElegantButton 
-                  onClick={() => {
-                    goToDashboard();
-                    handleClick();
-                  }} 
-                  variant="dashboard"
-                  className="w-full"
-                >
-                  Dashboard
-                </ElegantButton>
-              )}
-              {!user ? (
+              {user ? (
                 <>
                   <ElegantButton 
                     onClick={() => {
-                      handleLogin();
+                      goToDashboard();
                       handleClick();
                     }} 
-                    variant="primary"
+                    variant="dashboard"
                     className="w-full"
                   >
-                    Sign In
+                    Dashboard
                   </ElegantButton>
                   <ElegantButton 
                     onClick={() => {
-                      handleSignUp();
+                      handleLogout();
                       handleClick();
                     }} 
-                    variant="secondary"
+                    variant="logout"
                     className="w-full"
                   >
-                    Sign Up
+                    Logout
                   </ElegantButton>
                 </>
               ) : (
                 <ElegantButton 
                   onClick={() => {
-                    handleLogout();
+                    goToSignUp();
                     handleClick();
                   }} 
-                  variant="logout"
+                  variant="primary"
                   className="w-full"
                 >
-                  Logout
+                  Sign Up
                 </ElegantButton>
               )}
             </div>
           </div>
         </nav>
       </header>
-
-      {/* Add global animation */}
-      <style jsx global>{`
-        @keyframes fadeIn {
-          from {
-            opacity: 0;
-            transform: translateY(-10px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-      `}</style>
     </>
   );
 };
+
+const ChevronIcon = ({ isOpen }) => (
+  <svg
+    className={`ml-1 h-5 w-5 transition-transform duration-200 ${
+      isOpen ? "rotate-180" : ""
+    }`}
+    fill="none"
+    viewBox="0 0 24 24"
+    stroke="currentColor"
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={2}
+      d="M19 9l-7 7-7-7"
+    />
+  </svg>
+);
 
 const MenuItem = ({ title, description, url }) => {
   return (
@@ -441,7 +579,7 @@ const MenuItem = ({ title, description, url }) => {
         href={url}
         className="group block rounded-md p-2 transition-colors duration-200 hover:bg-gray-800"
       >
-        <p className="text-base font-medium text-white group-hover:text-purple-400">
+        <p className="text-base font-medium text-white group-hover:text-white">
           {title}
         </p>
         <p className="mt-1 text-sm text-gray-400">{description}</p>
