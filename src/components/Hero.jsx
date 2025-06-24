@@ -1,57 +1,66 @@
 import { useRef, useEffect } from 'react';
-import { Canvas, useFrame } from '@react-three/fiber';
-import { useGLTF, OrbitControls } from '@react-three/drei';
+import { Canvas, useFrame, useThree } from '@react-three/fiber';
+import { OrbitControls, useGLTF } from '@react-three/drei';
 
 function Robot({ mouse }) {
-  const group = useRef();
-  const { scene, nodes } = useGLTF('/cute_robot.glb');
-  const head = useRef();
+  const robotRef = useRef();
+  const headRef = useRef();
+  const { scene } = useGLTF('/cute_robot.glb');
 
   useEffect(() => {
-    // Auto find node yang punya kata 'head' di nama
-    const found = scene.getObjectByName('head') || scene.getObjectByName('Head') || Object.values(nodes).find(n => n.name?.toLowerCase().includes('head'));
-    if (found) head.current = found;
-  }, [nodes, scene]);
+    // Cari node kepala otomatis
+    scene.traverse((child) => {
+      if (child.name.toLowerCase().includes('head') || child.name.toLowerCase().includes('face')) {
+        headRef.current = child;
+      }
+    });
+
+    robotRef.current.add(scene);
+  }, [scene]);
 
   useFrame(() => {
-    if (head.current && mouse.current) {
-      head.current.rotation.y = mouse.current.x * 0.5;
-      head.current.rotation.x = mouse.current.y * 0.3;
+    if (headRef.current && mouse.current) {
+      headRef.current.rotation.y = mouse.current.x * 0.4;
+      headRef.current.rotation.x = mouse.current.y * 0.2;
     }
   });
 
-  return <primitive object={scene} scale={1.5} position={[0, -1.5, 0]} />;
+  return <group ref={robotRef} scale={1.5} position={[0, -1.5, 0]} />;
 }
 
-function HeroCanvas() {
-  const mouse = useRef({ x: 0, y: 0 });
+function RobotScene({ mouse }) {
+  const { size } = useThree();
 
   return (
-    <Canvas camera={{ position: [0, 0, 5], fov: 50 }}>
-      <ambientLight intensity={0.8} />
-      <directionalLight position={[5, 5, 5]} />
+    <>
+      <ambientLight intensity={0.6} />
+      <directionalLight position={[2, 2, 2]} intensity={1} />
       <OrbitControls enableZoom={false} enablePan={false} />
       <Robot mouse={mouse} />
       <mesh
         onPointerMove={(e) => {
           mouse.current = {
-            x: (e.pointer.x / window.innerWidth) * 2 - 1,
-            y: -((e.pointer.y / window.innerHeight) * 2 - 1),
+            x: (e.pointer.x / size.width) * 2 - 1,
+            y: -((e.pointer.y / size.height) * 2 - 1),
           };
         }}
       >
         <planeGeometry args={[100, 100]} />
         <meshBasicMaterial transparent opacity={0} />
       </mesh>
-    </Canvas>
+    </>
   );
 }
 
 export default function Hero() {
+  const mouse = useRef({ x: 0, y: 0 });
+
   return (
-    <section className="min-h-screen flex items-center justify-center bg-black">
-      <div className="w-full max-w-6xl px-4">
-        <HeroCanvas />
+    <section className="min-h-screen bg-black flex items-center justify-center">
+      <div className="w-full h-[500px]">
+        <Canvas camera={{ position: [0, 0, 5], fov: 50 }}>
+          <RobotScene mouse={mouse} />
+        </Canvas>
       </div>
     </section>
   );
