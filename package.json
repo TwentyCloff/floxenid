@@ -22,6 +22,7 @@
     "react-tsparticles": "^2.12.2",
     "scroll-lock": "^2.1.5",
     "sweetalert2": "^11.21.2",
+    "swiper": "^11.2.8",
     "tsparticles": "^3.8.1",
     "typewriter-effect": "^2.22.0"
   },
