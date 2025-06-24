@@ -1,21 +1,20 @@
 import { useEffect, useState } from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay, Pagination, Navigation } from 'swiper/modules';
-import { FaRocket, FaLock, FaTools, FaChartBar, FaStar, FaRegStar } from 'react-icons/fa';
-import { initializeApp } from 'firebase/app';
+import { FaRocket, FaLock, FaTools, FaChartBar, FaStar, FaRegStar, FaHeadset } from 'react-icons/fa';
 import { getDatabase, ref, onValue, push, set } from 'firebase/database';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
-import firebaseConfig from '../config/firebaseConfig';
+import { app, auth, db } from '../config/firebaseConfig';
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const database = getDatabase(app);
-const auth = getAuth(app);
+// Import Swiper styles
+import 'swiper/css';
+import 'swiper/css/pagination';
+import 'swiper/css/navigation';
 
 // Import images
-import banner1 from '../assets/imgHome/banner1.webp';
-import banner2 from '../assets/imgHome/banner2.webp';
-import banner3 from '../assets/imgHome/banner3.webp';
+import banner1 from '../assets/imgHome/banner1.png';
+import banner2 from '../assets/imgHome/banner2.png';
+import banner3 from '../assets/imgHome/banner3.png';
 
 const LandingPage = () => {
   const [testimonials, setTestimonials] = useState([]);
@@ -32,8 +31,8 @@ const LandingPage = () => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
       if (currentUser) {
-        // Check if user has purchased (mock implementation - replace with your actual purchase verification)
-        const userPurchasesRef = ref(database, `users/${currentUser.uid}/purchases`);
+        // Check if user has purchased
+        const userPurchasesRef = ref(db, `users/${currentUser.uid}/purchases`);
         onValue(userPurchasesRef, (snapshot) => {
           const purchases = snapshot.val();
           setHasPurchased(purchases && Object.keys(purchases).length > 0);
@@ -47,11 +46,10 @@ const LandingPage = () => {
 
   // Fetch testimonials from Firebase
   useEffect(() => {
-    const testimonialsRef = ref(database, 'testimonials');
+    const testimonialsRef = ref(db, 'testimonials');
     onValue(testimonialsRef, (snapshot) => {
       const data = snapshot.val();
       if (data) {
-        // Only show testimonials from authenticated users
         const validTestimonials = Object.values(data).filter(t => t.userId);
         setTestimonials(validTestimonials);
       }
@@ -62,7 +60,7 @@ const LandingPage = () => {
     e.preventDefault();
     if (!user || !hasPurchased) return;
 
-    const testimonialsRef = ref(database, 'testimonials');
+    const testimonialsRef = ref(db, 'testimonials');
     const newTestimonialRef = push(testimonialsRef);
 
     set(newTestimonialRef, {
