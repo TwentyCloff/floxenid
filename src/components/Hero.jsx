@@ -13,9 +13,9 @@ const database = getDatabase(app);
 const auth = getAuth(app);
 
 // Import images
-import banner1 from '../assets/imgHome/banner1.png';
-import banner2 from '../assets/imgHome/banner2.png';
-import banner3 from '../assets/imgHome/banner3.png';
+import banner1 from '../assets/imgHome/banner1.webp';
+import banner2 from '../assets/imgHome/banner2.webp';
+import banner3 from '../assets/imgHome/banner3.webp';
 
 const LandingPage = () => {
   const [testimonials, setTestimonials] = useState([]);
