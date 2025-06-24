@@ -1,114 +1,351 @@
-import Typewriter from "typewriter-effect";
-import blackholeVideo from "../assets/hero/blackhole.webm";
-import Section from "./Section";
+import { useEffect, useState } from 'react';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Autoplay, Pagination, Navigation } from 'swiper/modules';
+import { FaRocket, FaLock, FaTools, FaChartBar, FaStar, FaRegStar } from 'react-icons/fa';
+import { initializeApp } from 'firebase/app';
+import { getDatabase, ref, onValue, push, set } from 'firebase/database';
+import { getAuth, onAuthStateChanged } from 'firebase/auth';
+import firebaseConfig from '../config/firebaseConfig';
 
-const Hero = () => {
-  return (
-    <Section
-      id="hero"
-      customPaddings
-      className="pt-[12rem] -mt-[5.25rem] relative overflow-hidden"
-    >
-      {/* Background gradient gelap halus */}
-      <div
-        className="absolute inset-0 z-[-20] pointer-events-none"
-        style={{
-          background: "linear-gradient(180deg, #121212 0%, #000000 90%)",
-        }}
-      />
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const database = getDatabase(app);
+const auth = getAuth(app);
 
-      {/* Overlay hitam transparan */}
-      <div className="absolute top-0 left-0 w-full h-full bg-black opacity-20 z-[-9]" />
+// Import images
+import banner1 from '../assets/imgHome/banner1.png';
+import banner2 from '../assets/imgHome/banner2.png';
+import banner3 from '../assets/imgHome/banner3.png';
 
-      {/* Video blackhole */}
-      <video
-        autoPlay
-        muted
-        loop
-        playsInline
-        className="blackhole-video absolute left-1/2 transform -translate-x-1/2 w-[130vw] h-[130vh] object-cover z-[-10] pointer-events-none
-                   top-[-30%] sm:top-[-30%] md:top-[-20%] lg:top-[-15%] xl:top-[-12%] 2xl:top-[-10%]"
-        style={{
-          filter: "brightness(0.75)",
-        }}
-      >
-        <source src={blackholeVideo} type="video/webm" />
-      </video>
+const LandingPage = () => {
+  const [testimonials, setTestimonials] = useState([]);
+  const [user, setUser] = useState(null);
+  const [hasPurchased, setHasPurchased] = useState(false);
+  const [newTestimonial, setNewTestimonial] = useState({
+    message: '',
+    rating: 5
+  });
+  const [showForm, setShowForm] = useState(false);
 
-      <style>
-        {`
-          @media (max-width: 640px) {
-            .blackhole-video {
-              top: -50% !important;
-              filter: brightness(0.9) !important;
-            }
-          }
-          @media (min-width: 1920px) {
-            .blackhole-video {
-              top: -12% !important;
-              transform: translateX(-50%) scale(1.1);
-            }
-          }
-          @media (min-width: 2560px) {
-            .blackhole-video {
-              top: -10% !important;
-              transform: translateX(-50%) scale(1.25);
-            }
-          }
-        `}
-      </style>
+  // Check auth state and purchases
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+      if (currentUser) {
+        // Check if user has purchased (mock implementation - replace with your actual purchase verification)
+        const userPurchasesRef = ref(database, `users/${currentUser.uid}/purchases`);
+        onValue(userPurchasesRef, (snapshot) => {
+          const purchases = snapshot.val();
+          setHasPurchased(purchases && Object.keys(purchases).length > 0);
+        });
+      } else {
+        setHasPurchased(false);
+      }
+    });
+    return () => unsubscribe();
+  }, []);
 
-      {/* Konten utama */}
-      <div className="container relative z-10">
-        <div className="relative max-w-[62rem] mx-auto text-center mb-[4rem] md:mb-20 lg:mb-[6rem]">
-          <h1 className="h1 mb-6 text-white">
-            Empower Your Scripts With
-            <br />
-            <span className="text-[1.4rem] sm:text-[1.75rem] md:text-[2rem] leading-snug block">
-              <Typewriter
-                options={{
-                  strings: [
-                    "Fast Execution",
-                    "Continuous Improvement",
-                    "24/7 Support",
-                    "User-Friendly Interface",
-                    "Optimized Performance",
-                  ],
-                  autoStart: true,
-                  loop: true,
-                }}
-              />
-            </span>
-          </h1>
+  // Fetch testimonials from Firebase
+  useEffect(() => {
+    const testimonialsRef = ref(database, 'testimonials');
+    onValue(testimonialsRef, (snapshot) => {
+      const data = snapshot.val();
+      if (data) {
+        // Only show testimonials from authenticated users
+        const validTestimonials = Object.values(data).filter(t => t.userId);
+        setTestimonials(validTestimonials);
+      }
+    });
+  }, []);
 
-          <p className="body-1 max-w-3xl mx-auto mb-6 text-n-2 lg:mb-8 text-gray-300">
-            Unlock the next level of game scripting with{" "}
-            <span className="inline-block relative font-semibold text-white">
-              Qarvo
-            </span>
-            .network
-          </p>
+  const handleSubmitTestimonial = (e) => {
+    e.preventDefault();
+    if (!user || !hasPurchased) return;
 
-          {/* Tombol Glassmorphism */}
-          <a
-            href="#pricing"
-            className="inline-block px-7 py-3 rounded-full border border-white/30 text-white font-semibold
-                       bg-white/10 backdrop-blur-md hover:bg-white/20 transition-all duration-300 shadow-lg"
-          >
-            Get started
-          </a>
-        </div>
+    const testimonialsRef = ref(database, 'testimonials');
+    const newTestimonialRef = push(testimonialsRef);
+
+    set(newTestimonialRef, {
+      name: user.displayName || 'Anonymous',
+      photoURL: user.photoURL || '',
+      message: newTestimonial.message,
+      rating: newTestimonial.rating,
+      userId: user.uid,
+      createdAt: new Date().toISOString()
+    }).then(() => {
+      setNewTestimonial({ message: '', rating: 5 });
+      setShowForm(false);
+    });
+  };
+
+  const renderStars = (rating) => {
+    return (
+      <div className="flex">
+        {[1, 2, 3, 4, 5].map((star) => (
+          star <= rating ? 
+            <FaStar key={star} className="text-yellow-400" /> : 
+            <FaRegStar key={star} className="text-yellow-400" />
+        ))}
       </div>
+    );
+  };
 
-      {/* Gradient transisi ke hitam pekat */}
-      <div
-        className="absolute bottom-0 left-0 w-full h-[12rem] z-[-5]"
-        style={{
-          background: "linear-gradient(to bottom, transparent, #000)",
-        }}
-      />
-    </Section>
+  const features = [
+    {
+      icon: <FaRocket className="text-3xl text-blue-600" />,
+      title: "High Performance",
+      description: "Optimized for speed and efficiency"
+    },
+    {
+      icon: <FaLock className="text-3xl text-blue-600" />,
+      title: "Secure Solutions",
+      description: "Enterprise-grade security"
+    },
+    {
+      icon: <FaTools className="text-3xl text-blue-600" />,
+      title: "Easy Integration",
+      description: "Simple API and documentation"
+    },
+    {
+      icon: <FaChartBar className="text-3xl text-blue-600" />,
+      title: "Real Analytics",
+      description: "Monitor performance metrics"
+    }
+  ];
+
+  return (
+    <div className="w-full">
+      {/* Hero Slider Section */}
+      <section className="relative bg-gradient-to-r from-white via-blue-50 to-blue-100 pt-24 pb-16">
+        <div className="container mx-auto px-4">
+          <Swiper
+            spaceBetween={30}
+            centeredSlides={true}
+            autoplay={{
+              delay: 5000,
+              disableOnInteraction: false,
+            }}
+            pagination={{
+              clickable: true,
+            }}
+            navigation={true}
+            modules={[Autoplay, Pagination, Navigation]}
+            className="rounded-xl shadow-lg overflow-hidden"
+          >
+            <SwiperSlide>
+              <img 
+                src={banner1} 
+                alt="Premium Technology Solutions" 
+                className="w-full h-auto"
+              />
+            </SwiperSlide>
+            <SwiperSlide>
+              <img 
+                src={banner2} 
+                alt="Innovative Tools for Developers" 
+                className="w-full h-auto"
+              />
+            </SwiperSlide>
+            <SwiperSlide>
+              <a href="/community">
+                <img 
+                  src={banner3} 
+                  alt="Join Our Developer Community" 
+                  className="w-full h-auto"
+                />
+              </a>
+            </SwiperSlide>
+          </Swiper>
+
+          <div className="text-center mt-12">
+            <h1 className="text-4xl md:text-5xl font-bold text-gray-800 mb-4">
+              Advanced Solutions for Modern Developers
+            </h1>
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto mb-8">
+              Build faster, scale smarter, and deliver exceptional experiences
+            </p>
+            <button className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-8 rounded-full transition duration-300 shadow-lg">
+              Explore Products
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* Features Section */}
+      <section className="py-16 bg-white">
+        <div className="container mx-auto px-4">
+          <h2 className="text-3xl font-bold text-center text-gray-800 mb-12">Key Features</h2>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {features.map((feature, index) => (
+              <div 
+                key={index}
+                className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300"
+              >
+                <div className="flex justify-center mb-4">
+                  {feature.icon}
+                </div>
+                <h3 className="text-xl font-semibold text-center text-gray-800 mb-2">
+                  {feature.title}
+                </h3>
+                <p className="text-gray-600 text-center">
+                  {feature.description}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Testimonials Section */}
+      <section className="py-16 bg-blue-50">
+        <div className="container mx-auto px-4">
+          <div className="flex justify-between items-center mb-12">
+            <h2 className="text-3xl font-bold text-gray-800">Customer Feedback</h2>
+            {user && hasPurchased && (
+              <button 
+                onClick={() => setShowForm(!showForm)}
+                className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-full transition duration-300"
+              >
+                {showForm ? 'Cancel' : 'Add Testimonial'}
+              </button>
+            )}
+          </div>
+
+          {showForm && (
+            <div className="bg-white p-6 rounded-xl shadow-sm mb-8">
+              <form onSubmit={handleSubmitTestimonial}>
+                <div className="mb-4">
+                  <label className="block text-gray-700 mb-2">Your Rating</label>
+                  <div className="flex">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <button
+                        type="button"
+                        key={star}
+                        onClick={() => setNewTestimonial({...newTestimonial, rating: star})}
+                        className="text-2xl mr-1 focus:outline-none"
+                      >
+                        {star <= newTestimonial.rating ? 
+                          <FaStar className="text-yellow-400" /> : 
+                          <FaRegStar className="text-yellow-400" />}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <div className="mb-4">
+                  <label className="block text-gray-700 mb-2">Your Experience</label>
+                  <textarea
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                    rows="4"
+                    value={newTestimonial.message}
+                    onChange={(e) => setNewTestimonial({...newTestimonial, message: e.target.value})}
+                    required
+                  />
+                </div>
+                <button
+                  type="submit"
+                  className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-full transition duration-300"
+                >
+                  Submit Review
+                </button>
+              </form>
+            </div>
+          )}
+
+          {testimonials.length > 0 ? (
+            <Swiper
+              spaceBetween={30}
+              slidesPerView={1}
+              breakpoints={{
+                768: {
+                  slidesPerView: 2
+                },
+                1024: {
+                  slidesPerView: 3
+                }
+              }}
+              pagination={{
+                clickable: true,
+              }}
+              modules={[Pagination]}
+              className="pb-12"
+            >
+              {testimonials.map((testimonial, index) => (
+                <SwiperSlide key={index}>
+                  <div className="bg-white p-6 rounded-xl shadow-sm h-full">
+                    <div className="flex items-center mb-4">
+                      <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center mr-4 overflow-hidden">
+                        {testimonial.photoURL ? (
+                          <img 
+                            src={testimonial.photoURL} 
+                            alt={testimonial.name}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <span className="text-blue-500 text-xl">
+                            {testimonial.name.charAt(0).toUpperCase()}
+                          </span>
+                        )}
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-gray-800">{testimonial.name}</h3>
+                        {renderStars(testimonial.rating)}
+                      </div>
+                    </div>
+                    <p className="text-gray-600 italic">"{testimonial.message}"</p>
+                  </div>
+                </SwiperSlide>
+              ))}
+            </Swiper>
+          ) : (
+            <div className="text-center py-8">
+              <p className="text-gray-500">No testimonials yet. Be the first to review!</p>
+            </div>
+          )}
+
+          {user && !hasPurchased && (
+            <div className="text-center mt-8">
+              <p className="text-gray-600">
+                Purchase a product to leave your feedback!
+              </p>
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="py-16 bg-blue-600 text-white">
+        <div className="container mx-auto px-4 text-center">
+          <h2 className="text-3xl font-bold mb-4">Ready to Get Started?</h2>
+          <p className="text-xl mb-8 max-w-2xl mx-auto opacity-90">
+            Join thousands of developers already using our platform
+          </p>
+          <button className="bg-white text-blue-600 hover:bg-blue-50 font-semibold py-3 px-8 rounded-full transition duration-300 shadow-lg">
+            Sign Up Free
+          </button>
+        </div>
+      </section>
+
+      {/* Partners Section */}
+      <section className="py-16 bg-white">
+        <div className="container mx-auto px-4">
+          <h2 className="text-3xl font-bold text-center text-gray-800 mb-12">Trusted By</h2>
+          <div className="flex flex-wrap justify-center items-center gap-12">
+            {/* Replace with actual partner logos */}
+            <div className="w-40 h-20 bg-gray-100 rounded-lg flex items-center justify-center">
+              <span className="text-gray-400">Partner 1</span>
+            </div>
+            <div className="w-40 h-20 bg-gray-100 rounded-lg flex items-center justify-center">
+              <span className="text-gray-400">Partner 2</span>
+            </div>
+            <div className="w-40 h-20 bg-gray-100 rounded-lg flex items-center justify-center">
+              <span className="text-gray-400">Partner 3</span>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
   );
 };
 
-export default Hero;
+export default LandingPage;
