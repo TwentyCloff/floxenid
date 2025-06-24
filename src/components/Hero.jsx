@@ -1,87 +1,74 @@
-import { useRef, useEffect } from 'react';
+// src/components/Hero.jsx
+import React, { useRef, useEffect, useState } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { useGLTF, OrbitControls } from '@react-three/drei';
-import { Crown, Zap, Verified } from 'lucide-react';
+import { Verified } from 'lucide-react';
+import * as THREE from 'three';
 
-// 3D Robot Component
+// Robot 3D model
 function Robot({ mouse }) {
   const group = useRef();
-  const head = useRef();
-  const { nodes, materials } = useGLTF('/cute_robot.glb');
-  
-  useFrame(() => {
-    if (head.current) {
-      // Smooth head follow for mouse movement
-      head.current.rotation.y = mouse.current.x * 0.2;
-      head.current.rotation.x = mouse.current.y * 0.1;
-    }
-  });
+  const headRef = useRef();
+  const { scene, nodes } = useGLTF('/cute_robot.glb');
 
-  // Fallback if no specific head node found
+  // Cari node "head"
   useEffect(() => {
-    if (!nodes.Head && group.current) {
-      // Try to find head by common naming patterns
-      const headNode = Object.values(nodes).find(node => 
-        node.name.toLowerCase().includes('head') || 
+    const possibleHead = Object.values(nodes).find(
+      (node) =>
+        node.name.toLowerCase().includes('head') ||
         node.name.toLowerCase().includes('face')
-      );
-      if (headNode) {
-        head.current = headNode;
-      } else {
-        // Use the whole model if no head found
-        head.current = group.current;
-      }
+    );
+    if (possibleHead) {
+      headRef.current = possibleHead;
+    } else {
+      headRef.current = group.current;
     }
   }, [nodes]);
 
-  return (
-    <group ref={group} dispose={null}>
-      <primitive 
-        object={nodes.Scene} 
-        scale={1.5}
-        position={[0, -1.5, 0]}
-      />
-    </group>
-  );
+  // Gerakkan kepala
+  useFrame(() => {
+    if (headRef.current) {
+      headRef.current.rotation.y = THREE.MathUtils.lerp(
+        headRef.current.rotation.y,
+        mouse.current.x * 0.5,
+        0.1
+      );
+      headRef.current.rotation.x = THREE.MathUtils.lerp(
+        headRef.current.rotation.x,
+        -mouse.current.y * 0.3,
+        0.1
+      );
+    }
+  });
+
+  return <primitive ref={group} object={scene} scale={1.5} position={[0, -1.5, 0]} />;
 }
 
-// Mouse Tracker Component
-function Scene({ setMouse }) {
-  const { viewport } = useThree();
-  const handlePointerMove = (e) => {
-    setMouse({
-      x: (e.intersections[0]?.uv?.x || 0.5) * 2 - 1,
-      y: (e.intersections[0]?.uv?.y || 0.5) * 2 - 1
-    });
+// Main Hero component
+export default function Hero() {
+  const mouse = useRef({ x: 0, y: 0 });
+  const handleMouseMove = (e) => {
+    const { innerWidth, innerHeight } = window;
+    mouse.current = {
+      x: (e.clientX / innerWidth) * 2 - 1,
+      y: (e.clientY / innerHeight) * 2 - 1,
+    };
   };
 
   return (
-    <>
-      <ambientLight intensity={0.5} />
-      <pointLight position={[10, 10, 10]} intensity={1} />
-      <OrbitControls enableZoom={false} enablePan={false} />
-      <mesh onPointerMove={handlePointerMove}>
-        <planeGeometry args={[viewport.width, viewport.height]} />
-        <meshBasicMaterial transparent opacity={0} />
-      </mesh>
-    </>
-  );
-}
-
-// Main Hero Component
-export default function Hero() {
-  const mouse = useRef({ x: 0, y: 0 });
-
-  return (
-    <section className="relative min-h-screen flex items-center overflow-hidden bg-gradient-to-b from-gray-900 to-black">
+    <section
+      className="relative min-h-screen flex items-center overflow-hidden bg-gradient-to-b from-gray-900 to-black"
+      onMouseMove={handleMouseMove}
+    >
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           {/* Left Content */}
           <div className="relative z-10">
-            {/* Glassmorphism Label */}
             <div className="inline-flex items-center gap-2 mb-6 px-4 py-2 rounded-full border border-white/20 bg-white/5 backdrop-blur-md">
               <Verified className="w-5 h-5 text-yellow-400 animate-pulse" />
-              <span className="font-medium text-white">Get Pro – Limited time offer</span>
+              <span className="font-medium text-white">
+                Get Pro – Limited time offer
+              </span>
             </div>
 
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight">
@@ -92,7 +79,8 @@ export default function Hero() {
             </h1>
 
             <p className="text-lg md:text-xl text-gray-300 mb-8 max-w-lg">
-              The open-source stack for providing ready-to-use game scripts and premium tools with zero setup.
+              The open-source stack for providing ready-to-use game scripts and
+              premium tools with zero setup.
             </p>
 
             <div className="flex flex-wrap gap-4">
@@ -109,18 +97,18 @@ export default function Hero() {
                 Explore Features
               </a>
             </div>
-
-            {/* Trust badges can be added here */}
           </div>
 
-          {/* Right Content - 3D Robot */}
+          {/* Right Content - 3D Canvas */}
           <div className="h-[400px] lg:h-[500px] relative">
             <Canvas
               gl={{ antialias: true }}
               camera={{ position: [0, 0, 5], fov: 50 }}
               className="rounded-xl overflow-hidden"
             >
-              <Scene setMouse={(pos) => { mouse.current = pos; }} />
+              <ambientLight intensity={0.8} />
+              <directionalLight position={[5, 5, 5]} intensity={1} />
+              <OrbitControls enableZoom={false} enablePan={false} />
               <Robot mouse={mouse} />
             </Canvas>
           </div>
@@ -133,5 +121,5 @@ export default function Hero() {
   );
 }
 
-// Preload the model
+// Preload GLB
 useGLTF.preload('/cute_robot.glb');
