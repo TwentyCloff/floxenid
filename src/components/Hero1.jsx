@@ -1,6 +1,5 @@
 import Typewriter from "typewriter-effect";
 import Section from "./Section";
-import DotPatternBackground from "../assets/background"; // Import your dot pattern background
 
 const Hero = () => {
   return (
@@ -12,12 +11,37 @@ const Hero = () => {
       {/* White background */}
       <div className="absolute inset-0 z-[-20] bg-white" />
 
-      {/* Dot pattern background */}
-      <div className="absolute inset-0 z-[-15]">
-        <DotPatternBackground />
+      {/* Dot Pattern Background - enlarged with muted colors */}
+      <div className="absolute inset-0 z-[-15] overflow-hidden">
+        <svg
+          className="w-[200%] h-[200%] transform -translate-x-1/4 -translate-y-1/4"
+          aria-hidden="true"
+        >
+          <defs>
+            <pattern
+              id="dot-pattern"
+              width="32"
+              height="32"
+              patternUnits="userSpaceOnUse"
+              patternTransform="scale(2)" // Enlarged pattern
+            >
+              <circle 
+                cx="16" 
+                cy="16" 
+                r="1.5" 
+                fill="rgba(180, 180, 180, 0.3)" // Muted gray color
+              />
+            </pattern>
+          </defs>
+          <rect
+            width="100%"
+            height="100%"
+            fill="url(#dot-pattern)"
+          />
+        </svg>
       </div>
 
-      {/* Main content with white theme */}
+      {/* Main content */}
       <div className="container relative z-10">
         <div className="relative max-w-[62rem] mx-auto text-center mb-[4rem] md:mb-20 lg:mb-[6rem]">
           <h1 className="h1 mb-6 text-gray-800">
