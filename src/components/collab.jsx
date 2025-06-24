@@ -47,53 +47,55 @@ const AboutUs = () => {
             Built in-house. Shared with the world.
           </p>
 
-          {/* Logo Grid */}
+          {/* Text Logo Grid */}
           <motion.div
-            className="flex flex-col md:flex-row justify-center items-center gap-8 md:gap-16 mt-8"
+            className="flex flex-col md:flex-row justify-center items-center gap-12 md:gap-24 mt-8"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
           >
-            {/* Logo 1 */}
+            {/* FloxenID - Tesla Font */}
             <motion.div
-              whileHover={{ scale: 1.1 }}
+              whileHover={{ scale: 1.05 }}
               transition={{ type: "spring", stiffness: 400, damping: 10 }}
-              className="w-32 h-32 md:w-40 md:h-40"
+              className="text-3xl md:text-4xl"
+              style={{
+                fontFamily: '"TESLA", sans-serif',
+                color: colors.light,
+                letterSpacing: '-0.05em'
+              }}
             >
-              <img 
-                src="src/assets/imgSale/nier.webp" 
-                alt="Team Member" 
-                className="w-full h-full object-cover rounded-full border-2"
-                style={{ borderColor: colors.medium }}
-              />
+              FloxenID
             </motion.div>
 
-            {/* Logo 2 */}
+            {/* NierScript - Modern Font */}
             <motion.div
-              whileHover={{ scale: 1.1 }}
+              whileHover={{ scale: 1.05 }}
               transition={{ type: "spring", stiffness: 400, damping: 10 }}
-              className="w-32 h-32 md:w-40 md:h-40"
+              className="text-3xl md:text-4xl"
+              style={{
+                fontFamily: '"Rajdhani", sans-serif',
+                color: colors.medium,
+                fontWeight: 600,
+                letterSpacing: '0.1em'
+              }}
             >
-              <img 
-                src="src/assets/imgSale/nier.webp" 
-                alt="Team Member" 
-                className="w-full h-full object-cover rounded-full border-2"
-                style={{ borderColor: colors.medium }}
-              />
+              NierScript
             </motion.div>
 
-            {/* Logo 3 */}
+            {/* Sardonyx - Elegant Font */}
             <motion.div
-              whileHover={{ scale: 1.1 }}
+              whileHover={{ scale: 1.05 }}
               transition={{ type: "spring", stiffness: 400, damping: 10 }}
-              className="w-32 h-32 md:w-40 md:h-40"
+              className="text-3xl md:text-4xl"
+              style={{
+                fontFamily: '"Playfair Display", serif',
+                color: colors.dark,
+                fontStyle: 'italic',
+                fontWeight: 500
+              }}
             >
-              <img 
-                src="src/assets/imgSale/nier.webp" 
-                alt="Team Member" 
-                className="w-full h-full object-cover rounded-full border-2"
-                style={{ borderColor: colors.medium }}
-              />
+              Sardonyx
             </motion.div>
           </motion.div>
         </div>
