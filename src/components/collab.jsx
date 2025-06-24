@@ -29,23 +29,9 @@ const AboutUs = () => {
           transition={{ duration: 0.8 }}
           className="max-w-7xl mx-auto text-center"
         >
-          {/* Logo */}
-          <motion.div
-            initial={{ scale: 0.8, opacity: 0 }}
-            whileInView={{ scale: 1, opacity: 1 }}
-            transition={{ duration: 0.6 }}
-            className="mb-8"
-          >
-            <img 
-              src="src/assets/imgSale/elv.ico" 
-              alt="Logo" 
-              className="w-32 h-32 mx-auto"
-            />
-          </motion.div>
-
           {/* Main Text */}
           <motion.h2 
-            className="text-5xl font-bold mb-4 tracking-tight"
+            className="text-3xl md:text-4xl font-bold mb-4 tracking-tight"
             style={{ 
               color: colors.text,
               fontFamily: '"Conthrax", sans-serif',
@@ -60,7 +46,7 @@ const AboutUs = () => {
 
           {/* Sub Text */}
           <motion.p
-            className="text-xl"
+            className="text-lg md:text-xl mb-12"
             style={{
               color: colors.subtext,
               fontFamily: '"Conthrax", sans-serif',
@@ -74,7 +60,7 @@ const AboutUs = () => {
 
           {/* Gradient Divider */}
           <motion.div 
-            className="w-64 h-1 mx-auto mt-8 rounded-full"
+            className="w-48 h-1 mx-auto mb-12 rounded-full"
             style={{ 
               background: `linear-gradient(90deg, ${colors.light}, ${colors.medium}, ${colors.dark})`,
             }}
@@ -82,6 +68,53 @@ const AboutUs = () => {
             whileInView={{ scaleX: 1 }}
             transition={{ delay: 0.4, duration: 0.8 }}
           ></motion.div>
+
+          {/* Logo Grid */}
+          <motion.div
+            className="flex flex-col md:flex-row justify-center items-center gap-8 md:gap-16"
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            transition={{ duration: 0.8, delay: 0.6 }}
+          >
+            {/* Logo 1 */}
+            <motion.div
+              whileHover={{ scale: 1.1 }}
+              transition={{ type: "spring", stiffness: 400, damping: 10 }}
+              className="w-24 h-24 md:w-32 md:h-32"
+            >
+              <img 
+                src="src/assets/imgSale/nier.webp" 
+                alt="Team Member 1" 
+                className="w-full h-full object-contain rounded-full"
+              />
+            </motion.div>
+
+            {/* Logo 2 */}
+            <motion.div
+              whileHover={{ scale: 1.1 }}
+              transition={{ type: "spring", stiffness: 400, damping: 10 }}
+              className="w-24 h-24 md:w-32 md:h-32"
+            >
+              <img 
+                src="src/assets/imgSale/nier.webp" 
+                alt="Team Member 2" 
+                className="w-full h-full object-contain rounded-full"
+              />
+            </motion.div>
+
+            {/* Logo 3 */}
+            <motion.div
+              whileHover={{ scale: 1.1 }}
+              transition={{ type: "spring", stiffness: 400, damping: 10 }}
+              className="w-24 h-24 md:w-32 md:h-32"
+            >
+              <img 
+                src="src/assets/imgSale/nier.webp" 
+                alt="Team Member 3" 
+                className="w-full h-full object-contain rounded-full"
+              />
+            </motion.div>
+          </motion.div>
         </motion.div>
       </div>
     </Section>
