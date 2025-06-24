@@ -5,9 +5,9 @@ import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { app, auth, db } from '../config/firebaseConfig';
 
 // Import images
-import banner1 from '../assets/imgHome/banner1.webp';
-import banner2 from '../assets/imgHome/banner2.webp';
-import banner3 from '../assets/imgHome/banner3.webp';
+import banner1 from '../assets/imgHome/test.jpg';
+import banner2 from '../assets/imgHome/test.jpg';
+import banner3 from '../assets/imgHome/test.jpg';
 
 const LandingPage = () => {
   const [testimonials, setTestimonials] = useState([]);
