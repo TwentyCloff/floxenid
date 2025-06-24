@@ -1,6 +1,6 @@
 import Typewriter from "typewriter-effect";
-import blackholeVideo from "../assets/hero/blackhole.webm";
 import Section from "./Section";
+import DotPatternBackground from "../assets/background"; // Import your dot pattern background
 
 const Hero = () => {
   return (
@@ -9,42 +9,13 @@ const Hero = () => {
       customPaddings
       className="pt-[12rem] -mt-[5.25rem] relative overflow-hidden"
     >
-      {/* Clean white background */}
+      {/* White background */}
       <div className="absolute inset-0 z-[-20] bg-white" />
 
-      {/* Original video positioning without any filters */}
-      <video
-        autoPlay
-        muted
-        loop
-        playsInline
-        className="blackhole-video absolute left-1/2 transform -translate-x-1/2 w-[130vw] h-[130vh] object-cover z-[-10] pointer-events-none
-                   top-[-30%] sm:top-[-30%] md:top-[-20%] lg:top-[-15%] xl:top-[-12%] 2xl:top-[-10%]"
-      >
-        <source src={blackholeVideo} type="video/webm" />
-      </video>
-
-      <style>
-        {`
-          @media (max-width: 640px) {
-            .blackhole-video {
-              top: -50% !important;
-            }
-          }
-          @media (min-width: 1920px) {
-            .blackhole-video {
-              top: -12% !important;
-              transform: translateX(-50%) scale(1.1);
-            }
-          }
-          @media (min-width: 2560px) {
-            .blackhole-video {
-              top: -10% !important;
-              transform: translateX(-50%) scale(1.25);
-            }
-          }
-        `}
-      </style>
+      {/* Dot pattern background */}
+      <div className="absolute inset-0 z-[-15]">
+        <DotPatternBackground />
+      </div>
 
       {/* Main content with white theme */}
       <div className="container relative z-10">
@@ -77,7 +48,7 @@ const Hero = () => {
             .network
           </p>
 
-          {/* Clean button styling */}
+          {/* Button */}
           <a
             href="#pricing"
             className="inline-block px-7 py-3 rounded-full border border-gray-300 text-gray-800 font-semibold
@@ -87,14 +58,6 @@ const Hero = () => {
           </a>
         </div>
       </div>
-
-      {/* Subtle white fade at bottom */}
-      <div
-        className="absolute bottom-0 left-0 w-full h-[12rem] z-[-5]"
-        style={{
-          background: "linear-gradient(to bottom, transparent, rgba(255,255,255,0.9))",
-        }}
-      />
     </Section>
   );
 };
