@@ -9,25 +9,17 @@ const Hero = () => {
       customPaddings
       className="pt-[12rem] -mt-[5.25rem] relative overflow-hidden"
     >
-      {/* White background gradient */}
-      <div
-        className="absolute inset-0 z-[-20] pointer-events-none"
-        style={{
-          background: "linear-gradient(180deg, #f8f8f8 0%, #ffffff 90%)",
-        }}
-      />
+      {/* Clean white background */}
+      <div className="absolute inset-0 z-[-20] bg-white" />
 
-      {/* Video background (position maintained from original) */}
+      {/* Original video positioning without any filters */}
       <video
         autoPlay
         muted
         loop
         playsInline
-        className="absolute left-1/2 transform -translate-x-1/2 w-[130vw] h-[130vh] object-cover z-[-10] pointer-events-none
+        className="blackhole-video absolute left-1/2 transform -translate-x-1/2 w-[130vw] h-[130vh] object-cover z-[-10] pointer-events-none
                    top-[-30%] sm:top-[-30%] md:top-[-20%] lg:top-[-15%] xl:top-[-12%] 2xl:top-[-10%]"
-        style={{
-          opacity: 0.7,
-        }}
       >
         <source src={blackholeVideo} type="video/webm" />
       </video>
@@ -54,7 +46,7 @@ const Hero = () => {
         `}
       </style>
 
-      {/* Main content */}
+      {/* Main content with white theme */}
       <div className="container relative z-10">
         <div className="relative max-w-[62rem] mx-auto text-center mb-[4rem] md:mb-20 lg:mb-[6rem]">
           <h1 className="h1 mb-6 text-gray-800">
@@ -85,22 +77,22 @@ const Hero = () => {
             .network
           </p>
 
-          {/* Button */}
+          {/* Clean button styling */}
           <a
             href="#pricing"
             className="inline-block px-7 py-3 rounded-full border border-gray-300 text-gray-800 font-semibold
-                       bg-white/70 backdrop-blur-md hover:bg-white transition-all duration-300 shadow-lg"
+                       bg-white hover:bg-gray-50 transition-all duration-300 shadow-md"
           >
             Get started
           </a>
         </div>
       </div>
 
-      {/* White fade at bottom */}
+      {/* Subtle white fade at bottom */}
       <div
         className="absolute bottom-0 left-0 w-full h-[12rem] z-[-5]"
         style={{
-          background: "linear-gradient(to bottom, transparent, #ffffff)",
+          background: "linear-gradient(to bottom, transparent, rgba(255,255,255,0.9))",
         }}
       />
     </Section>
