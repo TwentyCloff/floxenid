@@ -17,7 +17,7 @@
   --font-code: "Source Code Pro", monospace;
   --font-grotesk: "Space Grotesk", sans-serif;
   --font-circular: "Circular Std", sans-serif;
-  color-scheme: light;
+  color-scheme: light; /* Ubah ke light mode */
 }
 
 /* Base Styles */
@@ -29,15 +29,15 @@
   html,
   #root {
     height: 100%;
-    background-color: #F5F5F5; /* Ghost White */
+    background-color: #ffffff; /* Background putih */
   }
 
   body {
-    @apply text-n-6 text-base;
+    @apply text-n-6 text-base; /* Gunakan warna teks gelap dari palet */
     font-family: var(--font-circular), -apple-system, BlinkMacSystemFont, sans-serif;
     margin: 0;
     min-height: 100vh;
-    background-color: #F5F5F5; /* Ghost White */
+    background-color: #ffffff; /* Latar belakang putih */
   }
 }
 
