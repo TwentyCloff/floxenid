@@ -1,13 +1,14 @@
 import { Routes, Route, Link } from "react-router-dom";
 import Header from "./components/Header";
 import Hero from "./components/Hero";
+import Hero1 from "./components/Hero1";
 import Footer from "./components/Footer";
 import Nav1 from "./components/Nav1";
 
 const Home = () => (
   <div className="pt-[4.75rem] lg:pt-[5.25rem] overflow-hidden">
     <Nav1 />
-    <Hero />
+    <Hero1 />
     {/*<Footer /> */}
   </div>
 );
