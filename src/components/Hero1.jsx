@@ -11,8 +11,15 @@ const Hero = () => {
       {/* White background */}
       <div className="absolute inset-0 z-[-20] bg-white" />
 
-      {/* Dot Pattern Background - slightly enlarged with muted colors */}
+      {/* Dot pattern background with fade effects */}
       <div className="absolute inset-0 z-[-15] overflow-hidden">
+        {/* Left fade */}
+        <div className="absolute left-0 top-0 h-full w-32 bg-gradient-to-r from-white to-transparent z-10" />
+        
+        {/* Right fade */}
+        <div className="absolute right-0 top-0 h-full w-32 bg-gradient-to-l from-white to-transparent z-10" />
+        
+        {/* Dot pattern (2% larger than original) */}
         <svg
           className="w-full h-full"
           aria-hidden="true"
@@ -20,16 +27,15 @@ const Hero = () => {
           <defs>
             <pattern
               id="dot-pattern"
-              width="24"  // Slightly larger than default
-              height="24" // Slightly larger than default
+              width="20.4"  // 2% larger than standard 20
+              height="20.4" // 2% larger than standard 20
               patternUnits="userSpaceOnUse"
-              patternTransform="scale(1.5)" // Subtle enlargement
             >
               <circle 
-                cx="12" 
-                cy="12" 
-                r="1.25"  // Slightly larger dots
-                fill="rgba(160, 160, 160, 0.25)" // Muted gray with subtle transparency
+                cx="10.2" 
+                cy="10.2" 
+                r="1" 
+                fill="rgba(160, 160, 160, 0.2)" // Muted gray
               />
             </pattern>
           </defs>
