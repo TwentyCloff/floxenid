@@ -1,15 +1,14 @@
 import { motion } from 'framer-motion';
 import Section from "./Section";
 
-// Ivory Mint Color Theme
+// White Color Theme
 const colors = {
-  dark: '#96C7B9',      // Soft teal
-  medium: '#D1F0E0',    // Mint
-  light: '#FFFFFF',      // Pure white
-  accent: '#96C7B9',     // Soft teal accent
-  text: '#FFFFFF',       // White text
-  subtext: '#A0AEC0',    // Gray subtext
-  background: '#000000'  // Black background
+  primary: '#ffffff',     // White
+  secondary: '#f8f8f8',   // Off-white
+  accent: '#e0e0e0',      // Light gray accent
+  text: '#333333',        // Dark text
+  subtext: '#666666',     // Medium gray subtext
+  background: '#ffffff'   // White background
 };
 
 const AboutUs = () => {
@@ -54,19 +53,18 @@ const AboutUs = () => {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
           >
-            {/* FloxenID - Tesla-like Font with Gradient */}
+            {/* FloxenID - Tesla-like Font with Subtle Gradient */}
             <motion.div
               whileHover={{ scale: 1.05 }}
               transition={{ type: "spring", stiffness: 400, damping: 10 }}
               className="text-3xl md:text-4xl font-bold"
               style={{
                 fontFamily: '"Orbitron", sans-serif',
-                background: 'linear-gradient(90deg, #00FFFF, #0066FF)',
+                background: 'linear-gradient(90deg, #888888, #333333)',
                 WebkitBackgroundClip: 'text',
                 backgroundClip: 'text',
                 color: 'transparent',
                 letterSpacing: '-0.05em',
-                textShadow: '0 0 10px rgba(0, 204, 255, 0.3)'
               }}
             >
               Floxen<span style={{ fontStyle: 'italic' }}>ID</span>
@@ -79,7 +77,7 @@ const AboutUs = () => {
               className="text-3xl md:text-4xl"
               style={{
                 fontFamily: '"Rajdhani", sans-serif',
-                color: colors.medium,
+                color: colors.text,
                 fontWeight: 600,
                 letterSpacing: '0.1em'
               }}
@@ -94,7 +92,7 @@ const AboutUs = () => {
               className="text-3xl md:text-4xl"
               style={{
                 fontFamily: '"Playfair Display", serif',
-                color: colors.dark,
+                color: colors.text,
                 fontStyle: 'italic',
                 fontWeight: 500
               }}
