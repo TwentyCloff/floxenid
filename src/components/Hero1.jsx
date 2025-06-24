@@ -9,19 +9,50 @@ const Hero = () => {
       customPaddings
       className="pt-[12rem] -mt-[5.25rem] relative overflow-hidden"
     >
-      {/* White background */}
-      <div className="absolute inset-0 z-[-20] bg-white" />
+      {/* White background gradient */}
+      <div
+        className="absolute inset-0 z-[-20] pointer-events-none"
+        style={{
+          background: "linear-gradient(180deg, #f8f8f8 0%, #ffffff 90%)",
+        }}
+      />
 
-      {/* Normal video background */}
+      {/* Video background (position maintained from original) */}
       <video
         autoPlay
         muted
         loop
         playsInline
-        className="absolute left-1/2 transform -translate-x-1/2 w-full h-full object-cover z-[-10] pointer-events-none"
+        className="absolute left-1/2 transform -translate-x-1/2 w-[130vw] h-[130vh] object-cover z-[-10] pointer-events-none
+                   top-[-30%] sm:top-[-30%] md:top-[-20%] lg:top-[-15%] xl:top-[-12%] 2xl:top-[-10%]"
+        style={{
+          opacity: 0.7,
+        }}
       >
         <source src={blackholeVideo} type="video/webm" />
       </video>
+
+      <style>
+        {`
+          @media (max-width: 640px) {
+            .blackhole-video {
+              top: -50% !important;
+            }
+          }
+          @media (min-width: 1920px) {
+            .blackhole-video {
+              top: -12% !important;
+              transform: translateX(-50%) scale(1.1);
+            }
+          }
+          @media (min-width: 2560px) {
+            .blackhole-video {
+              top: -10% !important;
+              transform: translateX(-50%) scale(1.25);
+            }
+          }
+        `}
+      </style>
 
       {/* Main content */}
       <div className="container relative z-10">
@@ -58,12 +89,20 @@ const Hero = () => {
           <a
             href="#pricing"
             className="inline-block px-7 py-3 rounded-full border border-gray-300 text-gray-800 font-semibold
-                       bg-white/70 hover:bg-white transition-all duration-300 shadow-lg"
+                       bg-white/70 backdrop-blur-md hover:bg-white transition-all duration-300 shadow-lg"
           >
             Get started
           </a>
         </div>
       </div>
+
+      {/* White fade at bottom */}
+      <div
+        className="absolute bottom-0 left-0 w-full h-[12rem] z-[-5]"
+        style={{
+          background: "linear-gradient(to bottom, transparent, #ffffff)",
+        }}
+      />
     </Section>
   );
 };
