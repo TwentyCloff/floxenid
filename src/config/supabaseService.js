@@ -1,10 +1,11 @@
 import { createClient } from '@supabase/supabase-js'
 
-// Ganti ini dari Project Settings → API
+// GANTI DENGAN MILIKMU SENDIRI:
 const supabaseUrl = 'https://meppqytugnpzabklqlyh.supabase.co'
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1lcHBxeXR1Z25wemFia2xxbHloIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA3NDE0MTgsImV4cCI6MjA2NjMxNzQxOH0.YHKEvbg7OruM4BHZpnOAvc5ykwUHF3mDRJgbDeuV6TE'
 
 export const supabase = createClient(supabaseUrl, supabaseKey)
+
 
 // ----------------------
 // 🔐 AUTH SECTION
@@ -39,6 +40,7 @@ export async function getSession() {
   return session
 }
 
+
 // ----------------------
 // 📦 STORAGE SECTION
 // ----------------------
@@ -61,19 +63,54 @@ export async function uploadFile(file, path = 'bukti', bucket = 'product-images'
   return publicData.publicUrl
 }
 
+
 // ----------------------
-// 🗂️ DATABASE SECTION
+// 🛍️ PRODUCTS SECTION
 // ----------------------
 
-export async function createTransaction(data) {
-  const { error } = await supabase.from('transactions').insert([data])
+export async function getProducts() {
+  const { data, error } = await supabase
+    .from('products')
+    .select('*')
+    .order('created_at', { ascending: false })
+
+  if (error) throw error
+  return data
+}
+
+export async function createProduct({ name, description, price, image_url }) {
+  const { error } = await supabase.from('products').insert([
+    {
+      name,
+      description,
+      price,
+      image_url,
+    },
+  ])
+  if (error) throw error
+}
+
+
+// ----------------------
+// 💸 TRANSACTIONS SECTION
+// ----------------------
+
+export async function createTransaction({ user_id, product_id, payment_note }) {
+  const { error } = await supabase.from('transactions').insert([
+    {
+      user_id,
+      product_id,
+      payment_note,
+      status: 'pending', // default dari backend juga
+    },
+  ])
   if (error) throw error
 }
 
 export async function getMyTransactions(user_id) {
   const { data, error } = await supabase
     .from('transactions')
-    .select('*')
+    .select('*, products(*)') // nested join ke produk
     .eq('user_id', user_id)
     .order('created_at', { ascending: false })
 
@@ -84,7 +121,7 @@ export async function getMyTransactions(user_id) {
 export async function getAllTransactions() {
   const { data, error } = await supabase
     .from('transactions')
-    .select('*')
+    .select('*, products(*)')
     .order('created_at', { ascending: false })
 
   if (error) throw error
