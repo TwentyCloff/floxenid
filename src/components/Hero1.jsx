@@ -11,25 +11,25 @@ const Hero = () => {
       {/* White background */}
       <div className="absolute inset-0 z-[-20] bg-white" />
 
-      {/* Dot Pattern Background - enlarged with muted colors */}
+      {/* Dot Pattern Background - slightly enlarged with muted colors */}
       <div className="absolute inset-0 z-[-15] overflow-hidden">
         <svg
-          className="w-[200%] h-[200%] transform -translate-x-1/4 -translate-y-1/4"
+          className="w-full h-full"
           aria-hidden="true"
         >
           <defs>
             <pattern
               id="dot-pattern"
-              width="32"
-              height="32"
+              width="24"  // Slightly larger than default
+              height="24" // Slightly larger than default
               patternUnits="userSpaceOnUse"
-              patternTransform="scale(2)" // Enlarged pattern
+              patternTransform="scale(1.5)" // Subtle enlargement
             >
               <circle 
-                cx="16" 
-                cy="16" 
-                r="1.5" 
-                fill="rgba(180, 180, 180, 0.3)" // Muted gray color
+                cx="12" 
+                cy="12" 
+                r="1.25"  // Slightly larger dots
+                fill="rgba(160, 160, 160, 0.25)" // Muted gray with subtle transparency
               />
             </pattern>
           </defs>
