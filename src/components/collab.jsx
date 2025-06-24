@@ -54,18 +54,22 @@ const AboutUs = () => {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
           >
-            {/* FloxenID - Tesla Font */}
+            {/* FloxenID - Tesla-like Font with Gradient */}
             <motion.div
               whileHover={{ scale: 1.05 }}
               transition={{ type: "spring", stiffness: 400, damping: 10 }}
-              className="text-3xl md:text-4xl"
+              className="text-3xl md:text-4xl font-bold"
               style={{
-                fontFamily: '"TESLA", sans-serif',
-                color: colors.light,
-                letterSpacing: '-0.05em'
+                fontFamily: '"Orbitron", sans-serif',
+                background: 'linear-gradient(90deg, #00FFFF, #0066FF)',
+                WebkitBackgroundClip: 'text',
+                backgroundClip: 'text',
+                color: 'transparent',
+                letterSpacing: '-0.05em',
+                textShadow: '0 0 10px rgba(0, 204, 255, 0.3)'
               }}
             >
-              FloxenID
+              Floxen<span style={{ fontStyle: 'italic' }}>ID</span>
             </motion.div>
 
             {/* NierScript - Modern Font */}
