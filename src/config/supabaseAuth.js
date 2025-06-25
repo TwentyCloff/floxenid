@@ -1,32 +1,31 @@
 import { supabase } from './supabaseClient';
 import { auth } from './firebaseConfig';
 
-// Fungsi untuk sinkronisasi session Firebase ke Supabase
+// Sinkronkan Firebase Auth ke Supabase
 export const syncFirebaseToSupabase = async (firebaseUser) => {
   if (!firebaseUser) return null;
 
-  // Dapatkan token ID dari Firebase
-  const token = await firebaseUser.getIdToken();
+  try {
+    const token = await firebaseUser.getIdToken();
+    
+    const { data, error } = await supabase.auth.signInWithIdToken({
+      provider: 'google', // Pakai provider google meskipun email
+      token: token
+    });
 
-  // Login ke Supabase menggunakan token Firebase
-  const { data, error } = await supabase.auth.signInWithIdToken({
-    provider: 'google', // Meskipun email, kita gunakan google provider
-    token: token
-  });
-
-  if (error) {
-    console.error('Supabase auth error:', error);
+    if (error) throw error;
+    return data.session;
+  } catch (error) {
+    console.error('Gagal sinkronisasi ke Supabase:', error);
     return null;
   }
-
-  return data.session;
 };
 
-// Listener untuk perubahan auth state di Firebase
+// Listener untuk sinkronisasi real-time
 export const setupAuthListener = () => {
-  return auth.onAuthStateChanged(async (firebaseUser) => {
-    if (firebaseUser) {
-      await syncFirebaseToSupabase(firebaseUser);
+  return auth.onAuthStateChanged(async (user) => {
+    if (user) {
+      await syncFirebaseToSupabase(user);
     } else {
       await supabase.auth.signOut();
     }
