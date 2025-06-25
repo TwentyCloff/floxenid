@@ -3,12 +3,13 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { disablePageScroll, enablePageScroll } from "scroll-lock";
 import { onAuthStateChanged, signOut } from "firebase/auth";
 import { auth } from "../config/firebaseConfig";
-import { uploadProfileImage } from "../config/supabaseProfile";
+import { getPublicUrl } from "../config/supabaseProfile";
 
 const Navbar = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [user, setUser] = useState(null);
+  const [profileImageUrl, setProfileImageUrl] = useState(null);
   const [openNavigation, setOpenNavigation] = useState(false);
   const [activeMenu, setActiveMenu] = useState(null);
   const [scrolled, setScrolled] = useState(false);
@@ -28,8 +29,17 @@ const Navbar = () => {
   const profileModalRef = useRef(null);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       setUser(currentUser);
+      
+      // Get profile image URL if user is logged in
+      if (currentUser) {
+        const path = `profiles/${currentUser.uid}/avatar`;
+        const { data: { publicUrl } } = getPublicUrl(path);
+        setProfileImageUrl(publicUrl);
+      } else {
+        setProfileImageUrl(null);
+      }
     });
 
     const handleScroll = () => {
@@ -233,12 +243,24 @@ const Navbar = () => {
   // Profile Icon Component
   const ProfileIcon = () => (
     <div 
-      className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center cursor-pointer hover:bg-gray-300 transition-colors"
+      className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center cursor-pointer hover:bg-gray-300 transition-colors overflow-hidden"
       onClick={() => setShowProfileModal(!showProfileModal)}
     >
-      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-      </svg>
+      {profileImageUrl ? (
+        <img 
+          src={profileImageUrl} 
+          alt="Profile" 
+          className="w-full h-full object-cover"
+          onError={(e) => {
+            e.target.onerror = null;
+            e.target.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%236B7280"><path d="M12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/><path d="M12 2a5 5 0 100 10 5 5 0 000-10z"/></svg>';
+          }}
+        />
+      ) : (
+        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+        </svg>
+      )}
     </div>
   );
 
@@ -253,16 +275,23 @@ const Navbar = () => {
           >
             <div className="flex items-start space-x-4 mb-4">
               <div className="relative">
-                <div className="w-16 h-16 rounded-full bg-gray-200 flex items-center justify-center">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                  </svg>
+                <div className="w-16 h-16 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
+                  {profileImageUrl ? (
+                    <img 
+                      src={profileImageUrl} 
+                      alt="Profile" 
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        e.target.onerror = null;
+                        e.target.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%236B7280"><path d="M12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/><path d="M12 2a5 5 0 100 10 5 5 0 000-10z"/></svg>';
+                      }}
+                    />
+                  ) : (
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                    </svg>
+                  )}
                 </div>
-                <button className="absolute -bottom-1 -right-1 bg-white rounded-full p-1 shadow-sm border border-gray-200">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                  </svg>
-                </button>
               </div>
               <div className="flex-1">
                 <div className="flex justify-between items-start">
