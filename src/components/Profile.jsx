@@ -1,23 +1,29 @@
 import { useEffect, useState, useRef } from 'react';
 import { auth } from '../config/firebaseConfig';
 import { onAuthStateChanged, updateProfile } from 'firebase/auth';
-import { uploadProfileImage, deleteProfileImage, getPublicUrl } from '../config/supabaseProfile';
-import { FaCheck, FaTimes, FaEdit, FaCamera, FaTrash } from 'react-icons/fa';
+import { FaCheck, FaTimes, FaEdit, FaTrash } from 'react-icons/fa';
 import { doc, setDoc, getFirestore } from 'firebase/firestore';
-import { syncFirebaseToSupabase } from '../config/supabaseAuth';
 
 const db = getFirestore();
+
+const avatars = [
+  'avatar1.png',
+  'avatar2.png',
+  'avatar3.png',
+  'avatar4.png',
+  'avatar5.png',
+  'avatar6.png',
+  'avatar7.png',
+  'avatar8.png'
+];
 
 export default function Profile() {
   const [user, setUser] = useState(null);
   const [editMode, setEditMode] = useState(false);
   const [displayName, setDisplayName] = useState('');
-  const [profileImage, setProfileImage] = useState(null);
-  const [previewImage, setPreviewImage] = useState('');
+  const [selectedAvatar, setSelectedAvatar] = useState('avatar1.png');
   const [loading, setLoading] = useState(false);
-  const [uploadStatus, setUploadStatus] = useState({ success: false, message: '' });
   const [nameError, setNameError] = useState('');
-  const fileInputRef = useRef(null);
 
   // Load user data with real-time updates
   useEffect(() => {
@@ -26,67 +32,17 @@ export default function Profile() {
         setUser(currentUser);
         setDisplayName(currentUser.displayName || '');
         
-        // Load profile image from Supabase with cache busting
-        try {
-          const path = `profiles/${currentUser.uid}/avatar`;
-          const { data: { publicUrl } } = getPublicUrl(path);
-          // Force refresh by adding timestamp and random parameter
-          const randomParam = Math.random().toString(36).substring(7);
-          setPreviewImage(publicUrl ? `${publicUrl}?ts=${Date.now()}&r=${randomParam}` : '');
-        } catch (error) {
-          console.error("Error loading profile image:", error);
-          setPreviewImage(currentUser.photoURL || '');
+        // Set default avatar when user logs in
+        if (currentUser.photoURL) {
+          const avatarName = currentUser.photoURL.split('/').pop();
+          setSelectedAvatar(avatars.includes(avatarName) ? avatarName : 'avatar1.png');
+        } else {
+          setSelectedAvatar('avatar1.png');
         }
-        
-        await syncFirebaseToSupabase(currentUser);
       }
     });
     return () => unsubscribe();
   }, []);
-
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
-        setUploadStatus({ success: false, message: 'Format file tidak didukung' });
-        return;
-      }
-      if (file.size > 5 * 1024 * 1024) {
-        setUploadStatus({ success: false, message: 'Ukuran file maksimal 5MB' });
-        return;
-      }
-
-      setProfileImage(file);
-      setPreviewImage(URL.createObjectURL(file));
-      setUploadStatus({ success: true, message: 'Gambar siap diupload' });
-    }
-  };
-
-  const handleDeleteImage = async () => {
-    try {
-      setLoading(true);
-      await deleteProfileImage(user.uid);
-      
-      await updateProfile(auth.currentUser, {
-        photoURL: ''
-      });
-
-      // Force refresh with new timestamp
-      const randomParam = Math.random().toString(36).substring(7);
-      setPreviewImage('');
-      setProfileImage(null);
-      setUploadStatus({ success: true, message: 'Gambar berhasil dihapus' });
-      
-      setUser({ ...auth.currentUser, photoURL: '' });
-      
-      // Force refresh in other components
-      window.dispatchEvent(new Event('profileImageUpdated'));
-    } catch (error) {
-      setUploadStatus({ success: false, message: error.message });
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleSave = async () => {
     try {
@@ -94,47 +50,47 @@ export default function Profile() {
       
       if (!auth.currentUser) throw new Error('Anda belum login!');
       
-      let photoURL = user.photoURL;
-
-      if (profileImage) {
-        try {
-          photoURL = await uploadProfileImage(profileImage, user.uid);
-          // Add cache busting parameters
-          const randomParam = Math.random().toString(36).substring(7);
-          photoURL = `${photoURL}?ts=${Date.now()}&r=${randomParam}`;
-          setUploadStatus({ success: true, message: 'Gambar berhasil diupload' });
-        } catch (uploadError) {
-          setUploadStatus({ success: false, message: uploadError.message });
-          return;
-        }
+      if (!displayName.trim()) {
+        setNameError('Nama tidak boleh kosong');
+        return;
       }
+      
+      const avatarUrl = `/profiles/${selectedAvatar}`;
 
       await updateProfile(auth.currentUser, {
         displayName: displayName.trim(),
-        photoURL: photoURL || null
+        photoURL: avatarUrl
       });
 
       await setDoc(doc(db, 'users', user.uid), {
         displayName: displayName.trim(),
-        photoURL: photoURL || null
+        photoURL: avatarUrl,
+        lastUpdated: new Date().toISOString()
       }, { merge: true });
 
       const updatedUser = {
         ...auth.currentUser,
         displayName: displayName.trim(),
-        photoURL: photoURL || null
+        photoURL: avatarUrl
       };
       setUser(updatedUser);
-      setPreviewImage(photoURL || '');
       setEditMode(false);
+      setNameError('');
       
       // Trigger event to update other components
-      window.dispatchEvent(new Event('profileImageUpdated'));
+      window.dispatchEvent(new CustomEvent('avatarChanged', { 
+        detail: { avatar: selectedAvatar } 
+      }));
     } catch (error) {
-      setUploadStatus({ success: false, message: error.message });
+      console.error("Error saving profile:", error);
+      setNameError('Terjadi kesalahan saat menyimpan profil');
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleDeleteImage = () => {
+    setSelectedAvatar('avatar1.png');
   };
 
   if (!user) return (
@@ -145,63 +101,50 @@ export default function Profile() {
 
   return (
     <div className="min-h-screen pt-[4.75rem] lg:pt-[5.25rem] bg-gradient-to-br from-gray-50 to-blue-50 p-4">
-      {uploadStatus.message && (
-        <div className={`fixed top-4 right-4 p-3 rounded-md shadow-md z-50 ${
-          uploadStatus.success ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-        }`}>
-          {uploadStatus.message}
-        </div>
-      )}
-
       <div className="max-w-3xl mx-auto bg-white rounded-xl shadow-lg overflow-hidden">
         <div className="p-8">
           <div className="flex flex-col md:flex-row gap-8 items-center">
             <div className="relative group">
               <div className="w-32 h-32 rounded-full bg-gray-200 overflow-hidden border-2 border-gray-300">
-                {previewImage ? (
-                  <img 
-                    src={previewImage} 
-                    alt="Profile" 
-                    className="w-full h-full object-cover"
-                    key={previewImage} // Force re-render when image changes
-                    onError={(e) => {
-                      e.target.onerror = null;
-                      e.target.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%236B7280"><path d="M12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/><path d="M12 2a5 5 0 100 10 5 5 0 000-10z"/></svg>';
-                    }}
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center text-gray-400">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                    </svg>
-                  </div>
-                )}
+                <img 
+                  src={`/profiles/${selectedAvatar}`} 
+                  alt="Profile" 
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    e.target.onerror = null;
+                    e.target.src = '/profiles/avatar1.png';
+                  }}
+                />
               </div>
 
               {editMode && (
-                <>
+                <div className="mt-4">
+                  <div className="grid grid-cols-4 gap-2">
+                    {avatars.map((avatar) => (
+                      <div 
+                        key={avatar}
+                        className={`cursor-pointer rounded-full overflow-hidden border-2 ${selectedAvatar === avatar ? 'border-blue-500' : 'border-transparent'}`}
+                        onClick={() => setSelectedAvatar(avatar)}
+                      >
+                        <img 
+                          src={`/profiles/${avatar}`} 
+                          alt={`Avatar ${avatar}`}
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            e.target.onerror = null;
+                            e.target.src = '/profiles/avatar1.png';
+                          }}
+                        />
+                      </div>
+                    ))}
+                  </div>
                   <button
-                    onClick={() => fileInputRef.current.click()}
-                    className="absolute bottom-0 right-0 bg-blue-600 text-white p-2 rounded-full shadow-lg hover:bg-blue-700 transition-all"
+                    onClick={handleDeleteImage}
+                    className="mt-2 px-3 py-1 text-sm bg-red-100 text-red-600 rounded-md hover:bg-red-200 transition-colors flex items-center gap-1"
                   >
-                    <FaCamera />
+                    <FaTrash className="text-xs" /> Reset Avatar
                   </button>
-                  {previewImage && (
-                    <button
-                      onClick={handleDeleteImage}
-                      className="absolute top-0 right-0 bg-red-600 text-white p-2 rounded-full shadow-lg hover:bg-red-700 transition-all"
-                    >
-                      <FaTrash />
-                    </button>
-                  )}
-                  <input
-                    type="file"
-                    ref={fileInputRef}
-                    onChange={handleImageChange}
-                    accept="image/*"
-                    className="hidden"
-                  />
-                </>
+                </div>
               )}
             </div>
 
@@ -212,9 +155,12 @@ export default function Profile() {
                     <input
                       type="text"
                       value={displayName}
-                      onChange={(e) => setDisplayName(e.target.value)}
+                      onChange={(e) => {
+                        setDisplayName(e.target.value);
+                        if (nameError) setNameError('');
+                      }}
                       className="text-2xl font-bold border-b border-gray-300 px-2 py-1 w-full focus:outline-none focus:border-blue-500"
-                      placeholder="Masukkan nama"
+                      placeholder="Enter your name"
                     />
                     {nameError && <p className="text-red-500 text-sm mt-1">{nameError}</p>}
                   </div>
@@ -228,25 +174,29 @@ export default function Profile() {
                   {editMode ? (
                     <>
                       <button
-                        onClick={() => setEditMode(false)}
-                        className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors"
+                        onClick={() => {
+                          setEditMode(false);
+                          setNameError('');
+                          setSelectedAvatar(user.photoURL ? user.photoURL.split('/').pop() : 'avatar1.png');
+                        }}
+                        className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors flex items-center gap-1"
                       >
-                        <FaTimes className="inline mr-1" /> Batal
+                        <FaTimes /> Cancel
                       </button>
                       <button
                         onClick={handleSave}
                         disabled={loading}
-                        className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:bg-blue-400"
+                        className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:bg-blue-400 flex items-center gap-1"
                       >
-                        {loading ? 'Menyimpan...' : (<><FaCheck className="inline mr-1" /> Simpan</>)}
+                        {loading ? 'Saving...' : <><FaCheck /> Save</>}
                       </button>
                     </>
                   ) : (
                     <button
                       onClick={() => setEditMode(true)}
-                      className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                      className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-1"
                     >
-                      <FaEdit className="inline mr-1" /> Edit Profile
+                      <FaEdit /> Edit Profile
                     </button>
                   )}
                 </div>
@@ -260,6 +210,10 @@ export default function Profile() {
                 <div>
                   <p className="text-sm text-gray-500">User ID</p>
                   <p className="text-gray-800 font-mono text-sm">{user.uid}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">Avatar</p>
+                  <p className="text-gray-800">{selectedAvatar.replace('.png', '')}</p>
                 </div>
               </div>
             </div>
