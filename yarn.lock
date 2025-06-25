@@ -2494,6 +2494,13 @@ react-just-parallax@^3.1.16:
     lodash.debounce "4.0.8"
     prefix "1.0.0"
 
+react-password-strength-bar@^0.4.1:
+  version "0.4.1"
+  resolved "https://registry.yarnpkg.com/react-password-strength-bar/-/react-password-strength-bar-0.4.1.tgz#381073552a99d3401b884195c5fa9a7d56913dd0"
+  integrity sha512-2NvYz4IUU8k7KDZgsXKoJWreKCZLKGaqF5QhIVhc09OsPBFXFMh0BeghNkBIRkaxLeI7/xjivknDCYfluBCXKA==
+  dependencies:
+    zxcvbn "4.4.2"
+
 react-reconciler@^0.31.0:
   version "0.31.0"
   resolved "https://registry.yarnpkg.com/react-reconciler/-/react-reconciler-0.31.0.tgz#6b7390fe8fab59210daf523d7400943973de1458"
@@ -3082,3 +3089,8 @@ zustand@^5.0.1, zustand@^5.0.3:
   version "5.0.5"
   resolved "https://registry.yarnpkg.com/zustand/-/zustand-5.0.5.tgz#3e236f6a953142d975336d179bc735d97db17e84"
   integrity sha512-mILtRfKW9xM47hqxGIxCv12gXusoY/xTSHBYApXozR0HmQv299whhBeeAcRy+KrPPybzosvJBCOmVjq6x12fCg==
+
+zxcvbn@4.4.2:
+  version "4.4.2"
+  resolved "https://registry.yarnpkg.com/zxcvbn/-/zxcvbn-4.4.2.tgz#28ec17cf09743edcab056ddd8b1b06262cc73c30"
+  integrity sha512-Bq0B+ixT/DMyG8kgX2xWcI5jUvCwqrMxSFam7m0lAf78nf04hv6lNCsyLYdyYTrCVMqNDY/206K7eExYCeSyUQ==
