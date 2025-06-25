@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { disablePageScroll, enablePageScroll } from "scroll-lock";
 import { onAuthStateChanged, signOut } from "firebase/auth";
 import { auth } from "../config/firebaseConfig";
-import { getPublicUrl } from "../config/supabaseProfile";
+import { getPublicUrl } from "../config/supabaseClient"; // Updated import path
 
 const Navbar = () => {
   const navigate = useNavigate();
@@ -34,9 +34,18 @@ const Navbar = () => {
       
       // Get profile image URL if user is logged in
       if (currentUser) {
-        const path = `profiles/${currentUser.uid}/avatar`;
-        const { data: { publicUrl } } = getPublicUrl(path);
-        setProfileImageUrl(publicUrl);
+        try {
+          const path = `profiles/${currentUser.uid}/avatar`;
+          const { data: { publicUrl } } = getPublicUrl(path, 'profile-images', {
+            width: 200,
+            height: 200,
+            resize: 'cover'
+          });
+          setProfileImageUrl(publicUrl);
+        } catch (error) {
+          console.error('Error getting profile image:', error);
+          setProfileImageUrl(null);
+        }
       } else {
         setProfileImageUrl(null);
       }
