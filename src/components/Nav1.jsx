@@ -3,7 +3,8 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { disablePageScroll, enablePageScroll } from "scroll-lock";
 import { onAuthStateChanged, signOut } from "firebase/auth";
 import { auth } from "../config/firebaseConfig";
-import { getPublicUrl } from "../config/supabaseClient"; // Updated import path
+import { getPublicUrl } from "../config/supabaseProfile";
+import { supabase } from "../config/supabaseClient";
 
 const Navbar = () => {
   const navigate = useNavigate();
@@ -28,28 +29,46 @@ const Navbar = () => {
   const resourcesMenuRef = useRef(null);
   const profileModalRef = useRef(null);
 
+  const loadProfileImage = async (currentUser) => {
+    if (!currentUser) {
+      setProfileImageUrl(null);
+      return;
+    }
+
+    try {
+      const path = `profiles/${currentUser.uid}/avatar`;
+      const { data: { publicUrl } } = getPublicUrl(path);
+      
+      // Add timestamp to force refresh
+      const timestamp = new Date().getTime();
+      const urlWithTimestamp = `${publicUrl}?t=${timestamp}`;
+      
+      setProfileImageUrl(urlWithTimestamp);
+    } catch (error) {
+      console.error("Error loading profile image:", error);
+      setProfileImageUrl(null);
+    }
+  };
+
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       setUser(currentUser);
-      
-      // Get profile image URL if user is logged in
-      if (currentUser) {
-        try {
-          const path = `profiles/${currentUser.uid}/avatar`;
-          const { data: { publicUrl } } = getPublicUrl(path, 'profile-images', {
-            width: 200,
-            height: 200,
-            resize: 'cover'
-          });
-          setProfileImageUrl(publicUrl);
-        } catch (error) {
-          console.error('Error getting profile image:', error);
-          setProfileImageUrl(null);
-        }
-      } else {
-        setProfileImageUrl(null);
-      }
+      await loadProfileImage(currentUser);
     });
+
+    // Set up Supabase realtime subscription for profile changes
+    const profileSubscription = supabase
+      .channel('profile_changes')
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'profiles'
+      }, async (payload) => {
+        if (payload.new.user_id === auth.currentUser?.uid) {
+          await loadProfileImage(auth.currentUser);
+        }
+      })
+      .subscribe();
 
     const handleScroll = () => {
       setScrolled(window.scrollY > 10);
@@ -66,6 +85,7 @@ const Navbar = () => {
     
     return () => {
       unsubscribe();
+      profileSubscription.unsubscribe();
       window.removeEventListener('scroll', handleScroll);
       document.removeEventListener('mousedown', handleClickOutside);
       clearTimeout(timeoutRef.current);
@@ -146,6 +166,7 @@ const Navbar = () => {
   const handleLogout = async () => {
     await signOut(auth);
     setUser(null);
+    setProfileImageUrl(null);
     setShowLogoutConfirm(false);
     setShowProfileModal(false);
   };
@@ -249,7 +270,7 @@ const Navbar = () => {
     );
   };
 
-  // Profile Icon Component
+  // Profile Icon Component with image handling
   const ProfileIcon = () => (
     <div 
       className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center cursor-pointer hover:bg-gray-300 transition-colors overflow-hidden"
@@ -310,7 +331,10 @@ const Navbar = () => {
                   </div>
                   <button 
                     className="text-gray-500 hover:text-gray-700"
-                    onClick={() => goToEditProfile()}
+                    onClick={() => {
+                      goToEditProfile();
+                      setShowProfileModal(false);
+                    }}
                   >
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
@@ -325,7 +349,10 @@ const Navbar = () => {
             <nav className="space-y-2">
               <button 
                 className="w-full text-left px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-100 transition-colors"
-                onClick={goToEditProfile}
+                onClick={() => {
+                  goToEditProfile();
+                  setShowProfileModal(false);
+                }}
               >
                 Edit Profile
               </button>
