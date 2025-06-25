@@ -22,27 +22,31 @@ export async function uploadProfileImage(file, userId) {
   const bucket = 'profile-images';
 
   try {
-    // 1. Hapus gambar lama jika ada
-    const { error: removeError } = await supabase.storage
-      .from(bucket)
-      .remove([path]);
+    // Verifikasi session user
+    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+    if (sessionError || !session) throw new Error('Not authenticated');
 
-    // 2. Upload gambar baru
+    // Upload dengan metadata owner
     const { error: uploadError } = await supabase.storage
       .from(bucket)
       .upload(path, file, {
         cacheControl: '3600',
         upsert: true,
-        contentType: file.type
+        contentType: file.type,
+        metadata: {
+          owner: userId  // Penting untuk RLS
+        }
       });
 
-    if (uploadError) throw uploadError;
+    if (uploadError) {
+      console.error('Upload error details:', uploadError);
+      throw uploadError;
+    }
 
-    // 3. Dapatkan URL publik
+    // Dapatkan URL publik
     const { data: { publicUrl } } = supabase.storage
       .from(bucket)
       .getPublicUrl(path, {
-        // Transformasi gambar (opsional)
         transform: {
           width: 200,
           height: 200,
@@ -52,20 +56,28 @@ export async function uploadProfileImage(file, userId) {
 
     return publicUrl;
   } catch (error) {
-    console.error('Error upload:', error);
+    console.error('Full upload error:', error);
     throw new Error(`Gagal mengupload gambar: ${error.message}`);
   }
 }
 
-// Fungsi untuk menghapus gambar
 export async function deleteProfileImage(userId) {
   const path = `profiles/${userId}/avatar`;
   const bucket = 'profile-images';
 
-  const { error } = await supabase.storage
-    .from(bucket)
-    .remove([path]);
+  try {
+    const { error } = await supabase.storage
+      .from(bucket)
+      .remove([path]);
 
-  if (error) throw error;
-  return true;
+    if (error) {
+      console.error('Delete error:', error);
+      throw error;
+    }
+    
+    return true;
+  } catch (error) {
+    console.error('Full delete error:', error);
+    throw new Error(`Gagal menghapus gambar: ${error.message}`);
+  }
 }
