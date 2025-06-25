@@ -1,8 +1,8 @@
 import { useEffect, useState, useRef } from 'react';
 import { auth } from '../config/firebaseConfig';
 import { onAuthStateChanged, updateProfile } from 'firebase/auth';
-import { uploadProfileImage } from '../config/supabaseProfile';
-import { FaCheck, FaTimes, FaEdit, FaCamera } from 'react-icons/fa';
+import { uploadProfileImage, deleteProfileImage } from '../config/supabaseProfile';
+import { FaCheck, FaTimes, FaEdit, FaCamera, FaTrash } from 'react-icons/fa';
 import { doc, setDoc, getFirestore } from 'firebase/firestore';
 
 const db = getFirestore();
@@ -13,124 +13,113 @@ export default function Profile() {
   const [displayName, setDisplayName] = useState('');
   const [profileImage, setProfileImage] = useState(null);
   const [previewImage, setPreviewImage] = useState('');
-  const [loading, setLoading] = useState(true);
-  const [uploadSuccess, setUploadSuccess] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [uploadStatus, setUploadStatus] = useState({ success: false, message: '' });
   const [nameError, setNameError] = useState('');
   const fileInputRef = useRef(null);
-  const uploadTimeoutRef = useRef(null);
 
+  // Load user data
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       if (currentUser) {
         setUser(currentUser);
-        const defaultName = `Floxen_User${Math.floor(1000 + Math.random() * 9000)}`;
-        setDisplayName(currentUser.displayName || defaultName);
+        setDisplayName(currentUser.displayName || '');
         setPreviewImage(currentUser.photoURL || '');
-
-        // Create user document if not exists
-        const userDoc = doc(db, 'users', currentUser.uid);
-        await setDoc(userDoc, {
-          uid: currentUser.uid,
-          displayName: currentUser.displayName || defaultName,
-          email: currentUser.email,
-          photoURL: currentUser.photoURL || '',
-          createdAt: new Date()
-        }, { merge: true });
       }
-      setLoading(false);
     });
     return () => unsubscribe();
   }, []);
 
+  // Handle image change
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      if (file.size > 5 * 1024 * 1024) {
-        setNameError('File size should be less than 5MB');
+      // Validasi
+      if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
+        setUploadStatus({ success: false, message: 'Format file tidak didukung' });
         return;
       }
-      setProfileImage(file);
-      setPreviewImage(URL.createObjectURL(file));
-      setNameError('');
-    }
-  };
-
-  const validateName = (name) => {
-    if (name.length < 3) {
-      setNameError('Name must be at least 3 characters');
-      return false;
-    }
-    if (name.length > 19) {
-      setNameError('Name must be less than 20 characters');
-      return false;
-    }
-    setNameError('');
-    return true;
-  };
-
-  const handleSave = async () => {
-    if (!validateName(displayName)) return;
-
-    try {
-      setLoading(true);
-      let photoURL = user.photoURL;
-
-      if (profileImage) {
-        photoURL = await uploadProfileImage(profileImage, user.uid);
-        setUploadSuccess(true);
-        uploadTimeoutRef.current = setTimeout(() => setUploadSuccess(false), 3000);
+      if (file.size > 5 * 1024 * 1024) {
+        setUploadStatus({ success: false, message: 'Ukuran file maksimal 5MB' });
+        return;
       }
 
+      setProfileImage(file);
+      setPreviewImage(URL.createObjectURL(file));
+      setUploadStatus({ success: true, message: 'Gambar siap diupload' });
+    }
+  };
+
+  // Handle delete image
+  const handleDeleteImage = async () => {
+    try {
+      setLoading(true);
+      await deleteProfileImage(user.uid);
+      
       await updateProfile(auth.currentUser, {
-        displayName,
-        photoURL
+        photoURL: ''
       });
 
-      // Update Firestore document
-      const userDoc = doc(db, 'users', user.uid);
-      await setDoc(userDoc, {
-        displayName,
-        photoURL: photoURL || user.photoURL
-      }, { merge: true });
-
-      setUser({ ...auth.currentUser });
-      setEditMode(false);
+      setPreviewImage('');
+      setUploadStatus({ success: true, message: 'Gambar berhasil dihapus' });
     } catch (error) {
-      console.error('Error updating profile:', error);
-      setNameError('Failed to update profile');
+      setUploadStatus({ success: false, message: 'Gagal menghapus gambar' });
     } finally {
       setLoading(false);
     }
   };
 
-  const handleCancel = () => {
-    setDisplayName(user.displayName || '');
-    setPreviewImage(user.photoURL || '');
-    setProfileImage(null);
-    setEditMode(false);
-    setNameError('');
+  // Handle save
+  const handleSave = async () => {
+    try {
+      setLoading(true);
+      let photoURL = user.photoURL;
+
+      // Upload gambar baru jika ada
+      if (profileImage) {
+        photoURL = await uploadProfileImage(profileImage, user.uid);
+        setUploadStatus({ success: true, message: 'Gambar berhasil diupload' });
+      }
+
+      // Update profile
+      await updateProfile(auth.currentUser, {
+        displayName: displayName.trim(),
+        photoURL
+      });
+
+      // Update Firestore
+      await setDoc(doc(db, 'users', user.uid), {
+        displayName,
+        photoURL
+      }, { merge: true });
+
+      setEditMode(false);
+    } catch (error) {
+      setUploadStatus({ success: false, message: error.message });
+    } finally {
+      setLoading(false);
+    }
   };
 
-  if (loading) return (
-    <div className="min-h-screen pt-[4.75rem] flex items-center justify-center">
-      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500"></div>
-    </div>
-  );
+  if (!user) return <div>Loading...</div>;
 
   return (
-    <div className="min-h-screen pt-[4.75rem] lg:pt-[5.25rem] bg-gradient-to-br from-gray-50 to-blue-50 p-4">
-      {/* Upload Success Notification */}
-      {uploadSuccess && (
-        <div className="fixed top-20 right-4 bg-green-100 border border-green-400 text-green-700 px-4 py-2 rounded z-50 animate-fade-in">
-          Foto Profile Berhasil Di Unggah
+    <div className="min-h-screen pt-16 bg-gray-50 p-4">
+      {/* Status Upload */}
+      {uploadStatus.message && (
+        <div className={`fixed top-4 right-4 p-3 rounded-md shadow-md z-50 ${
+          uploadStatus.success ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+        }`}>
+          {uploadStatus.message}
         </div>
       )}
 
-      <div className="max-w-4xl mx-auto bg-white rounded-xl shadow-lg overflow-hidden">
+      <div className="max-w-3xl mx-auto bg-white rounded-xl shadow-md overflow-hidden">
         <div className="p-8">
-          <div className="flex flex-col md:flex-row items-center md:items-start gap-8">
+          <div className="flex flex-col md:flex-row gap-8 items-center">
+            {/* Profile Image */}
             <div className="relative group">
-              <div className="w-32 h-32 rounded-full bg-gray-200 overflow-hidden shadow-md">
+              <div className="w-32 h-32 rounded-full bg-gray-200 overflow-hidden border-2 border-gray-300">
                 {previewImage ? (
                   <img 
                     src={previewImage} 
@@ -150,12 +139,20 @@ export default function Profile() {
                 <>
                   <button
                     onClick={() => fileInputRef.current.click()}
-                    className="absolute bottom-0 right-0 bg-indigo-600 text-white p-2 rounded-full shadow-lg hover:bg-indigo-700 transition-colors"
+                    className="absolute bottom-0 right-0 bg-blue-600 text-white p-2 rounded-full shadow-lg hover:bg-blue-700 transition-all"
                   >
                     <FaCamera />
                   </button>
-                  <input 
-                    type="file" 
+                  {previewImage && (
+                    <button
+                      onClick={handleDeleteImage}
+                      className="absolute top-0 right-0 bg-red-600 text-white p-2 rounded-full shadow-lg hover:bg-red-700 transition-all"
+                    >
+                      <FaTrash />
+                    </button>
+                  )}
+                  <input
+                    type="file"
                     ref={fileInputRef}
                     onChange={handleImageChange}
                     accept="image/*"
@@ -165,6 +162,7 @@ export default function Profile() {
               )}
             </div>
 
+            {/* Profile Info */}
             <div className="flex-1">
               <div className="flex justify-between items-start mb-6">
                 {editMode ? (
@@ -172,55 +170,41 @@ export default function Profile() {
                     <input
                       type="text"
                       value={displayName}
-                      onChange={(e) => {
-                        setDisplayName(e.target.value);
-                        validateName(e.target.value);
-                      }}
-                      className="text-2xl font-bold border-b border-gray-300 px-2 py-1 w-full focus:outline-none focus:border-indigo-500"
+                      onChange={(e) => setDisplayName(e.target.value)}
+                      className="text-2xl font-bold border-b border-gray-300 px-2 py-1 w-full focus:outline-none focus:border-blue-500"
+                      placeholder="Masukkan nama"
                     />
                     {nameError && <p className="text-red-500 text-sm mt-1">{nameError}</p>}
                   </div>
                 ) : (
-                  <h1 className="text-2xl font-bold text-gray-800">{displayName}</h1>
+                  <h1 className="text-2xl font-bold text-gray-800">
+                    {displayName || 'User'}
+                  </h1>
                 )}
-                
-                <div className="flex space-x-2">
+
+                <div className="flex gap-2">
                   {editMode ? (
                     <>
                       <button
-                        onClick={handleCancel}
-                        className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors flex items-center"
+                        onClick={() => setEditMode(false)}
+                        className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors"
                       >
-                        <FaTimes className="mr-1" /> Cancel
+                        <FaTimes className="inline mr-1" /> Batal
                       </button>
                       <button
                         onClick={handleSave}
-                        disabled={loading || nameError}
-                        className={`px-4 py-2 rounded-lg text-white flex items-center ${
-                          loading || nameError ? 'bg-indigo-400' : 'bg-indigo-600 hover:bg-indigo-700'
-                        } transition-colors`}
+                        disabled={loading}
+                        className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:bg-blue-400"
                       >
-                        {loading ? (
-                          <>
-                            <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                            </svg>
-                            Saving...
-                          </>
-                        ) : (
-                          <>
-                            <FaCheck className="mr-1" /> Save
-                          </>
-                        )}
+                        {loading ? 'Menyimpan...' : (<><FaCheck className="inline mr-1" /> Simpan</>)}
                       </button>
                     </>
                   ) : (
                     <button
                       onClick={() => setEditMode(true)}
-                      className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors flex items-center"
+                      className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
                     >
-                      <FaEdit className="mr-1" /> Edit Profile
+                      <FaEdit className="inline mr-1" /> Edit Profile
                     </button>
                   )}
                 </div>
@@ -233,7 +217,7 @@ export default function Profile() {
                 </div>
                 <div>
                   <p className="text-sm text-gray-500">User ID</p>
-                  <p className="text-gray-800 font-mono">{user.uid.substring(0, 8)}...</p>
+                  <p className="text-gray-800 font-mono text-sm">{user.uid}</p>
                 </div>
               </div>
             </div>
