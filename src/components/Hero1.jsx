@@ -13,36 +13,53 @@ const Hero = () => {
 
       {/* Dot pattern background with fade effects */}
       <div className="absolute inset-0 z-[-15] overflow-hidden">
-        {/* Left fade */}
+        {/* Left fade - creates a gradient fade effect on the left side */}
         <div className="absolute left-0 top-0 h-full w-32 bg-gradient-to-r from-white to-transparent z-10" />
         
-        {/* Right fade */}
+        {/* Right fade - creates a gradient fade effect on the right side */}
         <div className="absolute right-0 top-0 h-full w-32 bg-gradient-to-l from-white to-transparent z-10" />
         
-        {/* Dot pattern (2% larger than original) */}
+        {/* Dot pattern (2% larger than standard 20px grid) */}
         <svg
           className="w-full h-full"
           aria-hidden="true"
         >
           <defs>
+            {/* 
+              Pattern definition:
+              - width/height: 20.4px (2% larger than standard 20px)
+              - Creates a grid of dots spaced 20.4px apart
+            */}
             <pattern
               id="dot-pattern"
-              width="20.4"  // 2% larger than standard 20
-              height="20.4" // 2% larger than standard 20
-              patternUnits="userSpaceOnUse"
+              width="20.4"  // Horizontal spacing between dots
+              height="20.4" // Vertical spacing between dots
+              patternUnits="userSpaceOnUse" // Uses px units
+              patternTransform="scale(1)" // Optional: can adjust scale if needed
             >
+              {/* 
+                Each dot in the pattern:
+                - cx/cy: 10.2 (center of the 20.4px square)
+                - r: 1px radius (dot size)
+                - fill: semi-transparent light gray
+              */}
               <circle 
-                cx="10.2" 
-                cy="10.2" 
-                r="1" 
-                fill="rgba(160, 160, 160, 0.2)" // Muted gray
+                cx="10.2"  // Center X position
+                cy="10.2"  // Center Y position
+                r="1"      // Dot radius
+                fill="rgba(160, 160, 160, 0.2)" // Light gray with 20% opacity
               />
             </pattern>
           </defs>
+          {/* 
+            Rectangle that fills the entire area with the dot pattern 
+            - The pattern repeats infinitely in both directions
+          */}
           <rect
             width="100%"
             height="100%"
             fill="url(#dot-pattern)"
+            opacity="1"
           />
         </svg>
       </div>
@@ -65,6 +82,8 @@ const Hero = () => {
                   ],
                   autoStart: true,
                   loop: true,
+                  delay: 50,
+                  deleteSpeed: 30,
                 }}
               />
             </span>
@@ -82,7 +101,9 @@ const Hero = () => {
           <a
             href="#pricing"
             className="inline-block px-7 py-3 rounded-full border border-gray-300 text-gray-800 font-semibold
-                       bg-white hover:bg-gray-50 transition-all duration-300 shadow-md"
+                       bg-white hover:bg-gray-50 transition-all duration-300 shadow-md
+                       focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-opacity-50"
+            aria-label="Get started with Qarvo"
           >
             Get started
           </a>
