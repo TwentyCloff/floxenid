@@ -7,25 +7,27 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 export async function uploadProfileImage(file, userId) {
   if (!file || !userId) throw new Error('File and User ID are required');
 
-  // Validate file type
+  // Validasi tipe file
   const validTypes = ['image/jpeg', 'image/png', 'image/webp'];
   if (!validTypes.includes(file.type)) {
-    throw new Error('Only JPEG, PNG, and WebP images are allowed');
+    throw new Error('Hanya format JPEG, PNG, atau WebP yang diizinkan');
   }
 
-  // Validate file size (5MB max)
+  // Validasi ukuran file (5MB max)
   if (file.size > 5 * 1024 * 1024) {
-    throw new Error('File size exceeds 5MB limit');
+    throw new Error('Ukuran file maksimal 5MB');
   }
 
   const path = `profiles/${userId}/avatar`;
   const bucket = 'profile-images';
 
   try {
-    // Remove existing file if any
-    await supabase.storage.from(bucket).remove([path]);
+    // 1. Hapus gambar lama jika ada
+    const { error: removeError } = await supabase.storage
+      .from(bucket)
+      .remove([path]);
 
-    // Upload new file
+    // 2. Upload gambar baru
     const { error: uploadError } = await supabase.storage
       .from(bucket)
       .upload(path, file, {
@@ -36,14 +38,34 @@ export async function uploadProfileImage(file, userId) {
 
     if (uploadError) throw uploadError;
 
-    // Get public URL
+    // 3. Dapatkan URL publik
     const { data: { publicUrl } } = supabase.storage
       .from(bucket)
-      .getPublicUrl(path);
+      .getPublicUrl(path, {
+        // Transformasi gambar (opsional)
+        transform: {
+          width: 200,
+          height: 200,
+          resize: 'cover'
+        }
+      });
 
     return publicUrl;
   } catch (error) {
-    console.error('Supabase upload error:', error);
-    throw new Error('Failed to upload image. Please try again.');
+    console.error('Error upload:', error);
+    throw new Error(`Gagal mengupload gambar: ${error.message}`);
   }
+}
+
+// Fungsi untuk menghapus gambar
+export async function deleteProfileImage(userId) {
+  const path = `profiles/${userId}/avatar`;
+  const bucket = 'profile-images';
+
+  const { error } = await supabase.storage
+    .from(bucket)
+    .remove([path]);
+
+  if (error) throw error;
+  return true;
 }
