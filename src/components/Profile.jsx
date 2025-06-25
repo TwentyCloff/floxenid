@@ -4,6 +4,7 @@ import { onAuthStateChanged, updateProfile } from 'firebase/auth';
 import { uploadProfileImage, deleteProfileImage } from '../config/supabaseProfile';
 import { FaCheck, FaTimes, FaEdit, FaCamera, FaTrash } from 'react-icons/fa';
 import { doc, setDoc, getFirestore } from 'firebase/firestore';
+import { syncFirebaseToSupabase } from '../config/supabaseAuth';
 
 const db = getFirestore();
 
@@ -25,16 +26,17 @@ export default function Profile() {
         setUser(currentUser);
         setDisplayName(currentUser.displayName || '');
         setPreviewImage(currentUser.photoURL || '');
+        
+        // Sinkronkan Firebase ke Supabase
+        await syncFirebaseToSupabase(currentUser);
       }
     });
     return () => unsubscribe();
   }, []);
 
-  // Handle image change
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      // Validasi
       if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
         setUploadStatus({ success: false, message: 'Format file tidak didukung' });
         return;
@@ -50,7 +52,6 @@ export default function Profile() {
     }
   };
 
-  // Handle delete image
   const handleDeleteImage = async () => {
     try {
       setLoading(true);
@@ -69,10 +70,13 @@ export default function Profile() {
     }
   };
 
-  // Handle save
   const handleSave = async () => {
     try {
       setLoading(true);
+      
+      // Verifikasi user terautentikasi
+      if (!auth.currentUser) throw new Error('Anda belum login!');
+      
       let photoURL = user.photoURL;
 
       // Upload gambar baru jika ada
@@ -86,7 +90,7 @@ export default function Profile() {
         }
       }
 
-      // Update profile
+      // Update profile Firebase
       await updateProfile(auth.currentUser, {
         displayName: displayName.trim(),
         photoURL
@@ -106,11 +110,14 @@ export default function Profile() {
     }
   };
 
-  if (!user) return <div>Loading...</div>;
+  if (!user) return (
+    <div className="min-h-screen pt-[4.75rem] flex items-center justify-center">
+      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+    </div>
+  );
 
   return (
-    <div className="min-h-screen pt-16 bg-gray-50 p-4">
-      {/* Status Upload */}
+    <div className="min-h-screen pt-[4.75rem] lg:pt-[5.25rem] bg-gradient-to-br from-gray-50 to-blue-50 p-4">
       {uploadStatus.message && (
         <div className={`fixed top-4 right-4 p-3 rounded-md shadow-md z-50 ${
           uploadStatus.success ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
@@ -119,10 +126,9 @@ export default function Profile() {
         </div>
       )}
 
-      <div className="max-w-3xl mx-auto bg-white rounded-xl shadow-md overflow-hidden">
+      <div className="max-w-3xl mx-auto bg-white rounded-xl shadow-lg overflow-hidden">
         <div className="p-8">
           <div className="flex flex-col md:flex-row gap-8 items-center">
-            {/* Profile Image */}
             <div className="relative group">
               <div className="w-32 h-32 rounded-full bg-gray-200 overflow-hidden border-2 border-gray-300">
                 {previewImage ? (
@@ -167,7 +173,6 @@ export default function Profile() {
               )}
             </div>
 
-            {/* Profile Info */}
             <div className="flex-1">
               <div className="flex justify-between items-start mb-6">
                 {editMode ? (
