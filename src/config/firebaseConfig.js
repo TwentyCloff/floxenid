@@ -4,13 +4,13 @@ import { getStorage } from "firebase/storage";
 import { getAuth } from "firebase/auth";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyDP6XNlI1jUgHN3pVWIXNZjGT3YWXKSdes",
-  authDomain: "gweenlearn.firebaseapp.com",
-  projectId: "gweenlearn",
-  storageBucket: "gweenlearn.appspot.com",
-  messagingSenderId: "915816429541",
-  appId: "1:915816429541:web:65c885efda4472930c210c",
-  measurementId: "G-RSGBWRE6BD"
+  apiKey: "AIzaSyCSK9RlFNDfXMAK0CnY1Pbw5WRJHMBkwY4",
+  authDomain: "floxenid-api.firebaseapp.com",
+  projectId: "floxenid-api",
+  storageBucket: "floxenid-api.firebasestorage.app",
+  messagingSenderId: "960957637051",
+  appId: "1:960957637051:web:c385383342b603f523249e",
+  measurementId: "G-Q525B5DVG5"
 };
 
 const app = initializeApp(firebaseConfig);
