@@ -3,13 +3,12 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { disablePageScroll, enablePageScroll } from "scroll-lock";
 import { onAuthStateChanged, signOut } from "firebase/auth";
 import { auth } from "../config/firebaseConfig";
-import { getPublicUrl } from "../config/supabaseProfile";
 
 const Navbar = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [user, setUser] = useState(null);
-  const [profileImageUrl, setProfileImageUrl] = useState(null);
+  const [profileImage, setProfileImage] = useState('avatar1.png');
   const [openNavigation, setOpenNavigation] = useState(false);
   const [activeMenu, setActiveMenu] = useState(null);
   const [scrolled, setScrolled] = useState(false);
@@ -28,27 +27,13 @@ const Navbar = () => {
   const resourcesMenuRef = useRef(null);
   const profileModalRef = useRef(null);
 
-  const loadProfileImage = async (currentUser) => {
-    if (!currentUser) {
-      setProfileImageUrl(null);
-      return;
-    }
-
-    try {
-      const path = `profiles/${currentUser.uid}/avatar`;
-      const { data: { publicUrl } } = getPublicUrl(path);
-      // Add timestamp to force refresh
-      setProfileImageUrl(`${publicUrl}?${Date.now()}`);
-    } catch (error) {
-      console.error("Error loading profile image:", error);
-      setProfileImageUrl(null);
-    }
-  };
-
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
-      await loadProfileImage(currentUser);
+      // Set default avatar when user logs in
+      if (currentUser) {
+        setProfileImage('avatar1.png');
+      }
     });
 
     const handleScroll = () => {
@@ -61,13 +46,22 @@ const Navbar = () => {
       }
     };
 
+    // Listen for avatar changes from other components
+    const handleAvatarChange = (e) => {
+      if (e.detail && e.detail.avatar) {
+        setProfileImage(e.detail.avatar);
+      }
+    };
+
     window.addEventListener('scroll', handleScroll);
     document.addEventListener('mousedown', handleClickOutside);
+    window.addEventListener('avatarChanged', handleAvatarChange);
     
     return () => {
       unsubscribe();
       window.removeEventListener('scroll', handleScroll);
       document.removeEventListener('mousedown', handleClickOutside);
+      window.removeEventListener('avatarChanged', handleAvatarChange);
       clearTimeout(timeoutRef.current);
     };
   }, []);
@@ -146,7 +140,6 @@ const Navbar = () => {
   const handleLogout = async () => {
     await signOut(auth);
     setUser(null);
-    setProfileImageUrl(null);
     setShowLogoutConfirm(false);
     setShowProfileModal(false);
   };
@@ -158,6 +151,8 @@ const Navbar = () => {
     navigate("/profile");
     setShowProfileModal(false);
   };
+  const goToPurchaseHistory = () => navigate("/purchase-history");
+  const goToSupport = () => navigate("/support");
 
   const handleMenuEnter = (menuType) => {
     clearTimeout(timeoutRef.current);
@@ -256,12 +251,14 @@ const Navbar = () => {
   // Profile Icon Component with image handling
   const ProfileIcon = () => (
     <div 
-      className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center cursor-pointer hover:bg-gray-300 transition-colors overflow-hidden"
+      className={`w-8 h-8 rounded-full flex items-center justify-center cursor-pointer transition-colors overflow-hidden ${
+        showProfileModal ? 'bg-white' : 'bg-gray-200 hover:bg-gray-300'
+      }`}
       onClick={() => setShowProfileModal(!showProfileModal)}
     >
-      {profileImageUrl ? (
+      {user ? (
         <img 
-          src={profileImageUrl} 
+          src={`/profiles/${profileImage}`} 
           alt="Profile" 
           className="w-full h-full object-cover"
           onError={(e) => {
@@ -289,9 +286,9 @@ const Navbar = () => {
             <div className="flex items-start space-x-4 mb-4">
               <div className="relative">
                 <div className="w-16 h-16 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
-                  {profileImageUrl ? (
+                  {user ? (
                     <img 
-                      src={profileImageUrl} 
+                      src={`/profiles/${profileImage}`} 
                       alt="Profile" 
                       className="w-full h-full object-cover"
                       onError={(e) => {
@@ -335,11 +332,13 @@ const Navbar = () => {
               </button>
               <button 
                 className="w-full text-left px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-100 transition-colors"
+                onClick={goToPurchaseHistory}
               >
                 Purchase History
               </button>
               <button 
                 className="w-full text-left px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-100 transition-colors"
+                onClick={goToSupport}
               >
                 Support
               </button>
