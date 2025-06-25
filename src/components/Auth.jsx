@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { auth } from '../config/firebaseConfig';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
 import { FaEye, FaEyeSlash, FaCheck } from 'react-icons/fa';
-import { setupAuthListener, syncFirebaseToSupabase } from '../config/supabaseAuth';
+import PasswordStrengthBar from 'react-password-strength-bar';
 
 export default function Auth() {
   const [isSignUp, setIsSignUp] = useState(false);
@@ -16,22 +16,37 @@ export default function Auth() {
   const [showSuccess, setShowSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [passwordScore, setPasswordScore] = useState(0);
+  const [securityChecks, setSecurityChecks] = useState({
+    length: false,
+    uppercase: false,
+    number: false,
+    specialChar: false
+  });
   const navigate = useNavigate();
   const successTimeoutRef = useRef(null);
+  const emailInputRef = useRef(null);
 
-  // Setup auth listener saat komponen mount
   useEffect(() => {
-    const unsubscribe = setupAuthListener();
     return () => {
       if (successTimeoutRef.current) {
         clearTimeout(successTimeoutRef.current);
       }
-      unsubscribe();
     };
   }, []);
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+    
+    if (name === 'password') {
+      setSecurityChecks({
+        length: value.length >= 12,
+        uppercase: /[A-Z]/.test(value),
+        number: /\d/.test(value),
+        specialChar: /[!@#$%^&*(),.?":{}|<>]/.test(value)
+      });
+    }
     setError('');
   };
 
@@ -39,15 +54,37 @@ export default function Auth() {
     setShowPassword(!showPassword);
   };
 
+  const validateEmail = (email) => {
+    const re = /^[a-zA-Z0-9._%+-]+@(gmail\.com|yahoo\.com|outlook\.com|protonmail\.com|icloud\.com|edu\.[a-zA-Z]{2,}|gov\.[a-zA-Z]{2,}|mil\.[a-zA-Z]{2,})$/;
+    return re.test(String(email).toLowerCase());
+  };
+
   const validatePassword = () => {
     if (isSignUp && formData.password !== formData.confirmPassword) {
-      setError("Password tidak sama!");
+      setError("Passwords don't match!");
       return false;
     }
-    if (formData.password.length < 6) {
-      setError("Password minimal 6 karakter!");
+    
+    if (formData.password.length < 12) {
+      setError("Password must be at least 12 characters!");
       return false;
     }
+    
+    if (!/[A-Z]/.test(formData.password)) {
+      setError("Password must contain uppercase letters!");
+      return false;
+    }
+    
+    if (!/\d/.test(formData.password)) {
+      setError("Password must contain numbers!");
+      return false;
+    }
+    
+    if (!/[!@#$%^&*(),.?":{}|<>]/.test(formData.password)) {
+      setError("Password must contain special characters!");
+      return false;
+    }
+    
     return true;
   };
 
@@ -55,54 +92,85 @@ export default function Auth() {
     e.preventDefault();
     setError('');
     
+    if (!validateEmail(formData.email)) {
+      setError("Invalid email domain. Only approved domains allowed.");
+      emailInputRef.current.focus();
+      return;
+    }
+    
     if (isSignUp && !validatePassword()) return;
 
     setLoading(true);
 
     try {
       if (isSignUp) {
-        const userCredential = await createUserWithEmailAndPassword(
+        await createUserWithEmailAndPassword(
           auth, 
           formData.email, 
           formData.password
         );
-        
-        // Sinkronkan ke Supabase
-        await syncFirebaseToSupabase(userCredential.user);
         
         setShowSuccess(true);
         successTimeoutRef.current = setTimeout(() => {
-          setIsSignUp(false);
           setShowSuccess(false);
-        }, 3000);
+        }, 2000);
+        
+        setIsSignUp(false);
+        setFormData({...formData, confirmPassword: ''});
       } else {
-        const userCredential = await signInWithEmailAndPassword(
+        await signInWithEmailAndPassword(
           auth, 
           formData.email, 
           formData.password
         );
-        
-        // Sinkronkan ke Supabase
-        await syncFirebaseToSupabase(userCredential.user);
         
         navigate('/');
       }
     } catch (err) {
-      setError(err.code === 'auth/email-already-in-use' 
-        ? 'Email sudah terdaftar!' 
-        : err.message);
+      let errorMessage = 'An error occurred!';
+      
+      switch(err.code) {
+        case 'auth/email-already-in-use':
+          errorMessage = 'Email already registered!';
+          break;
+        case 'auth/invalid-email':
+          errorMessage = 'Invalid email format!';
+          break;
+        case 'auth/weak-password':
+          errorMessage = 'Password too weak! Minimum 12 characters with uppercase, numbers, and special chars.';
+          break;
+        case 'auth/user-not-found':
+          errorMessage = 'Account not found!';
+          break;
+        case 'auth/wrong-password':
+          errorMessage = 'Wrong password!';
+          break;
+        case 'auth/too-many-requests':
+          errorMessage = 'Too many failed attempts. Try again later.';
+          break;
+        default:
+          errorMessage = err.message;
+      }
+      
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
+  };
+
+  const changeAuthMode = () => {
+    setIsSignUp(!isSignUp);
+    setError('');
+    setFormData({...formData, confirmPassword: ''});
   };
 
   return (
     <div className="min-h-screen pt-[4.75rem] lg:pt-[5.25rem] bg-gradient-to-br from-gray-50 to-blue-50 flex items-center justify-center p-4">
       {showSuccess && (
         <div className="fixed top-20 left-1/2 transform -translate-x-1/2 z-50">
-          <div className="bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg flex items-center space-x-2 animate-fade-in">
+          <div className="bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg flex items-center space-x-2 animate-fade-in">
             <FaCheck className="text-xl" />
-            <span>Akun berhasil dibuat!</span>
+            <span>Account created successfully!</span>
           </div>
         </div>
       )}
@@ -110,11 +178,11 @@ export default function Auth() {
       <div className="w-full max-w-md bg-white rounded-xl shadow-lg overflow-hidden transition-all duration-300">
         <div className="p-8">
           <h1 className="text-2xl font-bold text-center text-gray-800 mb-6">
-            {isSignUp ? "Buat Akun Baru" : "Masuk"}
+            {isSignUp ? "Create Account" : "Sign In"}
           </h1>
           
           {error && (
-            <div className="mb-4 p-3 bg-red-50 text-red-600 rounded-md text-sm">
+            <div className="mb-4 p-3 bg-red-100 text-red-600 rounded-md text-sm">
               {error}
             </div>
           )}
@@ -128,9 +196,11 @@ export default function Auth() {
                 type="email"
                 id="email"
                 name="email"
+                ref={emailInputRef}
                 value={formData.email}
                 onChange={handleChange}
                 className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                placeholder="user@example.com"
                 required
               />
             </div>
@@ -147,23 +217,51 @@ export default function Auth() {
                   value={formData.password}
                   onChange={handleChange}
                   className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all pr-10"
+                  placeholder="Minimum 12 characters"
                   required
-                  minLength={6}
+                  minLength={12}
                 />
                 <button
                   type="button"
                   onClick={togglePasswordVisibility}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-blue-500"
                 >
                   {showPassword ? <FaEyeSlash /> : <FaEye />}
                 </button>
               </div>
+              
+              {isSignUp && (
+                <div className="mt-3">
+                  <PasswordStrengthBar 
+                    password={formData.password} 
+                    minLength={12}
+                    scoreWords={['Very Weak', 'Weak', 'Medium', 'Strong', 'Very Strong']}
+                    shortScoreWord="Too Short"
+                    onChangeScore={(score) => setPasswordScore(score)}
+                  />
+                  
+                  <div className="mt-2 grid grid-cols-2 gap-2 text-xs">
+                    <div className={`flex items-center ${securityChecks.length ? 'text-green-500' : 'text-gray-500'}`}>
+                      <span className="mr-1">✓</span> 12+ characters
+                    </div>
+                    <div className={`flex items-center ${securityChecks.uppercase ? 'text-green-500' : 'text-gray-500'}`}>
+                      <span className="mr-1">✓</span> Uppercase
+                    </div>
+                    <div className={`flex items-center ${securityChecks.number ? 'text-green-500' : 'text-gray-500'}`}>
+                      <span className="mr-1">✓</span> Number
+                    </div>
+                    <div className={`flex items-center ${securityChecks.specialChar ? 'text-green-500' : 'text-gray-500'}`}>
+                      <span className="mr-1">✓</span> Special char
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
 
             {isSignUp && (
               <div className="mb-6">
                 <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-1">
-                  Konfirmasi Password
+                  Confirm Password
                 </label>
                 <div className="relative">
                   <input
@@ -174,12 +272,12 @@ export default function Auth() {
                     onChange={handleChange}
                     className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all pr-10"
                     required
-                    minLength={6}
+                    minLength={12}
                   />
                   <button
                     type="button"
                     onClick={togglePasswordVisibility}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-blue-500"
                   >
                     {showPassword ? <FaEyeSlash /> : <FaEye />}
                   </button>
@@ -189,8 +287,8 @@ export default function Auth() {
 
             <button
               type="submit"
-              disabled={loading}
-              className="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors flex items-center justify-center disabled:bg-blue-400"
+              disabled={loading || (isSignUp && passwordScore < 3)}
+              className={`w-full py-3 px-4 ${(isSignUp && passwordScore < 3) ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'} text-white font-medium rounded-lg transition-all flex items-center justify-center`}
             >
               {loading ? (
                 <>
@@ -198,23 +296,20 @@ export default function Auth() {
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                   </svg>
-                  {isSignUp ? "Mendaftar..." : "Masuk..."}
+                  {isSignUp ? "Creating..." : "Signing in..."}
                 </>
-              ) : isSignUp ? "Daftar" : "Masuk"}
+              ) : isSignUp ? "Create Account" : "Sign In"}
             </button>
           </form>
 
           <div className="mt-6 text-center text-sm text-gray-600">
-            {isSignUp ? "Sudah punya akun? " : "Belum punya akun? "}
+            {isSignUp ? "Already have an account? " : "Don't have an account? "}
             <button
               type="button"
-              onClick={() => {
-                setIsSignUp(!isSignUp);
-                setError('');
-              }}
+              onClick={changeAuthMode}
               className="text-blue-600 hover:text-blue-800 font-medium"
             >
-              {isSignUp ? "Masuk" : "Daftar"}
+              {isSignUp ? "Sign In" : "Sign Up"}
             </button>
           </div>
         </div>
