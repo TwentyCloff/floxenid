@@ -5,6 +5,9 @@ import Hero1 from "./components/Hero1";
 import Clb from "./components/collab";
 import Footer from "./components/Footer";
 import Nav1 from "./components/Nav1";
+import Log from "./components/Auth";
+import Profile from "./components/Profile";
+
 
 const Home = () => (
   <div className="pt-[4.75rem] lg:pt-[5.25rem] overflow-hidden">
@@ -71,6 +74,8 @@ const App = () => {
     <Routes>
       <Route path="/" element={<Home />} />
       <Route path="*" element={<NotFound />} />
+      <Route path="/Profile" element={<Profile />} />
+      <Route path="/signup" element={<Auth />} />
     </Routes>
   );
 };
