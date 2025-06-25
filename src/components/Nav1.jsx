@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { disablePageScroll, enablePageScroll } from "scroll-lock";
 import { onAuthStateChanged, signOut } from "firebase/auth";
 import { auth } from "../config/firebaseConfig";
+import { uploadProfileImage } from "../config/supabaseProfile";
 
 const Navbar = () => {
   const navigate = useNavigate();
@@ -11,6 +12,8 @@ const Navbar = () => {
   const [openNavigation, setOpenNavigation] = useState(false);
   const [activeMenu, setActiveMenu] = useState(null);
   const [scrolled, setScrolled] = useState(false);
+  const [showProfileModal, setShowProfileModal] = useState(false);
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const timeoutRef = useRef(null);
   const isHoveringRef = useRef(false);
 
@@ -22,6 +25,7 @@ const Navbar = () => {
   const docsMenuRef = useRef(null);
   const resourcesButtonRef = useRef(null);
   const resourcesMenuRef = useRef(null);
+  const profileModalRef = useRef(null);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
@@ -32,10 +36,19 @@ const Navbar = () => {
       setScrolled(window.scrollY > 10);
     };
 
+    const handleClickOutside = (event) => {
+      if (profileModalRef.current && !profileModalRef.current.contains(event.target)) {
+        setShowProfileModal(false);
+      }
+    };
+
     window.addEventListener('scroll', handleScroll);
+    document.addEventListener('mousedown', handleClickOutside);
+    
     return () => {
       unsubscribe();
       window.removeEventListener('scroll', handleScroll);
+      document.removeEventListener('mousedown', handleClickOutside);
       clearTimeout(timeoutRef.current);
     };
   }, []);
@@ -57,16 +70,16 @@ const Navbar = () => {
 
       if (!button || !menu) return;
 
-      // Get precise boundaries with 10px buffer
+      // Get precise boundaries with 1% buffer
       const buttonRect = button.getBoundingClientRect();
       const menuRect = menu.getBoundingClientRect();
 
       // Create a connecting bridge between button and menu
       const bridgeArea = {
-        left: Math.min(buttonRect.left, menuRect.left) - 10,
-        right: Math.max(buttonRect.right, menuRect.right) + 10,
-        top: Math.min(buttonRect.top, menuRect.top) - 5,
-        bottom: Math.max(buttonRect.bottom, menuRect.bottom) + 5
+        left: Math.min(buttonRect.left, menuRect.left) - (window.innerWidth * 0.01),
+        right: Math.max(buttonRect.right, menuRect.right) + (window.innerWidth * 0.01),
+        top: Math.min(buttonRect.top, menuRect.top) - (window.innerHeight * 0.01),
+        bottom: Math.max(buttonRect.bottom, menuRect.bottom) + (window.innerHeight * 0.01)
       };
 
       // Check if cursor is within the interactive zone
@@ -80,7 +93,7 @@ const Navbar = () => {
         if (!timeoutRef.current) {
           timeoutRef.current = setTimeout(() => {
             setActiveMenu(null);
-          }, 100); // Reduced delay to 100ms
+          }, 100);
         }
       } else {
         clearTimeout(timeoutRef.current);
@@ -114,11 +127,14 @@ const Navbar = () => {
   const handleLogout = async () => {
     await signOut(auth);
     setUser(null);
+    setShowLogoutConfirm(false);
+    setShowProfileModal(false);
   };
 
   const goToDashboard = () => navigate("/dashboard");
   const goToPricing = () => navigate("/pricing");
   const goToSignUp = () => navigate("/signup");
+  const goToEditProfile = () => navigate("/profile");
 
   const handleMenuEnter = (menuType) => {
     clearTimeout(timeoutRef.current);
@@ -185,18 +201,23 @@ const Navbar = () => {
     const variants = {
       primary: `
         bg-white hover:bg-gray-100
-        text-black
+        text-gray-800
         border-gray-200
       `,
       dashboard: `
-        bg-[#160e29] hover:bg-[#1f1638]
-        text-indigo-100 hover:text-indigo-50
-        border-indigo-900/50 hover:border-indigo-500/30
+        bg-gray-100 hover:bg-gray-200
+        text-gray-800
+        border-gray-300
       `,
       logout: `
-        bg-[#180a1a] hover:bg-[#231025]
-        text-pink-100 hover:text-pink-50
-        border-pink-900/50 hover:border-pink-500/30
+        bg-red-500 hover:bg-red-600
+        text-white
+        border-red-600
+      `,
+      profile: `
+        bg-transparent hover:bg-gray-100
+        text-gray-800
+        border-transparent
       `
     };
 
@@ -209,8 +230,115 @@ const Navbar = () => {
     );
   };
 
+  // Profile Icon Component
+  const ProfileIcon = () => (
+    <div 
+      className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center cursor-pointer hover:bg-gray-300 transition-colors"
+      onClick={() => setShowProfileModal(!showProfileModal)}
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+      </svg>
+    </div>
+  );
+
   return (
     <>
+      {/* Profile Modal */}
+      {showProfileModal && (
+        <div className="fixed inset-0 bg-black/30 z-50 flex items-center justify-center">
+          <div 
+            ref={profileModalRef}
+            className="bg-white/60 backdrop-blur-lg rounded-xl p-6 w-full max-w-md border border-white/30"
+          >
+            <div className="flex items-start space-x-4 mb-4">
+              <div className="relative">
+                <div className="w-16 h-16 rounded-full bg-gray-200 flex items-center justify-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                  </svg>
+                </div>
+                <button className="absolute -bottom-1 -right-1 bg-white rounded-full p-1 shadow-sm border border-gray-200">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                  </svg>
+                </button>
+              </div>
+              <div className="flex-1">
+                <div className="flex justify-between items-start">
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-800">{user?.displayName || 'User Name'}</h3>
+                    <p className="text-sm text-gray-500">ID: {user?.uid?.substring(0, 7) || '1234567'}</p>
+                  </div>
+                  <button 
+                    className="text-gray-500 hover:text-gray-700"
+                    onClick={() => goToEditProfile()}
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+            
+            <div className="border-t border-gray-300 my-4"></div>
+            
+            <nav className="space-y-2">
+              <button 
+                className="w-full text-left px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-100 transition-colors"
+                onClick={goToEditProfile}
+              >
+                Edit Profile
+              </button>
+              <button 
+                className="w-full text-left px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-100 transition-colors"
+              >
+                Purchase History
+              </button>
+              <button 
+                className="w-full text-left px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-100 transition-colors"
+              >
+                Support
+              </button>
+              <button 
+                className="w-full text-left px-3 py-2 rounded-md text-sm font-medium text-red-600 hover:bg-red-50 transition-colors"
+                onClick={() => {
+                  setShowProfileModal(false);
+                  setShowLogoutConfirm(true);
+                }}
+              >
+                Log Out
+              </button>
+            </nav>
+          </div>
+        </div>
+      )}
+
+      {/* Logout Confirmation Modal */}
+      {showLogoutConfirm && (
+        <div className="fixed inset-0 bg-black/30 z-50 flex items-center justify-center">
+          <div className="bg-white/60 backdrop-blur-lg rounded-xl p-6 w-full max-w-sm border border-white/30">
+            <h3 className="text-lg font-semibold text-gray-800 mb-4">Confirm Logout</h3>
+            <p className="text-gray-600 mb-6">Are you sure you want to log out?</p>
+            <div className="flex justify-end space-x-3">
+              <button 
+                className="px-4 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-100 transition-colors"
+                onClick={() => setShowLogoutConfirm(false)}
+              >
+                Cancel
+              </button>
+              <button 
+                className="px-4 py-2 rounded-md text-sm font-medium text-white bg-red-500 hover:bg-red-600 transition-colors"
+                onClick={handleLogout}
+              >
+                Log Out
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {openNavigation && (
         <div 
           className="fixed inset-0 bg-black/80 z-40 lg:hidden transition-opacity duration-300"
@@ -220,14 +348,14 @@ const Navbar = () => {
 
       <header 
         ref={navRef}
-        className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${scrolled ? 'bg-[#0E0E10]/90 backdrop-blur-sm' : 'bg-transparent'}`}
+        className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${scrolled ? 'bg-white/90 backdrop-blur-sm shadow-sm' : 'bg-white'}`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           {/* Left section */}
           <div className="flex items-center space-x-8">
             <a 
               href="/" 
-              className="text-xl font-bold tracking-tight text-white"
+              className="text-xl font-bold tracking-tight text-gray-800"
             >
               once ui
             </a>
@@ -243,7 +371,7 @@ const Navbar = () => {
               >
                 <button 
                   className={`px-4 py-2 rounded-md text-sm font-medium transition-colors duration-200 flex items-center ${
-                    activeMenu === 'products' ? 'text-white' : 'text-gray-300 hover:text-white'
+                    activeMenu === 'products' ? 'text-gray-900' : 'text-gray-600 hover:text-gray-900'
                   }`}
                 >
                   Products
@@ -252,7 +380,7 @@ const Navbar = () => {
 
                 <div 
                   ref={productsMenuRef}
-                  className={`absolute left-0 mt-2 w-[600px] rounded-lg bg-[#161618]/80 backdrop-blur-lg border border-gray-600/30 overflow-hidden transition-all duration-200 origin-top ${
+                  className={`absolute left-0 mt-2 w-[600px] rounded-lg bg-white/60 backdrop-blur-lg border border-white/30 shadow-xl overflow-hidden transition-all duration-200 origin-top ${
                     activeMenu === 'products' ? 'opacity-100 scale-y-100' : 'opacity-0 scale-y-95 pointer-events-none'
                   }`}
                   onMouseEnter={() => isHoveringRef.current = true}
@@ -261,22 +389,22 @@ const Navbar = () => {
                   <div className="p-6">
                     <div className="grid grid-cols-2 gap-8">
                       <div>
-                        <h3 className="text-sm font-semibold text-gray-300 uppercase tracking-wider mb-4">
+                        <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-4">
                           Open-source
                         </h3>
                         <ul className="space-y-3">
                           {productsMenu.openSource.map((item, index) => (
-                            <MenuItem key={`opensource-${index}`} {...item} />
+                            <MenuItem key={`opensource-${index}`} {...item} darkText />
                           ))}
                         </ul>
                       </div>
                       <div>
-                        <h3 className="text-sm font-semibold text-gray-300 uppercase tracking-wider mb-4">
+                        <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-4">
                           Pro
                         </h3>
                         <ul className="space-y-3">
                           {productsMenu.pro.map((item, index) => (
-                            <MenuItem key={`pro-${index}`} {...item} />
+                            <MenuItem key={`pro-${index}`} {...item} darkText />
                           ))}
                         </ul>
                       </div>
@@ -294,7 +422,7 @@ const Navbar = () => {
               >
                 <button 
                   className={`px-4 py-2 rounded-md text-sm font-medium transition-colors duration-200 flex items-center ${
-                    activeMenu === 'docs' ? 'text-white' : 'text-gray-300 hover:text-white'
+                    activeMenu === 'docs' ? 'text-gray-900' : 'text-gray-600 hover:text-gray-900'
                   }`}
                 >
                   Docs
@@ -303,7 +431,7 @@ const Navbar = () => {
 
                 <div 
                   ref={docsMenuRef}
-                  className={`absolute left-0 mt-2 w-[500px] rounded-lg bg-[#161618]/80 backdrop-blur-lg border border-gray-600/30 overflow-hidden transition-all duration-200 origin-top ${
+                  className={`absolute left-0 mt-2 w-[500px] rounded-lg bg-white/60 backdrop-blur-lg border border-white/30 shadow-xl overflow-hidden transition-all duration-200 origin-top ${
                     activeMenu === 'docs' ? 'opacity-100 scale-y-100' : 'opacity-0 scale-y-95 pointer-events-none'
                   }`}
                   onMouseEnter={() => isHoveringRef.current = true}
@@ -312,22 +440,22 @@ const Navbar = () => {
                   <div className="p-6">
                     <div className="grid grid-cols-2 gap-8">
                       <div>
-                        <h3 className="text-sm font-semibold text-gray-300 uppercase tracking-wider mb-4">
+                        <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-4">
                           Guides
                         </h3>
                         <ul className="space-y-3">
                           {docsMenu.guides.map((item, index) => (
-                            <MenuItem key={`guide-${index}`} {...item} />
+                            <MenuItem key={`guide-${index}`} {...item} darkText />
                           ))}
                         </ul>
                       </div>
                       <div>
-                        <h3 className="text-sm font-semibold text-gray-300 uppercase tracking-wider mb-4">
+                        <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-4">
                           Reference
                         </h3>
                         <ul className="space-y-3">
                           {docsMenu.reference.map((item, index) => (
-                            <MenuItem key={`reference-${index}`} {...item} />
+                            <MenuItem key={`reference-${index}`} {...item} darkText />
                           ))}
                         </ul>
                       </div>
@@ -345,7 +473,7 @@ const Navbar = () => {
               >
                 <button 
                   className={`px-4 py-2 rounded-md text-sm font-medium transition-colors duration-200 flex items-center ${
-                    activeMenu === 'resources' ? 'text-white' : 'text-gray-300 hover:text-white'
+                    activeMenu === 'resources' ? 'text-gray-900' : 'text-gray-600 hover:text-gray-900'
                   }`}
                 >
                   Resources
@@ -354,7 +482,7 @@ const Navbar = () => {
 
                 <div 
                   ref={resourcesMenuRef}
-                  className={`absolute left-0 mt-2 w-[500px] rounded-lg bg-[#161618]/80 backdrop-blur-lg border border-gray-600/30 overflow-hidden transition-all duration-200 origin-top ${
+                  className={`absolute left-0 mt-2 w-[500px] rounded-lg bg-white/60 backdrop-blur-lg border border-white/30 shadow-xl overflow-hidden transition-all duration-200 origin-top ${
                     activeMenu === 'resources' ? 'opacity-100 scale-y-100' : 'opacity-0 scale-y-95 pointer-events-none'
                   }`}
                   onMouseEnter={() => isHoveringRef.current = true}
@@ -363,22 +491,22 @@ const Navbar = () => {
                   <div className="p-6">
                     <div className="grid grid-cols-2 gap-8">
                       <div>
-                        <h3 className="text-sm font-semibold text-gray-300 uppercase tracking-wider mb-4">
+                        <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-4">
                           Company
                         </h3>
                         <ul className="space-y-3">
                           {resourcesMenu.company.map((item, index) => (
-                            <MenuItem key={`company-${index}`} {...item} />
+                            <MenuItem key={`company-${index}`} {...item} darkText />
                           ))}
                         </ul>
                       </div>
                       <div>
-                        <h3 className="text-sm font-semibold text-gray-300 uppercase tracking-wider mb-4">
+                        <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-4">
                           Updates
                         </h3>
                         <ul className="space-y-3">
                           {resourcesMenu.updates.map((item, index) => (
-                            <MenuItem key={`update-${index}`} {...item} />
+                            <MenuItem key={`update-${index}`} {...item} darkText />
                           ))}
                         </ul>
                       </div>
@@ -391,7 +519,7 @@ const Navbar = () => {
               <button
                 onClick={goToPricing}
                 className={`px-4 py-2 rounded-md text-sm font-medium transition-colors duration-200 ${
-                  location.pathname === '/pricing' ? 'text-white' : 'text-gray-300 hover:text-white'
+                  location.pathname === '/pricing' ? 'text-gray-900' : 'text-gray-600 hover:text-gray-900'
                 }`}
               >
                 Pricing
@@ -405,7 +533,7 @@ const Navbar = () => {
               href="https://discord.gg"
               target="_blank"
               rel="noreferrer"
-              className="text-gray-300 hover:text-white transition-colors duration-200 hidden md:block"
+              className="text-gray-600 hover:text-gray-900 transition-colors duration-200 hidden md:block"
             >
               <span className="sr-only">Discord</span>
               <DiscordIcon />
@@ -417,9 +545,7 @@ const Navbar = () => {
                   <ElegantButton onClick={goToDashboard} variant="dashboard">
                     Dashboard
                   </ElegantButton>
-                  <ElegantButton onClick={handleLogout} variant="logout">
-                    Logout
-                  </ElegantButton>
+                  <ProfileIcon />
                 </>
               ) : (
                 <ElegantButton onClick={goToSignUp} variant="primary">
@@ -431,7 +557,7 @@ const Navbar = () => {
             {/* Mobile menu button */}
             <button
               onClick={toggleNavigation}
-              className="ml-auto md:hidden p-2 rounded-md hover:bg-gray-800/50 transition-colors"
+              className="ml-auto md:hidden p-2 rounded-md hover:bg-gray-100 transition-colors"
             >
               {openNavigation ? <CloseIcon /> : <MenuIcon />}
             </button>
@@ -442,7 +568,7 @@ const Navbar = () => {
         <nav
           className={`${
             openNavigation ? 'block' : 'hidden'
-          } fixed top-16 left-0 right-0 bg-[#161618]/95 backdrop-blur-lg border-t border-gray-700/30 md:hidden transition-all duration-200 ease-in-out`}
+          } fixed top-16 left-0 right-0 bg-white/95 backdrop-blur-lg border-t border-gray-200 md:hidden transition-all duration-200 ease-in-out`}
           style={{
             maxHeight: openNavigation ? 'calc(100vh - 64px)' : '0',
             overflow: 'hidden'
@@ -451,7 +577,7 @@ const Navbar = () => {
           <div className="px-4 py-3 space-y-1">
             <a
               href="/products"
-              className="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:bg-gray-800/50 hover:text-white"
+              className="block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:bg-gray-100 hover:text-gray-900"
               onClick={handleClick}
             >
               Products
@@ -459,7 +585,7 @@ const Navbar = () => {
 
             <a
               href="/docs"
-              className="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:bg-gray-800/50 hover:text-white"
+              className="block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:bg-gray-100 hover:text-gray-900"
               onClick={handleClick}
             >
               Docs
@@ -467,7 +593,7 @@ const Navbar = () => {
 
             <a
               href="/resources"
-              className="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:bg-gray-800/50 hover:text-white"
+              className="block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:bg-gray-100 hover:text-gray-900"
               onClick={handleClick}
             >
               Resources
@@ -479,13 +605,13 @@ const Navbar = () => {
                 handleClick();
               }}
               className={`w-full text-left px-3 py-2 rounded-md text-base font-medium ${
-                location.pathname === '/pricing' ? 'bg-gray-800/50 text-white' : 'text-gray-300 hover:bg-gray-800/50 hover:text-white'
+                location.pathname === '/pricing' ? 'bg-gray-100 text-gray-900' : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
               }`}
             >
               Pricing
             </button>
 
-            <div className="pt-4 pb-2 border-t border-gray-700/30 flex flex-col space-y-3">
+            <div className="pt-4 pb-2 border-t border-gray-200 flex flex-col space-y-3">
               {user ? (
                 <>
                   <ElegantButton 
@@ -498,16 +624,16 @@ const Navbar = () => {
                   >
                     Dashboard
                   </ElegantButton>
-                  <ElegantButton 
+                  <div 
+                    className="flex items-center justify-center px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:bg-gray-100 hover:text-gray-900 cursor-pointer"
                     onClick={() => {
-                      handleLogout();
+                      setShowProfileModal(true);
                       handleClick();
-                    }} 
-                    variant="logout"
-                    className="w-full"
+                    }}
                   >
-                    Logout
-                  </ElegantButton>
+                    <ProfileIcon />
+                    <span className="ml-2">Profile</span>
+                  </div>
                 </>
               ) : (
                 <ElegantButton 
@@ -556,7 +682,7 @@ const DiscordIcon = () => (
 
 const MenuIcon = () => (
   <svg
-    className="h-6 w-6 text-gray-300"
+    className="h-6 w-6 text-gray-600"
     fill="none"
     viewBox="0 0 24 24"
     stroke="currentColor"
@@ -572,7 +698,7 @@ const MenuIcon = () => (
 
 const CloseIcon = () => (
   <svg
-    className="h-6 w-6 text-gray-300"
+    className="h-6 w-6 text-gray-600"
     fill="none"
     viewBox="0 0 24 24"
     stroke="currentColor"
@@ -586,17 +712,23 @@ const CloseIcon = () => (
   </svg>
 );
 
-const MenuItem = ({ title, description, url }) => {
+const MenuItem = ({ title, description, url, darkText = false }) => {
   return (
     <li>
       <a
         href={url}
-        className="group block rounded-md p-2 transition-colors duration-200 hover:bg-gray-800/50"
+        className={`group block rounded-md p-2 transition-colors duration-200 hover:bg-gray-100 ${
+          darkText ? 'text-gray-800' : 'text-gray-600'
+        }`}
       >
-        <p className="text-base font-medium text-white group-hover:text-white">
+        <p className={`text-base font-medium group-hover:text-gray-900 ${
+          darkText ? 'text-gray-800' : 'text-gray-700'
+        }`}>
           {title}
         </p>
-        <p className="mt-1 text-sm text-gray-300">{description}</p>
+        <p className={`mt-1 text-sm ${
+          darkText ? 'text-gray-600' : 'text-gray-500'
+        }`}>{description}</p>
       </a>
     </li>
   );
