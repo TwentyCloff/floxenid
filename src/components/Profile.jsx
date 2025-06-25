@@ -63,7 +63,7 @@ export default function Profile() {
       setPreviewImage('');
       setUploadStatus({ success: true, message: 'Gambar berhasil dihapus' });
     } catch (error) {
-      setUploadStatus({ success: false, message: 'Gagal menghapus gambar' });
+      setUploadStatus({ success: false, message: error.message });
     } finally {
       setLoading(false);
     }
@@ -77,8 +77,13 @@ export default function Profile() {
 
       // Upload gambar baru jika ada
       if (profileImage) {
-        photoURL = await uploadProfileImage(profileImage, user.uid);
-        setUploadStatus({ success: true, message: 'Gambar berhasil diupload' });
+        try {
+          photoURL = await uploadProfileImage(profileImage, user.uid);
+          setUploadStatus({ success: true, message: 'Gambar berhasil diupload' });
+        } catch (uploadError) {
+          setUploadStatus({ success: false, message: uploadError.message });
+          return;
+        }
       }
 
       // Update profile
@@ -89,7 +94,7 @@ export default function Profile() {
 
       // Update Firestore
       await setDoc(doc(db, 'users', user.uid), {
-        displayName,
+        displayName: displayName.trim(),
         photoURL
       }, { merge: true });
 
