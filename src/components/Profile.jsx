@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { auth } from '../config/firebaseConfig';
 import { onAuthStateChanged, updateProfile } from 'firebase/auth';
-import { uploadProfileImage, deleteProfileImage } from '../config/supabaseProfile';
+import { uploadProfileImage, deleteProfileImage, getPublicUrl } from '../config/supabaseProfile';
 import { FaCheck, FaTimes, FaEdit, FaCamera, FaTrash } from 'react-icons/fa';
 import { doc, setDoc, getFirestore } from 'firebase/firestore';
 import { syncFirebaseToSupabase } from '../config/supabaseAuth';
@@ -25,7 +25,16 @@ export default function Profile() {
       if (currentUser) {
         setUser(currentUser);
         setDisplayName(currentUser.displayName || '');
-        setPreviewImage(currentUser.photoURL || '');
+        
+        // Load profile image from Supabase with timestamp to prevent caching
+        try {
+          const path = `profiles/${currentUser.uid}/avatar`;
+          const { data: { publicUrl } } = getPublicUrl(path);
+          setPreviewImage(publicUrl ? `${publicUrl}?${Date.now()}` : '');
+        } catch (error) {
+          console.error("Error loading profile image:", error);
+          setPreviewImage(currentUser.photoURL || '');
+        }
         
         // Sinkronkan Firebase ke Supabase
         await syncFirebaseToSupabase(currentUser);
@@ -61,8 +70,13 @@ export default function Profile() {
         photoURL: ''
       });
 
+      // Update local state and add timestamp to force refresh
       setPreviewImage('');
+      setProfileImage(null);
       setUploadStatus({ success: true, message: 'Gambar berhasil dihapus' });
+      
+      // Force refresh by updating the user state
+      setUser({ ...auth.currentUser, photoURL: '' });
     } catch (error) {
       setUploadStatus({ success: false, message: error.message });
     } finally {
@@ -83,6 +97,8 @@ export default function Profile() {
       if (profileImage) {
         try {
           photoURL = await uploadProfileImage(profileImage, user.uid);
+          // Add timestamp to force refresh
+          photoURL = `${photoURL}?${Date.now()}`;
           setUploadStatus({ success: true, message: 'Gambar berhasil diupload' });
         } catch (uploadError) {
           setUploadStatus({ success: false, message: uploadError.message });
@@ -93,15 +109,23 @@ export default function Profile() {
       // Update profile Firebase
       await updateProfile(auth.currentUser, {
         displayName: displayName.trim(),
-        photoURL
+        photoURL: photoURL || null
       });
 
       // Update Firestore
       await setDoc(doc(db, 'users', user.uid), {
         displayName: displayName.trim(),
-        photoURL
+        photoURL: photoURL || null
       }, { merge: true });
 
+      // Update local state with the new data
+      const updatedUser = {
+        ...auth.currentUser,
+        displayName: displayName.trim(),
+        photoURL: photoURL || null
+      };
+      setUser(updatedUser);
+      setPreviewImage(photoURL || '');
       setEditMode(false);
     } catch (error) {
       setUploadStatus({ success: false, message: error.message });
@@ -136,6 +160,10 @@ export default function Profile() {
                     src={previewImage} 
                     alt="Profile" 
                     className="w-full h-full object-cover"
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%236B7280"><path d="M12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/><path d="M12 2a5 5 0 100 10 5 5 0 000-10z"/></svg>';
+                    }}
                   />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-gray-400">
