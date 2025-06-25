@@ -1,12 +1,11 @@
-import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
+import { Routes, Route, Link } from "react-router-dom";
 import Header from "./components/Header";
 import Hero from "./components/Hero";
 import Hero1 from "./components/Hero1";
 import Clb from "./components/collab";
 import Footer from "./components/Footer";
 import Nav1 from "./components/Nav1";
-import Auth from "./components/Auth"; // Changed from Log to Auth
-import Profile from "./components/Profile";
+
 
 const Home = () => (
   <div className="pt-[4.75rem] lg:pt-[5.25rem] overflow-hidden">
@@ -70,12 +69,10 @@ const NotFound = () => (
 
 const App = () => {
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="*" element={<NotFound />} />
-      </Routes>
-    </BrowserRouter>
+    <Routes>
+      <Route path="/" element={<Home />} />
+      <Route path="*" element={<NotFound />} />
+    </Routes>
   );
 };
 
