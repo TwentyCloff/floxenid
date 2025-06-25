@@ -19,24 +19,25 @@ export default function Profile() {
   const [nameError, setNameError] = useState('');
   const fileInputRef = useRef(null);
 
-  // Load user data
+  // Load user data with real-time updates
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       if (currentUser) {
         setUser(currentUser);
         setDisplayName(currentUser.displayName || '');
         
-        // Load profile image from Supabase with timestamp to prevent caching
+        // Load profile image from Supabase with cache busting
         try {
           const path = `profiles/${currentUser.uid}/avatar`;
           const { data: { publicUrl } } = getPublicUrl(path);
-          setPreviewImage(publicUrl ? `${publicUrl}?${Date.now()}` : '');
+          // Force refresh by adding timestamp and random parameter
+          const randomParam = Math.random().toString(36).substring(7);
+          setPreviewImage(publicUrl ? `${publicUrl}?ts=${Date.now()}&r=${randomParam}` : '');
         } catch (error) {
           console.error("Error loading profile image:", error);
           setPreviewImage(currentUser.photoURL || '');
         }
         
-        // Sinkronkan Firebase ke Supabase
         await syncFirebaseToSupabase(currentUser);
       }
     });
@@ -70,13 +71,16 @@ export default function Profile() {
         photoURL: ''
       });
 
-      // Update local state and add timestamp to force refresh
+      // Force refresh with new timestamp
+      const randomParam = Math.random().toString(36).substring(7);
       setPreviewImage('');
       setProfileImage(null);
       setUploadStatus({ success: true, message: 'Gambar berhasil dihapus' });
       
-      // Force refresh by updating the user state
       setUser({ ...auth.currentUser, photoURL: '' });
+      
+      // Force refresh in other components
+      window.dispatchEvent(new Event('profileImageUpdated'));
     } catch (error) {
       setUploadStatus({ success: false, message: error.message });
     } finally {
@@ -88,17 +92,16 @@ export default function Profile() {
     try {
       setLoading(true);
       
-      // Verifikasi user terautentikasi
       if (!auth.currentUser) throw new Error('Anda belum login!');
       
       let photoURL = user.photoURL;
 
-      // Upload gambar baru jika ada
       if (profileImage) {
         try {
           photoURL = await uploadProfileImage(profileImage, user.uid);
-          // Add timestamp to force refresh
-          photoURL = `${photoURL}?${Date.now()}`;
+          // Add cache busting parameters
+          const randomParam = Math.random().toString(36).substring(7);
+          photoURL = `${photoURL}?ts=${Date.now()}&r=${randomParam}`;
           setUploadStatus({ success: true, message: 'Gambar berhasil diupload' });
         } catch (uploadError) {
           setUploadStatus({ success: false, message: uploadError.message });
@@ -106,19 +109,16 @@ export default function Profile() {
         }
       }
 
-      // Update profile Firebase
       await updateProfile(auth.currentUser, {
         displayName: displayName.trim(),
         photoURL: photoURL || null
       });
 
-      // Update Firestore
       await setDoc(doc(db, 'users', user.uid), {
         displayName: displayName.trim(),
         photoURL: photoURL || null
       }, { merge: true });
 
-      // Update local state with the new data
       const updatedUser = {
         ...auth.currentUser,
         displayName: displayName.trim(),
@@ -127,6 +127,9 @@ export default function Profile() {
       setUser(updatedUser);
       setPreviewImage(photoURL || '');
       setEditMode(false);
+      
+      // Trigger event to update other components
+      window.dispatchEvent(new Event('profileImageUpdated'));
     } catch (error) {
       setUploadStatus({ success: false, message: error.message });
     } finally {
@@ -160,6 +163,7 @@ export default function Profile() {
                     src={previewImage} 
                     alt="Profile" 
                     className="w-full h-full object-cover"
+                    key={previewImage} // Force re-render when image changes
                     onError={(e) => {
                       e.target.onerror = null;
                       e.target.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%236B7280"><path d="M12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/><path d="M12 2a5 5 0 100 10 5 5 0 000-10z"/></svg>';
