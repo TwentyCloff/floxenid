@@ -1,47 +1,30 @@
 import { supabase } from './supabaseClient';
-import { auth } from './firebaseConfig';
-import { syncFirebaseToSupabase } from './supabaseAuth';
 
-export const uploadProfileImage = async (file, userId) => {
-  if (!file || !userId) throw new Error('File dan User ID wajib diisi!');
+export async function uploadProfileImage(file, userId) {
+  if (!file || !userId) throw new Error('File and User ID are required');
 
-  // Validasi file
+  // Validasi tipe file
   const validTypes = ['image/jpeg', 'image/png', 'image/webp'];
   if (!validTypes.includes(file.type)) {
-    throw new Error('Hanya format JPEG, PNG, atau WebP yang diizinkan!');
+    throw new Error('Only JPEG, PNG, and WebP images are allowed');
   }
 
+  // Validasi ukuran file (5MB max)
   if (file.size > 5 * 1024 * 1024) {
-    throw new Error('Ukuran file maksimal 5MB!');
+    throw new Error('File size exceeds 5MB limit');
   }
 
   const path = `profiles/${userId}/avatar`;
   const bucket = 'profile-images';
 
   try {
-    // Cek session Supabase
-    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-    
-    // Jika tidak ada session, coba sinkronkan Firebase
-    if (!session || sessionError) {
-      const firebaseUser = auth.currentUser;
-      if (!firebaseUser) throw new Error('Anda belum login!');
-      
-      const supabaseSession = await syncFirebaseToSupabase(firebaseUser);
-      if (!supabaseSession) throw new Error('Gagal verifikasi akses!');
-    }
-
-    // Upload file dengan metadata
+    // Langsung upload tanpa cek auth
     const { error: uploadError } = await supabase.storage
       .from(bucket)
       .upload(path, file, {
         cacheControl: '3600',
         upsert: true,
-        contentType: file.type,
-        metadata: {
-          owner: userId,
-          uploaded_at: new Date().toISOString()
-        }
+        contentType: file.type
       });
 
     if (uploadError) throw uploadError;
@@ -59,20 +42,16 @@ export const uploadProfileImage = async (file, userId) => {
 
     return publicUrl;
   } catch (error) {
-    console.error('Error Upload:', error);
-    throw new Error(error.message || 'Gagal mengupload gambar!');
+    console.error('Upload error:', error);
+    throw new Error(`Failed to upload image: ${error.message}`);
   }
-};
+}
 
-export const deleteProfileImage = async (userId) => {
+export async function deleteProfileImage(userId) {
   const path = `profiles/${userId}/avatar`;
   const bucket = 'profile-images';
 
   try {
-    // Verifikasi session
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) throw new Error('Akses ditolak!');
-
     const { error } = await supabase.storage
       .from(bucket)
       .remove([path]);
@@ -80,7 +59,7 @@ export const deleteProfileImage = async (userId) => {
     if (error) throw error;
     return true;
   } catch (error) {
-    console.error('Error Hapus Gambar:', error);
-    throw new Error(error.message || 'Gagal menghapus gambar!');
+    console.error('Delete error:', error);
+    throw new Error(`Failed to delete image: ${error.message}`);
   }
-};
+}
