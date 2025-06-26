@@ -26,7 +26,6 @@ const Dashboard = () => {
     'flx-1006', 'flx-1007', 'flx-1008', 'flx-1009'
   ];
 
-  // Initialize user document with proper UUID
   const initializeUserDocument = async (currentUser) => {
     if (!currentUser) return;
     
@@ -95,14 +94,12 @@ const Dashboard = () => {
       const unsubscribeUsers = onSnapshot(usersQuery, (querySnapshot) => {
         const users = [];
         querySnapshot.forEach((doc) => {
-          if (doc.data().email && !doc.data().email.includes('at_gmail_dot_com')) {
-            users.push({ 
-              id: doc.id,
-              displayName: doc.data().displayName || 'No name',
-              email: doc.data().email,
-              plan: doc.data().plan || 'Free'
-            });
-          }
+          users.push({ 
+            id: doc.id,
+            displayName: doc.data().displayName || 'No name',
+            email: doc.data().email,
+            plan: doc.data().plan || 'Free'
+          });
         });
         setAllUsers(users);
       });
@@ -180,28 +177,12 @@ const Dashboard = () => {
     
     try {
       const userDocRef = doc(db, 'users', editUserId);
-      const userDoc = await getDoc(userDocRef);
-      
-      if (!userDoc.exists()) {
-        const authUser = auth.currentUser;
-        await setDoc(userDocRef, {
-          displayName: authUser?.displayName || '',
-          email: authUser?.email || '',
-          plan: newPlan,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString()
-        });
-      } else {
-        await updateDoc(userDocRef, {
-          plan: newPlan,
-          updatedAt: new Date().toISOString()
-        });
-      }
+      await updateDoc(userDocRef, {
+        plan: newPlan,
+        updatedAt: new Date().toISOString()
+      });
 
       if (auth.currentUser && auth.currentUser.uid === editUserId) {
-        await updateProfile(auth.currentUser, {
-          displayName: auth.currentUser.displayName || ''
-        });
         setUserPlan(newPlan);
       }
       
