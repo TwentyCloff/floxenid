@@ -1,10 +1,9 @@
 'use client';
 
-import React, { Suspense, lazy } from 'react';
+import React from 'react';
 import Typewriter from 'typewriter-effect';
 import Section from './Section';
-
-const Spline = lazy(() => import('@splinetool/react-spline'));
+import Spline from '@splinetool/react-spline'; // langsung import tanpa lazy
 
 const Hero = () => {
   const ROBOT_SCENE_URL = 'https://prod.spline.design/zK6boI3lfAHoTjb4/scene.splinecode';
@@ -31,12 +30,7 @@ const Hero = () => {
               patternUnits="userSpaceOnUse"
               patternTransform="scale(1)"
             >
-              <circle
-                cx="10.2"
-                cy="10.2"
-                r="1"
-                fill="rgba(160, 160, 160, 0.2)"
-              />
+              <circle cx="10.2" cy="10.2" r="1" fill="rgba(160, 160, 160, 0.2)" />
             </pattern>
           </defs>
           <rect width="100%" height="100%" fill="url(#dot-pattern)" opacity="1" />
@@ -44,15 +38,12 @@ const Hero = () => {
       </div>
 
       {/* === 🚀 3D Robot Whobee Layer === */}
-      <Suspense
-        fallback={
-          <div className="absolute inset-0 z-[-10] flex items-center justify-center bg-white">
-            <span className="text-gray-500">Loading robot...</span>
-          </div>
-        }
+      <div 
+        className="absolute left-0 right-0 z-[-10]" 
+        style={{ top: '6rem', height: 'calc(100% - 6rem)' }}
       >
-        <Spline scene={ROBOT_SCENE_URL} className="absolute inset-0 z-[-10]" />
-      </Suspense>
+        <Spline scene={ROBOT_SCENE_URL} />
+      </div>
 
       {/* Main content */}
       <div className="container relative z-10">
