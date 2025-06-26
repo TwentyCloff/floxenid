@@ -8,7 +8,6 @@ const Navbar = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [user, setUser] = useState(null);
-  const [profileImage, setProfileImage] = useState('avatar1.png');
   const [openNavigation, setOpenNavigation] = useState(false);
   const [activeMenu, setActiveMenu] = useState(null);
   const [scrolled, setScrolled] = useState(false);
@@ -30,10 +29,6 @@ const Navbar = () => {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
-      // Set default avatar when user logs in
-      if (currentUser) {
-        setProfileImage('avatar1.png');
-      }
     });
 
     const handleScroll = () => {
@@ -46,22 +41,13 @@ const Navbar = () => {
       }
     };
 
-    // Listen for avatar changes from other components
-    const handleAvatarChange = (e) => {
-      if (e.detail && e.detail.avatar) {
-        setProfileImage(e.detail.avatar);
-      }
-    };
-
     window.addEventListener('scroll', handleScroll);
     document.addEventListener('mousedown', handleClickOutside);
-    window.addEventListener('avatarChanged', handleAvatarChange);
     
     return () => {
       unsubscribe();
       window.removeEventListener('scroll', handleScroll);
       document.removeEventListener('mousedown', handleClickOutside);
-      window.removeEventListener('avatarChanged', handleAvatarChange);
       clearTimeout(timeoutRef.current);
     };
   }, []);
@@ -256,21 +242,9 @@ const Navbar = () => {
       }`}
       onClick={() => setShowProfileModal(!showProfileModal)}
     >
-      {user ? (
-        <img 
-          src={`/profiles/${profileImage}`} 
-          alt="Profile" 
-          className="w-full h-full object-cover"
-          onError={(e) => {
-            e.target.onerror = null;
-            e.target.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%236B7280"><path d="M12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/><path d="M12 2a5 5 0 100 10 5 5 0 000-10z"/></svg>';
-          }}
-        />
-      ) : (
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-        </svg>
-      )}
+      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+      </svg>
     </div>
   );
 
@@ -281,26 +255,14 @@ const Navbar = () => {
         <div className="fixed inset-0 bg-black/30 z-50 flex items-center justify-center">
           <div 
             ref={profileModalRef}
-            className="bg-white/60 backdrop-blur-lg rounded-xl p-6 w-full max-w-md border border-white/30"
+            className="bg-white/95 backdrop-blur-lg rounded-xl p-6 w-full max-w-md border border-white/30"
           >
             <div className="flex items-start space-x-4 mb-4">
               <div className="relative">
                 <div className="w-16 h-16 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
-                  {user ? (
-                    <img 
-                      src={`/profiles/${profileImage}`} 
-                      alt="Profile" 
-                      className="w-full h-full object-cover"
-                      onError={(e) => {
-                        e.target.onerror = null;
-                        e.target.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%236B7280"><path d="M12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/><path d="M12 2a5 5 0 100 10 5 5 0 000-10z"/></svg>';
-                      }}
-                    />
-                  ) : (
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                    </svg>
-                  )}
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                  </svg>
                 </div>
               </div>
               <div className="flex-1">
@@ -359,7 +321,7 @@ const Navbar = () => {
       {/* Logout Confirmation Modal */}
       {showLogoutConfirm && (
         <div className="fixed inset-0 bg-black/30 z-50 flex items-center justify-center">
-          <div className="bg-white/60 backdrop-blur-lg rounded-xl p-6 w-full max-w-sm border border-white/30">
+          <div className="bg-white/95 backdrop-blur-lg rounded-xl p-6 w-full max-w-sm border border-white/30">
             <h3 className="text-lg font-semibold text-gray-800 mb-4">Confirm Logout</h3>
             <p className="text-gray-600 mb-6">Are you sure you want to log out?</p>
             <div className="flex justify-end space-x-3">
@@ -421,7 +383,7 @@ const Navbar = () => {
 
                 <div 
                   ref={productsMenuRef}
-                  className={`absolute left-0 mt-2 w-[600px] rounded-lg bg-white/60 backdrop-blur-lg border border-white/30 shadow-xl overflow-hidden transition-all duration-200 origin-top ${
+                  className={`absolute left-0 mt-2 w-[600px] rounded-lg bg-white/95 backdrop-blur-lg border border-white/30 shadow-xl overflow-hidden transition-all duration-200 origin-top ${
                     activeMenu === 'products' ? 'opacity-100 scale-y-100' : 'opacity-0 scale-y-95 pointer-events-none'
                   }`}
                   onMouseEnter={() => isHoveringRef.current = true}
@@ -472,7 +434,7 @@ const Navbar = () => {
 
                 <div 
                   ref={docsMenuRef}
-                  className={`absolute left-0 mt-2 w-[500px] rounded-lg bg-white/60 backdrop-blur-lg border border-white/30 shadow-xl overflow-hidden transition-all duration-200 origin-top ${
+                  className={`absolute left-0 mt-2 w-[500px] rounded-lg bg-white/95 backdrop-blur-lg border border-white/30 shadow-xl overflow-hidden transition-all duration-200 origin-top ${
                     activeMenu === 'docs' ? 'opacity-100 scale-y-100' : 'opacity-0 scale-y-95 pointer-events-none'
                   }`}
                   onMouseEnter={() => isHoveringRef.current = true}
@@ -523,7 +485,7 @@ const Navbar = () => {
 
                 <div 
                   ref={resourcesMenuRef}
-                  className={`absolute left-0 mt-2 w-[500px] rounded-lg bg-white/60 backdrop-blur-lg border border-white/30 shadow-xl overflow-hidden transition-all duration-200 origin-top ${
+                  className={`absolute left-0 mt-2 w-[500px] rounded-lg bg-white/95 backdrop-blur-lg border border-white/30 shadow-xl overflow-hidden transition-all duration-200 origin-top ${
                     activeMenu === 'resources' ? 'opacity-100 scale-y-100' : 'opacity-0 scale-y-95 pointer-events-none'
                   }`}
                   onMouseEnter={() => isHoveringRef.current = true}
