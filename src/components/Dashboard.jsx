@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { auth, db } from '../config/firebaseConfig';
 import { onAuthStateChanged, signOut, updateProfile } from 'firebase/auth';
-import { collection, query, where, onSnapshot, doc, updateDoc } from 'firebase/firestore';
+import { collection, query, where, onSnapshot, doc, updateDoc, setDoc, getDoc } from 'firebase/firestore';
 import { FaCopy, FaEdit, FaTrash, FaSearch, FaSave, FaTimes, FaUser, FaShoppingCart, FaHistory } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 
@@ -26,11 +26,39 @@ const Dashboard = () => {
     'flx-1006', 'flx-1007', 'flx-1008', 'flx-1009'
   ];
 
+  // Initialize or update user document in Firestore
+  const initializeUserDocument = async (currentUser) => {
+    if (!currentUser) return;
+    
+    const userDocRef = doc(db, 'users', currentUser.uid);
+    const userDoc = await getDoc(userDocRef);
+
+    if (!userDoc.exists()) {
+      // Create new user document if it doesn't exist
+      await setDoc(userDocRef, {
+        displayName: currentUser.displayName || '',
+        email: currentUser.email,
+        plan: 'Free',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      });
+    } else if (!userDoc.data().email) {
+      // Update existing document if email is missing
+      await updateDoc(userDocRef, {
+        email: currentUser.email,
+        updatedAt: new Date().toISOString()
+      });
+    }
+  };
+
   useEffect(() => {
     const unsubscribeAuth = onAuthStateChanged(auth, async (currentUser) => {
       if (currentUser) {
         setUser(currentUser);
         
+        // Initialize user document
+        await initializeUserDocument(currentUser);
+
         // Check if admin or owner
         if (currentUser.email === 'floxenstaff@gmail.com') {
           setUserPlan('Admin');
@@ -41,8 +69,8 @@ const Dashboard = () => {
           const userDocRef = doc(db, 'users', currentUser.uid);
           const unsubscribeUser = onSnapshot(userDocRef, (doc) => {
             if (doc.exists()) {
-              const plan = doc.data().plan || 'Free';
-              setUserPlan(plan);
+              const userData = doc.data();
+              setUserPlan(userData.plan || 'Free');
             }
           });
           return () => unsubscribeUser();
@@ -81,7 +109,12 @@ const Dashboard = () => {
       const unsubscribeUsers = onSnapshot(usersQuery, (querySnapshot) => {
         const users = [];
         querySnapshot.forEach((doc) => {
-          users.push({ id: doc.id, ...doc.data() });
+          users.push({ 
+            id: doc.id, 
+            displayName: doc.data().displayName || 'No name',
+            email: doc.data().email || 'No email',
+            plan: doc.data().plan || 'Free'
+          });
         });
         setAllUsers(users);
       });
@@ -138,8 +171,9 @@ const Dashboard = () => {
   };
 
   const filteredUsers = allUsers.filter(user => 
-    user.displayName?.toLowerCase().includes(searchQuery.toLowerCase()) || 
-    user.email?.toLowerCase().includes(searchQuery.toLowerCase())
+    (user.displayName?.toLowerCase().includes(searchQuery.toLowerCase()) || 
+     user.email?.toLowerCase().includes(searchQuery.toLowerCase())) &&
+    user.email !== 'No email'
   );
 
   const startEditPlan = (userId, currentPlan) => {
@@ -158,12 +192,28 @@ const Dashboard = () => {
     if (!editUserId || !newPlan) return;
     
     try {
-      // Update the user's plan in Firestore
-      await updateDoc(doc(db, 'users', editUserId), {
-        plan: newPlan,
-        updatedAt: new Date().toISOString()
-      });
-      
+      // First ensure the user document exists
+      const userDocRef = doc(db, 'users', editUserId);
+      const userDoc = await getDoc(userDocRef);
+
+      if (!userDoc.exists()) {
+        // If document doesn't exist, create it
+        const authUser = auth.currentUser;
+        await setDoc(userDocRef, {
+          displayName: authUser?.displayName || '',
+          email: authUser?.email || '',
+          plan: newPlan,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        });
+      } else {
+        // Update existing document
+        await updateDoc(userDocRef, {
+          plan: newPlan,
+          updatedAt: new Date().toISOString()
+        });
+      }
+
       // Force update the navbar by triggering auth state change
       if (auth.currentUser && auth.currentUser.uid === editUserId) {
         await updateProfile(auth.currentUser, {
@@ -254,7 +304,7 @@ const Dashboard = () => {
                     {filteredUsers.map((user) => (
                       <tr key={user.id} className="hover:bg-gray-50">
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                          {user.displayName || 'No name'}
+                          {user.displayName}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                           {user.email}
@@ -276,7 +326,7 @@ const Dashboard = () => {
                               user.plan === 'Ultra' ? 'bg-yellow-100 text-yellow-800' :
                               'bg-gray-100 text-gray-800'
                             }`}>
-                              {user.plan || 'Free'}
+                              {user.plan}
                             </span>
                           )}
                         </td>
@@ -301,7 +351,7 @@ const Dashboard = () => {
                           ) : (
                             <div className="flex space-x-3">
                               <button
-                                onClick={() => startEditPlan(user.id, user.plan || 'Free')}
+                                onClick={() => startEditPlan(user.id, user.plan)}
                                 className="text-blue-600 hover:text-blue-800 p-1"
                                 title="Edit Plan"
                               >
