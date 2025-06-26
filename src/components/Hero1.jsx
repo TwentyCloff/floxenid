@@ -39,12 +39,9 @@ const Hero = () => {
 
       {/* === 🚀 3D Robot Whobee Layer === */}
       <div
-        className="absolute z-[-10]"
+        className="absolute inset-x-0 z-[-10]"
         style={{
-          top: '20rem',
-          left: '-5rem',
-          right: 'auto',
-          width: '110%',
+          top: '26rem',
           height: 'calc(100% - 26rem)',
         }}
       >
