@@ -415,7 +415,7 @@ const Navbar = () => {
               href="/" 
               className="text-xl font-bold tracking-tight text-gray-800"
             >
-              once ui
+              FLOXEN ID
             </a>
 
             {/* Desktop Navigation */}
