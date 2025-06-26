@@ -1,7 +1,14 @@
-import Typewriter from "typewriter-effect";
-import Section from "./Section";
+'use client';
+
+import React, { Suspense, lazy } from 'react';
+import Typewriter from 'typewriter-effect';
+import Section from './Section';
+
+const Spline = lazy(() => import('@splinetool/react-spline'));
 
 const Hero = () => {
+  const ROBOT_SCENE_URL = 'https://prod.spline.design/PyzDhpQ9E5f1E3MT/scene.splinecode';
+
   return (
     <Section
       id="hero"
@@ -13,56 +20,42 @@ const Hero = () => {
 
       {/* Dot pattern background with fade effects */}
       <div className="absolute inset-0 z-[-15] overflow-hidden">
-        {/* Left fade - creates a gradient fade effect on the left side */}
         <div className="absolute left-0 top-0 h-full w-32 bg-gradient-to-r from-white to-transparent z-10" />
-        
-        {/* Right fade - creates a gradient fade effect on the right side */}
         <div className="absolute right-0 top-0 h-full w-32 bg-gradient-to-l from-white to-transparent z-10" />
-        
-        {/* Dot pattern (2% larger than standard 20px grid) */}
-        <svg
-          className="w-full h-full"
-          aria-hidden="true"
-        >
+        <svg className="w-full h-full" aria-hidden="true">
           <defs>
-            {/* 
-              Pattern definition:
-              - width/height: 20.4px (2% larger than standard 20px)
-              - Creates a grid of dots spaced 20.4px apart
-            */}
             <pattern
               id="dot-pattern"
-              width="20.4"  // Horizontal spacing between dots
-              height="20.4" // Vertical spacing between dots
-              patternUnits="userSpaceOnUse" // Uses px units
-              patternTransform="scale(1)" // Optional: can adjust scale if needed
+              width="20.4"
+              height="20.4"
+              patternUnits="userSpaceOnUse"
+              patternTransform="scale(1)"
             >
-              {/* 
-                Each dot in the pattern:
-                - cx/cy: 10.2 (center of the 20.4px square)
-                - r: 1px radius (dot size)
-                - fill: semi-transparent light gray
-              */}
-              <circle 
-                cx="10.2"  // Center X position
-                cy="10.2"  // Center Y position
-                r="1"      // Dot radius
-                fill="rgba(160, 160, 160, 0.2)" // Light gray with 20% opacity
+              <circle
+                cx="10.2"
+                cy="10.2"
+                r="1"
+                fill="rgba(160, 160, 160, 0.2)"
               />
             </pattern>
           </defs>
-          {/* 
-            Rectangle that fills the entire area with the dot pattern 
-            - The pattern repeats infinitely in both directions
-          */}
-          <rect
-            width="100%"
-            height="100%"
-            fill="url(#dot-pattern)"
-            opacity="1"
-          />
+          <rect width="100%" height="100%" fill="url(#dot-pattern)" opacity="1" />
         </svg>
       </div>
+
+      {/* === 🚀 3D Robot Whobee === */}
+      <Suspense
+        fallback={
+          <div className="absolute inset-0 z-[-10] flex items-center justify-center bg-white">
+            <span className="text-gray-500">Loading robot...</span>
+          </div>
+        }
+      >
+        <Spline
+          scene={ROBOT_SCENE_URL}
+          className="absolute left-1/2 top-[60%] w-full max-w-[1400px] -translate-x-1/2 -translate-y-1/2 z-[-10] pointer-events-none"
+        />
+      </Suspense>
 
       {/* Main content */}
       <div className="container relative z-10">
@@ -74,11 +67,11 @@ const Hero = () => {
               <Typewriter
                 options={{
                   strings: [
-                    "Fast Execution",
-                    "Continuous Improvement",
-                    "24/7 Support",
-                    "User-Friendly Interface",
-                    "Optimized Performance",
+                    'Fast Execution',
+                    'Continuous Improvement',
+                    '24/7 Support',
+                    'User-Friendly Interface',
+                    'Optimized Performance',
                   ],
                   autoStart: true,
                   loop: true,
@@ -90,14 +83,13 @@ const Hero = () => {
           </h1>
 
           <p className="body-1 max-w-3xl mx-auto mb-6 text-gray-600 lg:mb-8">
-            Unlock the next level of game scripting with{" "}
+            Unlock the next level of game scripting with{' '}
             <span className="inline-block relative font-semibold text-gray-800">
               Qarvo
             </span>
             .network
           </p>
 
-          {/* Button */}
           <a
             href="#pricing"
             className="inline-block px-7 py-3 rounded-full border border-gray-300 text-gray-800 font-semibold
