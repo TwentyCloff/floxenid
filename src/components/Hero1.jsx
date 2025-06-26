@@ -40,7 +40,7 @@ const Hero = () => {
       {/* === 🚀 3D Robot Whobee Layer === */}
       <div 
         className="absolute left-0 right-0 z-[-10]" 
-        style={{ top: '6rem', height: 'calc(100% - 6rem)' }}
+        style={{ top: '26rem', height: 'calc(100% - 6rem)' }}
       >
         <Spline scene={ROBOT_SCENE_URL} />
       </div>
