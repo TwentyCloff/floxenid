@@ -6,6 +6,7 @@ import Auth from "./components/Auth";
 import Profile from "./components/Profile";
 import Dashboard from "./components/Dashboard";
 import Pricing from "./components/Pricing";
+import ResetPassword from "./components/ResetPassword";
 
 const Home = () => (
   <div className="pt-[4.75rem] lg:pt-[5.25rem] overflow-hidden">
@@ -38,6 +39,7 @@ const App = () => {
       <Route path="/signup" element={<Auth />} />
       <Route path="/dashboard" element={<Dashboard />} />
       <Route path="/pricing" element={<Pricing />} />
+      <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
   );
