@@ -26,7 +26,7 @@ const Dashboard = () => {
     'flx-1006', 'flx-1007', 'flx-1008', 'flx-1009'
   ];
 
-  // Initialize or update user document in Firestore
+  // Initialize user document with proper UUID
   const initializeUserDocument = async (currentUser) => {
     if (!currentUser) return;
     
@@ -34,18 +34,11 @@ const Dashboard = () => {
     const userDoc = await getDoc(userDocRef);
 
     if (!userDoc.exists()) {
-      // Create new user document if it doesn't exist
       await setDoc(userDocRef, {
         displayName: currentUser.displayName || '',
         email: currentUser.email,
         plan: 'Free',
         createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-      });
-    } else if (!userDoc.data().email) {
-      // Update existing document if email is missing
-      await updateDoc(userDocRef, {
-        email: currentUser.email,
         updatedAt: new Date().toISOString()
       });
     }
@@ -55,22 +48,17 @@ const Dashboard = () => {
     const unsubscribeAuth = onAuthStateChanged(auth, async (currentUser) => {
       if (currentUser) {
         setUser(currentUser);
-        
-        // Initialize user document
         await initializeUserDocument(currentUser);
 
-        // Check if admin or owner
         if (currentUser.email === 'floxenstaff@gmail.com') {
           setUserPlan('Admin');
         } else if (currentUser.email === 'floxenowner@gmail.com') {
           setUserPlan('Owner');
         } else {
-          // Set up real-time listener for user document
           const userDocRef = doc(db, 'users', currentUser.uid);
           const unsubscribeUser = onSnapshot(userDocRef, (doc) => {
             if (doc.exists()) {
-              const userData = doc.data();
-              setUserPlan(userData.plan || 'Free');
+              setUserPlan(doc.data().plan || 'Free');
             }
           });
           return () => unsubscribeUser();
@@ -86,7 +74,6 @@ const Dashboard = () => {
   useEffect(() => {
     if (!user) return;
 
-    // Set up real-time listener for purchases
     let purchasesQuery;
     if (selectedUser) {
       purchasesQuery = query(collection(db, 'purchases'), where('userId', '==', selectedUser));
@@ -103,18 +90,19 @@ const Dashboard = () => {
       setLoading(false);
     });
 
-    // Set up real-time listener for all users (admin/owner only)
     if (userPlan === 'Admin' || userPlan === 'Owner') {
       const usersQuery = query(collection(db, 'users'));
       const unsubscribeUsers = onSnapshot(usersQuery, (querySnapshot) => {
         const users = [];
         querySnapshot.forEach((doc) => {
-          users.push({ 
-            id: doc.id, 
-            displayName: doc.data().displayName || 'No name',
-            email: doc.data().email || 'No email',
-            plan: doc.data().plan || 'Free'
-          });
+          if (doc.data().email && !doc.data().email.includes('at_gmail_dot_com')) {
+            users.push({ 
+              id: doc.id,
+              displayName: doc.data().displayName || 'No name',
+              email: doc.data().email,
+              plan: doc.data().plan || 'Free'
+            });
+          }
         });
         setAllUsers(users);
       });
@@ -172,8 +160,7 @@ const Dashboard = () => {
 
   const filteredUsers = allUsers.filter(user => 
     (user.displayName?.toLowerCase().includes(searchQuery.toLowerCase()) || 
-     user.email?.toLowerCase().includes(searchQuery.toLowerCase())) &&
-    user.email !== 'No email'
+     user.email?.toLowerCase().includes(searchQuery.toLowerCase()))
   );
 
   const startEditPlan = (userId, currentPlan) => {
@@ -192,12 +179,10 @@ const Dashboard = () => {
     if (!editUserId || !newPlan) return;
     
     try {
-      // First ensure the user document exists
       const userDocRef = doc(db, 'users', editUserId);
       const userDoc = await getDoc(userDocRef);
-
+      
       if (!userDoc.exists()) {
-        // If document doesn't exist, create it
         const authUser = auth.currentUser;
         await setDoc(userDocRef, {
           displayName: authUser?.displayName || '',
@@ -207,14 +192,12 @@ const Dashboard = () => {
           updatedAt: new Date().toISOString()
         });
       } else {
-        // Update existing document
         await updateDoc(userDocRef, {
           plan: newPlan,
           updatedAt: new Date().toISOString()
         });
       }
 
-      // Force update the navbar by triggering auth state change
       if (auth.currentUser && auth.currentUser.uid === editUserId) {
         await updateProfile(auth.currentUser, {
           displayName: auth.currentUser.displayName || ''
@@ -236,11 +219,9 @@ const Dashboard = () => {
     );
   }
 
-  // Admin/Owner view
   if (userPlan === 'Admin' || userPlan === 'Owner') {
     return (
       <div className="min-h-screen pt-[4.75rem] lg:pt-[5.25rem] bg-gray-50 flex">
-        {/* Sidebar */}
         <div className="w-64 bg-white border-r border-gray-200 p-4 hidden md:block">
           <div className="mb-8">
             <h2 className="text-xl font-bold text-gray-800 mb-4">Admin Dashboard</h2>
@@ -273,7 +254,6 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* Main Content */}
         <div className="flex-1 p-6">
           {activeTab === 'users' && (
             <div>
@@ -450,7 +430,6 @@ const Dashboard = () => {
           )}
         </div>
 
-        {/* Key Modal */}
         {showKeyModal && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
             <div className="bg-white rounded-lg p-6 max-w-md w-full">
@@ -482,10 +461,8 @@ const Dashboard = () => {
     );
   }
 
-  // Regular user view
   return (
     <div className="min-h-screen pt-[4.75rem] lg:pt-[5.25rem] bg-gray-50 flex">
-      {/* Sidebar */}
       <div className="w-64 bg-white border-r border-gray-200 p-4 hidden md:block">
         <div className="mb-8">
           <h2 className="text-xl font-bold text-gray-800 mb-4">Personal Dashboard</h2>
@@ -518,7 +495,6 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* Main Content */}
       <div className="flex-1 p-6">
         {activeTab === 'profile' && (
           <div className="bg-white rounded-lg shadow p-6">
