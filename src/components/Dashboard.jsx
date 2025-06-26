@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { auth, db } from '../config/firebaseConfig';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { collection, query, where, onSnapshot, doc, updateDoc } from 'firebase/firestore';
-import { FaCopy, FaEdit, FaTrash, FaSearch, FaSave, FaTimes } from 'react-icons/fa';
+import { FaCopy, FaEdit, FaTrash, FaSearch, FaSave, FaTimes, FaUser, FaShoppingCart, FaHistory } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 
 const Dashboard = () => {
@@ -162,6 +162,11 @@ const Dashboard = () => {
         updatedAt: new Date().toISOString()
       });
       
+      // If editing current user's plan, update their plan state
+      if (user?.uid === editUserId) {
+        setUserPlan(newPlan);
+      }
+      
       cancelEditPlan();
     } catch (error) {
       console.error('Error updating plan:', error);
@@ -187,8 +192,9 @@ const Dashboard = () => {
             <nav className="space-y-2">
               <button
                 onClick={() => setActiveTab('users')}
-                className={`w-full text-left px-4 py-2 rounded-md ${activeTab === 'users' ? 'bg-blue-50 text-blue-600' : 'text-gray-700 hover:bg-gray-100'}`}
+                className={`w-full text-left px-4 py-2 rounded-md flex items-center ${activeTab === 'users' ? 'bg-blue-50 text-blue-600' : 'text-gray-700 hover:bg-gray-100'}`}
               >
+                <FaUser className="mr-2" />
                 User Management
               </button>
               <button
@@ -196,14 +202,16 @@ const Dashboard = () => {
                   setActiveTab('purchases');
                   setSelectedUser(null);
                 }}
-                className={`w-full text-left px-4 py-2 rounded-md ${activeTab === 'purchases' ? 'bg-blue-50 text-blue-600' : 'text-gray-700 hover:bg-gray-100'}`}
+                className={`w-full text-left px-4 py-2 rounded-md flex items-center ${activeTab === 'purchases' ? 'bg-blue-50 text-blue-600' : 'text-gray-700 hover:bg-gray-100'}`}
               >
+                <FaShoppingCart className="mr-2" />
                 All Purchases
               </button>
               <button
                 onClick={handleLogout}
-                className="w-full text-left px-4 py-2 rounded-md text-gray-700 hover:bg-gray-100"
+                className="w-full text-left px-4 py-2 rounded-md text-gray-700 hover:bg-gray-100 flex items-center"
               >
+                <FaHistory className="mr-2" />
                 Logout
               </button>
             </nav>
@@ -251,7 +259,7 @@ const Dashboard = () => {
                             <select
                               value={newPlan}
                               onChange={(e) => setNewPlan(e.target.value)}
-                              className="border border-gray-300 rounded px-2 py-1"
+                              className="border border-gray-300 rounded px-2 py-1 text-sm"
                             >
                               <option value="Free">Free</option>
                               <option value="Premium">Premium</option>
@@ -272,14 +280,14 @@ const Dashboard = () => {
                             <div className="flex space-x-2">
                               <button
                                 onClick={savePlan}
-                                className="text-green-600 hover:text-green-800"
+                                className="text-green-600 hover:text-green-800 p-1"
                                 title="Save"
                               >
                                 <FaSave />
                               </button>
                               <button
                                 onClick={cancelEditPlan}
-                                className="text-red-600 hover:text-red-800"
+                                className="text-red-600 hover:text-red-800 p-1"
                                 title="Cancel"
                               >
                                 <FaTimes />
@@ -289,17 +297,17 @@ const Dashboard = () => {
                             <div className="flex space-x-3">
                               <button
                                 onClick={() => startEditPlan(user.id, user.plan || 'Free')}
-                                className="text-blue-600 hover:text-blue-800"
+                                className="text-blue-600 hover:text-blue-800 p-1"
                                 title="Edit Plan"
                               >
                                 <FaEdit />
                               </button>
                               <button
                                 onClick={() => loadUserPurchaseHistory(user.id)}
-                                className="text-green-600 hover:text-green-800"
+                                className="text-green-600 hover:text-green-800 text-xs px-2 py-1 bg-green-50 rounded"
                                 title="View Purchases"
                               >
-                                View
+                                View Purchases
                               </button>
                             </div>
                           )}
@@ -325,6 +333,7 @@ const Dashboard = () => {
                       <tr>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Item</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                       </tr>
@@ -334,6 +343,13 @@ const Dashboard = () => {
                         <tr key={purchase.id} className="hover:bg-gray-50">
                           <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">#{purchase.id.substring(0, 6)}</td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{purchase.itemName}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            {new Intl.NumberFormat('id-ID', {
+                              style: 'currency',
+                              currency: 'IDR',
+                              minimumFractionDigits: 0
+                            }).format(purchase.price || 0)}
+                          </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                             <select
                               value={purchase.status}
@@ -421,60 +437,28 @@ const Dashboard = () => {
           <nav className="space-y-2">
             <button
               onClick={() => setActiveTab('profile')}
-              className={`w-full text-left px-4 py-2 rounded-md ${activeTab === 'profile' ? 'bg-blue-50 text-blue-600' : 'text-gray-700 hover:bg-gray-100'}`}
+              className={`w-full text-left px-4 py-2 rounded-md flex items-center ${activeTab === 'profile' ? 'bg-blue-50 text-blue-600' : 'text-gray-700 hover:bg-gray-100'}`}
             >
+              <FaUser className="mr-2" />
               Profile Overview
             </button>
             <button
               onClick={() => setActiveTab('purchases')}
-              className={`w-full text-left px-4 py-2 rounded-md ${activeTab === 'purchases' ? 'bg-blue-50 text-blue-600' : 'text-gray-700 hover:bg-gray-100'}`}
+              className={`w-full text-left px-4 py-2 rounded-md flex items-center ${activeTab === 'purchases' ? 'bg-blue-50 text-blue-600' : 'text-gray-700 hover:bg-gray-100'}`}
             >
+              <FaShoppingCart className="mr-2" />
               Purchase History
             </button>
             
             {(userPlan === 'Premium' || userPlan === 'Ultra') && (
               <button
                 onClick={() => setActiveTab('membership')}
-                className={`w-full text-left px-4 py-2 rounded-md ${activeTab === 'membership' ? 'bg-blue-50 text-blue-600' : 'text-gray-700 hover:bg-gray-100'}`}
+                className={`w-full text-left px-4 py-2 rounded-md flex items-center ${activeTab === 'membership' ? 'bg-blue-50 text-blue-600' : 'text-gray-700 hover:bg-gray-100'}`}
               >
+                <FaHistory className="mr-2" />
                 Membership Access
               </button>
             )}
-            
-            <div className="pt-2">
-              <button
-                onClick={() => setActiveTab('settings')}
-                className={`w-full text-left px-4 py-2 rounded-md flex items-center justify-between ${activeTab === 'settings' ? 'bg-blue-50 text-blue-600' : 'text-gray-700 hover:bg-gray-100'}`}
-              >
-                <span>Settings</span>
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-                </svg>
-              </button>
-              
-              {activeTab === 'settings' && (
-                <div className="pl-4 mt-1 space-y-1">
-                  <button
-                    onClick={() => navigate('/profile')}
-                    className="w-full text-left px-4 py-2 rounded-md text-gray-700 hover:bg-gray-100"
-                  >
-                    Account Settings
-                  </button>
-                  <button
-                    onClick={() => navigate('/change-password')}
-                    className="w-full text-left px-4 py-2 rounded-md text-gray-700 hover:bg-gray-100"
-                  >
-                    Change Password
-                  </button>
-                  <button
-                    onClick={handleLogout}
-                    className="w-full text-left px-4 py-2 rounded-md text-gray-700 hover:bg-gray-100"
-                  >
-                    Logout
-                  </button>
-                </div>
-              )}
-            </div>
           </nav>
         </div>
       </div>
@@ -540,6 +524,7 @@ const Dashboard = () => {
                     <tr>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Item</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Copy</th>
                     </tr>
@@ -549,6 +534,13 @@ const Dashboard = () => {
                       <tr key={purchase.id} className="hover:bg-gray-50">
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">#{purchase.id.substring(0, 6)}</td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{purchase.itemName}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          {new Intl.NumberFormat('id-ID', {
+                            style: 'currency',
+                            currency: 'IDR',
+                            minimumFractionDigits: 0
+                          }).format(purchase.price || 0)}
+                        </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                           {purchase.status === 'done' ? '✅ Done' : 
                            purchase.status === 'pending' ? '⏳ Pending' : 
@@ -619,53 +611,12 @@ const Dashboard = () => {
                       </button>
                     </td>
                   </tr>
-                  <tr className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Partner Creator Tier</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      <button
-                        onClick={() => navigator.clipboard.writeText('partner-creator-code-789')}
-                        className="text-blue-600 hover:text-blue-800"
-                        title="Copy access code"
-                      >
-                        <FaCopy />
-                      </button>
-                    </td>
-                  </tr>
                 </tbody>
               </table>
             </div>
           </div>
         )}
       </div>
-
-      {/* Key Modal */}
-      {showKeyModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 max-w-md w-full">
-            <h3 className="text-lg font-bold mb-4">Enter Download Key</h3>
-            <p className="mb-4 text-gray-600">Please select a key to copy the download link:</p>
-            
-            <div className="grid grid-cols-3 gap-2 mb-6">
-              {availableKeys.map((key) => (
-                <button
-                  key={key}
-                  onClick={() => handleKeySubmit(key)}
-                  className="px-3 py-2 border border-gray-300 rounded hover:bg-gray-100"
-                >
-                  {key}
-                </button>
-              ))}
-            </div>
-            
-            <button
-              onClick={() => setShowKeyModal(false)}
-              className="w-full py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300"
-            >
-              Cancel
-            </button>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
