@@ -1,7 +1,8 @@
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { auth } from '../config/firebaseConfig';
+import { auth, db } from '../config/firebaseConfig';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
+import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { FaEye, FaEyeSlash, FaCheck } from 'react-icons/fa';
 import PasswordStrengthBar from 'react-password-strength-bar';
 
@@ -88,6 +89,39 @@ export default function Auth() {
     return true;
   };
 
+  const createUserDocument = async (user) => {
+    try {
+      // Check if user already exists in Firestore
+      const userDoc = await getDoc(doc(db, 'users', user.uid));
+      
+      if (!userDoc.exists()) {
+        // Create new user document with default 'Free' plan
+        await setDoc(doc(db, 'users', user.uid), {
+          email: user.email,
+          displayName: user.displayName || '',
+          plan: 'Free',
+          createdAt: serverTimestamp(),
+          lastLogin: serverTimestamp(),
+          uid: user.uid
+        });
+
+        // Create a subcollection for user purchases
+        await setDoc(doc(db, 'users', user.uid, 'private', 'metadata'), {
+          purchaseCount: 0,
+          lastPurchase: null
+        });
+      } else {
+        // Update last login time for existing user
+        await updateDoc(doc(db, 'users', user.uid), {
+          lastLogin: serverTimestamp()
+        });
+      }
+    } catch (error) {
+      console.error("Error creating user document:", error);
+      throw error;
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
@@ -104,11 +138,15 @@ export default function Auth() {
 
     try {
       if (isSignUp) {
-        await createUserWithEmailAndPassword(
+        // Create user in Firebase Authentication
+        const userCredential = await createUserWithEmailAndPassword(
           auth, 
           formData.email, 
           formData.password
         );
+        
+        // Create user document in Firestore
+        await createUserDocument(userCredential.user);
         
         setShowSuccess(true);
         successTimeoutRef.current = setTimeout(() => {
@@ -118,11 +156,17 @@ export default function Auth() {
         setIsSignUp(false);
         setFormData({...formData, confirmPassword: ''});
       } else {
-        await signInWithEmailAndPassword(
+        // Sign in existing user
+        const userCredential = await signInWithEmailAndPassword(
           auth, 
           formData.email, 
           formData.password
         );
+        
+        // Update last login time
+        await updateDoc(doc(db, 'users', userCredential.user.uid), {
+          lastLogin: serverTimestamp()
+        });
         
         navigate('/');
       }
