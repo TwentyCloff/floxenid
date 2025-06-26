@@ -207,7 +207,7 @@ const Pricing = () => {
                 <Zap className="text-white mr-2" size={24} />
                 <h2 className="text-2xl font-bold text-white">Premium</h2>
               </div>
-              <p className="text-purple-100 mb-6">Perfect for professionals who need advanced features</p>
+              <p className="text-purple-100 mb-6">Perfect for pro user who need advanced features</p>
               
               <div className="mb-8">
                 <span className="text-4xl font-bold text-white">{formatCurrency(199000)}</span>
