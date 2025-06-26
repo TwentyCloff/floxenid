@@ -2,12 +2,14 @@ import { useState, useEffect, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { disablePageScroll, enablePageScroll } from "scroll-lock";
 import { onAuthStateChanged, signOut } from "firebase/auth";
-import { auth } from "../config/firebaseConfig";
+import { auth, db } from "../config/firebaseConfig";
+import { doc, getDoc } from "firebase/firestore";
 
 const Navbar = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [user, setUser] = useState(null);
+  const [userPlan, setUserPlan] = useState('Free');
   const [openNavigation, setOpenNavigation] = useState(false);
   const [activeMenu, setActiveMenu] = useState(null);
   const [scrolled, setScrolled] = useState(false);
@@ -27,8 +29,32 @@ const Navbar = () => {
   const profileModalRef = useRef(null);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       setUser(currentUser);
+      
+      if (currentUser) {
+        // Check for admin/owner emails first
+        if (currentUser.email === 'floxenstaff@gmail.com') {
+          setUserPlan('Admin');
+        } else if (currentUser.email === 'floxenowner@gmail.com') {
+          setUserPlan('Owner');
+        } else {
+          // Check Firestore for regular user's plan
+          const userDoc = await getDoc(doc(db, 'users', currentUser.uid));
+          if (userDoc.exists()) {
+            setUserPlan(userDoc.data().plan || 'Free');
+          } else {
+            // Create a new user document if it doesn't exist
+            await setDoc(doc(db, 'users', currentUser.uid), {
+              displayName: currentUser.displayName || '',
+              email: currentUser.email,
+              plan: 'Free',
+              createdAt: new Date().toISOString()
+            });
+            setUserPlan('Free');
+          }
+        }
+      }
     });
 
     const handleScroll = () => {
@@ -126,6 +152,7 @@ const Navbar = () => {
   const handleLogout = async () => {
     await signOut(auth);
     setUser(null);
+    setUserPlan('Free');
     setShowLogoutConfirm(false);
     setShowProfileModal(false);
   };
@@ -188,6 +215,31 @@ const Navbar = () => {
       { title: "Roadmap", description: "Future plans and features", url: "/roadmap" },
       { title: "Blog", description: "News and articles", url: "/blog" },
     ]
+  };
+
+  const PlanBadge = ({ plan }) => {
+    const getPlanStyles = () => {
+      switch (plan) {
+        case 'Free':
+          return 'bg-gray-100 text-gray-800';
+        case 'Premium':
+          return 'bg-purple-100 text-purple-800';
+        case 'Ultra':
+          return 'bg-yellow-100 text-yellow-800';
+        case 'Admin':
+          return 'bg-blue-100 text-blue-800';
+        case 'Owner':
+          return 'bg-green-100 text-green-800';
+        default:
+          return 'bg-gray-100 text-gray-800';
+      }
+    };
+  
+    return (
+      <span className={`text-xs px-2 py-1 rounded-full ${getPlanStyles()}`}>
+        {plan}
+      </span>
+    );
   };
 
   const ElegantButton = ({ children, onClick, variant = "primary", className = "" }) => {
@@ -270,6 +322,9 @@ const Navbar = () => {
                   <div>
                     <h3 className="text-lg font-semibold text-gray-800">{user?.displayName || 'User Name'}</h3>
                     <p className="text-sm text-gray-500">ID: {user?.uid?.substring(0, 7) || '1234567'}</p>
+                    <div className="mt-1">
+                      <PlanBadge plan={userPlan} />
+                    </div>
                   </div>
                   <button 
                     className="text-gray-500 hover:text-gray-700"
@@ -532,15 +587,18 @@ const Navbar = () => {
 
           {/* Right section */}
           <div className="flex items-center space-x-6">
-            <a
-              href="https://discord.gg"
-              target="_blank"
-              rel="noreferrer"
-              className="text-gray-600 hover:text-gray-900 transition-colors duration-200 hidden md:block"
-            >
-              <span className="sr-only">Discord</span>
-              <DiscordIcon />
-            </a>
+            <div className="flex items-center gap-2">
+              <a
+                href="https://discord.gg"
+                target="_blank"
+                rel="noreferrer"
+                className="text-gray-600 hover:text-gray-900 transition-colors duration-200 hidden md:block"
+              >
+                <span className="sr-only">Discord</span>
+                <DiscordIcon />
+              </a>
+              {user && <PlanBadge plan={userPlan} />}
+            </div>
 
             <div className="hidden lg:flex items-center gap-3">
               {user ? (
