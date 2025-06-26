@@ -1,10 +1,9 @@
 import { useEffect, useState } from 'react';
 import { auth, db } from '../config/firebaseConfig';
-import { onAuthStateChanged } from 'firebase/auth';
+import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { collection, query, where, getDocs, doc, getDoc, updateDoc } from 'firebase/firestore';
-import { FaCopy, FaEdit, FaTrash, FaSearch } from 'react-icons/fa';
+import { FaCopy, FaEdit, FaTrash, FaSearch, FaSave, FaTimes } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
-import { signOut } from 'firebase/auth';
 
 const Dashboard = () => {
   const [user, setUser] = useState(null);
@@ -17,15 +16,16 @@ const Dashboard = () => {
   const [selectedUser, setSelectedUser] = useState(null);
   const [showKeyModal, setShowKeyModal] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
+  const [editingPlan, setEditingPlan] = useState(false);
+  const [newPlan, setNewPlan] = useState('');
+  const [editUserId, setEditUserId] = useState('');
   const navigate = useNavigate();
 
-  // Available keys for copy functionality
   const availableKeys = [
     'flx-1001', 'flx-1002', 'flx-1003', 'flx-1004', 'flx-1005',
     'flx-1006', 'flx-1007', 'flx-1008', 'flx-1009'
   ];
 
-  // Load user data and plan
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       if (currentUser) {
@@ -99,7 +99,6 @@ const Dashboard = () => {
       await updateDoc(doc(db, 'purchases', purchaseId), {
         status: newStatus
       });
-      // Refresh purchase history
       if (selectedUser) {
         await loadUserPurchaseHistory(selectedUser);
       } else {
@@ -112,12 +111,9 @@ const Dashboard = () => {
 
   const deletePurchase = async (purchaseId) => {
     try {
-      // In a real app, you would delete the document here
-      // For this example, we'll just update it to 'deleted' status
       await updateDoc(doc(db, 'purchases', purchaseId), {
         status: 'deleted'
       });
-      // Refresh purchase history
       if (selectedUser) {
         await loadUserPurchaseHistory(selectedUser);
       } else {
@@ -134,7 +130,6 @@ const Dashboard = () => {
   };
 
   const handleKeySubmit = (key) => {
-    // In a real app, you would verify the key and copy the actual download link
     navigator.clipboard.writeText(`https://download.example.com/${selectedItem.id}?key=${key}`);
     setShowKeyModal(false);
     alert('Download link copied to clipboard!');
@@ -144,6 +139,43 @@ const Dashboard = () => {
     user.displayName?.toLowerCase().includes(searchQuery.toLowerCase()) || 
     user.id?.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  const startEditPlan = (userId, currentPlan) => {
+    setEditUserId(userId);
+    setNewPlan(currentPlan);
+    setEditingPlan(true);
+  };
+
+  const cancelEditPlan = () => {
+    setEditingPlan(false);
+    setEditUserId('');
+    setNewPlan('');
+  };
+
+  const savePlan = async () => {
+    try {
+      await updateDoc(doc(db, 'users', editUserId), {
+        plan: newPlan
+      });
+      
+      // Update local state
+      const updatedUsers = allUsers.map(u => 
+        u.id === editUserId ? { ...u, plan: newPlan } : u
+      );
+      setAllUsers(updatedUsers);
+      
+      // If editing current user's plan, update their plan state
+      if (user?.uid === editUserId) {
+        setUserPlan(newPlan);
+      }
+      
+      setEditingPlan(false);
+      setEditUserId('');
+      setNewPlan('');
+    } catch (error) {
+      console.error('Error updating plan:', error);
+    }
+  };
 
   if (loading) {
     return (
@@ -209,7 +241,7 @@ const Dashboard = () => {
                   <thead className="bg-gray-50">
                     <tr>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User ID</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Plan</th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                     </tr>
@@ -217,30 +249,69 @@ const Dashboard = () => {
                   <tbody className="bg-white divide-y divide-gray-200">
                     {filteredUsers.map((user) => (
                       <tr key={user.id} className="hover:bg-gray-50">
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{user.displayName || 'No name'}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{user.id}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          <span className={`px-2 py-1 rounded-full text-xs ${
-                            user.plan === 'Premium' ? 'bg-purple-100 text-purple-800' :
-                            user.plan === 'Ultra' ? 'bg-yellow-100 text-yellow-800' :
-                            'bg-gray-100 text-gray-800'
-                          }`}>
-                            {user.plan || 'Free'}
-                          </span>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                          {user.displayName || 'No name'}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          <button
-                            onClick={() => loadUserPurchaseHistory(user.id)}
-                            className="text-blue-600 hover:text-blue-800 mr-3"
-                          >
-                            View Purchases
-                          </button>
-                          <button
-                            onClick={() => navigate(`/admin/edit-user/${user.id}`)}
-                            className="text-gray-600 hover:text-gray-800"
-                          >
-                            Edit
-                          </button>
+                          {user.email}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          {editingPlan && editUserId === user.id ? (
+                            <select
+                              value={newPlan}
+                              onChange={(e) => setNewPlan(e.target.value)}
+                              className="border border-gray-300 rounded px-2 py-1"
+                            >
+                              <option value="Free">Free</option>
+                              <option value="Premium">Premium</option>
+                              <option value="Ultra">Ultra</option>
+                            </select>
+                          ) : (
+                            <span className={`px-2 py-1 rounded-full text-xs ${
+                              user.plan === 'Premium' ? 'bg-purple-100 text-purple-800' :
+                              user.plan === 'Ultra' ? 'bg-yellow-100 text-yellow-800' :
+                              'bg-gray-100 text-gray-800'
+                            }`}>
+                              {user.plan || 'Free'}
+                            </span>
+                          )}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          {editingPlan && editUserId === user.id ? (
+                            <div className="flex space-x-2">
+                              <button
+                                onClick={savePlan}
+                                className="text-green-600 hover:text-green-800"
+                                title="Save"
+                              >
+                                <FaSave />
+                              </button>
+                              <button
+                                onClick={cancelEditPlan}
+                                className="text-red-600 hover:text-red-800"
+                                title="Cancel"
+                              >
+                                <FaTimes />
+                              </button>
+                            </div>
+                          ) : (
+                            <div className="flex space-x-3">
+                              <button
+                                onClick={() => startEditPlan(user.id, user.plan || 'Free')}
+                                className="text-blue-600 hover:text-blue-800"
+                                title="Edit Plan"
+                              >
+                                <FaEdit />
+                              </button>
+                              <button
+                                onClick={() => loadUserPurchaseHistory(user.id)}
+                                className="text-green-600 hover:text-green-800"
+                                title="View Purchases"
+                              >
+                                View
+                              </button>
+                            </div>
+                          )}
                         </td>
                       </tr>
                     ))}
@@ -427,6 +498,11 @@ const Dashboard = () => {
               <div className="flex items-center">
                 <span className="w-32 font-medium text-gray-700">Name:</span>
                 <span className="text-gray-900">{user.displayName || 'Not set'}</span>
+              </div>
+              
+              <div className="flex items-center">
+                <span className="w-32 font-medium text-gray-700">Email:</span>
+                <span className="text-gray-900">{user.email}</span>
               </div>
               
               <div className="flex items-center">
