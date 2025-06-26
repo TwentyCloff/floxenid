@@ -3,7 +3,7 @@
 import React from 'react';
 import Typewriter from 'typewriter-effect';
 import Section from './Section';
-import Spline from '@splinetool/react-spline'; // langsung import tanpa lazy
+import Spline from '@splinetool/react-spline';
 
 const Hero = () => {
   const ROBOT_SCENE_URL = 'https://prod.spline.design/zK6boI3lfAHoTjb4/scene.splinecode';
@@ -38,9 +38,15 @@ const Hero = () => {
       </div>
 
       {/* === 🚀 3D Robot Whobee Layer === */}
-      <div 
-        className="absolute left-0 right-0 z-[-10]" 
-        style={{ top: '26rem', height: 'calc(100% - 6rem)' }}
+      <div
+        className="absolute z-[-10]"
+        style={{
+          top: '20rem',
+          left: '-5rem',
+          right: 'auto',
+          width: '110%',
+          height: 'calc(100% - 26rem)',
+        }}
       >
         <Spline scene={ROBOT_SCENE_URL} />
       </div>
