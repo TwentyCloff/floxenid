@@ -92,17 +92,21 @@ export default function Auth() {
   const createUserDocument = async (user) => {
     try {
       // Create document ID from email (replace special characters)
-      const docId = user.email.replace(/[^a-zA-Z0-9]/g, '_');
+      const docId = user.email
+        .toLowerCase()
+        .replace(/@/g, '_at_')
+        .replace(/\./g, '_dot_')
+        .replace(/[^a-z0-9_]/g, '');
       
-      // Check if user already exists in Firestore
-      const userDoc = await getDoc(doc(db, 'users', docId));
+      const userDocRef = doc(db, 'users', docId);
+      const userDoc = await getDoc(userDocRef);
       
       if (!userDoc.exists()) {
-        // Create new user document with email as document ID
-        await setDoc(doc(db, 'users', docId), {
+        // Create new user document with custom ID
+        await setDoc(userDocRef, {
           email: user.email,
           displayName: user.displayName || '',
-          plan: 'Free',
+          plan: 'Free', // Default plan for all new users
           createdAt: serverTimestamp(),
           lastLogin: serverTimestamp(),
           uid: user.uid,
@@ -112,7 +116,7 @@ export default function Auth() {
         console.log("User document created with ID:", docId);
       } else {
         // Update last login time for existing user
-        await updateDoc(doc(db, 'users', docId), {
+        await updateDoc(userDocRef, {
           lastLogin: serverTimestamp()
         });
       }
@@ -145,7 +149,7 @@ export default function Auth() {
           formData.password
         );
         
-        // Create user document in Firestore
+        // Create user document in Firestore with custom ID
         await createUserDocument(userCredential.user);
         
         setShowSuccess(true);
@@ -164,7 +168,12 @@ export default function Auth() {
         );
         
         // Update last login time
-        const docId = userCredential.user.email.replace(/[^a-zA-Z0-9]/g, '_');
+        const docId = userCredential.user.email
+          .toLowerCase()
+          .replace(/@/g, '_at_')
+          .replace(/\./g, '_dot_')
+          .replace(/[^a-z0-9_]/g, '');
+        
         await updateDoc(doc(db, 'users', docId), {
           lastLogin: serverTimestamp()
         });
