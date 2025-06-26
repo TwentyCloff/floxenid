@@ -1,27 +1,15 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import { auth } from '../config/firebaseConfig';
 import { onAuthStateChanged, updateProfile } from 'firebase/auth';
-import { FaCheck, FaTimes, FaEdit, FaTrash } from 'react-icons/fa';
+import { FaCheck, FaTimes, FaEdit } from 'react-icons/fa';
 import { doc, setDoc, getFirestore } from 'firebase/firestore';
 
 const db = getFirestore();
-
-const avatars = [
-  'avatar1.png',
-  'avatar2.png',
-  'avatar3.png',
-  'avatar4.png',
-  'avatar5.png',
-  'avatar6.png',
-  'avatar7.png',
-  'avatar8.png'
-];
 
 export default function Profile() {
   const [user, setUser] = useState(null);
   const [editMode, setEditMode] = useState(false);
   const [displayName, setDisplayName] = useState('');
-  const [selectedAvatar, setSelectedAvatar] = useState('avatar1.png');
   const [loading, setLoading] = useState(false);
   const [nameError, setNameError] = useState('');
 
@@ -31,14 +19,6 @@ export default function Profile() {
       if (currentUser) {
         setUser(currentUser);
         setDisplayName(currentUser.displayName || '');
-        
-        // Set default avatar when user logs in
-        if (currentUser.photoURL) {
-          const avatarName = currentUser.photoURL.split('/').pop();
-          setSelectedAvatar(avatars.includes(avatarName) ? avatarName : 'avatar1.png');
-        } else {
-          setSelectedAvatar('avatar1.png');
-        }
       }
     });
     return () => unsubscribe();
@@ -55,42 +35,28 @@ export default function Profile() {
         return;
       }
       
-      const avatarUrl = `/profiles/${selectedAvatar}`;
-
       await updateProfile(auth.currentUser, {
-        displayName: displayName.trim(),
-        photoURL: avatarUrl
+        displayName: displayName.trim()
       });
 
       await setDoc(doc(db, 'users', user.uid), {
         displayName: displayName.trim(),
-        photoURL: avatarUrl,
         lastUpdated: new Date().toISOString()
       }, { merge: true });
 
       const updatedUser = {
         ...auth.currentUser,
-        displayName: displayName.trim(),
-        photoURL: avatarUrl
+        displayName: displayName.trim()
       };
       setUser(updatedUser);
       setEditMode(false);
       setNameError('');
-      
-      // Trigger event to update other components
-      window.dispatchEvent(new CustomEvent('avatarChanged', { 
-        detail: { avatar: selectedAvatar } 
-      }));
     } catch (error) {
       console.error("Error saving profile:", error);
       setNameError('Terjadi kesalahan saat menyimpan profil');
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleDeleteImage = () => {
-    setSelectedAvatar('avatar1.png');
   };
 
   if (!user) return (
@@ -105,47 +71,11 @@ export default function Profile() {
         <div className="p-8">
           <div className="flex flex-col md:flex-row gap-8 items-center">
             <div className="relative group">
-              <div className="w-32 h-32 rounded-full bg-gray-200 overflow-hidden border-2 border-gray-300">
-                <img 
-                  src={`/profiles/${selectedAvatar}`} 
-                  alt="Profile" 
-                  className="w-full h-full object-cover"
-                  onError={(e) => {
-                    e.target.onerror = null;
-                    e.target.src = '/profiles/avatar1.png';
-                  }}
-                />
+              <div className="w-32 h-32 rounded-full bg-gray-200 overflow-hidden border-2 border-gray-300 flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
               </div>
-
-              {editMode && (
-                <div className="mt-4">
-                  <div className="grid grid-cols-4 gap-2">
-                    {avatars.map((avatar) => (
-                      <div 
-                        key={avatar}
-                        className={`cursor-pointer rounded-full overflow-hidden border-2 ${selectedAvatar === avatar ? 'border-blue-500' : 'border-transparent'}`}
-                        onClick={() => setSelectedAvatar(avatar)}
-                      >
-                        <img 
-                          src={`/profiles/${avatar}`} 
-                          alt={`Avatar ${avatar}`}
-                          className="w-full h-full object-cover"
-                          onError={(e) => {
-                            e.target.onerror = null;
-                            e.target.src = '/profiles/avatar1.png';
-                          }}
-                        />
-                      </div>
-                    ))}
-                  </div>
-                  <button
-                    onClick={handleDeleteImage}
-                    className="mt-2 px-3 py-1 text-sm bg-red-100 text-red-600 rounded-md hover:bg-red-200 transition-colors flex items-center gap-1"
-                  >
-                    <FaTrash className="text-xs" /> Reset Avatar
-                  </button>
-                </div>
-              )}
             </div>
 
             <div className="flex-1">
@@ -177,7 +107,7 @@ export default function Profile() {
                         onClick={() => {
                           setEditMode(false);
                           setNameError('');
-                          setSelectedAvatar(user.photoURL ? user.photoURL.split('/').pop() : 'avatar1.png');
+                          setDisplayName(user.displayName || '');
                         }}
                         className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors flex items-center gap-1"
                       >
@@ -210,10 +140,6 @@ export default function Profile() {
                 <div>
                   <p className="text-sm text-gray-500">User ID</p>
                   <p className="text-gray-800 font-mono text-sm">{user.uid}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-gray-500">Avatar</p>
-                  <p className="text-gray-800">{selectedAvatar.replace('.png', '')}</p>
                 </div>
               </div>
             </div>
