@@ -41,7 +41,10 @@ const Dashboard = () => {
           const userDocRef = doc(db, 'users', currentUser.uid);
           const unsubscribeUser = onSnapshot(userDocRef, (doc) => {
             if (doc.exists()) {
-              setUserPlan(doc.data().plan || 'Free');
+              const plan = doc.data().plan || 'Free';
+              setUserPlan(plan);
+              // Update local storage to trigger navbar update
+              localStorage.setItem('userPlan', plan);
             }
           });
           return () => unsubscribeUser();
@@ -163,20 +166,17 @@ const Dashboard = () => {
         updatedAt: new Date().toISOString()
       });
       
-      // If editing current user's plan, update their plan state
+      // Force update the navbar by triggering auth state change
+      if (auth.currentUser) {
+        await updateProfile(auth.currentUser, {
+          displayName: auth.currentUser.displayName || ''
+        });
+      }
+
+      // Update local state immediately
       if (user?.uid === editUserId) {
         setUserPlan(newPlan);
-      }
-      
-      // Force refresh the user data in navbar by checking auth state
-      const userDoc = await getDoc(doc(db, 'users', editUserId));
-      if (userDoc.exists()) {
-        const userData = userDoc.data();
-        if (auth.currentUser?.uid === editUserId) {
-          await updateProfile(auth.currentUser, {
-            displayName: userData.displayName || ''
-          });
-        }
+        localStorage.setItem('userPlan', newPlan);
       }
       
       cancelEditPlan();
