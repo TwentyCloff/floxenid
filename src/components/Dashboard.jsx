@@ -162,6 +162,13 @@ const Dashboard = () => {
         updatedAt: new Date().toISOString()
       });
       
+      // Update local state immediately
+      setAllUsers(prevUsers => 
+        prevUsers.map(u => 
+          u.id === editUserId ? { ...u, plan: newPlan } : u
+        )
+      );
+      
       // If editing current user's plan, update their plan state
       if (user?.uid === editUserId) {
         setUserPlan(newPlan);
