@@ -7,7 +7,7 @@ import Section from './Section';
 const Spline = lazy(() => import('@splinetool/react-spline'));
 
 const Hero = () => {
-  const ROBOT_SCENE_URL = 'https://prod.spline.design/PyzDhpQ9E5f1E3MT/scene.splinecode';
+  const ROBOT_SCENE_URL = 'https://prod.spline.design/zK6boI3lfAHoTjb4/scene.splinecode';
 
   return (
     <Section
@@ -43,7 +43,7 @@ const Hero = () => {
         </svg>
       </div>
 
-      {/* 3D Robot Whobee */}
+      {/* === 🚀 3D Robot Whobee Layer === */}
       <Suspense
         fallback={
           <div className="absolute inset-0 z-[-10] flex items-center justify-center bg-white">
@@ -51,10 +51,7 @@ const Hero = () => {
           </div>
         }
       >
-        <Spline
-          scene={ROBOT_SCENE_URL}
-          className="absolute left-1/2 top-[60%] w-full max-w-[1400px] -translate-x-1/2 -translate-y-1/2 z-[-10] pointer-events-none"
-        />
+        <Spline scene={ROBOT_SCENE_URL} className="absolute inset-0 z-[-10]" />
       </Suspense>
 
       {/* Main content */}
