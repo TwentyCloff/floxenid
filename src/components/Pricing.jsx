@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { auth, db } from '../config/firebaseConfig';
-import { collection, addDoc, serverTimestamp, onSnapshot, query, where } from 'firebase/firestore';
+import { collection, addDoc, serverTimestamp, doc, onSnapshot } from 'firebase/firestore';
 import { onAuthStateChanged } from 'firebase/auth';
 import { 
   Zap, 
@@ -17,7 +17,13 @@ import {
   CheckCircle,
   ChevronRight,
   Copy,
-  X
+  X,
+  Crown,
+  Gem,
+  Sparkles,
+  Shield,
+  Key,
+  Gift
 } from 'lucide-react';
 
 const Pricing = () => {
@@ -30,6 +36,36 @@ const Pricing = () => {
   const [activeTab, setActiveTab] = useState('plans');
   const [purchaseId, setPurchaseId] = useState(null);
   const navigate = useNavigate();
+
+  // Membership plans
+  const membershipPlans = [
+    {
+      id: 'premium',
+      name: 'Premium',
+      price: 199000,
+      color: 'purple',
+      features: [
+        'Access to all scripts',
+        'Priority support',
+        'Weekly updates',
+        'Commercial license'
+      ],
+      icon: <Crown size={24} />
+    },
+    {
+      id: 'ultra',
+      name: 'Ultra',
+      price: 499000,
+      color: 'red',
+      features: [
+        'Everything in Premium',
+        'Exclusive tools',
+        '24/7 VIP support',
+        'Source code access'
+      ],
+      icon: <Gem size={24} />
+    }
+  ];
 
   // Product categories and items
   const categories = [
@@ -100,7 +136,6 @@ const Pricing = () => {
 
   const handlePlanSelect = (plan) => {
     setSelectedPlan(plan);
-    setActiveTab('products');
   };
 
   const handleItemSelect = (item) => {
@@ -110,7 +145,6 @@ const Pricing = () => {
 
   const handlePaymentSelect = (method) => {
     setPaymentMethod(method);
-    setShowPaymentModal(true);
   };
 
   const confirmPurchase = async () => {
@@ -155,103 +189,95 @@ const Pricing = () => {
   return (
     <div className="min-h-screen pt-[4.75rem] lg:pt-[5.25rem] bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 py-8">
-        {activeTab === 'plans' && (
-          <div>
-            <h1 className="text-3xl font-bold text-center text-gray-800 mb-2">Choose Your Plan</h1>
-            <p className="text-gray-600 text-center mb-12">Select the plan that fits your needs</p>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-              {/* Premium Plan */}
+        {/* Membership Plans */}
+        <div className="mb-16">
+          <h1 className="text-3xl font-bold text-center text-gray-800 mb-2">Membership Plans</h1>
+          <p className="text-gray-600 text-center mb-12">Upgrade your experience with our premium memberships</p>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+            {membershipPlans.map((plan) => (
               <div 
-                className={`relative bg-gradient-to-br from-purple-500 to-purple-800 rounded-xl p-8 shadow-lg transition-all hover:shadow-xl hover:-translate-y-1 cursor-pointer ${selectedPlan === 'premium' ? 'ring-4 ring-purple-300' : ''}`}
-                onClick={() => handlePlanSelect('premium')}
+                key={plan.id}
+                className={`relative bg-gradient-to-br from-${plan.color}-500 to-${plan.color}-800 rounded-xl p-8 shadow-lg transition-all hover:shadow-xl hover:-translate-y-1 cursor-pointer ${selectedPlan?.id === plan.id ? 'ring-4 ring-${plan.color}-300' : ''}`}
+                onClick={() => handlePlanSelect(plan)}
               >
-                <div className="absolute top-4 right-4 bg-yellow-100 text-yellow-800 text-xs font-bold px-3 py-1 rounded-full">
-                  RECOMMENDED
-                </div>
+                {plan.id === 'premium' && (
+                  <div className="absolute top-4 right-4 bg-yellow-100 text-yellow-800 text-xs font-bold px-3 py-1 rounded-full">
+                    POPULAR
+                  </div>
+                )}
+                {plan.id === 'ultra' && (
+                  <div className="absolute top-4 right-4 bg-white text-red-800 text-xs font-bold px-3 py-1 rounded-full">
+                    BEST VALUE
+                  </div>
+                )}
                 <div className="flex items-center mb-4">
-                  <Zap className="text-white mr-2" size={24} />
-                  <h2 className="text-2xl font-bold text-white">Premium</h2>
+                  <div className="bg-white/20 p-2 rounded-lg text-white mr-3">
+                    {plan.icon}
+                  </div>
+                  <h2 className="text-2xl font-bold text-white">{plan.name}</h2>
                 </div>
-                <p className="text-purple-100 mb-6">Perfect for professionals who need advanced features</p>
+                <p className={`text-${plan.color}-100 mb-6`}>Perfect for professionals who need advanced features</p>
                 
                 <div className="mb-8">
-                  <span className="text-4xl font-bold text-white">{formatCurrency(199000)}</span>
-                  <span className="text-purple-200">/month</span>
+                  <span className="text-4xl font-bold text-white">{formatCurrency(plan.price)}</span>
+                  <span className={`text-${plan.color}-200`}>/month</span>
                 </div>
                 
                 <ul className="space-y-3 mb-8">
-                  <li className="flex items-center text-purple-100">
-                    <CheckCircle className="mr-2" size={18} />
-                    Access to all scripts
-                  </li>
-                  <li className="flex items-center text-purple-100">
-                    <CheckCircle className="mr-2" size={18} />
-                    Priority support
-                  </li>
-                  <li className="flex items-center text-purple-100">
-                    <CheckCircle className="mr-2" size={18} />
-                    Weekly updates
-                  </li>
-                  <li className="flex items-center text-purple-100">
-                    <CheckCircle className="mr-2" size={18} />
-                    Commercial license
-                  </li>
+                  {plan.features.map((feature, index) => (
+                    <li key={index} className={`flex items-center text-${plan.color}-100`}>
+                      <CheckCircle className="mr-2" size={18} />
+                      {feature}
+                    </li>
+                  ))}
                 </ul>
                 
-                <button className="w-full py-3 bg-white text-purple-700 font-bold rounded-lg hover:bg-gray-100 transition-colors">
-                  Select Premium
+                <button className={`w-full py-3 bg-white text-${plan.color}-700 font-bold rounded-lg hover:bg-gray-100 transition-colors`}>
+                  Select {plan.name}
                 </button>
               </div>
-              
-              {/* Ultra Plan */}
-              <div 
-                className={`relative bg-gradient-to-br from-red-500 to-red-800 rounded-xl p-8 shadow-lg transition-all hover:shadow-xl hover:-translate-y-1 cursor-pointer ${selectedPlan === 'ultra' ? 'ring-4 ring-red-300' : ''}`}
-                onClick={() => handlePlanSelect('ultra')}
-              >
-                <div className="absolute top-4 right-4 bg-white text-red-800 text-xs font-bold px-3 py-1 rounded-full">
-                  BEST VALUE
-                </div>
-                <div className="flex items-center mb-4">
-                  <Rocket className="text-white mr-2" size={24} />
-                  <h2 className="text-2xl font-bold text-white">Ultra</h2>
-                </div>
-                <p className="text-red-100 mb-6">For power users who need the ultimate experience</p>
-                
-                <div className="mb-8">
-                  <span className="text-4xl font-bold text-white">{formatCurrency(499000)}</span>
-                  <span className="text-red-200">/month</span>
-                </div>
-                
-                <ul className="space-y-3 mb-8">
-                  <li className="flex items-center text-red-100">
-                    <CheckCircle className="mr-2" size={18} />
-                    Everything in Premium
-                  </li>
-                  <li className="flex items-center text-red-100">
-                    <CheckCircle className="mr-2" size={18} />
-                    Exclusive tools
-                  </li>
-                  <li className="flex items-center text-red-100">
-                    <CheckCircle className="mr-2" size={18} />
-                    24/7 VIP support
-                  </li>
-                  <li className="flex items-center text-red-100">
-                    <CheckCircle className="mr-2" size={18} />
-                    Source code access
-                  </li>
-                </ul>
-                
-                <button className="w-full py-3 bg-white text-red-700 font-bold rounded-lg hover:bg-gray-100 transition-colors">
-                  Select Ultra
-                </button>
-              </div>
-            </div>
+            ))}
           </div>
-        )}
+        </div>
 
-        {activeTab === 'products' && (
-          <div>
+        {/* Products Section */}
+        <div className="mb-16">
+          <h1 className="text-3xl font-bold text-center text-gray-800 mb-2">Our Products</h1>
+          <p className="text-gray-600 text-center mb-12">High-quality digital products for your projects</p>
+          
+          <div className="space-y-12">
+            {categories.map((category) => (
+              <div key={category.id}>
+                <h2 className="text-2xl font-semibold text-gray-800 mb-6">{category.name}</h2>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  {category.items.map((item) => (
+                    <div 
+                      key={item.id}
+                      className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow cursor-pointer border border-gray-200"
+                      onClick={() => handleItemSelect(item)}
+                    >
+                      <div className="flex items-center mb-4">
+                        <div className="bg-purple-100 p-2 rounded-lg text-purple-600 mr-3">
+                          {item.icon}
+                        </div>
+                        <h3 className="text-lg font-semibold text-gray-800">{item.name}</h3>
+                      </div>
+                      <p className="text-gray-600 mb-4">High-quality {category.name.toLowerCase()} for your projects</p>
+                      <div className="text-right">
+                        <span className="text-xl font-bold text-gray-800">{formatCurrency(item.price)}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Checkout Section */}
+        {activeTab === 'checkout' && selectedItem && (
+          <div className="max-w-4xl mx-auto">
             <div className="flex items-center mb-8">
               <button 
                 onClick={() => setActiveTab('plans')}
@@ -259,58 +285,16 @@ const Pricing = () => {
               >
                 <ChevronRight className="rotate-180" size={20} />
               </button>
-              <h1 className="text-3xl font-bold text-gray-800">Choose Your Product</h1>
-            </div>
-            
-            <div className="space-y-12">
-              {categories.map((category) => (
-                <div key={category.id}>
-                  <h2 className="text-2xl font-semibold text-gray-800 mb-6">{category.name}</h2>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    {category.items.map((item) => (
-                      <div 
-                        key={item.id}
-                        className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow cursor-pointer border border-gray-200"
-                        onClick={() => handleItemSelect(item)}
-                      >
-                        <div className="flex items-center mb-4">
-                          <div className="bg-purple-100 p-2 rounded-lg text-purple-600 mr-3">
-                            {item.icon}
-                          </div>
-                          <h3 className="text-lg font-semibold text-gray-800">{item.name}</h3>
-                        </div>
-                        <p className="text-gray-600 mb-4">High-quality {category.name.toLowerCase()} for your projects</p>
-                        <div className="text-right">
-                          <span className="text-xl font-bold text-gray-800">{formatCurrency(item.price)}</span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {activeTab === 'checkout' && selectedItem && (
-          <div className="max-w-4xl mx-auto">
-            <div className="flex items-center mb-8">
-              <button 
-                onClick={() => setActiveTab('products')}
-                className="mr-4 text-gray-600 hover:text-gray-800"
-              >
-                <ChevronRight className="rotate-180" size={20} />
-              </button>
               <h1 className="text-3xl font-bold text-gray-800">Checkout</h1>
             </div>
             
-            <div className="bg-white rounded-xl shadow-md overflow-hidden">
+            <div className="bg-white rounded-xl shadow-md overflow-hidden mb-8">
               <div className="p-6 border-b border-gray-200">
                 <h2 className="text-xl font-semibold text-gray-800 mb-2">Order Summary</h2>
                 <div className="flex justify-between items-center">
                   <div>
                     <p className="text-gray-800 font-medium">{selectedItem.name}</p>
-                    <p className="text-gray-600 text-sm">{selectedPlan === 'premium' ? 'Premium Plan' : 'Ultra Plan'}</p>
+                    <p className="text-gray-600 text-sm">{selectedPlan?.name || 'Standard'}</p>
                   </div>
                   <p className="text-gray-800 font-bold">{formatCurrency(selectedItem.price)}</p>
                 </div>
@@ -318,7 +302,7 @@ const Pricing = () => {
               
               <div className="p-6">
                 <h2 className="text-xl font-semibold text-gray-800 mb-4">Payment Method</h2>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
                   {paymentMethods.map((method) => (
                     <div 
                       key={method.id}
@@ -334,41 +318,147 @@ const Pricing = () => {
                 </div>
                 
                 {paymentMethod && (
-                  <div className="mt-8">
-                    <button 
-                      onClick={() => setShowPaymentModal(true)}
-                      className="w-full py-3 bg-purple-600 text-white font-bold rounded-lg hover:bg-purple-700 transition-colors"
-                    >
-                      Continue to Payment
-                    </button>
+                  <div className="bg-gray-50 p-4 rounded-lg mb-6">
+                    <p className="text-sm text-purple-800 font-medium mb-2">Payment via {paymentMethod.name}</p>
+                    <div className="flex justify-between items-center mb-2">
+                      <span className="text-gray-600">Account Holder:</span>
+                      <span className="font-medium">{paymentMethod.holder}</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-gray-600">Account Number:</span>
+                      <div className="flex items-center">
+                        <span className="font-medium mr-2">{paymentMethod.account}</span>
+                        <button 
+                          onClick={() => copyToClipboard(paymentMethod.account)}
+                          className="text-purple-600 hover:text-purple-800"
+                          title="Copy"
+                        >
+                          <Copy size={16} />
+                        </button>
+                      </div>
+                    </div>
+                    {paymentMethod.id === 'qris' && (
+                      <div className="mt-4 p-4 bg-white rounded-lg border border-gray-200 flex justify-center">
+                        <div className="bg-gray-200 w-32 h-32 flex items-center justify-center text-gray-500">
+                          QR Code Image
+                        </div>
+                      </div>
+                    )}
                   </div>
                 )}
+                
+                <button 
+                  onClick={() => {
+                    if (paymentMethod) {
+                      setShowPaymentModal(true);
+                    } else {
+                      alert('Please select a payment method');
+                    }
+                  }}
+                  className="w-full py-3 bg-purple-600 text-white font-bold rounded-lg hover:bg-purple-700 transition-colors"
+                >
+                  Continue to Payment
+                </button>
               </div>
             </div>
           </div>
         )}
 
+        {/* Pending Payment Section */}
         {activeTab === 'pending' && (
           <div className="max-w-md mx-auto text-center py-12">
             <div className="bg-white rounded-xl shadow-md p-8">
               <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-yellow-500 mx-auto mb-6"></div>
               <h2 className="text-2xl font-bold text-gray-800 mb-4">Waiting for Payment Confirmation</h2>
               <p className="text-gray-600 mb-6">Your purchase is being processed. Please wait while we verify your payment.</p>
-              <p className="text-sm text-gray-500">Transaction ID: {purchaseId?.substring(0, 8)}</p>
+              
+              <div className="bg-gray-50 p-4 rounded-lg mb-6 text-left">
+                <h3 className="font-medium text-gray-800 mb-2">Order Details</h3>
+                <p className="text-gray-600 mb-1">{selectedItem?.name}</p>
+                <p className="text-gray-600 mb-1">{formatCurrency(selectedItem?.price)}</p>
+                <p className="text-gray-600">Payment: {paymentMethod?.name}</p>
+              </div>
+              
+              <p className="text-sm text-gray-500 mb-6">Transaction ID: {purchaseId?.substring(0, 8)}</p>
+              
+              <button
+                onClick={() => navigate('/dashboard')}
+                className="px-6 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors"
+              >
+                Go to Dashboard
+              </button>
             </div>
           </div>
         )}
 
+        {/* Payment Confirmation Modal */}
+        {showPaymentModal && paymentMethod && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-xl shadow-lg p-6 max-w-md w-full">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-xl font-bold text-gray-800">Confirm Payment</h2>
+                <button 
+                  onClick={() => setShowPaymentModal(false)}
+                  className="text-gray-500 hover:text-gray-700"
+                >
+                  <X size={20} />
+                </button>
+              </div>
+              
+              <div className="mb-6">
+                <div className="bg-gray-50 p-4 rounded-lg mb-4">
+                  <p className="font-medium text-gray-800">{selectedItem?.name}</p>
+                  <p className="text-gray-600">{formatCurrency(selectedItem?.price)}</p>
+                </div>
+                
+                <div className="bg-purple-50 p-4 rounded-lg">
+                  <p className="text-sm text-purple-800 font-medium mb-2">Payment via {paymentMethod.name}</p>
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="text-gray-600">Account Holder:</span>
+                    <span className="font-medium">{paymentMethod.holder}</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-600">Account Number:</span>
+                    <span className="font-medium">{paymentMethod.account}</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="flex justify-end space-x-3">
+                <button 
+                  onClick={() => setShowPaymentModal(false)}
+                  className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
+                >
+                  Cancel
+                </button>
+                <button 
+                  onClick={confirmPurchase}
+                  className="px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700"
+                >
+                  Confirm Payment
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Success/Failure Modals */}
         {purchaseStatus === 'success' && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
             <div className="bg-white rounded-xl shadow-lg p-8 max-w-md w-full text-center">
               <CheckCircle className="text-green-500 mx-auto mb-4" size={48} />
               <h2 className="text-2xl font-bold text-gray-800 mb-2">Payment Successful!</h2>
-              <p className="text-gray-600 mb-6">Your purchase has been confirmed. You'll be redirected to your dashboard shortly.</p>
+              <p className="text-gray-600 mb-6">Your purchase has been confirmed.</p>
               <div className="bg-green-50 text-green-800 p-4 rounded-lg mb-6">
                 <p className="font-medium">{selectedItem?.name}</p>
                 <p className="text-sm">{formatCurrency(selectedItem?.price)}</p>
               </div>
+              <button
+                onClick={() => navigate('/dashboard')}
+                className="px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700"
+              >
+                Go to Dashboard
+              </button>
             </div>
           </div>
         )}
@@ -384,7 +474,7 @@ const Pricing = () => {
                   setPurchaseStatus(null);
                   setActiveTab('checkout');
                 }}
-                className="px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+                className="px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700"
               >
                 Try Again
               </button>
@@ -392,73 +482,6 @@ const Pricing = () => {
           </div>
         )}
       </div>
-
-      {/* Payment Modal */}
-      {showPaymentModal && paymentMethod && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl shadow-lg p-6 max-w-md w-full">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-bold text-gray-800">Complete Your Payment</h2>
-              <button 
-                onClick={() => setShowPaymentModal(false)}
-                className="text-gray-500 hover:text-gray-700"
-              >
-                <X size={20} />
-              </button>
-            </div>
-            
-            <div className="mb-6">
-              <div className="bg-gray-50 p-4 rounded-lg mb-4">
-                <p className="font-medium text-gray-800">{selectedItem?.name}</p>
-                <p className="text-gray-600">{formatCurrency(selectedItem?.price)}</p>
-              </div>
-              
-              <div className="bg-purple-50 p-4 rounded-lg">
-                <p className="text-sm text-purple-800 font-medium mb-2">Payment via {paymentMethod.name}</p>
-                <div className="flex justify-between items-center mb-2">
-                  <span className="text-gray-600">Account Holder:</span>
-                  <span className="font-medium">{paymentMethod.holder}</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-gray-600">Account Number:</span>
-                  <div className="flex items-center">
-                    <span className="font-medium mr-2">{paymentMethod.account}</span>
-                    <button 
-                      onClick={() => copyToClipboard(paymentMethod.account)}
-                      className="text-purple-600 hover:text-purple-800"
-                      title="Copy"
-                    >
-                      <Copy size={16} />
-                    </button>
-                  </div>
-                </div>
-                {paymentMethod.id === 'qris' && (
-                  <div className="mt-4 p-4 bg-white rounded-lg border border-gray-200 flex justify-center">
-                    <div className="bg-gray-200 w-32 h-32 flex items-center justify-center text-gray-500">
-                      QR Code Image
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-            
-            <div className="flex justify-end space-x-3">
-              <button 
-                onClick={() => setShowPaymentModal(false)}
-                className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
-              >
-                Cancel
-              </button>
-              <button 
-                onClick={confirmPurchase}
-                className="px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700"
-              >
-                Confirm Payment
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
