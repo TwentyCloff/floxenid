@@ -12,7 +12,7 @@ const Hero = () => {
     <Section
       id="hero"
       customPaddings
-      className="pt-[12rem] -mt-[5.25rem] relative overflow-visible" // pastikan overflow visible supaya robot tidak terpotong
+      className="pt-[12rem] -mt-[5.25rem] relative overflow-hidden"
     >
       {/* White background */}
       <div className="absolute inset-0 z-[-20] bg-white" />
@@ -39,13 +39,11 @@ const Hero = () => {
 
       {/* === 🚀 3D Robot Whobee Layer === */}
       <div
-        className="absolute inset-x-0 z-[-10]"
+        className="absolute left-0 right-0 z-[-10]"
         style={{
           top: '26rem',
           height: 'calc(100% - 26rem)',
-          overflow: 'visible',
-          transform: 'translateX(-8rem) translateY(5rem)', // geser ke kiri dan sedikit turun
-          pointerEvents: 'none', // supaya gak ngintervensi klik konten lain
+          transform: 'translateX(-5rem)',  // geser kiri 5rem
         }}
       >
         <Spline scene={ROBOT_SCENE_URL} />
