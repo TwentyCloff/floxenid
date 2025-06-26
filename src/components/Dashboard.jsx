@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { auth, db } from '../config/firebaseConfig';
-import { onAuthStateChanged, signOut } from 'firebase/auth';
-import { collection, query, where, onSnapshot, doc, updateDoc, getDoc } from 'firebase/firestore';
+import { onAuthStateChanged, signOut, updateProfile } from 'firebase/auth';
+import { collection, query, where, onSnapshot, doc, updateDoc } from 'firebase/firestore';
 import { FaCopy, FaEdit, FaTrash, FaSearch, FaSave, FaTimes, FaUser, FaShoppingCart, FaHistory } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 
@@ -43,8 +43,6 @@ const Dashboard = () => {
             if (doc.exists()) {
               const plan = doc.data().plan || 'Free';
               setUserPlan(plan);
-              // Update local storage to trigger navbar update
-              localStorage.setItem('userPlan', plan);
             }
           });
           return () => unsubscribeUser();
@@ -167,16 +165,11 @@ const Dashboard = () => {
       });
       
       // Force update the navbar by triggering auth state change
-      if (auth.currentUser) {
+      if (auth.currentUser && auth.currentUser.uid === editUserId) {
         await updateProfile(auth.currentUser, {
           displayName: auth.currentUser.displayName || ''
         });
-      }
-
-      // Update local state immediately
-      if (user?.uid === editUserId) {
         setUserPlan(newPlan);
-        localStorage.setItem('userPlan', newPlan);
       }
       
       cancelEditPlan();
