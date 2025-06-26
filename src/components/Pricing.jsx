@@ -50,7 +50,7 @@ const Pricing = () => {
         'Weekly updates',
         'Commercial license'
       ],
-      icon: <Crown size={24} />
+      icon: <Zap size={24} />
     },
     {
       id: 'ultra',
@@ -63,7 +63,7 @@ const Pricing = () => {
         '24/7 VIP support',
         'Source code access'
       ],
-      icon: <Gem size={24} />
+      icon: <Rocket size={24} />
     }
   ];
 
@@ -195,49 +195,91 @@ const Pricing = () => {
           <p className="text-gray-600 text-center mb-12">Upgrade your experience with our premium memberships</p>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-            {membershipPlans.map((plan) => (
-              <div 
-                key={plan.id}
-                className={`relative bg-gradient-to-br from-${plan.color}-500 to-${plan.color}-800 rounded-xl p-8 shadow-lg transition-all hover:shadow-xl hover:-translate-y-1 cursor-pointer ${selectedPlan?.id === plan.id ? 'ring-4 ring-${plan.color}-300' : ''}`}
-                onClick={() => handlePlanSelect(plan)}
-              >
-                {plan.id === 'premium' && (
-                  <div className="absolute top-4 right-4 bg-yellow-100 text-yellow-800 text-xs font-bold px-3 py-1 rounded-full">
-                    POPULAR
-                  </div>
-                )}
-                {plan.id === 'ultra' && (
-                  <div className="absolute top-4 right-4 bg-white text-red-800 text-xs font-bold px-3 py-1 rounded-full">
-                    BEST VALUE
-                  </div>
-                )}
-                <div className="flex items-center mb-4">
-                  <div className="bg-white/20 p-2 rounded-lg text-white mr-3">
-                    {plan.icon}
-                  </div>
-                  <h2 className="text-2xl font-bold text-white">{plan.name}</h2>
-                </div>
-                <p className={`text-${plan.color}-100 mb-6`}>Perfect for professionals who need advanced features</p>
-                
-                <div className="mb-8">
-                  <span className="text-4xl font-bold text-white">{formatCurrency(plan.price)}</span>
-                  <span className={`text-${plan.color}-200`}>/month</span>
-                </div>
-                
-                <ul className="space-y-3 mb-8">
-                  {plan.features.map((feature, index) => (
-                    <li key={index} className={`flex items-center text-${plan.color}-100`}>
-                      <CheckCircle className="mr-2" size={18} />
-                      {feature}
-                    </li>
-                  ))}
-                </ul>
-                
-                <button className={`w-full py-3 bg-white text-${plan.color}-700 font-bold rounded-lg hover:bg-gray-100 transition-colors`}>
-                  Select {plan.name}
-                </button>
+            {/* Premium Plan */}
+            <div 
+              className={`relative bg-gradient-to-br from-purple-500 to-purple-800 rounded-xl p-8 shadow-lg transition-all hover:shadow-xl hover:-translate-y-1 cursor-pointer ${selectedPlan?.id === 'premium' ? 'ring-4 ring-purple-300' : ''}`}
+              onClick={() => handlePlanSelect(membershipPlans[0])}
+            >
+              <div className="absolute top-4 right-4 bg-yellow-100 text-yellow-800 text-xs font-bold px-3 py-1 rounded-full">
+                POPULAR
               </div>
-            ))}
+              <div className="flex items-center mb-4">
+                <Zap className="text-white mr-2" size={24} />
+                <h2 className="text-2xl font-bold text-white">Premium</h2>
+              </div>
+              <p className="text-purple-100 mb-6">Perfect for professionals who need advanced features</p>
+              
+              <div className="mb-8">
+                <span className="text-4xl font-bold text-white">{formatCurrency(199000)}</span>
+                <span className="text-purple-200">/month</span>
+              </div>
+              
+              <ul className="space-y-3 mb-8">
+                <li className="flex items-center text-purple-100">
+                  <CheckCircle className="mr-2" size={18} />
+                  Access to all scripts
+                </li>
+                <li className="flex items-center text-purple-100">
+                  <CheckCircle className="mr-2" size={18} />
+                  Priority support
+                </li>
+                <li className="flex items-center text-purple-100">
+                  <CheckCircle className="mr-2" size={18} />
+                  Weekly updates
+                </li>
+                <li className="flex items-center text-purple-100">
+                  <CheckCircle className="mr-2" size={18} />
+                  Commercial license
+                </li>
+              </ul>
+              
+              <button className="w-full py-3 bg-white text-purple-700 font-bold rounded-lg hover:bg-gray-100 transition-colors">
+                Select Premium
+              </button>
+            </div>
+            
+            {/* Ultra Plan */}
+            <div 
+              className={`relative bg-gradient-to-br from-red-500 to-red-800 rounded-xl p-8 shadow-lg transition-all hover:shadow-xl hover:-translate-y-1 cursor-pointer ${selectedPlan?.id === 'ultra' ? 'ring-4 ring-red-300' : ''}`}
+              onClick={() => handlePlanSelect(membershipPlans[1])}
+            >
+              <div className="absolute top-4 right-4 bg-white text-red-800 text-xs font-bold px-3 py-1 rounded-full">
+                BEST VALUE
+              </div>
+              <div className="flex items-center mb-4">
+                <Rocket className="text-white mr-2" size={24} />
+                <h2 className="text-2xl font-bold text-white">Ultra</h2>
+              </div>
+              <p className="text-red-100 mb-6">For power users who need the ultimate experience</p>
+              
+              <div className="mb-8">
+                <span className="text-4xl font-bold text-white">{formatCurrency(499000)}</span>
+                <span className="text-red-200">/month</span>
+              </div>
+              
+              <ul className="space-y-3 mb-8">
+                <li className="flex items-center text-red-100">
+                  <CheckCircle className="mr-2" size={18} />
+                  Everything in Premium
+                </li>
+                <li className="flex items-center text-red-100">
+                  <CheckCircle className="mr-2" size={18} />
+                  Exclusive tools
+                </li>
+                <li className="flex items-center text-red-100">
+                  <CheckCircle className="mr-2" size={18} />
+                  24/7 VIP support
+                </li>
+                <li className="flex items-center text-red-100">
+                  <CheckCircle className="mr-2" size={18} />
+                  Source code access
+                </li>
+              </ul>
+              
+              <button className="w-full py-3 bg-white text-red-700 font-bold rounded-lg hover:bg-gray-100 transition-colors">
+                Select Ultra
+              </button>
+            </div>
           </div>
         </div>
 
