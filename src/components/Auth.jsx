@@ -76,25 +76,18 @@ export default function Auth() {
 
   const createUserDocument = async (user) => {
     try {
-      // Create document ID from email (replace special characters)
-      const docId = user.email
-        .toLowerCase()
-        .replace(/@/g, '_at_')
-        .replace(/\./g, '_dot_')
-        .replace(/[^a-z0-9_]/g, '');
-      
-      const userDocRef = doc(db, 'users', docId);
+      // Gunakan UID sebagai document ID
+      const userDocRef = doc(db, 'users', user.uid);
       const userDoc = await getDoc(userDocRef);
       
       if (!userDoc.exists()) {
-        // Create new user document with custom ID
+        // Create new user document dengan UID sebagai ID
         await setDoc(userDocRef, {
           email: user.email,
           displayName: user.displayName || '',
           plan: 'Free',
           createdAt: serverTimestamp(),
           lastLogin: serverTimestamp(),
-          uid: user.uid,
           emailVerified: user.emailVerified || false
         });
       } else {
@@ -132,7 +125,7 @@ export default function Auth() {
           formData.password
         );
         
-        // Create user document in Firestore
+        // Create user document in Firestore dengan UID sebagai ID
         await createUserDocument(userCredential.user);
         
         setShowSuccess(true);
@@ -150,15 +143,9 @@ export default function Auth() {
           formData.password
         );
         
-        // Update last login time
+        // Update last login time menggunakan UID sebagai ID
         try {
-          const docId = userCredential.user.email
-            .toLowerCase()
-            .replace(/@/g, '_at_')
-            .replace(/\./g, '_dot_')
-            .replace(/[^a-z0-9_]/g, '');
-          
-          await updateDoc(doc(db, 'users', docId), {
+          await updateDoc(doc(db, 'users', userCredential.user.uid), {
             lastLogin: serverTimestamp()
           });
         } catch (updateError) {
