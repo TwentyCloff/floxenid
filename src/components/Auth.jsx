@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { auth, db } from '../config/firebaseConfig';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
-import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
+import { doc, setDoc, serverTimestamp, getDoc, updateDoc } from 'firebase/firestore';
 import { FaEye, FaEyeSlash, FaCheck } from 'react-icons/fa';
 import PasswordStrengthBar from 'react-password-strength-bar';
 
@@ -91,28 +91,28 @@ export default function Auth() {
 
   const createUserDocument = async (user) => {
     try {
+      // Create document ID from email (replace special characters)
+      const docId = user.email.replace(/[^a-zA-Z0-9]/g, '_');
+      
       // Check if user already exists in Firestore
-      const userDoc = await getDoc(doc(db, 'users', user.uid));
+      const userDoc = await getDoc(doc(db, 'users', docId));
       
       if (!userDoc.exists()) {
-        // Create new user document with default 'Free' plan
-        await setDoc(doc(db, 'users', user.uid), {
+        // Create new user document with email as document ID
+        await setDoc(doc(db, 'users', docId), {
           email: user.email,
           displayName: user.displayName || '',
           plan: 'Free',
           createdAt: serverTimestamp(),
           lastLogin: serverTimestamp(),
-          uid: user.uid
+          uid: user.uid,
+          emailVerified: user.emailVerified || false
         });
 
-        // Create a subcollection for user purchases
-        await setDoc(doc(db, 'users', user.uid, 'private', 'metadata'), {
-          purchaseCount: 0,
-          lastPurchase: null
-        });
+        console.log("User document created with ID:", docId);
       } else {
         // Update last login time for existing user
-        await updateDoc(doc(db, 'users', user.uid), {
+        await updateDoc(doc(db, 'users', docId), {
           lastLogin: serverTimestamp()
         });
       }
@@ -164,7 +164,8 @@ export default function Auth() {
         );
         
         // Update last login time
-        await updateDoc(doc(db, 'users', userCredential.user.uid), {
+        const docId = userCredential.user.email.replace(/[^a-zA-Z0-9]/g, '_');
+        await updateDoc(doc(db, 'users', docId), {
           lastLogin: serverTimestamp()
         });
         
