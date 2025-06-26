@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { auth, db } from '../config/firebaseConfig';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
-import { collection, query, where, getDocs, doc, getDoc, updateDoc } from 'firebase/firestore';
+import { collection, query, where, onSnapshot, doc, updateDoc } from 'firebase/firestore';
 import { FaCopy, FaEdit, FaTrash, FaSearch, FaSave, FaTimes } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 
@@ -27,65 +27,74 @@ const Dashboard = () => {
   ];
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+    const unsubscribeAuth = onAuthStateChanged(auth, async (currentUser) => {
       if (currentUser) {
         setUser(currentUser);
         
         // Check if admin or owner
         if (currentUser.email === 'floxenstaff@gmail.com') {
           setUserPlan('Admin');
-          await loadAllUsers();
         } else if (currentUser.email === 'floxenowner@gmail.com') {
           setUserPlan('Owner');
-          await loadAllUsers();
         } else {
-          // Load user plan from Firestore
-          const userDoc = await getDoc(doc(db, 'users', currentUser.uid));
-          if (userDoc.exists()) {
-            setUserPlan(userDoc.data().plan || 'Free');
-          }
+          // Set up real-time listener for user document
+          const userDocRef = doc(db, 'users', currentUser.uid);
+          const unsubscribeUser = onSnapshot(userDocRef, (doc) => {
+            if (doc.exists()) {
+              setUserPlan(doc.data().plan || 'Free');
+            }
+          });
+          return () => unsubscribeUser();
         }
-        
-        // Load purchase history
-        await loadPurchaseHistory(currentUser.uid);
-        setLoading(false);
       } else {
         navigate('/signin');
       }
     });
 
-    return () => unsubscribe();
+    return () => unsubscribeAuth();
   }, [navigate]);
 
-  const loadPurchaseHistory = async (userId) => {
-    const q = query(collection(db, 'purchases'), where('userId', '==', userId));
-    const querySnapshot = await getDocs(q);
-    const purchases = [];
-    querySnapshot.forEach((doc) => {
-      purchases.push({ id: doc.id, ...doc.data() });
-    });
-    setPurchaseHistory(purchases);
-  };
+  useEffect(() => {
+    if (!user) return;
 
-  const loadAllUsers = async () => {
-    const q = query(collection(db, 'users'));
-    const querySnapshot = await getDocs(q);
-    const users = [];
-    querySnapshot.forEach((doc) => {
-      users.push({ id: doc.id, ...doc.data() });
-    });
-    setAllUsers(users);
-  };
+    // Set up real-time listener for purchases
+    let purchasesQuery;
+    if (selectedUser) {
+      purchasesQuery = query(collection(db, 'purchases'), where('userId', '==', selectedUser));
+    } else {
+      purchasesQuery = query(collection(db, 'purchases'), where('userId', '==', user.uid));
+    }
 
-  const loadUserPurchaseHistory = async (userId) => {
+    const unsubscribePurchases = onSnapshot(purchasesQuery, (querySnapshot) => {
+      const purchases = [];
+      querySnapshot.forEach((doc) => {
+        purchases.push({ id: doc.id, ...doc.data() });
+      });
+      setPurchaseHistory(purchases);
+      setLoading(false);
+    });
+
+    // Set up real-time listener for all users (admin/owner only)
+    if (userPlan === 'Admin' || userPlan === 'Owner') {
+      const usersQuery = query(collection(db, 'users'));
+      const unsubscribeUsers = onSnapshot(usersQuery, (querySnapshot) => {
+        const users = [];
+        querySnapshot.forEach((doc) => {
+          users.push({ id: doc.id, ...doc.data() });
+        });
+        setAllUsers(users);
+      });
+      return () => {
+        unsubscribePurchases();
+        unsubscribeUsers();
+      };
+    }
+
+    return () => unsubscribePurchases();
+  }, [user, userPlan, selectedUser]);
+
+  const loadUserPurchaseHistory = (userId) => {
     setSelectedUser(userId);
-    const q = query(collection(db, 'purchases'), where('userId', '==', userId));
-    const querySnapshot = await getDocs(q);
-    const purchases = [];
-    querySnapshot.forEach((doc) => {
-      purchases.push({ id: doc.id, ...doc.data() });
-    });
-    setPurchaseHistory(purchases);
     setActiveTab('purchases');
   };
 
@@ -97,13 +106,9 @@ const Dashboard = () => {
   const updatePurchaseStatus = async (purchaseId, newStatus) => {
     try {
       await updateDoc(doc(db, 'purchases', purchaseId), {
-        status: newStatus
+        status: newStatus,
+        updatedAt: new Date().toISOString()
       });
-      if (selectedUser) {
-        await loadUserPurchaseHistory(selectedUser);
-      } else {
-        await loadPurchaseHistory(user.uid);
-      }
     } catch (error) {
       console.error('Error updating status:', error);
     }
@@ -112,13 +117,9 @@ const Dashboard = () => {
   const deletePurchase = async (purchaseId) => {
     try {
       await updateDoc(doc(db, 'purchases', purchaseId), {
-        status: 'deleted'
+        status: 'deleted',
+        updatedAt: new Date().toISOString()
       });
-      if (selectedUser) {
-        await loadUserPurchaseHistory(selectedUser);
-      } else {
-        await loadPurchaseHistory(user.uid);
-      }
     } catch (error) {
       console.error('Error deleting purchase:', error);
     }
@@ -137,7 +138,7 @@ const Dashboard = () => {
 
   const filteredUsers = allUsers.filter(user => 
     user.displayName?.toLowerCase().includes(searchQuery.toLowerCase()) || 
-    user.id?.toLowerCase().includes(searchQuery.toLowerCase())
+    user.email?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const startEditPlan = (userId, currentPlan) => {
@@ -153,25 +154,15 @@ const Dashboard = () => {
   };
 
   const savePlan = async () => {
+    if (!editUserId || !newPlan) return;
+    
     try {
       await updateDoc(doc(db, 'users', editUserId), {
-        plan: newPlan
+        plan: newPlan,
+        updatedAt: new Date().toISOString()
       });
       
-      // Update local state
-      const updatedUsers = allUsers.map(u => 
-        u.id === editUserId ? { ...u, plan: newPlan } : u
-      );
-      setAllUsers(updatedUsers);
-      
-      // If editing current user's plan, update their plan state
-      if (user?.uid === editUserId) {
-        setUserPlan(newPlan);
-      }
-      
-      setEditingPlan(false);
-      setEditUserId('');
-      setNewPlan('');
+      cancelEditPlan();
     } catch (error) {
       console.error('Error updating plan:', error);
     }
@@ -229,7 +220,7 @@ const Dashboard = () => {
                 <FaSearch className="absolute left-3 top-3 text-gray-400" />
                 <input
                   type="text"
-                  placeholder="Search users by name or ID..."
+                  placeholder="Search users by name or email..."
                   className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
