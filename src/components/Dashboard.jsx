@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { auth, db } from '../config/firebaseConfig';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
-import { collection, query, where, onSnapshot, doc, updateDoc } from 'firebase/firestore';
+import { collection, query, where, onSnapshot, doc, updateDoc, getDoc } from 'firebase/firestore';
 import { FaCopy, FaEdit, FaTrash, FaSearch, FaSave, FaTimes, FaUser, FaShoppingCart, FaHistory } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 
@@ -157,21 +157,26 @@ const Dashboard = () => {
     if (!editUserId || !newPlan) return;
     
     try {
+      // Update the user's plan in Firestore
       await updateDoc(doc(db, 'users', editUserId), {
         plan: newPlan,
         updatedAt: new Date().toISOString()
       });
       
-      // Update local state immediately
-      setAllUsers(prevUsers => 
-        prevUsers.map(u => 
-          u.id === editUserId ? { ...u, plan: newPlan } : u
-        )
-      );
-      
       // If editing current user's plan, update their plan state
       if (user?.uid === editUserId) {
         setUserPlan(newPlan);
+      }
+      
+      // Force refresh the user data in navbar by checking auth state
+      const userDoc = await getDoc(doc(db, 'users', editUserId));
+      if (userDoc.exists()) {
+        const userData = userDoc.data();
+        if (auth.currentUser?.uid === editUserId) {
+          await updateProfile(auth.currentUser, {
+            displayName: userData.displayName || ''
+          });
+        }
       }
       
       cancelEditPlan();
