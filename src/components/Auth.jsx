@@ -10,7 +10,7 @@ import { doc, setDoc, serverTimestamp, getDoc, updateDoc } from 'firebase/firest
 import { FaEye, FaEyeSlash, FaCheck, FaLock, FaEnvelope, FaArrowRight } from 'react-icons/fa';
 import PasswordStrengthBar from 'react-password-strength-bar';
 import { motion, AnimatePresence } from 'framer-motion';
-import webmBG from '../components/webmNeed/webmBG1.mp4';
+import webmBG from '../components/webmNeed/webmBG2.webm';
 
 export default function Auth() {
   const [isSignUp, setIsSignUp] = useState(false);
@@ -343,7 +343,7 @@ export default function Auth() {
             playsInline
             className="w-full h-full object-cover"
           >
-            <source src={webmBG} type="video/mp4" />
+            <source src={webmBG} type="video/webm" />
           </video>
           <div className="absolute inset-0 bg-black/30" />
           <div className="relative z-10 h-full flex flex-col justify-between text-white p-8">
