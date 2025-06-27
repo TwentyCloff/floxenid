@@ -17,15 +17,24 @@ const Table = () => {
     </div>
   );
 
-  // Whobee Robot positioned behind the entire table
+  // Whobee Robot positioned behind everything
   const WhobeeRobot = () => (
-    <div className="absolute top-[-100px] left-1/2 transform -translate-x-1/2 z-[-1] w-[300px] h-[300px] opacity-70">
-      <Spline scene="https://prod.spline.design/zK6boI3lfAHoTjb4/scene.splinecode" />
+    <div className="absolute top-[-80px] left-1/2 transform -translate-x-1/2 z-[-1] w-[350px] h-[350px] opacity-80">
+      <Spline 
+        scene="https://prod.spline.design/zK6boI3lfAHoTjb4/scene.splinecode" 
+        style={{ 
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%'
+        }}
+      />
     </div>
   );
 
   const renderDashboard = () => (
-    <div className="p-6 w-full mt-8">
+    <div className="p-6 w-full mt-10">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         {[
           { title: 'Profile', value: 'User Dashboard', icon: <User className="text-blue-600" size={20} />, color: 'blue' },
@@ -33,7 +42,7 @@ const Table = () => {
           { title: 'History', value: '$1,240', icon: <Bookmark className="text-purple-600" size={20} />, color: 'purple' },
           { title: 'Analytics', value: '+12.5%', icon: <Settings className="text-orange-600" size={20} />, color: 'orange' }
         ].map((item, index) => (
-          <div key={index} className="bg-white/70 backdrop-blur-md p-6 rounded-xl border border-gray-200 shadow-sm">
+          <div key={index} className="bg-white/80 backdrop-blur-md p-6 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-all">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">{item.title}</p>
@@ -46,7 +55,7 @@ const Table = () => {
           </div>
         ))}
       </div>
-      <div className="bg-white/70 backdrop-blur-md rounded-xl border border-gray-200 shadow-sm p-6">
+      <div className="bg-white/80 backdrop-blur-md rounded-xl border border-gray-200 shadow-sm p-6">
         <h3 className="text-lg font-semibold mb-4">Recent Activity</h3>
         <div className="space-y-4">
           {[1, 2, 3].map((item) => (
@@ -69,7 +78,7 @@ const Table = () => {
         return renderDashboard();
       case 'Ecommerce':
         return (
-          <div className="p-6 w-full mt-8">
+          <div className="p-6 w-full mt-10">
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-2xl font-bold">Personal Store</h2>
               <div className="flex items-center space-x-4">
@@ -79,10 +88,10 @@ const Table = () => {
             </div>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
               {[1, 2, 3, 4, 5, 6, 7, 8].map((item) => (
-                <div key={item} className="bg-white/70 backdrop-blur-md rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-                  <div className="h-40 bg-gray-200 relative">
-                    <div className="absolute top-2 right-2 bg-white/80 rounded-full p-1">
-                      <Heart className="text-gray-700" size={16} />
+                <div key={item} className="bg-white/80 backdrop-blur-md rounded-xl border border-gray-200 shadow-sm overflow-hidden hover:shadow-md transition-all">
+                  <div className="h-48 bg-gradient-to-br from-gray-100 to-gray-200 relative">
+                    <div className="absolute top-2 right-2 bg-white/90 rounded-full p-1.5 shadow-sm">
+                      <Heart className="text-gray-700" size={18} />
                     </div>
                   </div>
                   <div className="p-4">
@@ -99,12 +108,12 @@ const Table = () => {
         );
       case 'Social':
         return (
-          <div className="p-6 w-full mt-8">
+          <div className="p-6 w-full mt-10">
             <div className="max-w-2xl mx-auto">
-              <div className="flex space-x-4 mb-6 overflow-x-auto pb-2">
+              <div className="flex space-x-4 mb-6 overflow-x-auto pb-2 scrollbar-hide">
                 {[1, 2, 3, 4, 5, 6].map((item) => (
                   <div key={item} className="flex flex-col items-center flex-shrink-0">
-                    <div className="w-16 h-16 rounded-full bg-gray-200 border-2 border-pink-500 mb-1"></div>
+                    <div className="w-16 h-16 rounded-full bg-gradient-to-br from-pink-200 to-pink-300 border-2 border-pink-400 mb-1"></div>
                     <span className="text-xs">user{item}</span>
                   </div>
                 ))}
@@ -112,7 +121,7 @@ const Table = () => {
               
               <div className="space-y-6">
                 {[1, 2, 3].map((item) => (
-                  <div key={item} className="bg-white/70 backdrop-blur-md rounded-xl border border-gray-200 shadow-sm">
+                  <div key={item} className="bg-white/80 backdrop-blur-md rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-all">
                     <div className="flex items-center justify-between p-4">
                       <div className="flex items-center">
                         <div className="w-8 h-8 rounded-full bg-gray-200 mr-3"></div>
@@ -120,13 +129,13 @@ const Table = () => {
                       </div>
                       <ChevronDown size={20} />
                     </div>
-                    <div className="h-96 bg-gray-200"></div>
+                    <div className="h-96 bg-gradient-to-br from-gray-100 to-gray-200"></div>
                     <div className="p-4">
                       <div className="flex space-x-4 mb-2">
-                        <Heart size={24} className="text-black" />
-                        <MessageSquare size={24} className="text-black" />
-                        <Mail size={24} className="text-black" />
-                        <Bookmark size={24} className="text-black ml-auto" />
+                        <Heart size={24} className="text-black hover:text-red-500 cursor-pointer" />
+                        <MessageSquare size={24} className="text-black hover:text-blue-500 cursor-pointer" />
+                        <Mail size={24} className="text-black hover:text-yellow-500 cursor-pointer" />
+                        <Bookmark size={24} className="text-black hover:text-green-500 cursor-pointer ml-auto" />
                       </div>
                       <p className="font-semibold">1,234 likes</p>
                       <p className="mt-1">
@@ -141,8 +150,8 @@ const Table = () => {
         );
       case 'AI':
         return (
-          <div className="p-6 w-full h-full mt-8">
-            <div className="bg-white/70 backdrop-blur-md rounded-xl border border-gray-200 shadow-sm h-full flex flex-col">
+          <div className="p-6 w-full h-full mt-10">
+            <div className="bg-white/80 backdrop-blur-md rounded-xl border border-gray-200 shadow-sm h-full flex flex-col hover:shadow-md transition-all">
               <div className="p-4 border-b border-gray-200">
                 <h3 className="text-lg font-semibold">Floxen AI</h3>
               </div>
@@ -165,9 +174,9 @@ const Table = () => {
                   <input
                     type="text"
                     placeholder="Message Floxen..."
-                    className="w-full bg-gray-100 border border-gray-200 rounded-full py-3 px-4 pr-12 focus:outline-none"
+                    className="w-full bg-gray-100 border border-gray-200 rounded-full py-3 px-4 pr-12 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
-                  <button className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-blue-500 text-white p-2 rounded-full">
+                  <button className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-blue-500 text-white p-2 rounded-full hover:bg-blue-600 transition">
                     <Plus size={20} />
                   </button>
                 </div>
@@ -181,31 +190,31 @@ const Table = () => {
   };
 
   return (
-    <div className="relative max-w-6xl mx-auto px-6 mt-32 mb-32">
+    <div className="relative max-w-6xl mx-auto px-6 mt-40 mb-32">
       {/* Harmony shadow */}
       <div className="absolute inset-0 rounded-2xl overflow-hidden z-[-2]">
         <div 
-          className="absolute inset-0 bg-gradient-to-br from-green-100/30 via-cyan-100/30 to-blue-100/30 blur-xl opacity-20"
+          className="absolute inset-0 bg-gradient-to-br from-green-100/20 via-cyan-100/20 to-blue-100/20 blur-xl opacity-30"
           style={{
-            maskImage: 'radial-gradient(ellipse at center, black 40%, transparent 70%)'
+            maskImage: 'radial-gradient(ellipse at center, black 30%, transparent 70%)'
           }}
         ></div>
       </div>
 
-      {/* Whobee Robot positioned behind everything */}
+      {/* Whobee Robot - now properly positioned */}
       <WhobeeRobot />
 
       {/* White shape with MacOS controls */}
-      <div className="bg-white/90 backdrop-blur-md rounded-t-2xl border border-gray-200 shadow-sm relative pt-4 pb-2 px-6">
+      <div className="bg-white/95 backdrop-blur-md rounded-t-2xl border border-gray-200 shadow-lg relative pt-4 pb-2 px-6">
         <WindowControls />
         <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide mt-6">
           {tabs.map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
-              className={`px-4 py-2 text-sm font-medium rounded-full transition-all whitespace-nowrap ${
+              className={`px-4 py-2 text-sm font-medium rounded-full transition-all whitespace-nowrap flex-shrink-0 ${
                 activeTab === tab
-                  ? 'bg-black text-white'
+                  ? 'bg-black text-white shadow-md'
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
               }`}
             >
@@ -216,7 +225,7 @@ const Table = () => {
       </div>
 
       {/* Main table content */}
-      <div className="bg-white/80 backdrop-blur-sm rounded-b-2xl border border-t-0 border-gray-200 shadow-lg min-h-[500px]">
+      <div className="bg-white/90 backdrop-blur-sm rounded-b-2xl border border-t-0 border-gray-200 shadow-xl min-h-[500px]">
         {renderContent()}
       </div>
     </div>
