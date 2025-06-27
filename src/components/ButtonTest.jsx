@@ -2,9 +2,14 @@ import React from 'react';
 
 const CallToAction = () => {
   return (
-    <div className="relative bg-black text-white py-24 px-6 rounded-lg overflow-hidden">
-      {/* Glow effect background */}
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black to-orange-500 opacity-30 blur-2xl pointer-events-none" />
+    <div className="relative bg-black text-white py-24 px-6 rounded-lg overflow-hidden isolate">
+
+      {/* Left glow */}
+      <div className="absolute left-[-150px] top-0 h-full w-[300px] bg-orange-500 opacity-30 blur-3xl rounded-full" />
+      {/* Right glow */}
+      <div className="absolute right-[-150px] top-0 h-full w-[300px] bg-orange-500 opacity-30 blur-3xl rounded-full" />
+      {/* Bottom glow */}
+      <div className="absolute bottom-0 left-0 w-full h-[100px] bg-orange-500 opacity-20 blur-2xl" />
 
       {/* Content */}
       <div className="relative z-10 text-center max-w-2xl mx-auto">
