@@ -175,14 +175,14 @@ const Table = () => {
   };
 
   return (
-    <div className="relative max-w-6xl mx-auto px-6 mt-52">
-      {/* Whobee Robot - Fully visible head with extra space */}
+    <div className="relative max-w-6xl mx-auto px-6 mt-48">
+      {/* Whobee Robot - Perfectly positioned with full head visible */}
       <div 
         className="absolute left-1/2 transform -translate-x-1/2 z-10"
         style={{ 
-          top: '-180px',
-          width: '380px',
-          height: '300px',
+          top: '-150px',
+          width: '350px',
+          height: '280px',
           pointerEvents: 'none'
         }}
       >
@@ -198,8 +198,13 @@ const Table = () => {
         />
       </div>
 
-      {/* Unified table container pushed down */}
-      <div className="bg-white/90 backdrop-blur-md rounded-2xl border border-gray-200 shadow-xl overflow-hidden relative z-20 mt-16">
+      {/* Fixed background container */}
+      <div className="fixed inset-0 -z-10">
+        <div className="absolute inset-0 bg-gradient-to-br from-gray-50 to-gray-100"></div>
+      </div>
+
+      {/* Unified table container with proper spacing */}
+      <div className="bg-white/90 backdrop-blur-md rounded-2xl border border-gray-200 shadow-xl overflow-hidden relative z-20 mt-20">
         {/* Window controls and tabs */}
         <div className="relative pt-4 pb-2 px-6 border-b border-gray-200">
           <WindowControls />
@@ -224,16 +229,6 @@ const Table = () => {
         <div className="min-h-[500px]">
           {renderContent()}
         </div>
-      </div>
-
-      {/* Background shadow effect */}
-      <div className="absolute inset-0 rounded-2xl overflow-hidden z-0">
-        <div 
-          className="absolute inset-0 bg-gradient-to-br from-green-100/20 via-cyan-100/20 to-blue-100/20 blur-xl opacity-20"
-          style={{
-            maskImage: 'radial-gradient(ellipse at center, black 40%, transparent 70%)'
-          }}
-        ></div>
       </div>
     </div>
   );
