@@ -10,6 +10,7 @@ export default {
   ],
   theme: {
     extend: {
+      // Add star border animations
       animation: {
         'star-movement-bottom': 'star-movement-bottom linear infinite alternate',
         'star-movement-top': 'star-movement-top linear infinite alternate',
