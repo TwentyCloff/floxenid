@@ -360,7 +360,7 @@ export default function Auth() {
           >
             <source src={webmBG} type="video/webm" />
           </video>
-          <div className="absolute inset-0 bg-black/1 backdrop-blur-sm" />
+          <div className="absolute inset-0 bg-black/0 backdrop-blur-sm" />
           <div className="relative z-10 h-full flex flex-col justify-between text-white p-8">
             <div>
               <h1 className="text-2xl font-bold mb-3">Welcome {isSignUp ? 'to Our Platform' : 'Back'}</h1>
@@ -373,7 +373,7 @@ export default function Auth() {
             
             <div className="mt-auto">
               <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center backdrop-blur-sm">
+                <div className="w-10 h-10 rounded-full bg-white/0 flex items-center justify-center backdrop-blur-sm">
                   <FaLock className="text-lg" />
                 </div>
                 <div>
