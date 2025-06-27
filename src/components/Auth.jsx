@@ -10,7 +10,7 @@ import { doc, setDoc, serverTimestamp, getDoc, updateDoc } from 'firebase/firest
 import { FaEye, FaEyeSlash, FaCheck, FaLock, FaEnvelope, FaArrowRight } from 'react-icons/fa';
 import PasswordStrengthBar from 'react-password-strength-bar';
 import { motion, AnimatePresence } from 'framer-motion';
-import webmBG from '../components/webmNeed/webmBG2.webm';
+import bgImage from '../components/bgNeed/bg2.png';
 
 export default function Auth() {
   const [isSignUp, setIsSignUp] = useState(false);
@@ -36,14 +36,8 @@ export default function Auth() {
   const navigate = useNavigate();
   const successTimeoutRef = useRef(null);
   const emailInputRef = useRef(null);
-  const videoRef = useRef(null);
 
   useEffect(() => {
-    // Preload the video
-    if (videoRef.current) {
-      videoRef.current.load();
-    }
-
     return () => {
       if (successTimeoutRef.current) {
         clearTimeout(successTimeoutRef.current);
@@ -340,19 +334,12 @@ export default function Auth() {
 
       {/* Main Auth Container */}
       <div className="w-full max-w-4xl mx-4 bg-white rounded-3xl overflow-hidden shadow-2xl grid grid-cols-1 lg:grid-cols-2">
-        {/* Left Side - WebM Background */}
+        {/* Left Side - Image Background */}
         <div className="hidden lg:block relative">
-          <video 
-            ref={videoRef}
-            autoPlay 
-            loop 
-            muted 
-            playsInline
-            preload="auto"
-            className="w-full h-full object-cover"
-          >
-            <source src={webmBG} type="video/webm" />
-          </video>
+          <div 
+            className="w-full h-full bg-cover bg-center"
+            style={{ backgroundImage: `url(${bgImage})` }}
+          />
           <div className="absolute inset-0 bg-black/30" />
           <div className="relative z-10 h-full flex flex-col justify-between text-white p-8">
             <div>
