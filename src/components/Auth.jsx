@@ -33,11 +33,9 @@ export default function Auth() {
   });
   const [showResetModal, setShowResetModal] = useState(false);
   const [resetEmail, setResetEmail] = useState('');
-  const [videoLoaded, setVideoLoaded] = useState(false);
   const navigate = useNavigate();
   const successTimeoutRef = useRef(null);
   const emailInputRef = useRef(null);
-  const videoRef = useRef(null);
 
   useEffect(() => {
     return () => {
@@ -46,15 +44,6 @@ export default function Auth() {
       }
     };
   }, []);
-
-  const handleVideoLoaded = () => {
-    setVideoLoaded(true);
-    if (videoRef.current) {
-      videoRef.current.play().catch(error => {
-        console.log("Autoplay prevented:", error);
-      });
-    }
-  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -232,7 +221,7 @@ export default function Auth() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
+    <div className="min-h-screen flex items-center justify-center bg-gray-100">
       {/* Success Notifications */}
       <AnimatePresence>
         {showSuccess && (
@@ -240,10 +229,10 @@ export default function Auth() {
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50"
+            className="fixed top-6 left-1/2 transform -translate-x-1/2 z-50"
           >
-            <div className="bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg flex items-center space-x-2 text-sm">
-              <FaCheck className="text-lg" />
+            <div className="bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg flex items-center space-x-2">
+              <FaCheck className="text-xl" />
               <span>Account created successfully!</span>
             </div>
           </motion.div>
@@ -254,10 +243,10 @@ export default function Auth() {
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50"
+            className="fixed top-6 left-1/2 transform -translate-x-1/2 z-50"
           >
-            <div className="bg-blue-500 text-white px-4 py-2 rounded-lg shadow-lg flex items-center space-x-2 text-sm">
-              <FaCheck className="text-lg" />
+            <div className="bg-blue-500 text-white px-6 py-3 rounded-lg shadow-lg flex items-center space-x-2">
+              <FaCheck className="text-xl" />
               <span>Password reset link sent to your email!</span>
             </div>
           </motion.div>
@@ -278,16 +267,16 @@ export default function Auth() {
               initial={{ scale: 0.9, y: 20 }}
               animate={{ scale: 1, y: 0 }}
               exit={{ scale: 0.9, y: 20 }}
-              className="bg-white rounded-xl p-6 w-full max-w-sm shadow-xl"
+              className="bg-white rounded-2xl p-8 w-full max-w-md shadow-xl"
               onClick={(e) => e.stopPropagation()}
             >
-              <h2 className="text-xl font-bold text-gray-800 mb-3">Reset Password</h2>
-              <p className="text-gray-600 mb-4 text-sm">
+              <h2 className="text-2xl font-bold text-gray-800 mb-4">Reset Password</h2>
+              <p className="text-gray-600 mb-6">
                 Enter your email address and we'll send you a link to reset your password.
               </p>
               
-              <div className="mb-4">
-                <label htmlFor="resetEmail" className="block text-xs font-medium text-gray-700 mb-1">
+              <div className="mb-6">
+                <label htmlFor="resetEmail" className="block text-sm font-medium text-gray-700 mb-1">
                   Email Address
                 </label>
                 <input
@@ -295,25 +284,25 @@ export default function Auth() {
                   id="resetEmail"
                   value={resetEmail}
                   onChange={(e) => setResetEmail(e.target.value)}
-                  className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-sm"
+                  className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
                   placeholder="your@email.com"
                 />
               </div>
               
               {error && (
-                <div className="mb-3 p-2 bg-red-100 text-red-600 rounded-md text-xs flex items-center">
-                  <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <div className="mb-4 p-3 bg-red-100 text-red-600 rounded-md text-sm flex items-center">
+                  <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                   {error}
                 </div>
               )}
               
-              <div className="flex justify-end space-x-2">
+              <div className="flex justify-end space-x-3">
                 <button
                   type="button"
                   onClick={() => setShowResetModal(false)}
-                  className="px-3 py-1.5 rounded-md text-gray-600 hover:bg-gray-100 transition-colors text-sm"
+                  className="px-4 py-2 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors"
                 >
                   Cancel
                 </button>
@@ -321,11 +310,11 @@ export default function Auth() {
                   type="button"
                   onClick={handlePasswordReset}
                   disabled={loading}
-                  className={`px-4 py-1.5 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors flex items-center text-sm ${loading ? 'opacity-80' : ''}`}
+                  className={`px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center ${loading ? 'opacity-80' : ''}`}
                 >
                   {loading ? (
                     <>
-                      <svg className="animate-spin -ml-1 mr-1 h-3 w-3 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                         <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                       </svg>
@@ -333,7 +322,7 @@ export default function Auth() {
                     </>
                   ) : (
                     <>
-                      Send <FaArrowRight className="ml-1 text-xs" />
+                      Send Link <FaArrowRight className="ml-2" />
                     </>
                   )}
                 </button>
@@ -344,27 +333,23 @@ export default function Auth() {
       </AnimatePresence>
 
       {/* Main Auth Container */}
-      <div className="w-full max-w-4xl bg-white rounded-2xl overflow-hidden shadow-xl grid grid-cols-1 lg:grid-cols-2">
+      <div className="w-full max-w-4xl mx-4 bg-white rounded-3xl overflow-hidden shadow-2xl grid grid-cols-1 lg:grid-cols-2">
         {/* Left Side - WebM Background */}
         <div className="hidden lg:block relative">
-          <div className={`absolute inset-0 bg-gray-200 ${videoLoaded ? 'hidden' : 'block'}`}></div>
           <video 
-            ref={videoRef}
             autoPlay 
             loop 
             muted 
             playsInline
             className="w-full h-full object-cover"
-            onCanPlayThrough={handleVideoLoaded}
-            preload="auto"
           >
             <source src={webmBG} type="video/webm" />
           </video>
-          <div className="absolute inset-0 bg-black/0 backdrop-blur-sm" />
+          <div className="absolute inset-0 bg-black/30" />
           <div className="relative z-10 h-full flex flex-col justify-between text-white p-8">
             <div>
-              <h1 className="text-2xl font-bold mb-3">Welcome {isSignUp ? 'to Our Platform' : 'Back'}</h1>
-              <p className="text-sm opacity-90">
+              <h1 className="text-3xl font-bold mb-3">Welcome {isSignUp ? 'to Our Platform' : 'Back'}</h1>
+              <p className="text-lg">
                 {isSignUp 
                   ? "Join thousands of users who trust our platform for their needs." 
                   : "Sign in to access your personalized dashboard and features."}
@@ -373,12 +358,12 @@ export default function Auth() {
             
             <div className="mt-auto">
               <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 rounded-full bg-white/0 flex items-center justify-center backdrop-blur-sm">
+                <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
                   <FaLock className="text-lg" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-sm">Secure Authentication</h3>
-                  <p className="text-xs opacity-80">End-to-end encrypted</p>
+                  <h3 className="font-semibold">Secure Authentication</h3>
+                  <p className="text-sm opacity-90">End-to-end encrypted</p>
                 </div>
               </div>
             </div>
@@ -386,9 +371,9 @@ export default function Auth() {
         </div>
         
         {/* Right Side - Auth Form */}
-        <div className="p-6 sm:p-8 flex flex-col justify-center">
+        <div className="p-8 flex flex-col justify-center">
           <div className="text-center mb-6">
-            <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mx-auto mb-3">
+            <div className="w-14 h-14 bg-blue-100 rounded-xl flex items-center justify-center mx-auto mb-3">
               <FaLock className="text-blue-600 text-xl" />
             </div>
             <h2 className="text-2xl font-bold text-gray-800">
@@ -403,9 +388,9 @@ export default function Auth() {
             <motion.div 
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
-              className="mb-4 p-3 bg-red-50 text-red-600 rounded-lg text-xs flex items-start"
+              className="mb-4 p-3 bg-red-50 text-red-600 rounded-lg text-sm flex items-start"
             >
-              <svg className="w-4 h-4 mr-1.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <svg className="w-4 h-4 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
               <span>{error}</span>
@@ -414,12 +399,12 @@ export default function Auth() {
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label htmlFor="email" className="block text-xs font-medium text-gray-700 mb-1">
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
                 Email Address
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <FaEnvelope className="text-gray-400 text-sm" />
+                  <FaEnvelope className="text-gray-400" />
                 </div>
                 <input
                   type="email"
@@ -428,7 +413,7 @@ export default function Auth() {
                   ref={emailInputRef}
                   value={formData.email}
                   onChange={handleChange}
-                  className="w-full pl-9 px-3 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-sm"
+                  className="w-full pl-10 px-3 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-sm"
                   placeholder="your@email.com"
                   required
                 />
@@ -436,12 +421,12 @@ export default function Auth() {
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-xs font-medium text-gray-700 mb-1">
+              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
                 Password
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <FaLock className="text-gray-400 text-sm" />
+                  <FaLock className="text-gray-400" />
                 </div>
                 <input
                   type={showPassword ? "text" : "password"}
@@ -449,7 +434,7 @@ export default function Auth() {
                   name="password"
                   value={formData.password}
                   onChange={handleChange}
-                  className="w-full pl-9 px-3 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-sm pr-9"
+                  className="w-full pl-10 px-3 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-sm pr-9"
                   placeholder={isSignUp ? "Create a password" : "Enter your password"}
                   required
                   minLength={6}
@@ -457,7 +442,7 @@ export default function Auth() {
                 <button
                   type="button"
                   onClick={togglePasswordVisibility}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-blue-500 text-sm"
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-blue-500"
                 >
                   {showPassword ? <FaEyeSlash /> : <FaEye />}
                 </button>
@@ -474,7 +459,7 @@ export default function Auth() {
                     className="mt-1"
                   />
                   
-                  <div className="mt-2 grid grid-cols-2 gap-1 text-2xs">
+                  <div className="mt-2 grid grid-cols-2 gap-1 text-xs">
                     <div className={`flex items-center ${securityChecks.length ? 'text-green-500' : 'text-gray-500'}`}>
                       <span className="mr-1">✓</span> 6+ characters
                     </div>
@@ -494,12 +479,12 @@ export default function Auth() {
 
             {isSignUp && (
               <div>
-                <label htmlFor="confirmPassword" className="block text-xs font-medium text-gray-700 mb-1">
+                <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-1">
                   Confirm Password
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <FaLock className="text-gray-400 text-sm" />
+                    <FaLock className="text-gray-400" />
                   </div>
                   <input
                     type={showPassword ? "text" : "password"}
@@ -507,14 +492,14 @@ export default function Auth() {
                     name="confirmPassword"
                     value={formData.confirmPassword}
                     onChange={handleChange}
-                    className="w-full pl-9 px-3 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-sm pr-9"
+                    className="w-full pl-10 px-3 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-sm pr-9"
                     required
                     minLength={6}
                   />
                   <button
                     type="button"
                     onClick={togglePasswordVisibility}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-blue-500 text-sm"
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-blue-500"
                   >
                     {showPassword ? <FaEyeSlash /> : <FaEye />}
                   </button>
@@ -553,7 +538,7 @@ export default function Auth() {
               ) : (
                 <>
                   {isSignUp ? "Create Account" : "Sign In"}
-                  <FaArrowRight className="ml-1.5 text-xs" />
+                  <FaArrowRight className="ml-1.5" />
                 </>
               )}
             </button>
