@@ -10,7 +10,7 @@ import { doc, setDoc, serverTimestamp, getDoc, updateDoc } from 'firebase/firest
 import { FaEye, FaEyeSlash, FaCheck, FaLock, FaEnvelope, FaArrowRight } from 'react-icons/fa';
 import PasswordStrengthBar from 'react-password-strength-bar';
 import { motion, AnimatePresence } from 'framer-motion';
-import webmBG from '../components/webmNeed/webmBG2.webm';
+import webmBG from '../components/webmNeed/webmBG1.webm';
 
 export default function Auth() {
   const [isSignUp, setIsSignUp] = useState(false);
