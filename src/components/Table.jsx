@@ -175,14 +175,14 @@ const Table = () => {
   };
 
   return (
-    <div className="relative max-w-6xl mx-auto px-6 mt-40">
-      {/* Whobee Robot - Perfectly positioned head and shoulders */}
+    <div className="relative max-w-6xl mx-auto px-6 mt-52">
+      {/* Whobee Robot - Fully visible head with extra space */}
       <div 
         className="absolute left-1/2 transform -translate-x-1/2 z-10"
         style={{ 
-          top: '-120px',
-          width: '320px',
-          height: '240px',
+          top: '-180px',
+          width: '380px',
+          height: '300px',
           pointerEvents: 'none'
         }}
       >
@@ -198,8 +198,8 @@ const Table = () => {
         />
       </div>
 
-      {/* Unified table container with proper spacing */}
-      <div className="bg-white/90 backdrop-blur-md rounded-2xl border border-gray-200 shadow-xl overflow-hidden relative z-20 mt-10">
+      {/* Unified table container pushed down */}
+      <div className="bg-white/90 backdrop-blur-md rounded-2xl border border-gray-200 shadow-xl overflow-hidden relative z-20 mt-16">
         {/* Window controls and tabs */}
         <div className="relative pt-4 pb-2 px-6 border-b border-gray-200">
           <WindowControls />
