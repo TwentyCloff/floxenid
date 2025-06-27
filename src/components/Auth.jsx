@@ -36,8 +36,14 @@ export default function Auth() {
   const navigate = useNavigate();
   const successTimeoutRef = useRef(null);
   const emailInputRef = useRef(null);
+  const videoRef = useRef(null);
 
   useEffect(() => {
+    // Preload the video
+    if (videoRef.current) {
+      videoRef.current.load();
+    }
+
     return () => {
       if (successTimeoutRef.current) {
         clearTimeout(successTimeoutRef.current);
@@ -337,10 +343,12 @@ export default function Auth() {
         {/* Left Side - WebM Background */}
         <div className="hidden lg:block relative">
           <video 
+            ref={videoRef}
             autoPlay 
             loop 
             muted 
             playsInline
+            preload="auto"
             className="w-full h-full object-cover"
           >
             <source src={webmBG} type="video/webm" />
