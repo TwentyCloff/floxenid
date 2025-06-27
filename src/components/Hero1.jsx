@@ -128,7 +128,24 @@ const HeroLanding = () => {
           </div>
         </div>
 
-        {/* Right: Preview Tilted Board */}
+        {/* Right: Tabs Selector Outside Tilt */}
+        <div className="lg:w-[130%] -ml-20 mb-4">
+          <div className="flex gap-2">
+            {tabs.map((tab) => (
+              <button
+                key={tab}
+                onClick={() => setActiveTab(tab)}
+                className={`px-4 py-1 text-sm rounded-full transition-all border border-zinc-700 backdrop-blur-md ${
+                  activeTab === tab ? 'bg-black text-white' : 'bg-zinc-200 text-black/60 hover:bg-zinc-300'
+                }`}
+              >
+                {tab}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Right: Tilted Preview */}
         <div className="lg:w-[130%] -ml-20">
           <Tilt
             tiltEnable={true}
@@ -139,47 +156,32 @@ const HeroLanding = () => {
             transitionSpeed={1500}
             className="w-full"
           >
-            <div className="transform rotate-x-[3deg] rotate-y-[-8deg] scale-[0.97] hover:rotate-x-0 hover:rotate-y-0 hover:scale-100 transition-all duration-700 bg-[#0b0b0b] border border-zinc-800 rounded-2xl shadow-2xl p-6 text-white">
-              <div className="flex gap-2 mb-4">
-                {tabs.map((tab) => (
-                  <button
-                    key={tab}
-                    onClick={() => setActiveTab(tab)}
-                    className={`px-4 py-1 text-sm rounded-full transition-all border border-zinc-700 backdrop-blur-md ${
-                      activeTab === tab ? 'bg-white text-black' : 'bg-zinc-800 text-white/60 hover:bg-zinc-700'
-                    }`}
-                  >
-                    {tab}
-                  </button>
-                ))}
-              </div>
-              <div className="bg-zinc-900 rounded-xl p-6 overflow-x-auto">
-                <h3 className="text-lg font-semibold mb-4">Platform Squad</h3>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 min-w-[960px]">
-                  {(tabContent[activeTab] || []).map((col) => (
-                    <div key={col.column}>
-                      <h4 className="text-sm font-medium text-white/80 mb-2">{col.column}</h4>
-                      <div className="space-y-3">
-                        {col.tasks.map((task, i) => (
-                          <div
-                            key={i}
-                            className="bg-zinc-800 p-4 rounded-lg shadow hover:shadow-xl transition border border-zinc-700"
-                          >
-                            <h5 className="text-sm font-semibold mb-1">{task.title}</h5>
-                            <p className="text-xs text-white/60 mb-2">{task.desc}</p>
-                            <div className="flex gap-2 flex-wrap">
-                              {task.tags.map((tag, j) => (
-                                <span key={j} className="text-xs bg-zinc-700 px-2 py-1 rounded-full">
-                                  {tag}
-                                </span>
-                              ))}
-                            </div>
+            <div className="transform rotate-x-[2deg] rotate-y-[-7deg] scale-[0.96] hover:rotate-x-0 hover:rotate-y-0 hover:scale-100 transition-all duration-700 bg-[#0b0b0b] border border-zinc-800 rounded-2xl shadow-2xl p-6 text-white max-h-[600px] overflow-hidden">
+              <h3 className="text-lg font-semibold mb-4">Platform Squad</h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {(tabContent[activeTab] || []).map((col) => (
+                  <div key={col.column}>
+                    <h4 className="text-sm font-medium text-white/80 mb-2">{col.column}</h4>
+                    <div className="space-y-3">
+                      {col.tasks.map((task, i) => (
+                        <div
+                          key={i}
+                          className="bg-zinc-800 p-4 rounded-lg shadow hover:shadow-xl transition border border-zinc-700"
+                        >
+                          <h5 className="text-sm font-semibold mb-1">{task.title}</h5>
+                          <p className="text-xs text-white/60 mb-2">{task.desc}</p>
+                          <div className="flex gap-2 flex-wrap">
+                            {task.tags.map((tag, j) => (
+                              <span key={j} className="text-xs bg-zinc-700 px-2 py-1 rounded-full">
+                                {tag}
+                              </span>
+                            ))}
                           </div>
-                        ))}
-                      </div>
+                        </div>
+                      ))}
                     </div>
-                  ))}
-                </div>
+                  </div>
+                ))}
               </div>
             </div>
           </Tilt>
