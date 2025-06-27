@@ -7,10 +7,9 @@ import {
   sendPasswordResetEmail
 } from 'firebase/auth';
 import { doc, setDoc, serverTimestamp, getDoc, updateDoc } from 'firebase/firestore';
-import { FaEye, FaEyeSlash, FaCheck, FaLock, FaEnvelope, FaArrowRight } from 'react-icons/fa';
+import { FaEye, FaEyeSlash, FaCheck, FaLock, FaEnvelope, FaArrowRight, FaArrowLeft } from 'react-icons/fa';
 import PasswordStrengthBar from 'react-password-strength-bar';
 import { motion, AnimatePresence } from 'framer-motion';
-import webmBG from '../components/webmNeed/webmBG1.webm';
 
 export default function Auth() {
   const [isSignUp, setIsSignUp] = useState(false);
@@ -221,7 +220,7 @@ export default function Auth() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+    <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
       {/* Success Notifications */}
       <AnimatePresence>
         {showSuccess && (
@@ -333,45 +332,17 @@ export default function Auth() {
       </AnimatePresence>
 
       {/* Main Auth Container */}
-      <div className="w-full max-w-6xl mx-4 bg-white rounded-3xl overflow-hidden shadow-2xl grid grid-cols-1 lg:grid-cols-2">
-        {/* Left Side - WebM Background */}
-        <div className="hidden lg:block relative">
-          <video 
-            autoPlay 
-            loop 
-            muted 
-            playsInline
-            className="w-full h-full object-cover"
+      <div className="w-full max-w-md mx-auto bg-white rounded-2xl overflow-hidden shadow-xl">
+        <div className="p-8 flex flex-col justify-center relative">
+          {/* Back Button */}
+          <button 
+            onClick={() => navigate(-1)}
+            className="absolute top-6 left-6 flex items-center text-gray-600 hover:text-gray-800 transition-colors"
           >
-            <source src={webmBG} type="video/webm" />
-          </video>
-          <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" />
-          <div className="relative z-10 h-full flex flex-col justify-between text-white p-12">
-            <div>
-              <h1 className="text-4xl font-bold mb-4">Welcome {isSignUp ? 'to Our Platform' : 'Back'}</h1>
-              <p className="text-xl opacity-90">
-                {isSignUp 
-                  ? "Join thousands of users who trust our platform for their needs." 
-                  : "Sign in to access your personalized dashboard and features."}
-              </p>
-            </div>
-            
-            <div className="mt-auto">
-              <div className="flex items-center space-x-4">
-                <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center backdrop-blur-sm">
-                  <FaLock className="text-xl" />
-                </div>
-                <div>
-                  <h3 className="font-semibold">Secure Authentication</h3>
-                  <p className="text-sm opacity-80">End-to-end encrypted</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        {/* Right Side - Auth Form (EXACTLY THE SAME AS YOUR ORIGINAL) */}
-        <div className="p-10 flex flex-col justify-center">
+            <FaArrowLeft className="mr-1" />
+            <span className="text-sm">Back</span>
+          </button>
+
           <div className="text-center mb-8">
             <div className="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
               <FaLock className="text-blue-600 text-2xl" />
