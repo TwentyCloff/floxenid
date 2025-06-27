@@ -27,7 +27,7 @@ const Table = () => {
           { title: 'History', value: '$1,240', icon: <Bookmark className="text-purple-600" size={20} />, color: 'purple' },
           { title: 'Analytics', value: '+12.5%', icon: <Settings className="text-orange-600" size={20} />, color: 'orange' }
         ].map((item, index) => (
-          <div key={index} className="bg-white/80 backdrop-blur-md p-6 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-all">
+          <div key={index} className="bg-white/99 backdrop-blur-md p-6 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-all">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">{item.title}</p>
@@ -175,14 +175,14 @@ const Table = () => {
   };
 
   return (
-    <div className="relative max-w-6xl mx-auto px-6 mt-48">
-      {/* Whobee Robot - Perfectly positioned with full head visible */}
+    <div className="relative max-w-6xl mx-auto px-6 mt-40">
+      {/* Whobee Robot - positioned above the table showing only head and neck */}
       <div 
         className="absolute left-1/2 transform -translate-x-1/2 z-10"
         style={{ 
-          top: '-200px',
-          width: '320px',
-          height: '240px',
+          top: '-250px',
+          width: '250px',
+          height: '550px',
           pointerEvents: 'none'
         }}
       >
@@ -198,13 +198,8 @@ const Table = () => {
         />
       </div>
 
-      {/* Fixed background container */}
-      <div className="fixed inset-0 -z-10">
-        <div className="absolute inset-0 bg-gradient-to-br from-gray-50 to-gray-100"></div>
-      </div>
-
-      {/* Unified table container with proper spacing */}
-      <div className="bg-white/90 backdrop-blur-md rounded-2xl border border-gray-200 shadow-xl overflow-hidden relative z-20 mt-20">
+      {/* Unified table and tabs container */}
+      <div className="bg-white/90 backdrop-blur-md rounded-2xl border border-gray-200 shadow-xl overflow-hidden relative z-20">
         {/* Window controls and tabs */}
         <div className="relative pt-4 pb-2 px-6 border-b border-gray-200">
           <WindowControls />
@@ -229,6 +224,16 @@ const Table = () => {
         <div className="min-h-[500px]">
           {renderContent()}
         </div>
+      </div>
+
+      {/* Harmony shadow */}
+      <div className="absolute inset-0 rounded-2xl overflow-hidden z-0">
+        <div 
+          className="absolute inset-0 bg-gradient-to-br from-green-100/20 via-cyan-100/20 to-blue-100/20 blur-xl opacity-20"
+          style={{
+            maskImage: 'radial-gradient(ellipse at center, black 40%, transparent 70%)'
+          }}
+        ></div>
       </div>
     </div>
   );
