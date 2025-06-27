@@ -159,7 +159,7 @@ const Navbar = () => {
 
   const goToDashboard = () => navigate("/dashboard");
   const goToPricing = () => navigate("/pricing");
-  const goToSignUp = () => navigate("/signup");
+  const goToSignUp = () => navigate("/Sign-Up");
   const goToEditProfile = () => {
     navigate("/profile");
     setShowProfileModal(false);
