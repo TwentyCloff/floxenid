@@ -14,19 +14,24 @@ const HeroLanding = () => {
         tasks: [
           { title: 'Fix login bug', desc: 'Implement new authentication flow with OAuth2', tags: ['Frontend', 'Bug'] },
           { title: 'Design new UI', desc: 'Add responsive layouts and improve mobile experience', tags: ['Frontend', 'Feature'] },
+          { title: 'Update database schema', desc: 'Create comprehensive test suite for authentication system', tags: ['Backend', 'Feature'] },
         ]
       },
       {
         column: 'In progress',
         tasks: [
           { title: 'Write unit tests', desc: 'Integrate and test Stripe payment processing', tags: ['Backend', 'Tech'] },
-          { title: 'Test payment gateway', desc: 'Implement code splitting and lazy loading', tags: ['Frontend', 'Bug'] }
+          { title: 'Test payment gateway', desc: 'Implement code splitting and lazy loading', tags: ['Frontend', 'Bug'] },
+          { title: 'Optimize performance', desc: 'Configure 2FA and update password policies', tags: ['Frontend', 'Feature'] },
+          { title: 'Update security settings', desc: 'Design and implement user onboarding wizard', tags: ['Backend', 'Feature'] },
         ]
       },
       {
         column: 'Done',
         tasks: [
-          { title: 'Deploy to production', desc: 'Update API documentation and usage examples', tags: ['Backend', 'Feature'] }
+          { title: 'Deploy to production', desc: 'Update API documentation and usage examples', tags: ['Backend', 'Feature'] },
+          { title: 'Update documentation', desc: 'Set up automated testing and deployment workflow', tags: ['Frontend', 'Bug'] },
+          { title: 'Implement CI/CD pipeline', desc: 'Configure Jenkins pipeline with automated testing', tags: ['Platform', 'Tech'] },
         ]
       }
     ],
@@ -93,9 +98,9 @@ const HeroLanding = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white text-black px-6 py-16">
-      <div className="max-w-7xl mx-auto flex flex-col lg:flex-row items-start gap-20">
-        {/* Left: Hero Content */}
+    <div className="min-h-screen bg-white text-black px-6 py-20">
+      <div className="max-w-7xl mx-auto flex flex-col lg:flex-row items-start gap-16">
+        {/* Left Side */}
         <div className="lg:w-1/2">
           <div className="inline-flex items-center px-3 py-1 rounded-full bg-blue-950 text-blue-400 text-sm font-medium mb-6">
             Get Pro – Limited time offer
@@ -103,7 +108,7 @@ const HeroLanding = () => {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-6 text-black">
             Build faster than AI<br /> with Once UI for Next.js
           </h1>
-          <p className="text-gray-600 mb-6">
+          <p className="text-gray-600 mb-6 text-lg">
             The open-source stack that helps you ship faster than VC-backed startups
           </p>
           <div className="flex items-center gap-2 mb-6">
@@ -111,7 +116,7 @@ const HeroLanding = () => {
               {[...Array(5)].map((_, i) => (
                 <div
                   key={i}
-                  className="w-8 h-8 rounded-full border-2 border-white bg-gray-300"
+                  className="w-9 h-9 rounded-full border-2 border-white bg-gray-300"
                 />
               ))}
             </div>
@@ -122,51 +127,52 @@ const HeroLanding = () => {
               npx create-once-ui-app@latest
               <span className="ml-2">📋</span>
             </div>
-            <button className="bg-black text-white px-5 py-2 rounded-md shadow hover:bg-zinc-800 transition">
+            <button className="bg-black text-white px-6 py-2 rounded-md shadow-md hover:bg-zinc-800 transition">
               Start building
             </button>
           </div>
         </div>
 
-        {/* Right: Tabs Selector Outside Tilt */}
-        <div className="lg:w-[130%] -ml-20 mb-4">
+        {/* Right Side */}
+        <div className="lg:w-1/2 w-full flex flex-col gap-4">
+          {/* Tab Selector */}
           <div className="flex gap-2">
             {tabs.map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
-                className={`px-4 py-1 text-sm rounded-full transition-all border border-zinc-700 backdrop-blur-md ${
-                  activeTab === tab ? 'bg-black text-white' : 'bg-zinc-200 text-black/60 hover:bg-zinc-300'
+                className={`px-4 py-1.5 text-sm font-medium rounded-full border transition-all ${
+                  activeTab === tab
+                    ? 'bg-black text-white'
+                    : 'bg-zinc-200 text-black/60 hover:bg-zinc-300'
                 }`}
               >
                 {tab}
               </button>
             ))}
           </div>
-        </div>
 
-        {/* Right: Tilted Preview */}
-        <div className="lg:w-[130%] -ml-20">
+          {/* Tilt Preview Board */}
           <Tilt
             tiltEnable={true}
-            tiltMaxAngleX={7}
-            tiltMaxAngleY={7}
+            tiltMaxAngleX={6}
+            tiltMaxAngleY={6}
             perspective={1200}
-            scale={1.01}
+            scale={1.02}
             transitionSpeed={1500}
             className="w-full"
           >
-            <div className="transform rotate-x-[2deg] rotate-y-[-7deg] scale-[0.96] hover:rotate-x-0 hover:rotate-y-0 hover:scale-100 transition-all duration-700 bg-[#0b0b0b] border border-zinc-800 rounded-2xl shadow-2xl p-6 text-white max-h-[600px] overflow-hidden">
+            <div className="bg-[#0b0b0b] border border-zinc-800 rounded-2xl shadow-xl p-6 text-white max-h-[600px] overflow-hidden">
               <h3 className="text-lg font-semibold mb-4">Platform Squad</h3>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
                 {(tabContent[activeTab] || []).map((col) => (
                   <div key={col.column}>
-                    <h4 className="text-sm font-medium text-white/80 mb-2">{col.column}</h4>
+                    <h4 className="text-sm font-semibold text-white/80 mb-2">{col.column}</h4>
                     <div className="space-y-3">
                       {col.tasks.map((task, i) => (
                         <div
                           key={i}
-                          className="bg-zinc-800 p-4 rounded-lg shadow hover:shadow-xl transition border border-zinc-700"
+                          className="bg-zinc-800 p-4 rounded-lg shadow hover:shadow-lg transition border border-zinc-700"
                         >
                           <h5 className="text-sm font-semibold mb-1">{task.title}</h5>
                           <p className="text-xs text-white/60 mb-2">{task.desc}</p>
