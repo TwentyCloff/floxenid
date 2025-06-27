@@ -17,17 +17,16 @@ const Table = () => {
     </div>
   );
 
-  // Whobee Robot (positioned behind the tabs)
+  // Whobee Robot positioned behind the entire table
   const WhobeeRobot = () => (
-    <div className="absolute top-[-50px] left-1/2 transform -translate-x-1/2 z-0 w-40 h-40">
+    <div className="absolute top-[-100px] left-1/2 transform -translate-x-1/2 z-[-1] w-[300px] h-[300px] opacity-70">
       <Spline scene="https://prod.spline.design/zK6boI3lfAHoTjb4/scene.splinecode" />
     </div>
   );
 
   const renderDashboard = () => (
-    <div className="p-6 w-full">
+    <div className="p-6 w-full mt-8">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        {/* Dashboard cards */}
         {[
           { title: 'Profile', value: 'User Dashboard', icon: <User className="text-blue-600" size={20} />, color: 'blue' },
           { title: 'Products', value: '24 Items', icon: <ShoppingCart className="text-green-600" size={20} />, color: 'green' },
@@ -47,6 +46,20 @@ const Table = () => {
           </div>
         ))}
       </div>
+      <div className="bg-white/70 backdrop-blur-md rounded-xl border border-gray-200 shadow-sm p-6">
+        <h3 className="text-lg font-semibold mb-4">Recent Activity</h3>
+        <div className="space-y-4">
+          {[1, 2, 3].map((item) => (
+            <div key={item} className="flex items-start pb-4 border-b border-gray-200 last:border-0">
+              <div className="w-10 h-10 rounded-full bg-gray-200 mr-4"></div>
+              <div>
+                <p className="font-medium">Activity {item}</p>
+                <p className="text-sm text-gray-600">Description of activity {item}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   );
 
@@ -56,17 +69,24 @@ const Table = () => {
         return renderDashboard();
       case 'Ecommerce':
         return (
-          <div className="p-6 w-full">
+          <div className="p-6 w-full mt-8">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-2xl font-bold">Personal Store</h2>
+              <div className="flex items-center space-x-4">
+                <Search className="text-gray-500" size={20} />
+                <ShoppingCart className="text-gray-500" size={20} />
+              </div>
+            </div>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-              {Array.from({ length: 8 }).map((_, i) => (
-                <div key={i} className="bg-white/70 backdrop-blur-md rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+              {[1, 2, 3, 4, 5, 6, 7, 8].map((item) => (
+                <div key={item} className="bg-white/70 backdrop-blur-md rounded-xl border border-gray-200 shadow-sm overflow-hidden">
                   <div className="h-40 bg-gray-200 relative">
                     <div className="absolute top-2 right-2 bg-white/80 rounded-full p-1">
                       <Heart className="text-gray-700" size={16} />
                     </div>
                   </div>
                   <div className="p-4">
-                    <h3 className="font-medium">Product {i + 1}</h3>
+                    <h3 className="font-medium">Product {item}</h3>
                     <p className="text-sm text-gray-600 mt-1">$19.99</p>
                     <button className="mt-3 w-full bg-black text-white py-2 rounded-md text-sm hover:bg-gray-800 transition">
                       Add to Cart
@@ -79,38 +99,49 @@ const Table = () => {
         );
       case 'Social':
         return (
-          <div className="p-6 w-full">
-            <div className="max-w-2xl mx-auto space-y-6">
-              {[1, 2, 3].map((item) => (
-                <div key={item} className="bg-white/70 backdrop-blur-md rounded-xl border border-gray-200 shadow-sm">
-                  <div className="flex items-center justify-between p-4">
-                    <div className="flex items-center">
-                      <div className="w-8 h-8 rounded-full bg-gray-200 mr-3"></div>
-                      <span className="font-semibold">username{item}</span>
-                    </div>
-                    <ChevronDown size={20} />
+          <div className="p-6 w-full mt-8">
+            <div className="max-w-2xl mx-auto">
+              <div className="flex space-x-4 mb-6 overflow-x-auto pb-2">
+                {[1, 2, 3, 4, 5, 6].map((item) => (
+                  <div key={item} className="flex flex-col items-center flex-shrink-0">
+                    <div className="w-16 h-16 rounded-full bg-gray-200 border-2 border-pink-500 mb-1"></div>
+                    <span className="text-xs">user{item}</span>
                   </div>
-                  <div className="h-96 bg-gray-200"></div>
-                  <div className="p-4">
-                    <div className="flex space-x-4 mb-2">
-                      <Heart size={24} className="text-black" />
-                      <MessageSquare size={24} className="text-black" />
-                      <Mail size={24} className="text-black" />
-                      <Bookmark size={24} className="text-black ml-auto" />
+                ))}
+              </div>
+              
+              <div className="space-y-6">
+                {[1, 2, 3].map((item) => (
+                  <div key={item} className="bg-white/70 backdrop-blur-md rounded-xl border border-gray-200 shadow-sm">
+                    <div className="flex items-center justify-between p-4">
+                      <div className="flex items-center">
+                        <div className="w-8 h-8 rounded-full bg-gray-200 mr-3"></div>
+                        <span className="font-semibold">username{item}</span>
+                      </div>
+                      <ChevronDown size={20} />
                     </div>
-                    <p className="font-semibold">1,234 likes</p>
-                    <p className="mt-1">
-                      <span className="font-semibold">username{item}</span> This is a sample post caption #{item}
-                    </p>
+                    <div className="h-96 bg-gray-200"></div>
+                    <div className="p-4">
+                      <div className="flex space-x-4 mb-2">
+                        <Heart size={24} className="text-black" />
+                        <MessageSquare size={24} className="text-black" />
+                        <Mail size={24} className="text-black" />
+                        <Bookmark size={24} className="text-black ml-auto" />
+                      </div>
+                      <p className="font-semibold">1,234 likes</p>
+                      <p className="mt-1">
+                        <span className="font-semibold">username{item}</span> This is a sample post caption #{item}
+                      </p>
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
           </div>
         );
       case 'AI':
         return (
-          <div className="p-6 w-full h-full">
+          <div className="p-6 w-full h-full mt-8">
             <div className="bg-white/70 backdrop-blur-md rounded-xl border border-gray-200 shadow-sm h-full flex flex-col">
               <div className="p-4 border-b border-gray-200">
                 <h3 className="text-lg font-semibold">Floxen AI</h3>
@@ -150,9 +181,9 @@ const Table = () => {
   };
 
   return (
-    <div className="relative max-w-6xl mx-auto px-6">
+    <div className="relative max-w-6xl mx-auto px-6 mt-32 mb-32">
       {/* Harmony shadow */}
-      <div className="absolute inset-0 rounded-2xl overflow-hidden z-[-1]">
+      <div className="absolute inset-0 rounded-2xl overflow-hidden z-[-2]">
         <div 
           className="absolute inset-0 bg-gradient-to-br from-green-100/30 via-cyan-100/30 to-blue-100/30 blur-xl opacity-20"
           style={{
@@ -161,10 +192,12 @@ const Table = () => {
         ></div>
       </div>
 
+      {/* Whobee Robot positioned behind everything */}
+      <WhobeeRobot />
+
       {/* White shape with MacOS controls */}
       <div className="bg-white/90 backdrop-blur-md rounded-t-2xl border border-gray-200 shadow-sm relative pt-4 pb-2 px-6">
         <WindowControls />
-        <WhobeeRobot />
         <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide mt-6">
           {tabs.map((tab) => (
             <button
@@ -183,7 +216,7 @@ const Table = () => {
       </div>
 
       {/* Main table content */}
-      <div className="bg-white/80 backdrop-blur-sm rounded-b-2xl border border-t-0 border-gray-200 shadow-lg">
+      <div className="bg-white/80 backdrop-blur-sm rounded-b-2xl border border-t-0 border-gray-200 shadow-lg min-h-[500px]">
         {renderContent()}
       </div>
     </div>
