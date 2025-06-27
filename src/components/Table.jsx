@@ -180,7 +180,7 @@ const Table = () => {
       <div 
         className="absolute left-1/2 transform -translate-x-1/2 z-10"
         style={{ 
-          top: '-150px',
+          top: '-180px',
           width: '350px',
           height: '280px',
           pointerEvents: 'none'
