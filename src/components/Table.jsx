@@ -176,12 +176,13 @@ const Table = () => {
 
   return (
     <div className="relative max-w-6xl mx-auto px-6 mt-32">
-      {/* Whobee Robot - positioned exactly as in original code */}
+      {/* Whobee Robot - positioned above the table showing only head and neck */}
       <div 
-        className="absolute left-0 right-0 z-0" 
+        className="absolute left-1/2 transform -translate-x-1/2 z-10"
         style={{ 
-          top: '20rem', 
-          height: 'calc(100% - 6rem)',
+          top: '-80px',
+          width: '300px',
+          height: '200px',
           pointerEvents: 'none'
         }}
       >
@@ -198,7 +199,7 @@ const Table = () => {
       </div>
 
       {/* Unified table and tabs container */}
-      <div className="bg-white/90 backdrop-blur-md rounded-2xl border border-gray-200 shadow-xl overflow-hidden">
+      <div className="bg-white/90 backdrop-blur-md rounded-2xl border border-gray-200 shadow-xl overflow-hidden relative z-20">
         {/* Window controls and tabs */}
         <div className="relative pt-4 pb-2 px-6 border-b border-gray-200">
           <WindowControls />
@@ -226,7 +227,7 @@ const Table = () => {
       </div>
 
       {/* Harmony shadow */}
-      <div className="absolute inset-0 rounded-2xl overflow-hidden z-[-1]">
+      <div className="absolute inset-0 rounded-2xl overflow-hidden z-0">
         <div 
           className="absolute inset-0 bg-gradient-to-br from-green-100/20 via-cyan-100/20 to-blue-100/20 blur-xl opacity-20"
           style={{
