@@ -33,9 +33,11 @@ export default function Auth() {
   });
   const [showResetModal, setShowResetModal] = useState(false);
   const [resetEmail, setResetEmail] = useState('');
+  const [videoLoaded, setVideoLoaded] = useState(false);
   const navigate = useNavigate();
   const successTimeoutRef = useRef(null);
   const emailInputRef = useRef(null);
+  const videoRef = useRef(null);
 
   useEffect(() => {
     return () => {
@@ -44,6 +46,15 @@ export default function Auth() {
       }
     };
   }, []);
+
+  const handleVideoLoaded = () => {
+    setVideoLoaded(true);
+    if (videoRef.current) {
+      videoRef.current.play().catch(error => {
+        console.log("Autoplay prevented:", error);
+      });
+    }
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -336,12 +347,16 @@ export default function Auth() {
       <div className="w-full max-w-6xl mx-4 bg-white rounded-3xl overflow-hidden shadow-2xl grid grid-cols-1 lg:grid-cols-2">
         {/* Left Side - WebM Background */}
         <div className="hidden lg:block relative">
+          <div className={`absolute inset-0 bg-gray-200 ${videoLoaded ? 'hidden' : 'block'}`}></div>
           <video 
+            ref={videoRef}
             autoPlay 
             loop 
             muted 
             playsInline
             className="w-full h-full object-cover"
+            onCanPlayThrough={handleVideoLoaded}
+            preload="auto"
           >
             <source src={webmBG} type="video/webm" />
           </video>
@@ -370,7 +385,7 @@ export default function Auth() {
           </div>
         </div>
         
-        {/* Right Side - Auth Form (EXACTLY THE SAME AS YOUR ORIGINAL) */}
+        {/* Right Side - Auth Form */}
         <div className="p-10 flex flex-col justify-center">
           <div className="text-center mb-8">
             <div className="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
