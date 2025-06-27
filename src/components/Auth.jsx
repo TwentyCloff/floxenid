@@ -10,7 +10,7 @@ import { doc, setDoc, serverTimestamp, getDoc, updateDoc } from 'firebase/firest
 import { FaEye, FaEyeSlash, FaCheck, FaLock, FaEnvelope, FaArrowRight } from 'react-icons/fa';
 import PasswordStrengthBar from 'react-password-strength-bar';
 import { motion, AnimatePresence } from 'framer-motion';
-import webmBG from '../components/webmNeed/webmBG1.webm';
+import webmBG from '../components/webmNeed/webmBG2.webm';
 
 export default function Auth() {
   const [isSignUp, setIsSignUp] = useState(false);
@@ -360,7 +360,7 @@ export default function Auth() {
           >
             <source src={webmBG} type="video/webm" />
           </video>
-          <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" />
+          <div className="absolute inset-0 bg-black/1 backdrop-blur-sm" />
           <div className="relative z-10 h-full flex flex-col justify-between text-white p-8">
             <div>
               <h1 className="text-2xl font-bold mb-3">Welcome {isSignUp ? 'to Our Platform' : 'Back'}</h1>
