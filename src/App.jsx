@@ -7,6 +7,8 @@ import Profile from "./components/Profile";
 import Dashboard from "./components/Dashboard";
 import Pricing from "./components/Pricing";
 import ResetPassword from "./components/ResetPassword";
+import ButtonTest from "./components/ButtonTest"
+
 
 const Home = () => (
   <div className="pt-[4.75rem] lg:pt-[5.25rem] overflow-hidden">
