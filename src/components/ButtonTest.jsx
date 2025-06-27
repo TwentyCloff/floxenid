@@ -1,66 +1,28 @@
-import { ElementType } from "react";
+import React from 'react';
 
-// Simple class merging utility
-const mergeClasses = (...classes) => classes.filter(Boolean).join(' ');
-
-export function StarBorder({
-  as: Component = 'button',
-  className = '',
-  color = '#ffffff',
-  speed = "6s",
-  children,
-  ...props
-}) {
+const CallToAction = () => {
   return (
-    <Component 
-      className={mergeClasses(
-        "relative inline-block py-[1px] overflow-hidden rounded-[20px]",
-        className
-      )} 
-      {...props}
-    >
-      <div
-        className={mergeClasses(
-          "absolute w-[300%] h-[50%] bottom-[-11px] right-[-250%] rounded-full animate-star-movement-bottom z-0",
-          "opacity-20 dark:opacity-70" 
-        )}
-        style={{
-          background: `radial-gradient(circle, ${color}, transparent 10%)`,
-          animationDuration: speed,
-        }}
-      />
-      <div
-        className={mergeClasses(
-          "absolute w-[300%] h-[50%] top-[-10px] left-[-250%] rounded-full animate-star-movement-top z-0",
-          "opacity-20 dark:opacity-70"
-        )}
-        style={{
-          background: `radial-gradient(circle, ${color}, transparent 10%)`,
-          animationDuration: speed,
-        }}
-      />
-      <div className={mergeClasses(
-        "relative z-1 border text-foreground text-center text-base py-4 px-6 rounded-[20px]",
-        "bg-black border-black/40",
-        "dark:bg-black dark:border-black"
-      )}>
-        {children}
+    <div className="relative bg-black text-white py-24 px-6 rounded-lg overflow-hidden">
+      {/* Glow effect background */}
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black to-orange-500 opacity-30 blur-2xl pointer-events-none" />
+
+      {/* Content */}
+      <div className="relative z-10 text-center max-w-2xl mx-auto">
+        <button className="text-sm px-3 py-1 rounded-full border border-gray-600 mb-4 text-gray-300 hover:bg-gray-800 transition">
+          Get started
+        </button>
+        <h2 className="text-3xl md:text-4xl font-bold mb-4">
+          Start building with Launch UI
+        </h2>
+        <p className="text-gray-400 mb-6">
+          Get started with Launch UI and build your landing page in no time
+        </p>
+        <button className="bg-white text-black font-medium px-5 py-2 rounded-md shadow-md hover:bg-gray-200 transition">
+          Get Started
+        </button>
       </div>
-    </Component>
-  );
-}
-
-// Main demo component
-export function StarBorderDemo() {
-  return (
-    <div className="space-y-8">
-      <StarBorder>
-        Theme-aware Border
-      </StarBorder>
     </div>
   );
-}
+};
 
-// Add default export
-const ButtonTest = { StarBorderDemo, StarBorder };
-export default ButtonTest;
+export default CallToAction;
