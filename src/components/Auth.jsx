@@ -1,10 +1,15 @@
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { auth, db } from '../config/firebaseConfig';
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
+import { 
+  createUserWithEmailAndPassword, 
+  signInWithEmailAndPassword,
+  sendPasswordResetEmail
+} from 'firebase/auth';
 import { doc, setDoc, serverTimestamp, getDoc, updateDoc } from 'firebase/firestore';
-import { FaEye, FaEyeSlash, FaCheck, FaLock, FaEnvelope } from 'react-icons/fa';
+import { FaEye, FaEyeSlash, FaCheck, FaLock, FaEnvelope, FaArrowRight } from 'react-icons/fa';
 import PasswordStrengthBar from 'react-password-strength-bar';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export default function Auth() {
   const [isSignUp, setIsSignUp] = useState(false);
@@ -15,6 +20,7 @@ export default function Auth() {
   });
   const [showPassword, setShowPassword] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [showResetSuccess, setShowResetSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [passwordScore, setPasswordScore] = useState(0);
@@ -24,6 +30,8 @@ export default function Auth() {
     number: false,
     specialChar: false
   });
+  const [showResetModal, setShowResetModal] = useState(false);
+  const [resetEmail, setResetEmail] = useState('');
   const navigate = useNavigate();
   const successTimeoutRef = useRef(null);
   const emailInputRef = useRef(null);
@@ -76,12 +84,10 @@ export default function Auth() {
 
   const createUserDocument = async (user) => {
     try {
-      // Gunakan UID sebagai document ID
       const userDocRef = doc(db, 'users', user.uid);
       const userDoc = await getDoc(userDocRef);
       
       if (!userDoc.exists()) {
-        // Create new user document dengan UID sebagai ID
         await setDoc(userDocRef, {
           email: user.email,
           displayName: user.displayName || '',
@@ -91,7 +97,6 @@ export default function Auth() {
           emailVerified: user.emailVerified || false
         });
       } else {
-        // Update last login time for existing user
         await updateDoc(userDocRef, {
           lastLogin: serverTimestamp()
         });
@@ -118,14 +123,12 @@ export default function Auth() {
 
     try {
       if (isSignUp) {
-        // Create user in Firebase Authentication
         const userCredential = await createUserWithEmailAndPassword(
           auth, 
           formData.email, 
           formData.password
         );
         
-        // Create user document in Firestore dengan UID sebagai ID
         await createUserDocument(userCredential.user);
         
         setShowSuccess(true);
@@ -136,14 +139,12 @@ export default function Auth() {
         setIsSignUp(false);
         setFormData({...formData, confirmPassword: ''});
       } else {
-        // Sign in existing user
         const userCredential = await signInWithEmailAndPassword(
           auth, 
           formData.email, 
           formData.password
         );
         
-        // Update last login time menggunakan UID sebagai ID
         try {
           await updateDoc(doc(db, 'users', userCredential.user.uid), {
             lastLogin: serverTimestamp()
@@ -193,45 +194,203 @@ export default function Auth() {
     setFormData({...formData, confirmPassword: ''});
   };
 
+  const handlePasswordReset = async () => {
+    if (!resetEmail.trim()) {
+      setError("Please enter your email address");
+      return;
+    }
+
+    if (!validateEmail(resetEmail)) {
+      setError("Invalid email format");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      await sendPasswordResetEmail(auth, resetEmail);
+      setShowResetSuccess(true);
+      setShowResetModal(false);
+      setResetEmail('');
+      setTimeout(() => setShowResetSuccess(false), 5000);
+    } catch (error) {
+      setError(error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <div className="min-h-screen pt-[4.75rem] lg:pt-[5.25rem] bg-gradient-to-br from-gray-50 to-blue-50 flex items-center justify-center p-4">
-      {showSuccess && (
-        <div className="fixed top-20 left-1/2 transform -translate-x-1/2 z-50">
-          <div className="bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg flex items-center space-x-2 animate-fade-in">
-            <FaCheck className="text-xl" />
-            <span>Account created successfully!</span>
+    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+      {/* Success Notifications */}
+      <AnimatePresence>
+        {showSuccess && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="fixed top-6 left-1/2 transform -translate-x-1/2 z-50"
+          >
+            <div className="bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg flex items-center space-x-2">
+              <FaCheck className="text-xl" />
+              <span>Account created successfully!</span>
+            </div>
+          </motion.div>
+        )}
+
+        {showResetSuccess && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="fixed top-6 left-1/2 transform -translate-x-1/2 z-50"
+          >
+            <div className="bg-blue-500 text-white px-6 py-3 rounded-lg shadow-lg flex items-center space-x-2">
+              <FaCheck className="text-xl" />
+              <span>Password reset link sent to your email!</span>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Password Reset Modal */}
+      <AnimatePresence>
+        {showResetModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
+            onClick={() => setShowResetModal(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, y: 20 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.9, y: 20 }}
+              className="bg-white rounded-2xl p-8 w-full max-w-md shadow-xl"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <h2 className="text-2xl font-bold text-gray-800 mb-4">Reset Password</h2>
+              <p className="text-gray-600 mb-6">
+                Enter your email address and we'll send you a link to reset your password.
+              </p>
+              
+              <div className="mb-6">
+                <label htmlFor="resetEmail" className="block text-sm font-medium text-gray-700 mb-1">
+                  Email Address
+                </label>
+                <input
+                  type="email"
+                  id="resetEmail"
+                  value={resetEmail}
+                  onChange={(e) => setResetEmail(e.target.value)}
+                  className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                  placeholder="your@email.com"
+                />
+              </div>
+              
+              {error && (
+                <div className="mb-4 p-3 bg-red-100 text-red-600 rounded-md text-sm flex items-center">
+                  <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  {error}
+                </div>
+              )}
+              
+              <div className="flex justify-end space-x-3">
+                <button
+                  type="button"
+                  onClick={() => setShowResetModal(false)}
+                  className="px-4 py-2 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={handlePasswordReset}
+                  disabled={loading}
+                  className={`px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center ${loading ? 'opacity-80' : ''}`}
+                >
+                  {loading ? (
+                    <>
+                      <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      Sending...
+                    </>
+                  ) : (
+                    <>
+                      Send Link <FaArrowRight className="ml-2" />
+                    </>
+                  )}
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Main Auth Container */}
+      <div className="w-full max-w-6xl mx-4 bg-white rounded-3xl overflow-hidden shadow-2xl grid grid-cols-1 lg:grid-cols-2">
+        {/* Left Side - Glass Background */}
+        <div className="hidden lg:block relative bg-gradient-to-br from-blue-500 to-indigo-600 p-12">
+          <div className="absolute inset-0 bg-white bg-opacity-10 backdrop-blur-md" />
+          <div className="relative z-10 h-full flex flex-col justify-between text-white">
+            <div>
+              <h1 className="text-4xl font-bold mb-4">Welcome {isSignUp ? 'to Our Platform' : 'Back'}</h1>
+              <p className="text-xl opacity-90">
+                {isSignUp 
+                  ? "Join thousands of users who trust our platform for their needs." 
+                  : "Sign in to access your personalized dashboard and features."}
+              </p>
+            </div>
+            
+            <div className="mt-auto">
+              <div className="flex items-center space-x-4">
+                <div className="w-12 h-12 rounded-full bg-white bg-opacity-20 flex items-center justify-center">
+                  <FaLock className="text-xl" />
+                </div>
+                <div>
+                  <h3 className="font-semibold">Secure Authentication</h3>
+                  <p className="text-sm opacity-80">End-to-end encrypted</p>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
-      )}
-
-      <div className="w-full max-w-md bg-white rounded-xl shadow-lg overflow-hidden transition-all duration-300">
-        <div className="p-8">
-          <div className="flex justify-center mb-6">
-            <div className="bg-blue-100 p-4 rounded-full">
-              <FaLock className="text-blue-600 text-3xl" />
+        
+        {/* Right Side - Auth Form */}
+        <div className="p-10 flex flex-col justify-center">
+          <div className="text-center mb-8">
+            <div className="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+              <FaLock className="text-blue-600 text-2xl" />
             </div>
+            <h2 className="text-3xl font-bold text-gray-800">
+              {isSignUp ? "Create Account" : "Welcome Back"}
+            </h2>
+            <p className="text-gray-500 mt-2">
+              {isSignUp ? "Get started with your account" : "Sign in to continue"}
+            </p>
           </div>
           
-          <h1 className="text-2xl font-bold text-center text-gray-800 mb-6">
-            {isSignUp ? "Create Account" : "Welcome Back"}
-          </h1>
-          <p className="text-center text-gray-500 mb-8">
-            {isSignUp ? "Get started with your account" : "Sign in to continue"}
-          </p>
-          
           {error && (
-            <div className="mb-4 p-3 bg-red-100 text-red-600 rounded-md text-sm flex items-center">
-              <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <motion.div 
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mb-6 p-4 bg-red-50 text-red-600 rounded-xl text-sm flex items-start"
+            >
+              <svg className="w-5 h-5 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
-              {error}
-            </div>
+              <span>{error}</span>
+            </motion.div>
           )}
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-                Email
+                Email Address
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -244,8 +403,8 @@ export default function Auth() {
                   ref={emailInputRef}
                   value={formData.email}
                   onChange={handleChange}
-                  className="w-full pl-10 px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
-                  placeholder="user@example.com"
+                  className="w-full pl-10 px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                  placeholder="your@email.com"
                   required
                 />
               </div>
@@ -265,8 +424,8 @@ export default function Auth() {
                   name="password"
                   value={formData.password}
                   onChange={handleChange}
-                  className="w-full pl-10 px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all pr-10"
-                  placeholder={isSignUp ? "At least 6 characters" : "Your password"}
+                  className="w-full pl-10 px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all pr-10"
+                  placeholder={isSignUp ? "Create a password" : "Enter your password"}
                   required
                   minLength={6}
                 />
@@ -323,7 +482,7 @@ export default function Auth() {
                     name="confirmPassword"
                     value={formData.confirmPassword}
                     onChange={handleChange}
-                    className="w-full pl-10 px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all pr-10"
+                    className="w-full pl-10 px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all pr-10"
                     required
                     minLength={6}
                   />
@@ -343,7 +502,10 @@ export default function Auth() {
                 <button 
                   type="button" 
                   className="text-sm text-blue-600 hover:text-blue-800"
-                  onClick={() => setError("Password reset functionality not implemented yet")}
+                  onClick={() => {
+                    setShowResetModal(true);
+                    setError('');
+                  }}
                 >
                   Forgot password?
                 </button>
@@ -353,7 +515,7 @@ export default function Auth() {
             <button
               type="submit"
               disabled={loading}
-              className={`w-full py-3 px-4 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white font-medium rounded-lg transition-all flex items-center justify-center shadow-md hover:shadow-lg ${loading ? 'opacity-80' : ''}`}
+              className={`w-full py-3 px-4 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white font-medium rounded-xl transition-all flex items-center justify-center shadow-md hover:shadow-lg ${loading ? 'opacity-80' : ''}`}
             >
               {loading ? (
                 <>
@@ -363,7 +525,12 @@ export default function Auth() {
                   </svg>
                   {isSignUp ? "Creating Account..." : "Signing In..."}
                 </>
-              ) : isSignUp ? "Create Account" : "Sign In"}
+              ) : (
+                <>
+                  {isSignUp ? "Create Account" : "Sign In"}
+                  <FaArrowRight className="ml-2" />
+                </>
+              )}
             </button>
           </form>
 
