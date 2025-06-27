@@ -181,7 +181,7 @@ const Table = () => {
         className="absolute left-1/2 transform -translate-x-1/2 z-10"
         style={{ 
           top: '-250px',
-          width: '250px',
+          width: '300px',
           height: '550px',
           pointerEvents: 'none'
         }}
