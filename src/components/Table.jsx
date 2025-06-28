@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { User, ShoppingCart, MessageSquare, Settings, Bookmark, ChevronDown, Plus, Heart, Mail, Search } from 'lucide-react';
 import Spline from '@splinetool/react-spline';
 
@@ -9,7 +9,40 @@ const Table = () => {
   const tabs = ['Productivity', 'Ecommerce', 'Social', 'AI'];
   const ROBOT_SCENE_URL = 'https://prod.spline.design/zK6boI3lfAHoTjb4/scene.splinecode';
 
-  // MacOS-style window controls
+  const splineRef = useRef();
+  const [showSpline, setShowSpline] = useState(false);
+
+  useEffect(() => {
+    if (window.innerWidth >= 768) {
+      // Desktop langsung render spline
+      setShowSpline(true);
+    } else {
+      // Mobile pakai IntersectionObserver
+      const observer = new IntersectionObserver(
+        ([entry]) => {
+          if (entry.isIntersecting) {
+            setShowSpline(true);
+            observer.disconnect();
+          }
+        },
+        { threshold: 0.1 }
+      );
+      if (splineRef.current) observer.observe(splineRef.current);
+      return () => observer.disconnect();
+    }
+  }, []);
+
+  // inject preload di head
+  useEffect(() => {
+    const preloadLink = document.createElement('link');
+    preloadLink.rel = 'preload';
+    preloadLink.href = ROBOT_SCENE_URL;
+    preloadLink.as = 'fetch';
+    preloadLink.crossOrigin = 'anonymous';
+    document.head.appendChild(preloadLink);
+    return () => document.head.removeChild(preloadLink);
+  }, []);
+
   const WindowControls = () => (
     <div className="absolute top-4 left-4 flex space-x-2 z-20">
       <div className="w-3 h-3 rounded-full bg-red-500"></div>
@@ -21,7 +54,7 @@ const Table = () => {
   const renderDashboard = () => (
     <div className="p-6 w-full">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        {[
+        {[ 
           { title: 'Profile', value: 'User Dashboard', icon: <User className="text-blue-600" size={20} />, color: 'blue' },
           { title: 'Products', value: '24 Items', icon: <ShoppingCart className="text-green-600" size={20} />, color: 'green' },
           { title: 'History', value: '$1,240', icon: <Bookmark className="text-purple-600" size={20} />, color: 'purple' },
@@ -103,7 +136,6 @@ const Table = () => {
                   </div>
                 ))}
               </div>
-              
               <div className="space-y-6">
                 {[1, 2, 3].map((item) => (
                   <div key={item} className="bg-white/80 backdrop-blur-md rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-all">
@@ -176,8 +208,8 @@ const Table = () => {
 
   return (
     <div className="relative max-w-6xl mx-auto px-6 mt-40">
-      {/* Whobee Robot - positioned above the table showing only head and neck */}
       <div 
+        ref={splineRef}
         className="absolute left-1/2 transform -translate-x-1/2 z-10"
         style={{ 
           top: '-250px',
@@ -186,21 +218,21 @@ const Table = () => {
           pointerEvents: 'none'
         }}
       >
-        <Spline 
-          scene={ROBOT_SCENE_URL}
-          style={{
-            width: '100%',
-            height: '100%',
-            position: 'absolute',
-            top: 0,
-            left: 0,
-          }}
-        />
+        {showSpline && (
+          <Spline 
+            scene={ROBOT_SCENE_URL}
+            style={{
+              width: '100%',
+              height: '100%',
+              position: 'absolute',
+              top: 0,
+              left: 0,
+            }}
+          />
+        )}
       </div>
 
-      {/* Unified table and tabs container */}
       <div className="bg-white/90 backdrop-blur-md rounded-2xl border border-gray-200 shadow-xl overflow-hidden relative z-20">
-        {/* Window controls and tabs */}
         <div className="relative pt-4 pb-2 px-6 border-b border-gray-200">
           <WindowControls />
           <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide mt-6">
@@ -220,13 +252,11 @@ const Table = () => {
           </div>
         </div>
 
-        {/* Main content area */}
         <div className="min-h-[500px]">
           {renderContent()}
         </div>
       </div>
 
-      {/* Harmony shadow */}
       <div className="absolute inset-0 rounded-2xl overflow-hidden z-0">
         <div 
           className="absolute inset-0 bg-gradient-to-br from-green-100/20 via-cyan-100/20 to-blue-100/20 blur-xl opacity-20"
