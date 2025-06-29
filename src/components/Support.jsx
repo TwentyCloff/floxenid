@@ -1,32 +1,30 @@
-// src/pages/Support.jsx
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { auth, db } from '../config/firebaseConfig';
-import { collection, query, where, orderBy, addDoc, serverTimestamp, onSnapshot, doc, getDoc, setDoc } from 'firebase/firestore';
+import { collection, query, where, orderBy, doc, setDoc, serverTimestamp, onSnapshot, getDoc } from 'firebase/firestore';
 import { onAuthStateChanged } from 'firebase/auth';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 
 const Support = () => {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
-  const [isTyping, setIsTyping] = useState(false);
   const [user, setUser] = useState(null);
   const [showFAQ, setShowFAQ] = useState(true);
-  const [isTypingIndicator, setIsTypingIndicator] = useState(false);
+  const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef(null);
   const navigate = useNavigate();
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       if (currentUser) {
-        if (currentUser.email === 'floxenstaff@gmail.com' || currentUser.email === 'floxenowner@gmail.com') {
+        if (['floxenstaff@gmail.com', 'floxenowner@gmail.com'].includes(currentUser.email)) {
           navigate('/admin-support');
         } else {
           setUser(currentUser);
-          // Create user document if it doesn't exist
+          // Create user document if not exists
           const userDocRef = doc(db, 'users', currentUser.uid);
-          const docSnap = await getDoc(userDocRef);
-          if (!docSnap.exists()) {
+          const userDoc = await getDoc(userDocRef);
+          if (!userDoc.exists()) {
             await setDoc(userDocRef, {
               displayName: currentUser.displayName || currentUser.email.split('@')[0],
               email: currentUser.email,
@@ -35,7 +33,7 @@ const Support = () => {
           }
         }
       } else {
-        navigate('/Sign-Up');
+        navigate('/sign-in');
       }
     });
 
@@ -58,20 +56,12 @@ const Support = () => {
       });
       setMessages(messagesData);
       scrollToBottom();
+    }, (error) => {
+      console.error("Error fetching messages:", error);
     });
 
     return () => unsubscribe();
   }, [user]);
-
-  useEffect(() => {
-    if (messages.length > 0 && messages[messages.length - 1].sender === 'user') {
-      setIsTypingIndicator(true);
-      const timer = setTimeout(() => {
-        setIsTypingIndicator(false);
-      }, 2000);
-      return () => clearTimeout(timer);
-    }
-  }, [messages]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -81,17 +71,12 @@ const Support = () => {
     e.preventDefault();
     if (!newMessage.trim() || !user) return;
 
-    if (showFAQ) {
-      setShowFAQ(false);
-    }
-
-    // Create timestamp-based ID
-    const timestamp = new Date();
-    const docId = `${timestamp.getFullYear()}${(timestamp.getMonth()+1).toString().padStart(2, '0')}${timestamp.getDate().toString().padStart(2, '0')}_${timestamp.getHours().toString().padStart(2, '0')}${timestamp.getMinutes().toString().padStart(2, '0')}${timestamp.getSeconds().toString().padStart(2, '0')}`;
-
     try {
-      // Add user message with explicit document ID
-      await setDoc(doc(db, 'supportMessages', docId), {
+      // Create message with timestamp ID
+      const timestamp = Date.now();
+      const messageRef = doc(db, 'supportMessages', `msg_${timestamp}_${user.uid}`);
+      
+      await setDoc(messageRef, {
         text: newMessage,
         sender: 'user',
         userId: user.uid,
@@ -101,47 +86,39 @@ const Support = () => {
       });
 
       setNewMessage('');
+      setShowFAQ(false);
       setIsTyping(true);
 
       // Simulate support response
       setTimeout(async () => {
-        const responseTimestamp = new Date();
-        const responseId = `${responseTimestamp.getFullYear()}${(responseTimestamp.getMonth()+1).toString().padStart(2, '0')}${responseTimestamp.getDate().toString().padStart(2, '0')}_${responseTimestamp.getHours().toString().padStart(2, '0')}${responseTimestamp.getMinutes().toString().padStart(2, '0')}${responseTimestamp.getSeconds().toString().padStart(2, '0')}`;
+        const responseTimestamp = Date.now();
+        const responseRef = doc(db, 'supportMessages', `msg_${responseTimestamp}_support_${user.uid}`);
         
-        await setDoc(doc(db, 'supportMessages', responseId), {
-          text: `Thank you for your message. Our support team will get back to you shortly.`,
+        await setDoc(responseRef, {
+          text: "Thank you for your message. Our team will respond shortly.",
           sender: 'support',
           userId: user.uid,
           createdAt: serverTimestamp()
         });
         setIsTyping(false);
-      }, 3000);
+      }, 2000);
     } catch (error) {
-      console.error('Error sending message:', error);
+      console.error("Error sending message:", error);
     }
-  };
-
-  const sendFAQMessage = (faqText) => {
-    setNewMessage(faqText);
-    setShowFAQ(false);
   };
 
   const FAQItems = [
     {
       question: "How do I upgrade my plan?",
-      answer: "You can upgrade your plan by visiting the pricing page and selecting the plan you want."
+      answer: "You can upgrade from your account dashboard."
     },
     {
       question: "Where can I find documentation?",
-      answer: "All documentation is available in the Docs section of our website."
+      answer: "Visit our documentation page."
     },
     {
       question: "How do I cancel my subscription?",
-      answer: "You can cancel your subscription from your account settings page."
-    },
-    {
-      question: "What payment methods do you accept?",
-      answer: "We accept all major credit cards and PayPal."
+      answer: "Go to billing settings in your account."
     }
   ];
 
@@ -152,15 +129,13 @@ const Support = () => {
           <div className="flex flex-col md:flex-row h-[calc(100vh-200px)]">
             {/* Sidebar */}
             <div className="w-full md:w-64 border-r border-gray-200 bg-gray-50 p-4 hidden md:block">
-              <h2 className="text-lg font-semibold text-gray-800 mb-4">Support Requests</h2>
-              <div className="space-y-2">
-                {user && (
-                  <div className="bg-blue-50 rounded-lg p-3">
-                    <p className="text-sm font-medium text-blue-800">Current Conversation</p>
-                    <p className="text-xs text-blue-600">{user.email}</p>
-                  </div>
-                )}
-              </div>
+              <h2 className="text-lg font-semibold text-gray-800 mb-4">Support History</h2>
+              {user && (
+                <div className="bg-blue-50 rounded-lg p-3">
+                  <p className="text-sm font-medium text-blue-800">Current Conversation</p>
+                  <p className="text-xs text-blue-600">{user.email}</p>
+                </div>
+              )}
             </div>
 
             {/* Main Chat Area */}
@@ -186,22 +161,23 @@ const Support = () => {
                   <motion.div 
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -20 }}
                     className="mb-6"
                   >
                     <div className="bg-white rounded-lg shadow-sm p-4 border border-gray-200">
-                      <h3 className="text-sm font-semibold text-gray-800 mb-3">Frequently Asked Questions</h3>
+                      <h3 className="text-sm font-semibold text-gray-800 mb-3">FAQs</h3>
                       <div className="space-y-2">
                         {FAQItems.map((faq, index) => (
-                          <div key={index} className="group">
-                            <button
-                              onClick={() => sendFAQMessage(faq.question)}
-                              className="w-full text-left p-2 rounded-md hover:bg-gray-100 transition-colors duration-200"
-                            >
-                              <p className="text-sm font-medium text-gray-800 group-hover:text-blue-600">{faq.question}</p>
-                              <p className="text-xs text-gray-500 mt-1">{faq.answer}</p>
-                            </button>
-                          </div>
+                          <button
+                            key={index}
+                            onClick={() => {
+                              setNewMessage(faq.question);
+                              setShowFAQ(false);
+                            }}
+                            className="w-full text-left p-2 rounded-md hover:bg-gray-100 transition-colors"
+                          >
+                            <p className="text-sm font-medium text-gray-800">{faq.question}</p>
+                            <p className="text-xs text-gray-500 mt-1">{faq.answer}</p>
+                          </button>
                         ))}
                       </div>
                     </div>
@@ -214,27 +190,22 @@ const Support = () => {
                       key={message.id}
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.2 }}
                       className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
                     >
-                      <div
-                        className={`max-w-xs md:max-w-md rounded-lg px-4 py-2 ${message.sender === 'user' ? 'bg-blue-500 text-white' : 'bg-white border border-gray-200 text-gray-800'}`}
-                      >
+                      <div className={`max-w-xs md:max-w-md rounded-lg px-4 py-2 ${
+                        message.sender === 'user' ? 'bg-blue-500 text-white' : 'bg-white border border-gray-200 text-gray-800'
+                      }`}>
                         <p className="text-sm">{message.text}</p>
                         <p className="text-xs mt-1 opacity-70">
                           {message.sender === 'user' ? 'You' : 'Support'} •{' '}
-                          {message.createdAt?.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                          {message.createdAt?.toDate().toLocaleTimeString()}
                         </p>
                       </div>
                     </motion.div>
                   ))}
 
-                  {isTypingIndicator && (
-                    <motion.div
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      className="flex justify-start"
-                    >
+                  {isTyping && (
+                    <div className="flex justify-start">
                       <div className="bg-white border border-gray-200 rounded-lg px-4 py-2">
                         <div className="flex space-x-1">
                           <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
@@ -242,7 +213,7 @@ const Support = () => {
                           <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
                         </div>
                       </div>
-                    </motion.div>
+                    </div>
                   )}
                 </div>
                 <div ref={messagesEndRef} />
@@ -251,26 +222,14 @@ const Support = () => {
               {/* Message Input */}
               <div className="border-t border-gray-200 p-4 bg-white">
                 <form onSubmit={handleSendMessage} className="flex items-center">
-                  <div className="relative flex-1">
-                    <div className="absolute left-2 top-1/2 transform -translate-y-1/2">
-                      <button
-                        type="button"
-                        onClick={() => setShowFAQ(!showFAQ)}
-                        className="text-gray-500 hover:text-gray-700"
-                      >
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                      </button>
-                    </div>
-                    <input
-                      type="text"
-                      value={newMessage}
-                      onChange={(e) => setNewMessage(e.target.value)}
-                      placeholder="Type your message..."
-                      className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    />
-                  </div>
+                  <input
+                    type="text"
+                    value={newMessage}
+                    onChange={(e) => setNewMessage(e.target.value)}
+                    onKeyPress={(e) => e.key === 'Enter' && handleSendMessage(e)}
+                    placeholder="Type your message..."
+                    className="flex-1 px-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
                   <button
                     type="submit"
                     className="ml-2 bg-blue-500 hover:bg-blue-600 text-white rounded-full p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
