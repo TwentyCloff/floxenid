@@ -1,5 +1,4 @@
 // src/pages/Support.jsx
-
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { auth, db } from '../config/firebaseConfig';
@@ -17,9 +16,8 @@ const Support = () => {
   const messagesEndRef = useRef(null);
   const navigate = useNavigate();
 
-  // Check if user is admin/owner and redirect if needed
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       if (currentUser) {
         if (currentUser.email === 'floxenstaff@gmail.com' || currentUser.email === 'floxenowner@gmail.com') {
           navigate('/admin-support');
@@ -27,25 +25,23 @@ const Support = () => {
           setUser(currentUser);
           // Create user document if it doesn't exist
           const userDocRef = doc(db, 'users', currentUser.uid);
-          getDoc(userDocRef).then((docSnap) => {
-            if (!docSnap.exists()) {
-              setDoc(userDocRef, {
-                displayName: currentUser.displayName || currentUser.email.split('@')[0],
-                email: currentUser.email,
-                createdAt: serverTimestamp()
-              });
-            }
-          });
+          const docSnap = await getDoc(userDocRef);
+          if (!docSnap.exists()) {
+            await setDoc(userDocRef, {
+              displayName: currentUser.displayName || currentUser.email.split('@')[0],
+              email: currentUser.email,
+              createdAt: serverTimestamp()
+            });
+          }
         }
       } else {
-        navigate('/sign-in');
+        navigate('/Sign-Up');
       }
     });
 
     return () => unsubscribe();
   }, [navigate]);
 
-  // Load messages
   useEffect(() => {
     if (!user) return;
 
@@ -67,7 +63,6 @@ const Support = () => {
     return () => unsubscribe();
   }, [user]);
 
-  // Simulate typing indicator from support
   useEffect(() => {
     if (messages.length > 0 && messages[messages.length - 1].sender === 'user') {
       setIsTypingIndicator(true);
@@ -86,34 +81,44 @@ const Support = () => {
     e.preventDefault();
     if (!newMessage.trim() || !user) return;
 
-    // Hide FAQ after first message
     if (showFAQ) {
       setShowFAQ(false);
     }
 
-    // Add user message
-    await addDoc(collection(db, 'supportMessages'), {
-      text: newMessage,
-      sender: 'user',
-      userId: user.uid,
-      userEmail: user.email,
-      userName: user.displayName || user.email.split('@')[0],
-      createdAt: serverTimestamp()
-    });
+    // Create timestamp-based ID
+    const timestamp = new Date();
+    const docId = `${timestamp.getFullYear()}${(timestamp.getMonth()+1).toString().padStart(2, '0')}${timestamp.getDate().toString().padStart(2, '0')}_${timestamp.getHours().toString().padStart(2, '0')}${timestamp.getMinutes().toString().padStart(2, '0')}${timestamp.getSeconds().toString().padStart(2, '0')}`;
 
-    setNewMessage('');
-    setIsTyping(true);
-
-    // Simulate support response after a delay
-    setTimeout(async () => {
-      await addDoc(collection(db, 'supportMessages'), {
-        text: `Thank you for your message. Our support team will get back to you shortly. In the meantime, you might find answers in our documentation.`,
-        sender: 'support',
+    try {
+      // Add user message with explicit document ID
+      await setDoc(doc(db, 'supportMessages', docId), {
+        text: newMessage,
+        sender: 'user',
         userId: user.uid,
+        userEmail: user.email,
+        userName: user.displayName || user.email.split('@')[0],
         createdAt: serverTimestamp()
       });
-      setIsTyping(false);
-    }, 3000);
+
+      setNewMessage('');
+      setIsTyping(true);
+
+      // Simulate support response
+      setTimeout(async () => {
+        const responseTimestamp = new Date();
+        const responseId = `${responseTimestamp.getFullYear()}${(responseTimestamp.getMonth()+1).toString().padStart(2, '0')}${responseTimestamp.getDate().toString().padStart(2, '0')}_${responseTimestamp.getHours().toString().padStart(2, '0')}${responseTimestamp.getMinutes().toString().padStart(2, '0')}${responseTimestamp.getSeconds().toString().padStart(2, '0')}`;
+        
+        await setDoc(doc(db, 'supportMessages', responseId), {
+          text: `Thank you for your message. Our support team will get back to you shortly.`,
+          sender: 'support',
+          userId: user.uid,
+          createdAt: serverTimestamp()
+        });
+        setIsTyping(false);
+      }, 3000);
+    } catch (error) {
+      console.error('Error sending message:', error);
+    }
   };
 
   const sendFAQMessage = (faqText) => {
