@@ -1,63 +1,83 @@
-// src/pages/AdminSupport.jsx
 import { useState, useEffect, useRef } from 'react';
 import { auth, db } from '../config/firebaseConfig';
-import { collection, query, where, orderBy, setDoc, doc, serverTimestamp, onSnapshot } from 'firebase/firestore';
+import { collection, query, where, orderBy, setDoc, doc, serverTimestamp, onSnapshot, getDoc } from 'firebase/firestore';
 import { onAuthStateChanged } from 'firebase/auth';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 
 const AdminSupport = () => {
   const [conversations, setConversations] = useState([]);
   const [selectedConversation, setSelectedConversation] = useState(null);
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
-  const [isTyping, setIsTyping] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [user, setUser] = useState(null);
-  const [isTypingIndicator, setIsTypingIndicator] = useState(false);
   const messagesEndRef = useRef(null);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+    const unsubscribeAuth = onAuthStateChanged(auth, (currentUser) => {
       if (currentUser) {
         setUser(currentUser);
+        if (!['floxenstaff@gmail.com', 'floxenowner@gmail.com'].includes(currentUser.email)) {
+          window.location.href = '/support';
+        }
+      } else {
+        window.location.href = '/sign-in';
       }
     });
 
-    return () => unsubscribe();
+    return () => unsubscribeAuth();
   }, []);
 
   useEffect(() => {
+    if (!user) return;
+
     const q = query(
       collection(db, 'supportMessages'),
       orderBy('createdAt', 'desc')
     );
 
-    const unsubscribe = onSnapshot(q, (querySnapshot) => {
-      const uniqueUserIds = new Set();
-      const conversationsData = [];
+    const unsubscribe = onSnapshot(q, async (querySnapshot) => {
+      const userMap = new Map();
+      const convos = [];
 
-      querySnapshot.forEach((doc) => {
-        const message = doc.data();
-        if (!uniqueUserIds.has(message.userId)) {
-          uniqueUserIds.add(message.userId);
-          conversationsData.push({
+      for (const docSnap of querySnapshot.docs) {
+        const message = docSnap.data();
+        if (!userMap.has(message.userId)) {
+          // Get user details
+          let userData = {};
+          try {
+            const userDoc = await getDoc(doc(db, 'users', message.userId));
+            if (userDoc.exists()) {
+              userData = userDoc.data();
+            }
+          } catch (error) {
+            console.error("Error fetching user data:", error);
+          }
+
+          convos.push({
             userId: message.userId,
-            userEmail: message.userEmail,
-            userName: message.userName,
+            userEmail: message.userEmail || userData.email || 'Unknown',
+            userName: message.userName || userData.displayName || 'User',
             lastMessage: message.text,
             lastMessageTime: message.createdAt
           });
+          userMap.set(message.userId, true);
         }
-      });
-
-      setConversations(conversationsData);
-
-      if (conversationsData.length > 0 && !selectedConversation) {
-        setSelectedConversation(conversationsData[0]);
       }
+
+      setConversations(convos);
+      setIsLoading(false);
+
+      if (convos.length > 0 && !selectedConversation) {
+        setSelectedConversation(convos[0]);
+      }
+    }, (error) => {
+      console.error("Error fetching conversations:", error);
+      setIsLoading(false);
     });
 
     return () => unsubscribe();
-  }, [selectedConversation]);
+  }, [user, selectedConversation]);
 
   useEffect(() => {
     if (!selectedConversation) return;
@@ -69,26 +89,18 @@ const AdminSupport = () => {
     );
 
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
-      const messagesData = [];
+      const msgs = [];
       querySnapshot.forEach((doc) => {
-        messagesData.push({ id: doc.id, ...doc.data() });
+        msgs.push({ id: doc.id, ...doc.data() });
       });
-      setMessages(messagesData);
+      setMessages(msgs);
       scrollToBottom();
+    }, (error) => {
+      console.error("Error fetching messages:", error);
     });
 
     return () => unsubscribe();
   }, [selectedConversation]);
-
-  useEffect(() => {
-    if (messages.length > 0 && messages[messages.length - 1].sender === 'support') {
-      setIsTypingIndicator(true);
-      const timer = setTimeout(() => {
-        setIsTypingIndicator(false);
-      }, 2000);
-      return () => clearTimeout(timer);
-    }
-  }, [messages]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -98,12 +110,10 @@ const AdminSupport = () => {
     e.preventDefault();
     if (!newMessage.trim() || !selectedConversation || !user) return;
 
-    // Create timestamp-based ID
     const timestamp = new Date();
-    const docId = `${timestamp.getFullYear()}${(timestamp.getMonth()+1).toString().padStart(2, '0')}${timestamp.getDate().toString().padStart(2, '0')}_${timestamp.getHours().toString().padStart(2, '0')}${timestamp.getMinutes().toString().padStart(2, '0')}${timestamp.getSeconds().toString().padStart(2, '0')}`;
+    const docId = `${timestamp.getTime()}`;
 
     try {
-      // Add support message with explicit document ID
       await setDoc(doc(db, 'supportMessages', docId), {
         text: newMessage,
         sender: 'support',
@@ -114,27 +124,21 @@ const AdminSupport = () => {
       });
 
       setNewMessage('');
-      setIsTyping(true);
-
-      // Simulate user response
-      setTimeout(async () => {
-        const responseTimestamp = new Date();
-        const responseId = `${responseTimestamp.getFullYear()}${(responseTimestamp.getMonth()+1).toString().padStart(2, '0')}${responseTimestamp.getDate().toString().padStart(2, '0')}_${responseTimestamp.getHours().toString().padStart(2, '0')}${responseTimestamp.getMinutes().toString().padStart(2, '0')}${responseTimestamp.getSeconds().toString().padStart(2, '0')}`;
-        
-        await setDoc(doc(db, 'supportMessages', responseId), {
-          text: `Thanks for your help!`,
-          sender: 'user',
-          userId: selectedConversation.userId,
-          userEmail: selectedConversation.userEmail,
-          userName: selectedConversation.userName,
-          createdAt: serverTimestamp()
-        });
-        setIsTyping(false);
-      }, 3000);
     } catch (error) {
-      console.error('Error sending message:', error);
+      console.error("Error sending message:", error);
     }
   };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading conversations...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -142,29 +146,33 @@ const AdminSupport = () => {
         <div className="bg-white rounded-xl shadow-md overflow-hidden">
           <div className="flex flex-col md:flex-row h-[calc(100vh-200px)]">
             {/* Sidebar */}
-            <div className="w-full md:w-64 border-r border-gray-200 bg-gray-50 p-4">
-              <h2 className="text-lg font-semibold text-gray-800 mb-4">Support Conversations</h2>
-              <div className="space-y-2">
-                {conversations.map((conversation) => (
-                  <div
-                    key={conversation.userId}
-                    onClick={() => setSelectedConversation(conversation)}
-                    className={`p-3 rounded-lg cursor-pointer transition-colors ${
-                      selectedConversation?.userId === conversation.userId
-                        ? 'bg-blue-100 border border-blue-200'
-                        : 'bg-white hover:bg-gray-100 border border-gray-200'
-                    }`}
-                  >
-                    <p className="text-sm font-medium text-gray-800 truncate">
-                      {conversation.userName || conversation.userEmail.split('@')[0]}
-                    </p>
-                    <p className="text-xs text-gray-500 truncate">{conversation.userEmail}</p>
-                    <p className="text-xs text-gray-500 mt-1 truncate">
-                      {conversation.lastMessage}
-                    </p>
-                  </div>
-                ))}
-              </div>
+            <div className="w-full md:w-64 border-r border-gray-200 bg-gray-50 p-4 overflow-y-auto">
+              <h2 className="text-lg font-semibold text-gray-800 mb-4">Conversations</h2>
+              {conversations.length === 0 ? (
+                <p className="text-sm text-gray-500">No conversations found</p>
+              ) : (
+                <div className="space-y-2">
+                  {conversations.map((convo) => (
+                    <div
+                      key={convo.userId}
+                      onClick={() => setSelectedConversation(convo)}
+                      className={`p-3 rounded-lg cursor-pointer transition-colors ${
+                        selectedConversation?.userId === convo.userId
+                          ? 'bg-blue-100 border border-blue-200'
+                          : 'bg-white hover:bg-gray-100 border border-gray-200'
+                      }`}
+                    >
+                      <p className="text-sm font-medium text-gray-800 truncate">
+                        {convo.userName}
+                      </p>
+                      <p className="text-xs text-gray-500 truncate">{convo.userEmail}</p>
+                      <p className="text-xs text-gray-500 mt-1 truncate">
+                        {convo.lastMessage?.substring(0, 50)}{convo.lastMessage?.length > 50 ? '...' : ''}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
 
             {/* Main Chat Area */}
@@ -179,10 +187,10 @@ const AdminSupport = () => {
                   </div>
                   <div>
                     <h2 className="text-lg font-semibold text-gray-800">
-                      {selectedConversation?.userName || selectedConversation?.userEmail.split('@')[0] || 'Select a conversation'}
+                      {selectedConversation?.userName || 'Select a conversation'}
                     </h2>
                     <p className="text-xs text-gray-500">
-                      {selectedConversation?.userEmail || 'No conversation selected'}
+                      {selectedConversation?.userEmail || ''}
                     </p>
                   </div>
                 </div>
@@ -209,28 +217,13 @@ const AdminSupport = () => {
                         >
                           <p className="text-sm">{message.text}</p>
                           <p className="text-xs mt-1 opacity-70">
-                            {message.sender === 'support' ? 'You' : message.userName} •{' '}
+                            {message.sender === 'support' ? 'You' : selectedConversation.userName} •{' '}
                             {message.createdAt?.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                           </p>
                         </div>
                       </motion.div>
                     ))}
-
-                    {isTypingIndicator && (
-                      <motion.div
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="flex justify-start"
-                      >
-                        <div className="bg-white border border-gray-200 rounded-lg px-4 py-2">
-                          <div className="flex space-x-1">
-                            <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                            <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                            <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
-                          </div>
-                        </div>
-                      </motion.div>
-                    )}
+                    <div ref={messagesEndRef} />
                   </div>
                 ) : (
                   <div className="flex items-center justify-center h-full">
@@ -239,11 +232,10 @@ const AdminSupport = () => {
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                       </svg>
                       <h3 className="mt-2 text-sm font-medium text-gray-900">No conversation selected</h3>
-                      <p className="mt-1 text-sm text-gray-500">Select a conversation from the sidebar to view messages</p>
+                      <p className="mt-1 text-sm text-gray-500">Select a conversation from the sidebar</p>
                     </div>
                   </div>
                 )}
-                <div ref={messagesEndRef} />
               </div>
 
               {/* Message Input */}
@@ -254,12 +246,14 @@ const AdminSupport = () => {
                       type="text"
                       value={newMessage}
                       onChange={(e) => setNewMessage(e.target.value)}
-                      placeholder="Type your message..."
+                      placeholder="Type your reply..."
                       className="flex-1 px-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      disabled={!selectedConversation}
                     />
                     <button
                       type="submit"
                       className="ml-2 bg-blue-500 hover:bg-blue-600 text-white rounded-full p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                      disabled={!selectedConversation || !newMessage.trim()}
                     >
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
