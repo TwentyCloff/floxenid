@@ -1,8 +1,7 @@
 // src/pages/AdminSupport.jsx
-
 import { useState, useEffect, useRef } from 'react';
 import { auth, db } from '../config/firebaseConfig';
-import { collection, query, where, orderBy, addDoc, serverTimestamp, onSnapshot, doc, getDoc } from 'firebase/firestore';
+import { collection, query, where, orderBy, setDoc, doc, serverTimestamp, onSnapshot } from 'firebase/firestore';
 import { onAuthStateChanged } from 'firebase/auth';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -26,7 +25,6 @@ const AdminSupport = () => {
     return () => unsubscribe();
   }, []);
 
-  // Load all conversations
   useEffect(() => {
     const q = query(
       collection(db, 'supportMessages'),
@@ -53,7 +51,6 @@ const AdminSupport = () => {
 
       setConversations(conversationsData);
 
-      // If no conversation is selected, select the first one
       if (conversationsData.length > 0 && !selectedConversation) {
         setSelectedConversation(conversationsData[0]);
       }
@@ -62,7 +59,6 @@ const AdminSupport = () => {
     return () => unsubscribe();
   }, [selectedConversation]);
 
-  // Load messages for selected conversation
   useEffect(() => {
     if (!selectedConversation) return;
 
@@ -84,7 +80,6 @@ const AdminSupport = () => {
     return () => unsubscribe();
   }, [selectedConversation]);
 
-  // Simulate typing indicator from user
   useEffect(() => {
     if (messages.length > 0 && messages[messages.length - 1].sender === 'support') {
       setIsTypingIndicator(true);
@@ -103,31 +98,42 @@ const AdminSupport = () => {
     e.preventDefault();
     if (!newMessage.trim() || !selectedConversation || !user) return;
 
-    // Add support message
-    await addDoc(collection(db, 'supportMessages'), {
-      text: newMessage,
-      sender: 'support',
-      userId: selectedConversation.userId,
-      userEmail: selectedConversation.userEmail,
-      userName: selectedConversation.userName,
-      createdAt: serverTimestamp()
-    });
+    // Create timestamp-based ID
+    const timestamp = new Date();
+    const docId = `${timestamp.getFullYear()}${(timestamp.getMonth()+1).toString().padStart(2, '0')}${timestamp.getDate().toString().padStart(2, '0')}_${timestamp.getHours().toString().padStart(2, '0')}${timestamp.getMinutes().toString().padStart(2, '0')}${timestamp.getSeconds().toString().padStart(2, '0')}`;
 
-    setNewMessage('');
-    setIsTyping(true);
-
-    // Simulate user response after a delay
-    setTimeout(async () => {
-      await addDoc(collection(db, 'supportMessages'), {
-        text: `Thanks for your help!`,
-        sender: 'user',
+    try {
+      // Add support message with explicit document ID
+      await setDoc(doc(db, 'supportMessages', docId), {
+        text: newMessage,
+        sender: 'support',
         userId: selectedConversation.userId,
         userEmail: selectedConversation.userEmail,
         userName: selectedConversation.userName,
         createdAt: serverTimestamp()
       });
-      setIsTyping(false);
-    }, 3000);
+
+      setNewMessage('');
+      setIsTyping(true);
+
+      // Simulate user response
+      setTimeout(async () => {
+        const responseTimestamp = new Date();
+        const responseId = `${responseTimestamp.getFullYear()}${(responseTimestamp.getMonth()+1).toString().padStart(2, '0')}${responseTimestamp.getDate().toString().padStart(2, '0')}_${responseTimestamp.getHours().toString().padStart(2, '0')}${responseTimestamp.getMinutes().toString().padStart(2, '0')}${responseTimestamp.getSeconds().toString().padStart(2, '0')}`;
+        
+        await setDoc(doc(db, 'supportMessages', responseId), {
+          text: `Thanks for your help!`,
+          sender: 'user',
+          userId: selectedConversation.userId,
+          userEmail: selectedConversation.userEmail,
+          userName: selectedConversation.userName,
+          createdAt: serverTimestamp()
+        });
+        setIsTyping(false);
+      }, 3000);
+    } catch (error) {
+      console.error('Error sending message:', error);
+    }
   };
 
   return (
