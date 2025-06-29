@@ -1,3 +1,5 @@
+//src/components/Nav1.jsx
+
 import { useState, useEffect, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { disablePageScroll, enablePageScroll } from "scroll-lock";
@@ -34,10 +36,8 @@ const Navbar = () => {
       
       if (currentUser) {
         // Check for admin/owner emails first
-        if (currentUser.email === 'floxenstaff@gmail.com') {
-          setUserPlan('Admin');
-        } else if (currentUser.email === 'floxenowner@gmail.com') {
-          setUserPlan('Owner');
+        if (currentUser.email === 'floxenstaff@gmail.com' || currentUser.email === 'floxenowner@gmail.com') {
+          setUserPlan(currentUser.email === 'floxenowner@gmail.com' ? 'Owner' : 'Admin');
         } else {
           // Check Firestore for regular user's plan
           const userDoc = await getDoc(doc(db, 'users', currentUser.uid));
@@ -165,7 +165,13 @@ const Navbar = () => {
     setShowProfileModal(false);
   };
   const goToPurchaseHistory = () => navigate("/purchase-history");
-  const goToSupport = () => navigate("/support");
+  const goToSupport = () => {
+    if (user && (user.email === 'floxenstaff@gmail.com' || user.email === 'floxenowner@gmail.com')) {
+      navigate("/admin-support");
+    } else {
+      navigate("/support");
+    }
+  };
 
   const handleMenuEnter = (menuType) => {
     clearTimeout(timeoutRef.current);
@@ -588,6 +594,13 @@ const Navbar = () => {
           {/* Right section */}
           <div className="flex items-center space-x-6">
             <div className="flex items-center gap-2">
+              <button
+                onClick={goToSupport}
+                className="text-gray-600 hover:text-gray-900 transition-colors duration-200 hidden md:block"
+              >
+                <span className="sr-only">Support</span>
+                <SupportIcon />
+              </button>
               <a
                 href="https://discord.gg"
                 target="_blank"
@@ -672,6 +685,18 @@ const Navbar = () => {
               Pricing
             </button>
 
+            <button
+              onClick={() => {
+                goToSupport();
+                handleClick();
+              }}
+              className={`w-full text-left px-3 py-2 rounded-md text-base font-medium ${
+                location.pathname === '/support' ? 'bg-gray-100 text-gray-900' : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
+              }`}
+            >
+              Support
+            </button>
+
             <div className="pt-4 pb-2 border-t border-gray-200 flex flex-col space-y-3">
               {user ? (
                 <>
@@ -732,6 +757,12 @@ const ChevronIcon = ({ isOpen }) => (
       strokeWidth={2}
       d="M19 9l-7 7-7-7"
     />
+  </svg>
+);
+
+const SupportIcon = () => (
+  <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z" />
   </svg>
 );
 

@@ -1,3 +1,1 @@
-export const links = {
-  sourceCode: "https://github.com/sanidhyy/brainwave",
-};
+export const API_URL = "/.netlify/functions/chat";

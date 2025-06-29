@@ -8,8 +8,9 @@ import Dashboard from "./components/Dashboard";
 import Pricing from "./components/Pricing";
 import ResetPassword from "./components/ResetPassword";
 import Table from "./components/Table";
-import ButtonTest from "./components/ButtonTest"
-
+import ButtonTest from "./components/ButtonTest";
+import Support from "./components/Support";
+import AdminSupport from "./components/AdminSupport";
 
 const Home = () => (
   <div className="pt-[4.75rem] lg:pt-[5.25rem] overflow-hidden">
@@ -45,6 +46,9 @@ const App = () => {
       <Route path="/pricing" element={<Pricing />} />
       <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="/d1" element={<ButtonTest />} />
+      {/* Support Routes */}
+      <Route path="/support" element={<Support />} />
+      <Route path="/admin-support" element={<AdminSupport />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
   );
