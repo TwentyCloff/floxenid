@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { auth, db } from '../config/firebaseConfig';
-import { collection, query, where, orderBy, setDoc, doc, serverTimestamp, onSnapshot, getDoc } from 'firebase/firestore';
+import { collection, query, where, orderBy, doc, setDoc, serverTimestamp, onSnapshot } from 'firebase/firestore';
 import { onAuthStateChanged } from 'firebase/auth';
 import { motion } from 'framer-motion';
 
@@ -10,18 +10,12 @@ const AdminSupport = () => {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
   const [isLoading, setIsLoading] = useState(true);
-  const [user, setUser] = useState(null);
   const messagesEndRef = useRef(null);
 
   useEffect(() => {
-    const unsubscribeAuth = onAuthStateChanged(auth, (currentUser) => {
-      if (currentUser) {
-        setUser(currentUser);
-        if (!['floxenstaff@gmail.com', 'floxenowner@gmail.com'].includes(currentUser.email)) {
-          window.location.href = '/support';
-        }
-      } else {
-        window.location.href = '/sign-in';
+    const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
+      if (!user || !['floxenstaff@gmail.com', 'floxenowner@gmail.com'].includes(user.email)) {
+        window.location.href = '/support';
       }
     });
 
@@ -29,41 +23,28 @@ const AdminSupport = () => {
   }, []);
 
   useEffect(() => {
-    if (!user) return;
-
     const q = query(
       collection(db, 'supportMessages'),
       orderBy('createdAt', 'desc')
     );
 
-    const unsubscribe = onSnapshot(q, async (querySnapshot) => {
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
       const userMap = new Map();
       const convos = [];
 
-      for (const docSnap of querySnapshot.docs) {
-        const message = docSnap.data();
+      querySnapshot.forEach((doc) => {
+        const message = doc.data();
         if (!userMap.has(message.userId)) {
-          // Get user details
-          let userData = {};
-          try {
-            const userDoc = await getDoc(doc(db, 'users', message.userId));
-            if (userDoc.exists()) {
-              userData = userDoc.data();
-            }
-          } catch (error) {
-            console.error("Error fetching user data:", error);
-          }
-
           convos.push({
             userId: message.userId,
-            userEmail: message.userEmail || userData.email || 'Unknown',
-            userName: message.userName || userData.displayName || 'User',
+            userEmail: message.userEmail,
+            userName: message.userName || message.userEmail?.split('@')[0] || 'User',
             lastMessage: message.text,
             lastMessageTime: message.createdAt
           });
           userMap.set(message.userId, true);
         }
-      }
+      });
 
       setConversations(convos);
       setIsLoading(false);
@@ -77,7 +58,7 @@ const AdminSupport = () => {
     });
 
     return () => unsubscribe();
-  }, [user, selectedConversation]);
+  }, [selectedConversation]);
 
   useEffect(() => {
     if (!selectedConversation) return;
@@ -108,13 +89,13 @@ const AdminSupport = () => {
 
   const handleSendMessage = async (e) => {
     e.preventDefault();
-    if (!newMessage.trim() || !selectedConversation || !user) return;
-
-    const timestamp = new Date();
-    const docId = `${timestamp.getTime()}`;
+    if (!newMessage.trim() || !selectedConversation) return;
 
     try {
-      await setDoc(doc(db, 'supportMessages', docId), {
+      const timestamp = Date.now();
+      const messageRef = doc(db, 'supportMessages', `msg_${timestamp}_admin_${selectedConversation.userId}`);
+      
+      await setDoc(messageRef, {
         text: newMessage,
         sender: 'support',
         userId: selectedConversation.userId,
@@ -149,7 +130,7 @@ const AdminSupport = () => {
             <div className="w-full md:w-64 border-r border-gray-200 bg-gray-50 p-4 overflow-y-auto">
               <h2 className="text-lg font-semibold text-gray-800 mb-4">Conversations</h2>
               {conversations.length === 0 ? (
-                <p className="text-sm text-gray-500">No conversations found</p>
+                <p className="text-sm text-gray-500">No conversations yet</p>
               ) : (
                 <div className="space-y-2">
                   {conversations.map((convo) => (
@@ -205,20 +186,17 @@ const AdminSupport = () => {
                         key={message.id}
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.2 }}
                         className={`flex ${message.sender === 'support' ? 'justify-end' : 'justify-start'}`}
                       >
-                        <div
-                          className={`max-w-xs md:max-w-md rounded-lg px-4 py-2 ${
-                            message.sender === 'support' 
-                              ? 'bg-blue-500 text-white' 
-                              : 'bg-white border border-gray-200 text-gray-800'
-                          }`}
-                        >
+                        <div className={`max-w-xs md:max-w-md rounded-lg px-4 py-2 ${
+                          message.sender === 'support' 
+                            ? 'bg-blue-500 text-white' 
+                            : 'bg-white border border-gray-200 text-gray-800'
+                        }`}>
                           <p className="text-sm">{message.text}</p>
                           <p className="text-xs mt-1 opacity-70">
                             {message.sender === 'support' ? 'You' : selectedConversation.userName} •{' '}
-                            {message.createdAt?.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                            {message.createdAt?.toDate().toLocaleTimeString()}
                           </p>
                         </div>
                       </motion.div>
@@ -246,14 +224,13 @@ const AdminSupport = () => {
                       type="text"
                       value={newMessage}
                       onChange={(e) => setNewMessage(e.target.value)}
+                      onKeyPress={(e) => e.key === 'Enter' && handleSendMessage(e)}
                       placeholder="Type your reply..."
                       className="flex-1 px-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      disabled={!selectedConversation}
                     />
                     <button
                       type="submit"
                       className="ml-2 bg-blue-500 hover:bg-blue-600 text-white rounded-full p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-                      disabled={!selectedConversation || !newMessage.trim()}
                     >
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
