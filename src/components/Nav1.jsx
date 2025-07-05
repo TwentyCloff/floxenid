@@ -1,828 +1,368 @@
-//src/components/Nav1.jsx
+'use client';
 
-import { useState, useEffect, useRef } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
-import { disablePageScroll, enablePageScroll } from "scroll-lock";
-import { onAuthStateChanged, signOut } from "firebase/auth";
-import { auth, db } from "../config/firebaseConfig";
-import { doc, getDoc } from "firebase/firestore";
+import { useState } from 'react';
+import { 
+  Headphones, 
+  MessageCircle, 
+  User, 
+  Terminal, 
+  ChevronDown,
+  Code,
+  BookOpen,
+  Zap,
+  Users,
+  Star,
+  Play,
+  Download,
+  FileText,
+  Video,
+  HelpCircle,
+  Menu,
+  X,
+  Shield,
+  Rocket,
+  Settings,
+  Globe,
+  Sparkles,
+  ArrowRight
+} from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const Navbar = () => {
-  const navigate = useNavigate();
-  const location = useLocation();
-  const [user, setUser] = useState(null);
-  const [userPlan, setUserPlan] = useState('Free');
-  const [openNavigation, setOpenNavigation] = useState(false);
   const [activeMenu, setActiveMenu] = useState(null);
-  const [scrolled, setScrolled] = useState(false);
-  const [showProfileModal, setShowProfileModal] = useState(false);
-  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
-  const timeoutRef = useRef(null);
-  const isHoveringRef = useRef(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  // Refs for all interactive elements
-  const navRef = useRef(null);
-  const productsButtonRef = useRef(null);
-  const productsMenuRef = useRef(null);
-  const docsButtonRef = useRef(null);
-  const docsMenuRef = useRef(null);
-  const resourcesButtonRef = useRef(null);
-  const resourcesMenuRef = useRef(null);
-  const profileModalRef = useRef(null);
-
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
-      setUser(currentUser);
-      
-      if (currentUser) {
-        // Check for admin/owner emails first
-        if (currentUser.email === 'floxenstaff@gmail.com' || currentUser.email === 'floxenowner@gmail.com') {
-          setUserPlan(currentUser.email === 'floxenowner@gmail.com' ? 'Owner' : 'Admin');
-        } else {
-          // Check Firestore for regular user's plan
-          const userDoc = await getDoc(doc(db, 'users', currentUser.uid));
-          if (userDoc.exists()) {
-            setUserPlan(userDoc.data().plan || 'Free');
-          } else {
-            // Create a new user document if it doesn't exist
-            await setDoc(doc(db, 'users', currentUser.uid), {
-              displayName: currentUser.displayName || '',
-              email: currentUser.email,
-              plan: 'Free',
-              createdAt: new Date().toISOString()
-            });
-            setUserPlan('Free');
-          }
-        }
-      }
-    });
-
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 10);
-    };
-
-    const handleClickOutside = (event) => {
-      if (profileModalRef.current && !profileModalRef.current.contains(event.target)) {
-        setShowProfileModal(false);
-      }
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    document.addEventListener('mousedown', handleClickOutside);
-    
-    return () => {
-      unsubscribe();
-      window.removeEventListener('scroll', handleScroll);
-      document.removeEventListener('mousedown', handleClickOutside);
-      clearTimeout(timeoutRef.current);
-    };
-  }, []);
-
-  // Enhanced hover detection with precise boundaries
-  useEffect(() => {
-    const handleMouseMove = (e) => {
-      if (!activeMenu) return;
-
-      const button = 
-        activeMenu === 'products' ? productsButtonRef.current :
-        activeMenu === 'docs' ? docsButtonRef.current :
-        resourcesButtonRef.current;
-
-      const menu = 
-        activeMenu === 'products' ? productsMenuRef.current :
-        activeMenu === 'docs' ? docsMenuRef.current :
-        resourcesMenuRef.current;
-
-      if (!button || !menu) return;
-
-      // Get precise boundaries with 1% buffer
-      const buttonRect = button.getBoundingClientRect();
-      const menuRect = menu.getBoundingClientRect();
-
-      // Create a connecting bridge between button and menu
-      const bridgeArea = {
-        left: Math.min(buttonRect.left, menuRect.left) - (window.innerWidth * 0.01),
-        right: Math.max(buttonRect.right, menuRect.right) + (window.innerWidth * 0.01),
-        top: Math.min(buttonRect.top, menuRect.top) - (window.innerHeight * 0.01),
-        bottom: Math.max(buttonRect.bottom, menuRect.bottom) + (window.innerHeight * 0.01)
-      };
-
-      // Check if cursor is within the interactive zone
-      const isInZone = 
-        e.clientX >= bridgeArea.left &&
-        e.clientX <= bridgeArea.right &&
-        e.clientY >= bridgeArea.top && 
-        e.clientY <= bridgeArea.bottom;
-
-      if (!isInZone && !isHoveringRef.current) {
-        if (!timeoutRef.current) {
-          timeoutRef.current = setTimeout(() => {
-            setActiveMenu(null);
-          }, 100);
-        }
-      } else {
-        clearTimeout(timeoutRef.current);
-        timeoutRef.current = null;
-      }
-    };
-
-    window.addEventListener('mousemove', handleMouseMove);
-    return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
-    };
-  }, [activeMenu]);
-
-  const toggleNavigation = () => {
-    if (openNavigation) {
-      setOpenNavigation(false);
-      enablePageScroll();
-    } else {
-      setOpenNavigation(true);
-      disablePageScroll();
+  const menuItems = {
+    Product: {
+      icon: Rocket,
+      items: [
+        { name: 'AI Assistant', icon: Sparkles, desc: 'Intelligent code companion', color: 'from-purple-400 to-pink-400' },
+        { name: 'Code Generator', icon: Code, desc: 'Generate code instantly', color: 'from-blue-400 to-cyan-400' },
+        { name: 'API Tools', icon: Settings, desc: 'RESTful API solutions', color: 'from-green-400 to-emerald-400' },
+        { name: 'Analytics', icon: Zap, desc: 'Performance insights', color: 'from-orange-400 to-red-400' },
+        { name: 'Security', icon: Shield, desc: 'Enterprise-grade security', color: 'from-indigo-400 to-purple-400' },
+        { name: 'Integrations', icon: Globe, desc: 'Connect everything', color: 'from-teal-400 to-blue-400' }
+      ]
+    },
+    Docs: {
+      icon: BookOpen,
+      items: [
+        { name: 'Getting Started', icon: Play, desc: 'Quick start guide', color: 'from-emerald-400 to-green-400' },
+        { name: 'API Reference', icon: FileText, desc: 'Complete API docs', color: 'from-blue-400 to-indigo-400' },
+        { name: 'Tutorials', icon: Video, desc: 'Step-by-step guides', color: 'from-purple-400 to-pink-400' },
+        { name: 'Examples', icon: Code, desc: 'Code samples', color: 'from-orange-400 to-red-400' },
+        { name: 'SDK Downloads', icon: Download, desc: 'All platforms', color: 'from-cyan-400 to-blue-400' }
+      ]
+    },
+    Resource: {
+      icon: Users,
+      items: [
+        { name: 'Community', icon: Users, desc: 'Join our developers', color: 'from-pink-400 to-rose-400' },
+        { name: 'Blog', icon: FileText, desc: 'Latest updates', color: 'from-indigo-400 to-blue-400' },
+        { name: 'Help Center', icon: HelpCircle, desc: 'Find answers', color: 'from-green-400 to-emerald-400' },
+        { name: 'Status Page', icon: Zap, desc: 'System status', color: 'from-yellow-400 to-orange-400' },
+        { name: 'Roadmap', icon: Star, desc: 'What\'s coming next', color: 'from-purple-400 to-indigo-400' }
+      ]
+    },
+    Pricing: {
+      icon: Star,
+      items: [
+        { name: 'Free Plan', icon: Star, desc: 'Perfect for getting started', color: 'from-emerald-400 to-green-400' },
+        { name: 'Pro Plan', icon: Rocket, desc: 'For growing teams', color: 'from-blue-400 to-indigo-400' },
+        { name: 'Enterprise', icon: Shield, desc: 'Custom solutions', color: 'from-purple-400 to-pink-400' },
+        { name: 'Compare Plans', icon: FileText, desc: 'See all features', color: 'from-orange-400 to-red-400' }
+      ]
     }
   };
 
-  const handleClick = () => {
-    if (!openNavigation) return;
-    enablePageScroll();
-    setOpenNavigation(false);
-    setActiveMenu(null);
-  };
-
-  const handleLogout = async () => {
-    await signOut(auth);
-    setUser(null);
-    setUserPlan('Free');
-    setShowLogoutConfirm(false);
-    setShowProfileModal(false);
-  };
-
-  const goToDashboard = () => navigate("/dashboard");
-  const goToPricing = () => navigate("/pricing");
-  const goToSignUp = () => navigate("/Sign-Up");
-  const goToEditProfile = () => {
-    navigate("/profile");
-    setShowProfileModal(false);
-  };
-  const goToPurchaseHistory = () => navigate("/purchase-history");
-  const goToSupport = () => {
-    if (user && (user.email === 'floxenstaff@gmail.com' || user.email === 'floxenowner@gmail.com')) {
-      navigate("/admin-support");
-    } else {
-      navigate("/support");
-    }
-  };
-
-  const handleMenuEnter = (menuType) => {
-    clearTimeout(timeoutRef.current);
-    timeoutRef.current = null;
-    setActiveMenu(menuType);
-    isHoveringRef.current = true;
+  const handleMenuHover = (menu) => {
+    setActiveMenu(menu);
   };
 
   const handleMenuLeave = () => {
-    isHoveringRef.current = false;
+    setActiveMenu(null);
   };
-
-  // Menu data
-  const productsMenu = {
-    openSource: [
-      { title: "Once UI Core", description: "Open-source NPM package", url: "/core" },
-      { title: "Once UI Starter", description: "Quick start from scratch", url: "/starter" },
-      { title: "Magic Portfolio", description: "Free portfolio template", url: "/portfolio" },
-    ],
-    pro: [
-      { title: "Magic Store", description: "Store for selling merch", url: "/store" },
-      { title: "Magic Docs", description: "Automatic MDX documentation", url: "/magic-docs" },
-      { title: "Magic Bio", description: "Link-in-bio site", url: "/bio" },
-      { title: "Once UI Blocks", description: "Copy-paste sections", url: "/blocks" },
-      { title: "Once UI for Figma", description: "Figma design system", url: "/figma" },
-    ]
-  };
-
-  const docsMenu = {
-    guides: [
-      { title: "Getting Started", description: "Begin your Once UI journey", url: "/docs/getting-started" },
-      { title: "Customization", description: "Tailor Once UI to your needs", url: "/docs/customization" },
-    ],
-    reference: [
-      { title: "Components API", description: "Complete component reference", url: "/docs/components" },
-      { title: "Theme Config", description: "Customize colors and styles", url: "/docs/theme" },
-    ]
-  };
-
-  const resourcesMenu = {
-    company: [
-      { title: "About Us", description: "Learn about our mission", url: "/about" },
-      { title: "Our Team", description: "Meet the creators", url: "/team" },
-    ],
-    updates: [
-      { title: "Changelog", description: "Latest updates and changes", url: "/changelog" },
-      { title: "Roadmap", description: "Future plans and features", url: "/roadmap" },
-      { title: "Blog", description: "News and articles", url: "/blog" },
-    ]
-  };
-
-  const PlanBadge = ({ plan }) => {
-    const getPlanStyles = () => {
-      switch (plan) {
-        case 'Free':
-          return 'bg-gray-100 text-gray-800';
-        case 'Premium':
-          return 'bg-purple-100 text-purple-800';
-        case 'Ultra':
-          return 'bg-yellow-100 text-yellow-800';
-        case 'Admin':
-          return 'bg-blue-100 text-blue-800';
-        case 'Owner':
-          return 'bg-green-100 text-green-800';
-        default:
-          return 'bg-gray-100 text-gray-800';
-      }
-    };
-  
-    return (
-      <span className={`text-xs px-2 py-1 rounded-full ${getPlanStyles()}`}>
-        {plan}
-      </span>
-    );
-  };
-
-  const ElegantButton = ({ children, onClick, variant = "primary", className = "" }) => {
-    const baseStyle = `
-      relative overflow-hidden
-      px-6 py-2.5 rounded-md
-      text-sm font-medium
-      transition-all duration-200
-      border
-      backdrop-blur-sm
-      hover:shadow-lg
-      active:scale-[0.98]
-    `;
-
-    const variants = {
-      primary: `
-        bg-white hover:bg-gray-100
-        text-gray-800
-        border-gray-200
-      `,
-      dashboard: `
-        bg-gray-100 hover:bg-gray-200
-        text-gray-800
-        border-gray-300
-      `,
-      logout: `
-        bg-red-500 hover:bg-red-600
-        text-white
-        border-red-600
-      `,
-      profile: `
-        bg-transparent hover:bg-gray-100
-        text-gray-800
-        border-transparent
-      `
-    };
-
-    return (
-      <button onClick={onClick} className={`${baseStyle} ${variants[variant]} ${className}`}>
-        <span className="relative z-10 flex items-center justify-center gap-2">
-          {children}
-        </span>
-      </button>
-    );
-  };
-
-  // Profile Icon Component with image handling
-  const ProfileIcon = () => (
-    <div 
-      className={`w-8 h-8 rounded-full flex items-center justify-center cursor-pointer transition-colors overflow-hidden ${
-        showProfileModal ? 'bg-white' : 'bg-gray-200 hover:bg-gray-300'
-      }`}
-      onClick={() => setShowProfileModal(!showProfileModal)}
-    >
-      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-      </svg>
-    </div>
-  );
 
   return (
     <>
-      {/* Profile Modal */}
-      {showProfileModal && (
-        <div className="fixed inset-0 bg-black/30 z-50 flex items-center justify-center">
-          <div 
-            ref={profileModalRef}
-            className="bg-white/95 backdrop-blur-lg rounded-xl p-6 w-full max-w-md border border-white/30"
-          >
-            <div className="flex items-start space-x-4 mb-4">
+      <motion.nav
+        initial={{ y: -100, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.8, ease: "easeOut" }}
+        className="fixed top-0 left-0 right-0 z-50 bg-neutral-950/90 backdrop-blur-xl border-b border-neutral-800/50"
+        onMouseLeave={handleMenuLeave}
+      >
+        <div className="max-w-7xl mx-auto px-6 py-4">
+          <div className="flex items-center justify-between">
+            {/* Logo Section */}
+            <motion.div 
+              className="flex items-center space-x-3 cursor-pointer"
+              whileHover={{ scale: 1.02 }}
+              transition={{ type: "spring", stiffness: 400, damping: 25 }}
+            >
               <div className="relative">
-                <div className="w-16 h-16 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                  </svg>
-                </div>
+                <motion.div 
+                  className="w-10 h-10 bg-gradient-to-br from-emerald-400 via-emerald-500 to-emerald-600 rounded-xl flex items-center justify-center font-bold text-neutral-900 shadow-2xl"
+                  whileHover={{ 
+                    rotate: [0, -10, 10, 0],
+                    scale: 1.1,
+                    boxShadow: '0 0 30px rgba(74, 222, 128, 0.6)'
+                  }}
+                  transition={{ duration: 0.6 }}
+                >
+                  FX
+                </motion.div>
+                <motion.div 
+                  className="absolute -top-1 -right-1 w-4 h-4 bg-gradient-to-r from-blue-400 to-cyan-400 rounded-full shadow-lg"
+                  animate={{ 
+                    scale: [1, 1.2, 1],
+                    opacity: [0.8, 1, 0.8] 
+                  }}
+                  transition={{ 
+                    duration: 2,
+                    repeat: Infinity,
+                    ease: "easeInOut"
+                  }}
+                />
               </div>
-              <div className="flex-1">
-                <div className="flex justify-between items-start">
-                  <div>
-                    <h3 className="text-lg font-semibold text-gray-800">{user?.displayName || 'User Name'}</h3>
-                    <p className="text-sm text-gray-500">ID: {user?.uid?.substring(0, 7) || '1234567'}</p>
-                    <div className="mt-1">
-                      <PlanBadge plan={userPlan} />
-                    </div>
-                  </div>
-                  <button 
-                    className="text-gray-500 hover:text-gray-700"
-                    onClick={goToEditProfile}
+              <span className="text-2xl font-bold bg-gradient-to-r from-white to-neutral-300 bg-clip-text text-transparent">
+                FLOXEN
+              </span>
+            </motion.div>
+
+            {/* Navigation Menu */}
+            <div className="hidden lg:flex items-center space-x-2">
+              {Object.entries(menuItems).map(([key, menu]) => (
+                <div
+                  key={key}
+                  className="relative"
+                  onMouseEnter={() => handleMenuHover(key)}
+                >
+                  <motion.button
+                    className="relative px-4 py-2 text-neutral-300 hover:text-white transition-colors duration-300 font-medium group flex items-center space-x-1 rounded-lg hover:bg-neutral-800/50"
+                    whileHover={{ y: -2 }}
+                    transition={{ type: "spring", stiffness: 400, damping: 25 }}
                   >
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                    </svg>
-                  </button>
+                    <menu.icon className="w-4 h-4" />
+                    <span>{key}</span>
+                    <motion.div
+                      animate={{ rotate: activeMenu === key ? 180 : 0 }}
+                      transition={{ duration: 0.3 }}
+                    >
+                      <ChevronDown className="w-4 h-4" />
+                    </motion.div>
+                    
+                    {/* Hover indicator */}
+                    <motion.div
+                      className="absolute -bottom-1 left-0 h-0.5 bg-gradient-to-r from-emerald-400 to-blue-400 rounded-full"
+                      initial={{ width: 0 }}
+                      whileHover={{ width: '100%' }}
+                      transition={{ duration: 0.3 }}
+                    />
+                  </motion.button>
                 </div>
-              </div>
+              ))}
             </div>
-            
-            <div className="border-t border-gray-300 my-4"></div>
-            
-            <nav className="space-y-2">
-              <button 
-                className="w-full text-left px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-100 transition-colors"
-                onClick={goToEditProfile}
-              >
-                Edit Profile
-              </button>
-              <button 
-                className="w-full text-left px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-100 transition-colors"
-                onClick={goToPurchaseHistory}
-              >
-                Purchase History
-              </button>
-              <button 
-                className="w-full text-left px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-100 transition-colors"
-                onClick={goToSupport}
-              >
-                Support
-              </button>
-              <button 
-                className="w-full text-left px-3 py-2 rounded-md text-sm font-medium text-red-600 hover:bg-red-50 transition-colors"
-                onClick={() => {
-                  setShowProfileModal(false);
-                  setShowLogoutConfirm(true);
+
+            {/* Action Buttons */}
+            <div className="flex items-center space-x-3">
+              {/* Support Button */}
+              <motion.button
+                whileHover={{ 
+                  scale: 1.05,
+                  boxShadow: '0 0 25px rgba(74, 222, 128, 0.4)'
                 }}
+                whileTap={{ scale: 0.95 }}
+                className="hidden md:flex items-center px-4 py-2 bg-neutral-800/80 hover:bg-neutral-700 text-emerald-400 rounded-xl transition-all duration-300 group border border-neutral-700 hover:border-emerald-400/50 backdrop-blur-sm"
               >
-                Log Out
-              </button>
-            </nav>
-          </div>
-        </div>
-      )}
-
-      {/* Logout Confirmation Modal */}
-      {showLogoutConfirm && (
-        <div className="fixed inset-0 bg-black/30 z-50 flex items-center justify-center">
-          <div className="bg-white/95 backdrop-blur-lg rounded-xl p-6 w-full max-w-sm border border-white/30">
-            <h3 className="text-lg font-semibold text-gray-800 mb-4">Confirm Logout</h3>
-            <p className="text-gray-600 mb-6">Are you sure you want to log out?</p>
-            <div className="flex justify-end space-x-3">
-              <button 
-                className="px-4 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-100 transition-colors"
-                onClick={() => setShowLogoutConfirm(false)}
-              >
-                Cancel
-              </button>
-              <button 
-                className="px-4 py-2 rounded-md text-sm font-medium text-white bg-red-500 hover:bg-red-600 transition-colors"
-                onClick={handleLogout}
-              >
-                Log Out
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {openNavigation && (
-        <div 
-          className="fixed inset-0 bg-black/80 z-40 lg:hidden transition-opacity duration-300"
-          onClick={toggleNavigation}
-        />
-      )}
-
-      <header 
-        ref={navRef}
-        className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${scrolled ? 'bg-white/90 backdrop-blur-sm shadow-sm' : 'bg-white'}`}
-      >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          {/* Left section */}
-          <div className="flex items-center space-x-8">
-            <a 
-              href="/" 
-              className="text-xl font-bold tracking-tight text-gray-800"
-            >
-              FLOXEN ID
-            </a>
-
-            {/* Desktop Navigation */}
-            <nav className="hidden md:flex items-center space-x-1">
-              {/* Products Menu */}
-              <div 
-                className="relative"
-                ref={productsButtonRef}
-                onMouseEnter={() => handleMenuEnter('products')}
-                onMouseLeave={handleMenuLeave}
-              >
-                <button 
-                  className={`px-4 py-2 rounded-md text-sm font-medium transition-colors duration-200 flex items-center ${
-                    activeMenu === 'products' ? 'text-gray-900' : 'text-gray-600 hover:text-gray-900'
-                  }`}
+                <motion.div
+                  animate={{ rotate: [0, 15, -15, 0] }}
+                  transition={{ duration: 2, repeat: Infinity }}
                 >
-                  Products
-                  <ChevronIcon isOpen={activeMenu === 'products'} />
-                </button>
+                  <Headphones className="w-4 h-4 mr-2" />
+                </motion.div>
+                Support
+              </motion.button>
 
-                <div 
-                  ref={productsMenuRef}
-                  className={`absolute left-0 mt-2 w-[600px] rounded-lg bg-white/95 backdrop-blur-lg border border-white/30 shadow-xl overflow-hidden transition-all duration-200 origin-top ${
-                    activeMenu === 'products' ? 'opacity-100 scale-y-100' : 'opacity-0 scale-y-95 pointer-events-none'
-                  }`}
-                  onMouseEnter={() => isHoveringRef.current = true}
-                  onMouseLeave={handleMenuLeave}
-                >
-                  <div className="p-6">
-                    <div className="grid grid-cols-2 gap-8">
-                      <div>
-                        <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-4">
-                          Open-source
-                        </h3>
-                        <ul className="space-y-3">
-                          {productsMenu.openSource.map((item, index) => (
-                            <MenuItem key={`opensource-${index}`} {...item} darkText />
-                          ))}
-                        </ul>
-                      </div>
-                      <div>
-                        <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-4">
-                          Pro
-                        </h3>
-                        <ul className="space-y-3">
-                          {productsMenu.pro.map((item, index) => (
-                            <MenuItem key={`pro-${index}`} {...item} darkText />
-                          ))}
-                        </ul>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Docs Menu */}
-              <div 
-                className="relative"
-                ref={docsButtonRef}
-                onMouseEnter={() => handleMenuEnter('docs')}
-                onMouseLeave={handleMenuLeave}
+              {/* Discord Button */}
+              <motion.button
+                whileHover={{ 
+                  scale: 1.05,
+                  boxShadow: '0 0 25px rgba(96, 165, 250, 0.4)'
+                }}
+                whileTap={{ scale: 0.95 }}
+                className="hidden md:flex items-center px-4 py-2 bg-neutral-800/80 hover:bg-neutral-700 text-blue-400 rounded-xl transition-all duration-300 group border border-neutral-700 hover:border-blue-400/50 backdrop-blur-sm"
               >
-                <button 
-                  className={`px-4 py-2 rounded-md text-sm font-medium transition-colors duration-200 flex items-center ${
-                    activeMenu === 'docs' ? 'text-gray-900' : 'text-gray-600 hover:text-gray-900'
-                  }`}
+                <motion.div
+                  whileHover={{ scale: 1.2, rotate: 15 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 25 }}
                 >
-                  Docs
-                  <ChevronIcon isOpen={activeMenu === 'docs'} />
-                </button>
+                  <MessageCircle className="w-4 h-4 mr-2" />
+                </motion.div>
+                Discord
+              </motion.button>
 
-                <div 
-                  ref={docsMenuRef}
-                  className={`absolute left-0 mt-2 w-[500px] rounded-lg bg-white/95 backdrop-blur-lg border border-white/30 shadow-xl overflow-hidden transition-all duration-200 origin-top ${
-                    activeMenu === 'docs' ? 'opacity-100 scale-y-100' : 'opacity-0 scale-y-95 pointer-events-none'
-                  }`}
-                  onMouseEnter={() => isHoveringRef.current = true}
-                  onMouseLeave={handleMenuLeave}
-                >
-                  <div className="p-6">
-                    <div className="grid grid-cols-2 gap-8">
-                      <div>
-                        <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-4">
-                          Guides
-                        </h3>
-                        <ul className="space-y-3">
-                          {docsMenu.guides.map((item, index) => (
-                            <MenuItem key={`guide-${index}`} {...item} darkText />
-                          ))}
-                        </ul>
-                      </div>
-                      <div>
-                        <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-4">
-                          Reference
-                        </h3>
-                        <ul className="space-y-3">
-                          {docsMenu.reference.map((item, index) => (
-                            <MenuItem key={`reference-${index}`} {...item} darkText />
-                          ))}
-                        </ul>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Resources Menu */}
-              <div 
-                className="relative"
-                ref={resourcesButtonRef}
-                onMouseEnter={() => handleMenuEnter('resources')}
-                onMouseLeave={handleMenuLeave}
+              {/* Sign Up Button */}
+              <motion.button
+                whileHover={{ 
+                  scale: 1.05,
+                  boxShadow: '0 0 30px rgba(74, 222, 128, 0.6)'
+                }}
+                whileTap={{ scale: 0.95 }}
+                className="relative px-6 py-2.5 bg-gradient-to-r from-emerald-400 via-emerald-500 to-emerald-600 text-neutral-900 font-semibold rounded-xl hover:from-emerald-300 hover:to-emerald-500 transition-all duration-300 group overflow-hidden shadow-lg"
               >
-                <button 
-                  className={`px-4 py-2 rounded-md text-sm font-medium transition-colors duration-200 flex items-center ${
-                    activeMenu === 'resources' ? 'text-gray-900' : 'text-gray-600 hover:text-gray-900'
-                  }`}
-                >
-                  Resources
-                  <ChevronIcon isOpen={activeMenu === 'resources'} />
-                </button>
-
-                <div 
-                  ref={resourcesMenuRef}
-                  className={`absolute left-0 mt-2 w-[500px] rounded-lg bg-white/95 backdrop-blur-lg border border-white/30 shadow-xl overflow-hidden transition-all duration-200 origin-top ${
-                    activeMenu === 'resources' ? 'opacity-100 scale-y-100' : 'opacity-0 scale-y-95 pointer-events-none'
-                  }`}
-                  onMouseEnter={() => isHoveringRef.current = true}
-                  onMouseLeave={handleMenuLeave}
-                >
-                  <div className="p-6">
-                    <div className="grid grid-cols-2 gap-8">
-                      <div>
-                        <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-4">
-                          Company
-                        </h3>
-                        <ul className="space-y-3">
-                          {resourcesMenu.company.map((item, index) => (
-                            <MenuItem key={`company-${index}`} {...item} darkText />
-                          ))}
-                        </ul>
-                      </div>
-                      <div>
-                        <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-4">
-                          Updates
-                        </h3>
-                        <ul className="space-y-3">
-                          {resourcesMenu.updates.map((item, index) => (
-                            <MenuItem key={`update-${index}`} {...item} darkText />
-                          ))}
-                        </ul>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Pricing Link */}
-              <button
-                onClick={goToPricing}
-                className={`px-4 py-2 rounded-md text-sm font-medium transition-colors duration-200 ${
-                  location.pathname === '/pricing' ? 'text-gray-900' : 'text-gray-600 hover:text-gray-900'
-                }`}
-              >
-                Pricing
-              </button>
-            </nav>
-          </div>
-
-          {/* Right section */}
-          <div className="flex items-center space-x-6">
-            <div className="flex items-center gap-2">
-              <button
-                onClick={goToSupport}
-                className="text-gray-600 hover:text-gray-900 transition-colors duration-200 hidden md:block"
-              >
-                <span className="sr-only">Support</span>
-                <SupportIcon />
-              </button>
-              <a
-                href="https://discord.gg"
-                target="_blank"
-                rel="noreferrer"
-                className="text-gray-600 hover:text-gray-900 transition-colors duration-200 hidden md:block"
-              >
-                <span className="sr-only">Discord</span>
-                <DiscordIcon />
-              </a>
-              {user && <PlanBadge plan={userPlan} />}
-            </div>
-
-            <div className="hidden lg:flex items-center gap-3">
-              {user ? (
-                <>
-                  <ElegantButton onClick={goToDashboard} variant="dashboard">
-                    Dashboard
-                  </ElegantButton>
-                  <ProfileIcon />
-                </>
-              ) : (
-                <ElegantButton onClick={goToSignUp} variant="primary">
-                  Sign Up
-                </ElegantButton>
-              )}
-            </div>
-
-            {/* Mobile menu button */}
-            <button
-              onClick={toggleNavigation}
-              className="ml-auto md:hidden p-2 rounded-md hover:bg-gray-100 transition-colors"
-            >
-              {openNavigation ? <CloseIcon /> : <MenuIcon />}
-            </button>
-          </div>
-        </div>
-
-        {/* Mobile Navigation */}
-        <nav
-          className={`${
-            openNavigation ? 'block' : 'hidden'
-          } fixed top-16 left-0 right-0 bg-white/95 backdrop-blur-lg border-t border-gray-200 md:hidden transition-all duration-200 ease-in-out`}
-          style={{
-            maxHeight: openNavigation ? 'calc(100vh - 64px)' : '0',
-            overflow: 'hidden'
-          }}
-        >
-          <div className="px-4 py-3 space-y-1">
-            <a
-              href="/products"
-              className="block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:bg-gray-100 hover:text-gray-900"
-              onClick={handleClick}
-            >
-              Products
-            </a>
-
-            <a
-              href="/docs"
-              className="block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:bg-gray-100 hover:text-gray-900"
-              onClick={handleClick}
-            >
-              Docs
-            </a>
-
-            <a
-              href="/resources"
-              className="block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:bg-gray-100 hover:text-gray-900"
-              onClick={handleClick}
-            >
-              Resources
-            </a>
-
-            <button
-              onClick={() => {
-                goToPricing();
-                handleClick();
-              }}
-              className={`w-full text-left px-3 py-2 rounded-md text-base font-medium ${
-                location.pathname === '/pricing' ? 'bg-gray-100 text-gray-900' : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
-              }`}
-            >
-              Pricing
-            </button>
-
-            <button
-              onClick={() => {
-                goToSupport();
-                handleClick();
-              }}
-              className={`w-full text-left px-3 py-2 rounded-md text-base font-medium ${
-                location.pathname === '/support' ? 'bg-gray-100 text-gray-900' : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
-              }`}
-            >
-              Support
-            </button>
-
-            <div className="pt-4 pb-2 border-t border-gray-200 flex flex-col space-y-3">
-              {user ? (
-                <>
-                  <ElegantButton 
-                    onClick={() => {
-                      goToDashboard();
-                      handleClick();
-                    }} 
-                    variant="dashboard"
-                    className="w-full"
+                <motion.div
+                  className="absolute inset-0 bg-gradient-to-r from-white/30 to-transparent"
+                  initial={{ x: '-100%', skewX: -20 }}
+                  whileHover={{ x: '100%' }}
+                  transition={{ duration: 0.8 }}
+                />
+                <span className="relative z-10 flex items-center">
+                  <motion.div
+                    whileHover={{ scale: 1.2, rotate: 360 }}
+                    transition={{ duration: 0.5 }}
                   >
-                    Dashboard
-                  </ElegantButton>
-                  <div 
-                    className="flex items-center justify-center px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:bg-gray-100 hover:text-gray-900 cursor-pointer"
-                    onClick={() => {
-                      setShowProfileModal(true);
-                      handleClick();
-                    }}
-                  >
-                    <ProfileIcon />
-                    <span className="ml-2">Profile</span>
-                  </div>
-                </>
-              ) : (
-                <ElegantButton 
-                  onClick={() => {
-                    goToSignUp();
-                    handleClick();
-                  }} 
-                  variant="primary"
-                  className="w-full"
-                >
+                    <User className="w-4 h-4 mr-2" />
+                  </motion.div>
                   Sign Up
-                </ElegantButton>
-              )}
+                </span>
+              </motion.button>
+
+              {/* Mobile Menu Button */}
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="lg:hidden p-2 text-neutral-300 hover:text-white transition-colors duration-300 rounded-lg hover:bg-neutral-800/50"
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              >
+                <motion.div
+                  animate={{ rotate: isMobileMenuOpen ? 180 : 0 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+                </motion.div>
+              </motion.button>
             </div>
           </div>
-        </nav>
-      </header>
+        </div>
+
+        {/* Mega Menu Dropdown */}
+        <AnimatePresence>
+          {activeMenu && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.3 }}
+              className="absolute top-full left-0 right-0 bg-neutral-950/95 backdrop-blur-xl border-b border-neutral-800/50 shadow-2xl"
+            >
+              <div className="max-w-7xl mx-auto px-6 py-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {menuItems[activeMenu].items.map((item, index) => (
+                    <motion.div
+                      key={item.name}
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: index * 0.1 }}
+                      className="group cursor-pointer"
+                    >
+                      <motion.div
+                        whileHover={{ 
+                          scale: 1.02,
+                          boxShadow: '0 10px 30px rgba(0, 0, 0, 0.3)'
+                        }}
+                        className="p-4 rounded-xl bg-neutral-900/50 hover:bg-neutral-800/50 border border-neutral-800/30 hover:border-neutral-700/50 transition-all duration-300 backdrop-blur-sm"
+                      >
+                        <div className="flex items-start space-x-3">
+                          <motion.div
+                            whileHover={{ scale: 1.1, rotate: 5 }}
+                            className={`w-10 h-10 rounded-lg bg-gradient-to-br ${item.color} flex items-center justify-center text-white shadow-lg`}
+                          >
+                            <item.icon className="w-5 h-5" />
+                          </motion.div>
+                          <div className="flex-1">
+                            <h3 className="font-semibold text-white group-hover:text-emerald-400 transition-colors duration-300 flex items-center">
+                              {item.name}
+                              <motion.div
+                                initial={{ opacity: 0, x: -10 }}
+                                whileHover={{ opacity: 1, x: 0 }}
+                                transition={{ duration: 0.2 }}
+                              >
+                                <ArrowRight className="w-4 h-4 ml-2" />
+                              </motion.div>
+                            </h3>
+                            <p className="text-sm text-neutral-400 mt-1 group-hover:text-neutral-300 transition-colors duration-300">
+                              {item.desc}
+                            </p>
+                          </div>
+                        </div>
+                      </motion.div>
+                    </motion.div>
+                  ))}
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </motion.nav>
+
+      {/* Mobile Menu */}
+      <AnimatePresence>
+        {isMobileMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            className="fixed inset-0 z-40 lg:hidden"
+          >
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-neutral-950/90 backdrop-blur-xl"
+              onClick={() => setIsMobileMenuOpen(false)}
+            />
+            <motion.div
+              initial={{ x: '100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '100%' }}
+              transition={{ type: "spring", stiffness: 300, damping: 30 }}
+              className="fixed top-0 right-0 w-80 h-full bg-neutral-900/95 backdrop-blur-xl shadow-2xl border-l border-neutral-800/50"
+            >
+              <div className="p-6 space-y-6 mt-20">
+                {Object.entries(menuItems).map(([key, menu]) => (
+                  <motion.div
+                    key={key}
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.1 }}
+                    className="space-y-3"
+                  >
+                    <div className="flex items-center space-x-3 text-white font-semibold">
+                      <menu.icon className="w-5 h-5" />
+                      <span>{key}</span>
+                    </div>
+                    <div className="space-y-2 ml-8">
+                      {menu.items.map((item) => (
+                        <motion.div
+                          key={item.name}
+                          whileHover={{ x: 5 }}
+                          className="flex items-center space-x-3 p-2 rounded-lg hover:bg-neutral-800/50 text-neutral-300 hover:text-white transition-all duration-200 cursor-pointer"
+                        >
+                          <item.icon className="w-4 h-4" />
+                          <span className="text-sm">{item.name}</span>
+                        </motion.div>
+                      ))}
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </>
-  );
-};
-
-// Icon Components
-const ChevronIcon = ({ isOpen }) => (
-  <svg
-    className={`ml-1 h-5 w-5 transition-transform duration-200 ${
-      isOpen ? "rotate-180" : ""
-    }`}
-    fill="none"
-    viewBox="0 0 24 24"
-    stroke="currentColor"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth={2}
-      d="M19 9l-7 7-7-7"
-    />
-  </svg>
-);
-
-const SupportIcon = () => (
-  <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z" />
-  </svg>
-);
-
-const DiscordIcon = () => (
-  <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
-    <path d="M20.317 4.37a19.791 19.791 0 00-4.885-1.515.074.074 0 00-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 00-5.487 0 12.64 12.64 0 00-.617-1.25.077.077 0 00-.079-.037A19.736 19.736 0 003.677 4.37a.07.07 0 00-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 00.031.057 19.9 19.9 0 005.993 3.03.078.078 0 00.084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 00-.041-.106 13.107 13.107 0 01-1.872-.892.077.077 0 01-.008-.128 10.2 10.2 0 00.372-.292.074.074 0 01.077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 01.078.01c.12.098.246.198.373.292a.077.077 0 01-.006.127 12.299 12.299 0 01-1.873.892.077.077 0 00-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 00.084.028 19.839 19.839 0 006.002-3.03.077.077 0 00.032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 00-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z" />
-  </svg>
-);
-
-const MenuIcon = () => (
-  <svg
-    className="h-6 w-6 text-gray-600"
-    fill="none"
-    viewBox="0 0 24 24"
-    stroke="currentColor"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth={2}
-      d="M4 6h16M4 12h16M4 18h16"
-    />
-  </svg>
-);
-
-const CloseIcon = () => (
-  <svg
-    className="h-6 w-6 text-gray-600"
-    fill="none"
-    viewBox="0 0 24 24"
-    stroke="currentColor"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth={2}
-      d="M6 18L18 6M6 6l12 12"
-    />
-  </svg>
-);
-
-const MenuItem = ({ title, description, url, darkText = false }) => {
-  return (
-    <li>
-      <a
-        href={url}
-        className={`group block rounded-md p-2 transition-colors duration-200 hover:bg-gray-100 ${
-          darkText ? 'text-gray-800' : 'text-gray-600'
-        }`}
-      >
-        <p className={`text-base font-medium group-hover:text-gray-900 ${
-          darkText ? 'text-gray-800' : 'text-gray-700'
-        }`}>
-          {title}
-        </p>
-        <p className={`mt-1 text-sm ${
-          darkText ? 'text-gray-600' : 'text-gray-500'
-        }`}>{description}</p>
-      </a>
-    </li>
   );
 };
 
