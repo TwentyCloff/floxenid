@@ -403,7 +403,7 @@ const PaymentSystem = () => {
               </div>
             )}
 
-            {/* Action Buttons */}
+            {/* Action Buttonss */}
             <div className="mt-6 space-y-3">
               <button
                 onClick={simulatePayment}
