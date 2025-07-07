@@ -94,40 +94,23 @@ const Navbar = () => {
       >
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
-            {/* Logo Section */}
+            {/* Logo Section with GIF */}
             <motion.div 
-              className="flex items-center space-x-3 cursor-pointer"
-              whileHover={{ scale: 1.02 }}
+              className="flex items-center cursor-pointer"
+              whileHover={{ scale: 1.05 }}
               transition={{ type: "spring", stiffness: 400, damping: 25 }}
             >
-              <div className="relative">
-                <motion.div 
-                  className="w-10 h-10 bg-gradient-to-br from-emerald-400 via-emerald-500 to-emerald-600 rounded-xl flex items-center justify-center font-bold text-neutral-900 shadow-2xl"
-                  whileHover={{ 
-                    rotate: [0, -10, 10, 0],
-                    scale: 1.1,
-                    boxShadow: '0 0 30px rgba(74, 222, 128, 0.6)'
-                  }}
-                  transition={{ duration: 0.6 }}
-                >
-                  FX
-                </motion.div>
-                <motion.div 
-                  className="absolute -top-1 -right-1 w-4 h-4 bg-gradient-to-r from-blue-400 to-cyan-400 rounded-full shadow-lg"
-                  animate={{ 
-                    scale: [1, 1.2, 1],
-                    opacity: [0.8, 1, 0.8] 
-                  }}
-                  transition={{ 
-                    duration: 2,
-                    repeat: Infinity,
-                    ease: "easeInOut"
-                  }}
+              <motion.div
+                className="relative overflow-hidden rounded-xl"
+                whileHover={{ scale: 1.1 }}
+                transition={{ duration: 0.3 }}
+              >
+                <img 
+                  src="https://i.imgur.com/WRJRR5G.gif"
+                  alt="Floxen Logo" 
+                  className="h-10 w-auto object-contain"
                 />
-              </div>
-              <span className="text-2xl font-bold bg-gradient-to-r from-white to-neutral-300 bg-clip-text text-transparent">
-                FLOXEN
-              </span>
+              </motion.div>
             </motion.div>
 
             {/* Navigation Menu */}
@@ -139,26 +122,57 @@ const Navbar = () => {
                   onMouseEnter={() => handleMenuHover(key)}
                 >
                   <motion.button
-                    className="relative px-4 py-2 text-neutral-300 hover:text-white transition-colors duration-300 font-medium group flex items-center space-x-1 rounded-lg hover:bg-neutral-800/50"
-                    whileHover={{ y: -2 }}
+                    className="relative px-6 py-3 text-neutral-300 hover:text-white transition-all duration-300 font-medium group flex items-center space-x-2 rounded-xl"
+                    whileHover={{ 
+                      scale: 1.05,
+                      y: -2,
+                      boxShadow: '0 10px 30px rgba(0, 0, 0, 0.3)',
+                      backgroundColor: 'rgba(38, 38, 38, 0.8)'
+                    }}
+                    whileTap={{ scale: 0.98 }}
                     transition={{ type: "spring", stiffness: 400, damping: 25 }}
                   >
-                    <menu.icon className="w-4 h-4" />
-                    <span>{key}</span>
+                    {/* Animated background glow */}
+                    <motion.div
+                      className="absolute inset-0 rounded-xl bg-gradient-to-r from-emerald-500/20 via-blue-500/20 to-purple-500/20 opacity-0"
+                      whileHover={{ opacity: 1 }}
+                      transition={{ duration: 0.3 }}
+                    />
+                    
+                    {/* Animated border */}
+                    <motion.div
+                      className="absolute inset-0 rounded-xl border border-transparent"
+                      whileHover={{ 
+                        borderColor: 'rgba(74, 222, 128, 0.4)',
+                        boxShadow: '0 0 20px rgba(74, 222, 128, 0.2)'
+                      }}
+                      transition={{ duration: 0.3 }}
+                    />
+                    
+                    {/* Icon with enhanced animation */}
+                    <motion.div
+                      whileHover={{ 
+                        scale: 1.2, 
+                        rotate: 5,
+                        color: '#4ade80'
+                      }}
+                      transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                    >
+                      <menu.icon className="w-4 h-4 relative z-10" />
+                    </motion.div>
+                    
+                    {/* Text */}
+                    <span className="relative z-10">{key}</span>
+                    
+                    {/* Chevron with smooth rotation */}
                     <motion.div
                       animate={{ rotate: activeMenu === key ? 180 : 0 }}
+                      whileHover={{ scale: 1.1 }}
                       transition={{ duration: 0.3 }}
+                      className="relative z-10"
                     >
                       <ChevronDown className="w-4 h-4" />
                     </motion.div>
-                    
-                    {/* Hover indicator */}
-                    <motion.div
-                      className="absolute -bottom-1 left-0 h-0.5 bg-gradient-to-r from-emerald-400 to-blue-400 rounded-full"
-                      initial={{ width: 0 }}
-                      whileHover={{ width: '100%' }}
-                      transition={{ duration: 0.3 }}
-                    />
                   </motion.button>
                 </div>
               ))}
