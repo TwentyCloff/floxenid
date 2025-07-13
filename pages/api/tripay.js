@@ -1,4 +1,3 @@
-// pages/api/tripay.js
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).end('Method Not Allowed');
 
@@ -18,7 +17,7 @@ export default async function handler(req, res) {
 
     res.status(200).json(response.data);
   } catch (error) {
-    console.error(error.response?.data || error.message);
+    console.error('Tripay error:', error.response?.data || error.message);
     res.status(500).json({ error: error.response?.data || error.message });
   }
 }
