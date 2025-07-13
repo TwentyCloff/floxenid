@@ -31,6 +31,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 const Navbar = () => {
   const [activeMenu, setActiveMenu] = useState(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [showDiscordConfirm, setShowDiscordConfirm] = useState(false);
 
   const menuItems = {
     Docs: {
@@ -61,13 +62,19 @@ const Navbar = () => {
 
   const handleNavigation = (path) => {
     if (path.startsWith('http')) {
-      window.open(path, '_blank');
+      if (path.includes('discord')) {
+        setShowDiscordConfirm(true);
+      } else {
+        window.open(path, '_blank');
+      }
     } else {
-      // In a real application, you would use Next.js router or React Router
-      console.log(`Navigate to: ${path}`);
-      // For demo purposes, we'll show an alert
-      alert(`Would navigate to: ${path}`);
+      window.location.href = path;
     }
+  };
+
+  const confirmDiscordNavigation = () => {
+    window.open('https://dsc.gg/floxen', '_blank');
+    setShowDiscordConfirm(false);
   };
 
   return (
@@ -522,6 +529,51 @@ const Navbar = () => {
                     </div>
                   </motion.div>
                 ))}
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Discord Confirmation Modal */}
+      <AnimatePresence>
+        {showDiscordConfirm && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-neutral-950/80 backdrop-blur-sm"
+          >
+            <motion.div
+              initial={{ scale: 0.9, y: 20 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.9, y: 20 }}
+              className="bg-neutral-900/95 border border-neutral-800 rounded-2xl p-6 max-w-md w-full mx-4"
+            >
+              <div className="flex items-center space-x-3 mb-4">
+                <MessageCircle className="w-6 h-6 text-blue-400" />
+                <h3 className="text-xl font-semibold text-white">Join Our Discord</h3>
+              </div>
+              <p className="text-neutral-400 mb-6">
+                You're about to be redirected to our Discord server. This will open in a new tab.
+              </p>
+              <div className="flex space-x-3">
+                <motion.button
+                  onClick={() => setShowDiscordConfirm(false)}
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="flex-1 px-4 py-2.5 bg-neutral-800 hover:bg-neutral-700 text-white rounded-lg transition-all duration-200 border border-neutral-700"
+                >
+                  Cancel
+                </motion.button>
+                <motion.button
+                  onClick={confirmDiscordNavigation}
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="flex-1 px-4 py-2.5 bg-blue-500 hover:bg-blue-400 text-white rounded-lg transition-all duration-200"
+                >
+                  Continue
+                </motion.button>
               </div>
             </motion.div>
           </motion.div>
