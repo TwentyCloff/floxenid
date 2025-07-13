@@ -1,49 +1,53 @@
-import React, { useState } from 'react';
-import { ShoppingBag } from 'lucide-react';
-import PaymentSystem from './Payment';
+import React from 'react';
 
 const Product = () => {
-  const [showPayment, setShowPayment] = useState(false);
-  const [selectedProduct, setSelectedProduct] = useState(null);
+  const handleBuyNow = async () => {
+    const orderData = {
+      method: 'QRIS', // bisa diganti dengan BCA, BNI, dll sesuai Tripay channel
+      merchant_ref: 'INV-' + Date.now(), // ID unik
+      amount: 10000,
+      customer_name: 'Venera',
+      customer_email: 'venera@example.com',
+      order_items: [
+        {
+          sku: 'SKU001',
+          name: 'Produk Premium',
+          price: 10000,
+          quantity: 1
+        }
+      ],
+      return_url: 'https://yourdomain.vercel.app/thanks', // optional
+      callback_url: 'https://yourdomain.vercel.app/api/callback', // optional
+      expired_time: Math.floor(Date.now() / 1000) + 86400
+    };
 
-  const product = {
-    id: 'ptht-v1',
-    name: 'PTHt v1',
-    price: 12500,
-    description: 'Auto harvesting script with advanced pathfinding and intelligent detection'
+    try {
+      const res = await fetch('/api/tripay', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(orderData)
+      });
+
+      const result = await res.json();
+
+      if (result.success) {
+        // Redirect ke halaman bayar Tripay
+        window.location.href = result.data.checkout_url;
+      } else {
+        alert('Gagal membuat transaksi: ' + result.message);
+        console.error(result);
+      }
+    } catch (err) {
+      alert('Terjadi kesalahan saat menghubungi server.');
+      console.error(err);
+    }
   };
-
-  const handleBuyNow = () => {
-    setSelectedProduct(product);
-    setShowPayment(true);
-  };
-
-  if (showPayment) {
-    return <PaymentSystem product={selectedProduct} onBack={() => setShowPayment(false)} />;
-  }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-xl shadow-lg overflow-hidden max-w-md w-full">
-        <div className="p-6">
-          <h2 className="text-2xl font-bold text-gray-800 mb-2">{product.name}</h2>
-          <p className="text-gray-600 mb-4">{product.description}</p>
-          <div className="text-3xl font-bold text-gray-900 mb-6">
-            {new Intl.NumberFormat('id-ID', {
-              style: 'currency',
-              currency: 'IDR',
-              minimumFractionDigits: 0
-            }).format(product.price)}
-          </div>
-          <button
-            onClick={handleBuyNow}
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg flex items-center justify-center space-x-2 transition-colors"
-          >
-            <ShoppingBag className="w-5 h-5" />
-            <span>Buy Now</span>
-          </button>
-        </div>
-      </div>
+    <div style={{ padding: 20 }}>
+      <h2>Produk Premium</h2>
+      <p>Harga: Rp 10.000</p>
+      <button onClick={handleBuyNow}>Beli Sekarang</button>
     </div>
   );
 };
