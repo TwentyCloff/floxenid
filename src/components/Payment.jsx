@@ -18,7 +18,7 @@ const PaymentSystem = () => {
       qris: {
         name: 'QRIS',
         icon: QrCode,
-        description: 'Scan QR Code below to pay'
+        description: 'Scan QR Code below to payy'
       },
       bank_transfer: {
         name: 'Bank Transfer',
