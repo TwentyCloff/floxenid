@@ -14,6 +14,7 @@ import Pricing from "./components/Pricing";
 import ResetPassword from "./components/ResetPassword";
 import Table from "./components/Table";
 import ButtonTest from "./components/ButtonTest";
+import Product from "./components/Product";
 import Support from "./components/Support"; // ChatUser → renamed
 import AdminSupport from "./components/AdminSupport"; // ChatAdmin → renamed
 import DashboardLayout from "./components/DashboardLayout"; // layout sidebar
@@ -57,6 +58,7 @@ const App = () => {
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/pricing" element={<Pricing />} />
         <Route path="/reset-password" element={<ResetPassword />} />
+        <Route path="/product" element={<Product />} />
 
         {/* ✅ Dashboard routes with sidebar layout */}
         <Route
