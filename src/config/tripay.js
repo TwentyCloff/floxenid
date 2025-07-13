@@ -6,5 +6,3 @@ const tripayConfig = {
   privateKey: process.env.TRIPAY_PRIVATE_KEY,
   merchantCode: process.env.TRIPAY_MERCHANT_CODE
 };
-
-export default tripayConfig;
