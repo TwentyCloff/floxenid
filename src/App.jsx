@@ -14,7 +14,6 @@ import Pricing from "./components/Pricing";
 import ResetPassword from "./components/ResetPassword";
 import Table from "./components/Table";
 import ButtonTest from "./components/ButtonTest";
-import Payment from "./components/Payment"
 import Product from "./components/Product"
 import Support from "./components/Support"; // ChatUser → renamed
 import AdminSupport from "./components/AdminSupport"; // ChatAdmin → renamed
