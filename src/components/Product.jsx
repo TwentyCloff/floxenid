@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { ShoppingBag } from 'lucide-react';
-import PaymentSystem from './payment';
+import PaymentSystem from './Payment';
 
 const Product = () => {
   const [showPayment, setShowPayment] = useState(false);
