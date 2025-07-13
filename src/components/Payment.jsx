@@ -1,74 +1,62 @@
 import React, { useState, useEffect } from 'react';
-import { Clock, CreditCard, CheckCircle, XCircle, Copy, Smartphone, Building, Wallet, AlertCircle, ArrowLeft, Zap, Sparkles, QrCode } from 'lucide-react';
+import { 
+  Clock, 
+  CreditCard, 
+  CheckCircle, 
+  XCircle, 
+  Copy, 
+  ArrowLeft,
+  Loader2
+} from 'lucide-react';
+import { 
+  createTransaction, 
+  getPaymentMethods, 
+  checkTransactionStatus 
+} from '../services/tripayService';
 
-const PaymentSystem = () => {
+const PaymentSystem = ({ product, onBack }) => {
   const [paymentStatus, setPaymentStatus] = useState('pending');
-  const [timeLeft, setTimeLeft] = useState(5 * 60); // 5 menit dalam detik
-  const [selectedMethod, setSelectedMethod] = useState('qris');
+  const [timeLeft, setTimeLeft] = useState(24 * 60 * 60); // 24 jam dalam detik
+  const [selectedMethod, setSelectedMethod] = useState(null);
+  const [paymentMethods, setPaymentMethods] = useState([]);
+  const [paymentData, setPaymentData] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
   const [copied, setCopied] = useState(false);
-  const [qrCodeUrl, setQrCodeUrl] = useState('');
-  const [paymentLink, setPaymentLink] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
 
-  const paymentData = {
-    orderId: 'ORD-' + Math.floor(Math.random() * 10000),
-    amount: 5000, // Changed to 5,000 IDR
-    description: 'Basic Product',
-    methods: {
-      qris: {
-        name: 'QRIS',
-        icon: QrCode,
-        description: 'Scan QR Code below to payy'
-      },
-      bank_transfer: {
-        name: 'Bank Transfer',
-        icon: Building,
-        account: '1234567890',
-        accountName: 'PT. Digital Solutions',
-        bank: 'Bank Central Asia (BCA)'
-      },
-      e_wallet: {
-        name: 'E-Wallet',
-        icon: Smartphone,
-        number: '081234567890',
-        name_display: 'GoPay / OVO / DANA'
-      }
-    }
-  };
-
-  // Initialize Trakteer payment
+  // Load payment methods
   useEffect(() => {
-    if (selectedMethod === 'qris' && !qrCodeUrl) {
-      createTrakteerPayment();
+    const loadPaymentMethods = async () => {
+      try {
+        const methods = await getPaymentMethods();
+        setPaymentMethods(methods);
+        if (methods.length > 0) {
+          setSelectedMethod(methods[0].code);
+        }
+      } catch (error) {
+        console.error('Error loading payment methods:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadPaymentMethods();
+  }, []);
+
+  // Create transaction when method is selected
+  useEffect(() => {
+    if (selectedMethod && product) {
+      createPaymentTransaction();
     }
   }, [selectedMethod]);
 
-  const createTrakteerPayment = async () => {
+  const createPaymentTransaction = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch('https://api.trakteer.id/v1/payment-links', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer trapi-QeOcwup0wXgvWLlcUk11jOyG'
-        },
-        body: JSON.stringify({
-          type: 'qris',
-          amount: paymentData.amount,
-          name: paymentData.description,
-          order_id: paymentData.orderId,
-          redirect_url: window.location.href,
-          callback_url: window.location.href
-        })
-      });
-
-      const data = await response.json();
-      if (data.data) {
-        setQrCodeUrl(data.data.qr_code_url);
-        setPaymentLink(data.data.payment_url);
-      }
+      const transaction = await createTransaction(product, selectedMethod);
+      setPaymentData(transaction.data);
     } catch (error) {
-      console.error('Error creating payment:', error);
+      console.error('Error creating transaction:', error);
+      setPaymentStatus('failed');
     } finally {
       setIsLoading(false);
     }
@@ -83,15 +71,35 @@ const PaymentSystem = () => {
   };
 
   const formatTime = (seconds) => {
-    const minutes = Math.floor(seconds / 60);
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
     const secs = seconds % 60;
-    return `${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
   const copyToClipboard = (text) => {
     navigator.clipboard.writeText(text);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+  };
+
+  const checkPayment = async () => {
+    setIsLoading(true);
+    try {
+      if (paymentData?.reference) {
+        const transaction = await checkTransactionStatus(paymentData.reference);
+        if (transaction.status === 'PAID') {
+          setPaymentStatus('success');
+        } else {
+          // In a real app, you might want to poll the status
+          alert('Payment not completed yet. Status: ' + transaction.status);
+        }
+      }
+    } catch (error) {
+      console.error('Error checking payment:', error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -109,78 +117,14 @@ const PaymentSystem = () => {
     }
   }, [paymentStatus, timeLeft]);
 
-  const checkPaymentStatus = async () => {
-    setIsLoading(true);
-    try {
-      // In a real implementation, you would check the payment status with Trakteer API
-      // This is just a simulation
-      setTimeout(() => {
-        setPaymentStatus('success');
-      }, 2000);
-    } catch (error) {
-      console.error('Error checking payment:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  // Enhanced Background Component
-  const EnhancedBackground = () => (
-    <div className="absolute inset-0 overflow-hidden">
-      <div className="absolute inset-0 bg-neutral-950" />
-      
-      {/* Grid Pattern */}
-      <div className="absolute inset-0 grid grid-cols-12 grid-rows-12 gap-px opacity-5 pointer-events-none">
-        {Array.from({ length: 144 }).map((_, i) => (
-          <div key={i} className="bg-neutral-800" />
-        ))}
-      </div>
-
-      {/* Animated Grid Lines */}
-      <div className="absolute inset-0 pointer-events-none">
-        {[3, 6, 9].map((row) => (
-          <div
-            key={`row-${row}`}
-            className="absolute left-0 right-0 h-px bg-gradient-to-r from-transparent via-emerald-400/20 to-transparent animate-pulse"
-            style={{ top: `${(row / 12) * 100}%` }}
-          />
-        ))}
-        {[2, 5, 8, 11].map((col) => (
-          <div
-            key={`col-${col}`}
-            className="absolute top-0 bottom-0 w-px bg-gradient-to-b from-transparent via-blue-400/20 to-transparent animate-pulse"
-            style={{ left: `${(col / 12) * 100}%` }}
-          />
-        ))}
-      </div>
-
-      {/* Floating Particles */}
-      <div className="absolute inset-0 pointer-events-none">
-        {Array.from({ length: 20 }).map((_, i) => (
-          <div
-            key={i}
-            className="absolute w-1 h-1 bg-emerald-400/40 rounded-full animate-pulse"
-            style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-              animationDelay: `${Math.random() * 4}s`,
-              animationDuration: `${2 + Math.random() * 2}s`
-            }}
-          />
-        ))}
-      </div>
-    </div>
-  );
-
   // Loading State
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center relative">
-        <EnhancedBackground />
-        <div className="relative z-10 text-center">
-          <div className="w-16 h-16 border-4 border-emerald-400 border-t-transparent rounded-full animate-spin mx-auto mb-6"></div>
-          <h2 className="text-2xl font-bold text-white mb-2">Memproses Pembayaran</h2>
-          <p className="text-neutral-400">Harap tunggu sebentar...</p>
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <Loader2 className="w-12 h-12 text-blue-500 animate-spin mx-auto mb-4" />
+          <h2 className="text-xl font-semibold text-gray-800">Loading Payment...</h2>
+          <p className="text-gray-600">Please wait a moment</p>
         </div>
       </div>
     );
@@ -189,41 +133,33 @@ const PaymentSystem = () => {
   // Success State
   if (paymentStatus === 'success') {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4 relative">
-        <EnhancedBackground />
-        <div className="relative z-10 bg-neutral-900/90 backdrop-blur-xl rounded-3xl shadow-2xl p-8 max-w-md w-full text-center border border-emerald-400/20">
-          <div className="absolute inset-0 bg-gradient-to-br from-emerald-400/10 via-transparent to-blue-400/10 rounded-3xl"></div>
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
+        <div className="bg-white rounded-xl shadow-lg p-8 max-w-md w-full text-center">
+          <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-6" />
+          <h1 className="text-2xl font-bold text-gray-800 mb-2">Payment Successful!</h1>
+          <p className="text-gray-600 mb-6">Thank you for your purchase.</p>
           
-          <div className="relative z-10">
-            <div className="mb-6">
-              <CheckCircle className="w-20 h-20 text-emerald-400 mx-auto animate-bounce" />
+          <div className="bg-gray-100 rounded-lg p-4 mb-6">
+            <div className="flex justify-between mb-2">
+              <span className="text-gray-600">Product:</span>
+              <span className="font-medium">{product.name}</span>
             </div>
-            
-            <h1 className="text-3xl font-bold text-white mb-2">Pembayaran Berhasil!</h1>
-            <p className="text-neutral-400 mb-6">Terima kasih, pembayaran Anda telah berhasil diproses.</p>
-            
-            <div className="bg-neutral-800/50 rounded-2xl p-6 mb-6 border border-neutral-700">
-              <div className="flex justify-between items-center mb-3">
-                <span className="text-neutral-400">Order ID:</span>
-                <span className="font-mono font-semibold text-white">{paymentData.orderId}</span>
-              </div>
-              <div className="flex justify-between items-center mb-3">
-                <span className="text-neutral-400">Total:</span>
-                <span className="font-bold text-xl text-emerald-400">{formatCurrency(paymentData.amount)}</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-neutral-400">Status:</span>
-                <span className="bg-emerald-400/20 text-emerald-400 px-3 py-1 rounded-full text-sm font-semibold border border-emerald-400/30">BERHASIL</span>
-              </div>
+            <div className="flex justify-between mb-2">
+              <span className="text-gray-600">Amount:</span>
+              <span className="font-bold text-green-600">{formatCurrency(product.price)}</span>
             </div>
-            
-            <button
-              onClick={() => window.location.reload()}
-              className="w-full bg-gradient-to-r from-emerald-400 to-blue-500 text-neutral-900 font-bold py-3 px-6 rounded-xl hover:from-emerald-300 hover:to-blue-400 transition-all duration-300 transform hover:scale-105 shadow-lg"
-            >
-              Kembali ke Beranda
-            </button>
+            <div className="flex justify-between">
+              <span className="text-gray-600">Status:</span>
+              <span className="bg-green-100 text-green-800 px-2 py-1 rounded text-sm font-medium">PAID</span>
+            </div>
           </div>
+          
+          <button
+            onClick={onBack}
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-6 rounded-lg transition-colors"
+          >
+            Back to Product
+          </button>
         </div>
       </div>
     );
@@ -232,41 +168,18 @@ const PaymentSystem = () => {
   // Failed State
   if (paymentStatus === 'failed') {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4 relative">
-        <EnhancedBackground />
-        <div className="relative z-10 bg-neutral-900/90 backdrop-blur-xl rounded-3xl shadow-2xl p-8 max-w-md w-full text-center border border-red-400/20">
-          <div className="absolute inset-0 bg-gradient-to-br from-red-400/10 via-transparent to-pink-400/10 rounded-3xl"></div>
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
+        <div className="bg-white rounded-xl shadow-lg p-8 max-w-md w-full text-center">
+          <XCircle className="w-16 h-16 text-red-500 mx-auto mb-6" />
+          <h1 className="text-2xl font-bold text-gray-800 mb-2">Payment Failed</h1>
+          <p className="text-gray-600 mb-6">Payment time has expired. Please try again.</p>
           
-          <div className="relative z-10">
-            <div className="mb-6">
-              <XCircle className="w-20 h-20 text-red-400 mx-auto animate-bounce" />
-            </div>
-            
-            <h1 className="text-3xl font-bold text-white mb-2">Pembayaran Gagal!</h1>
-            <p className="text-neutral-400 mb-6">Maaf, waktu pembayaran telah habis. Silakan coba lagi.</p>
-            
-            <div className="bg-neutral-800/50 rounded-2xl p-6 mb-6 border border-neutral-700">
-              <div className="flex justify-between items-center mb-3">
-                <span className="text-neutral-400">Order ID:</span>
-                <span className="font-mono font-semibold text-white">{paymentData.orderId}</span>
-              </div>
-              <div className="flex justify-between items-center mb-3">
-                <span className="text-neutral-400">Total:</span>
-                <span className="font-bold text-xl text-red-400">{formatCurrency(paymentData.amount)}</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-neutral-400">Status:</span>
-                <span className="bg-red-400/20 text-red-400 px-3 py-1 rounded-full text-sm font-semibold border border-red-400/30">GAGAL</span>
-              </div>
-            </div>
-            
-            <button
-              onClick={() => window.location.reload()}
-              className="w-full bg-gradient-to-r from-red-400 to-pink-500 text-white font-bold py-3 px-6 rounded-xl hover:from-red-300 hover:to-pink-400 transition-all duration-300 transform hover:scale-105 shadow-lg"
-            >
-              Coba Lagi
-            </button>
-          </div>
+          <button
+            onClick={onBack}
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-6 rounded-lg transition-colors"
+          >
+            Try Again
+          </button>
         </div>
       </div>
     );
@@ -274,210 +187,135 @@ const PaymentSystem = () => {
 
   // Main Payment Page
   return (
-    <div className="min-h-screen p-4 relative">
-      <EnhancedBackground />
-      
-      <div className="relative z-10 max-w-6xl mx-auto">
+    <div className="min-h-screen bg-gray-50 p-4">
+      <div className="max-w-md mx-auto bg-white rounded-xl shadow-lg overflow-hidden">
         {/* Header */}
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center px-4 py-2 rounded-full bg-neutral-900/50 border border-emerald-400/20 text-emerald-400 font-mono text-xs mb-4 backdrop-blur-md">
-            <Zap className="mr-2 h-3 w-3" />
-            SECURE PAYMENT
-          </div>
-          <h1 className="text-4xl md:text-5xl font-bold text-white mb-2">
-            <span className="bg-gradient-to-r from-emerald-400 to-blue-400 bg-clip-text text-transparent">
-              Complete Payment
-            </span>
-          </h1>
-          <p className="text-neutral-400 text-lg">Secure and fast payment processing</p>
-        </div>
-
-        {/* Alert Banner */}
-        <div className="bg-gradient-to-r from-yellow-400/20 to-orange-500/20 rounded-2xl p-6 mb-8 border border-yellow-400/30 backdrop-blur-md">
-          <div className="flex items-center justify-center">
-            <AlertCircle className="w-6 h-6 text-yellow-400 mr-3 animate-pulse" />
-            <div className="text-center">
-              <h2 className="text-xl font-bold text-yellow-400">Payment Pending</h2>
-              <p className="text-yellow-200">Complete your payment before time expires</p>
-            </div>
+        <div className="bg-blue-600 p-6 text-white">
+          <div className="flex items-center justify-between">
+            <button
+              onClick={onBack}
+              className="p-2 rounded-full hover:bg-blue-700 transition-colors"
+            >
+              <ArrowLeft className="w-5 h-5" />
+            </button>
+            <h1 className="text-xl font-bold">Complete Payment</h1>
+            <div className="w-5"></div> {/* Spacer for alignment */}
           </div>
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-8">
-          {/* Payment Summary */}
-          <div className="bg-neutral-900/50 backdrop-blur-xl rounded-2xl border border-neutral-700 p-6">
-            <h3 className="text-2xl font-bold mb-6 text-white flex items-center">
-              <Sparkles className="mr-3 h-6 w-6 text-emerald-400" />
-              Payment Summary
-            </h3>
-            
-            <div className="space-y-4 mb-6">
-              <div className="flex justify-between">
-                <span className="text-neutral-400">Order ID:</span>
-                <span className="font-mono font-semibold text-white">{paymentData.orderId}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-neutral-400">Product:</span>
-                <span className="font-semibold text-white">{paymentData.description}</span>
-              </div>
-              <div className="border-t border-neutral-700 pt-4">
-                <div className="flex justify-between items-center">
-                  <span className="text-xl font-bold text-white">Total:</span>
-                  <span className="text-2xl font-bold bg-gradient-to-r from-emerald-400 to-blue-400 bg-clip-text text-transparent">
-                    {formatCurrency(paymentData.amount)}
-                  </span>
-                </div>
-              </div>
-            </div>
+        {/* Payment Content */}
+        <div className="p-6">
+          {/* Product Info */}
+          <div className="mb-6">
+            <h2 className="text-lg font-semibold text-gray-800 mb-1">{product.name}</h2>
+            <p className="text-gray-600 mb-2">{product.description}</p>
+            <div className="text-xl font-bold text-blue-600">{formatCurrency(product.price)}</div>
+          </div>
 
-            {/* Timer */}
-            <div className="bg-gradient-to-r from-red-500/20 to-pink-500/20 rounded-xl p-4 text-center border border-red-400/30">
-              <div className="flex items-center justify-center mb-2">
-                <Clock className="w-5 h-5 mr-2 text-red-400" />
-                <span className="font-semibold text-red-400">Time Remaining:</span>
-              </div>
-              <div className="text-3xl font-mono font-bold text-red-400 animate-pulse">
-                {formatTime(timeLeft)}
-              </div>
+          {/* Timer */}
+          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
+            <div className="flex items-center justify-center mb-2">
+              <Clock className="w-5 h-5 text-yellow-600 mr-2" />
+              <span className="font-medium text-yellow-700">Time Remaining: {formatTime(timeLeft)}</span>
             </div>
           </div>
 
           {/* Payment Methods */}
-          <div className="bg-neutral-900/50 backdrop-blur-xl rounded-2xl border border-neutral-700 p-6">
-            <h3 className="text-2xl font-bold mb-6 text-white flex items-center">
-              <CreditCard className="mr-3 h-6 w-6 text-blue-400" />
+          <div className="mb-6">
+            <h3 className="flex items-center text-lg font-semibold text-gray-800 mb-4">
+              <CreditCard className="w-5 h-5 mr-2 text-blue-500" />
               Payment Methods
             </h3>
+
+            <div className="space-y-3">
+              {paymentMethods.map(method => (
+                <button
+                  key={method.code}
+                  onClick={() => setSelectedMethod(method.code)}
+                  className={`w-full p-4 rounded-lg border-2 transition-colors flex items-center ${
+                    selectedMethod === method.code
+                      ? 'border-blue-500 bg-blue-50'
+                      : 'border-gray-200 hover:border-gray-300'
+                  }`}
+                >
+                  <img 
+                    src={method.icon_url} 
+                    alt={method.name} 
+                    className="w-8 h-8 mr-3 object-contain"
+                  />
+                  <span className="font-medium">{method.name}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Payment Instructions */}
+          {paymentData && (
+            <div className="bg-gray-50 rounded-lg p-4 border border-gray-200 mb-6">
+              <h4 className="font-semibold text-gray-800 mb-3">Payment Instructions</h4>
+              
+              {paymentData.payment_method === 'QRIS' && (
+                <div className="text-center">
+                  <img 
+                    src={paymentData.qr_url} 
+                    alt="QR Code" 
+                    className="w-48 h-48 mx-auto mb-4"
+                  />
+                  <p className="text-gray-600 mb-2">Scan the QR code above to pay</p>
+                </div>
+              )}
+
+              {(paymentData.payment_method === 'Virtual Account' || 
+                paymentData.payment_method.includes('Transfer')) && (
+                <div className="space-y-3">
+                  <div>
+                    <p className="text-sm text-gray-500">Virtual Account Number:</p>
+                    <div className="flex items-center justify-between bg-white p-3 rounded border border-gray-300">
+                      <span className="font-mono font-bold">{paymentData.pay_code || paymentData.account_number}</span>
+                      <button
+                        onClick={() => copyToClipboard(paymentData.pay_code || paymentData.account_number)}
+                        className="text-blue-500 hover:text-blue-700"
+                      >
+                        <Copy className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <p className="text-sm text-gray-500">Amount:</p>
+                    <p className="font-bold">{formatCurrency(paymentData.amount)}</p>
+                  </div>
+                  
+                  <div>
+                    <p className="text-sm text-gray-500">Expired:</p>
+                    <p className="font-medium">{new Date(paymentData.expired_time * 1000).toLocaleString()}</p>
+                  </div>
+                </div>
+              )}
+
+              {copied && (
+                <div className="mt-3 text-center text-sm text-green-600">
+                  Copied to clipboard!
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Action Buttons */}
+          <div className="space-y-3">
+            <button
+              onClick={checkPayment}
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-6 rounded-lg transition-colors"
+            >
+              I Have Paid
+            </button>
             
-            {/* Method Selection */}
-            <div className="grid grid-cols-3 gap-3 mb-6">
-              {Object.entries(paymentData.methods).map(([key, method]) => {
-                const Icon = method.icon;
-                return (
-                  <button
-                    key={key}
-                    onClick={() => setSelectedMethod(key)}
-                    className={`p-4 rounded-xl border-2 transition-all duration-300 ${
-                      selectedMethod === key
-                        ? 'border-emerald-400 bg-emerald-400/10 text-emerald-400'
-                        : 'border-neutral-700 hover:border-neutral-600 text-neutral-400 hover:text-white'
-                    }`}
-                  >
-                    <Icon className="w-6 h-6 mx-auto mb-2" />
-                    <span className="text-sm font-semibold">{method.name}</span>
-                  </button>
-                );
-              })}
-            </div>
-
-            {/* Payment Details */}
-            <div className="bg-neutral-800/50 rounded-xl p-6 border border-neutral-700">
-              <h4 className="font-bold mb-4 text-white">
-                {paymentData.methods[selectedMethod].name}
-              </h4>
-              
-              {selectedMethod === 'bank_transfer' && (
-                <div className="space-y-3">
-                  <div>
-                    <label className="text-sm text-neutral-400">Bank:</label>
-                    <p className="font-semibold text-white">{paymentData.methods[selectedMethod].bank}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm text-neutral-400">Account Number:</label>
-                    <div className="flex items-center justify-between bg-neutral-700 p-3 rounded-lg border border-neutral-600">
-                      <span className="font-mono font-semibold text-white">{paymentData.methods[selectedMethod].account}</span>
-                      <button
-                        onClick={() => copyToClipboard(paymentData.methods[selectedMethod].account)}
-                        className="text-emerald-400 hover:text-emerald-300 transition-colors"
-                      >
-                        <Copy className="w-4 h-4" />
-                      </button>
-                    </div>
-                  </div>
-                  <div>
-                    <label className="text-sm text-neutral-400">Account Name:</label>
-                    <p className="font-semibold text-white">{paymentData.methods[selectedMethod].accountName}</p>
-                  </div>
-                </div>
-              )}
-
-              {selectedMethod === 'e_wallet' && (
-                <div className="space-y-3">
-                  <div>
-                    <label className="text-sm text-neutral-400">Number:</label>
-                    <div className="flex items-center justify-between bg-neutral-700 p-3 rounded-lg border border-neutral-600">
-                      <span className="font-mono font-semibold text-white">{paymentData.methods[selectedMethod].number}</span>
-                      <button
-                        onClick={() => copyToClipboard(paymentData.methods[selectedMethod].number)}
-                        className="text-emerald-400 hover:text-emerald-300 transition-colors"
-                      >
-                        <Copy className="w-4 h-4" />
-                      </button>
-                    </div>
-                  </div>
-                  <div>
-                    <label className="text-sm text-neutral-400">Platform:</label>
-                    <p className="font-semibold text-white">{paymentData.methods[selectedMethod].name_display}</p>
-                  </div>
-                </div>
-              )}
-
-              {selectedMethod === 'qris' && (
-                <div className="space-y-4 text-center">
-                  <div>
-                    <p className="text-neutral-400 mb-3">{paymentData.methods[selectedMethod].description}</p>
-                    {qrCodeUrl ? (
-                      <>
-                        <div className="bg-white p-4 rounded-lg inline-block">
-                          <img src={qrCodeUrl} alt="QR Code" className="w-48 h-48" />
-                        </div>
-                        <div className="mt-4">
-                          <a 
-                            href={paymentLink} 
-                            target="_blank" 
-                            rel="noopener noreferrer"
-                            className="text-blue-400 hover:text-blue-300 underline"
-                          >
-                            Open Payment Link
-                          </a>
-                        </div>
-                      </>
-                    ) : (
-                      <div className="w-48 h-48 bg-neutral-700 rounded-lg flex items-center justify-center mx-auto">
-                        <div className="text-center">
-                          <div className="w-12 h-12 border-4 border-emerald-400 border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
-                          <p className="text-neutral-400 text-sm">Generating QR Code...</p>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* Copy Notification */}
-            {copied && (
-              <div className="mt-4 p-3 bg-emerald-400/20 text-emerald-400 rounded-lg text-center border border-emerald-400/30">
-                ✓ Successfully copied to clipboard!
-              </div>
-            )}
-
-            {/* Action Buttons */}
-            <div className="mt-6 space-y-3">
-              <button
-                onClick={checkPaymentStatus}
-                className="w-full bg-gradient-to-r from-emerald-400 to-blue-500 text-neutral-900 font-bold py-3 px-6 rounded-xl hover:from-emerald-300 hover:to-blue-400 transition-all duration-300 transform hover:scale-105 shadow-lg"
-              >
-                I Have Paid
-              </button>
-              
-              <button
-                onClick={() => window.location.reload()}
-                className="w-full bg-neutral-800 text-white font-bold py-3 px-6 rounded-xl hover:bg-neutral-700 transition-all duration-300 border border-neutral-700"
-              >
-                Back
-              </button>
-            </div>
+            <button
+              onClick={onBack}
+              className="w-full bg-white hover:bg-gray-50 text-gray-800 font-medium py-3 px-6 rounded-lg border border-gray-300 transition-colors"
+            >
+              Cancel Payment
+            </button>
           </div>
         </div>
       </div>
