@@ -22,7 +22,7 @@ const TripayEcommerce = () => {
     {
       id: 1,
       name: 'Smartphone Premium',
-      price: 2500000,
+      price: 5000,
       image: '/api/placeholder/300/300',
       description: 'Smartphone flagship dengan kamera canggih dan performa tinggi',
       category: 'Electronics'
@@ -30,7 +30,7 @@ const TripayEcommerce = () => {
     {
       id: 2,
       name: 'Laptop Gaming',
-      price: 12000000,
+      price: 5000,
       image: '/api/placeholder/300/300',
       description: 'Laptop gaming dengan spesifikasi tinggi untuk gaming dan produktivitas',
       category: 'Electronics'
@@ -38,7 +38,7 @@ const TripayEcommerce = () => {
     {
       id: 3,
       name: 'Headphone Wireless',
-      price: 800000,
+      price: 5000,
       image: '/api/placeholder/300/300',
       description: 'Headphone wireless dengan kualitas suara premium dan noise cancellation',
       category: 'Audio'
