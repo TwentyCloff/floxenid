@@ -2756,10 +2756,10 @@ react-merge-refs@2.1.1:
   resolved "https://registry.yarnpkg.com/react-merge-refs/-/react-merge-refs-2.1.1.tgz#e46763f8f1b881c0226ee54a1a2a10ffefba0233"
   integrity sha512-jLQXJ/URln51zskhgppGJ2ub7b2WFKGq3cl3NYKtlHoTG+dN2q7EzWrn3hN3EgPsTMvpR9tpq5ijdp7YwFZkag==
 
-react-parallax-tilt@^1.7.298:
-  version "1.7.298"
-  resolved "https://registry.yarnpkg.com/react-parallax-tilt/-/react-parallax-tilt-1.7.298.tgz#d083c8eaafae691499e36554cda83484c45a2749"
-  integrity sha512-onHiUJJDJEOiqU4QP7jYQP1d1+ivFLBrCLRxTfVU/NqAhP0kOgWr9YY5ataYcK0eusltX9GGIpIDh+D9PfCfPA==
+react-parallax-tilt@^1.7.300:
+  version "1.7.300"
+  resolved "https://registry.yarnpkg.com/react-parallax-tilt/-/react-parallax-tilt-1.7.300.tgz#9cd61c96061667e8d879c8b69f0c1efb0c3a935e"
+  integrity sha512-C/+SwEVBLsY7mCMBVG9S8emo7BuA3mXMzvWvtJ07rHfy9888XYZ/464c9z4aqtdKfFYwhL2TBwb39NNUkcBa3w==
 
 react-password-strength-bar@^0.4.1:
   version "0.4.1"
