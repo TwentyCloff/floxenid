@@ -19,7 +19,7 @@
     "@splinetool/runtime": "^1.10.15",
     "@supabase/supabase-js": "^2.50.1",
     "crypto-js": "^4.2.0",
-    "dotenv": "^17.0.0",
+    "dotenv": "^17.2.0",
     "firebase": "^11.9.1",
     "framer-motion": "^12.19.1",
     "gsap": "^3.13.0",
